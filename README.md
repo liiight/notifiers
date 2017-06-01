@@ -8,7 +8,7 @@ pushover = pushover(token='TOKEN')
 pushover.notify(title='Foo', message='Bar')
 ```
 
-From CLI:
+From CLI: (gets token from environment variable, uses a default title. All can be overriden):
 ```bash
 less file.txt | notify pushover 
 ```
@@ -22,7 +22,7 @@ pip install notifiers
 
 Get a notifier:
 ```python
-pushover = notifiers.get_notifer('pushover)(token='TOKEN')
+pushover = notifiers.get_notifer('pushover')(token='TOKEN')
 ```
 Or:
 ```python
