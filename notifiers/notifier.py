@@ -1,4 +1,5 @@
-from notifiers.exceptions import MissingRequired
+from notifiers.exceptions import MissingRequired, BadArguments
+import jsonschema
 
 
 class Notifier(object):
@@ -6,24 +7,30 @@ class Notifier(object):
     method = 'post'
 
     @property
-    def schema(self):
+    def schema(self) -> dict:
         raise NotImplementedError
 
     @property
-    def arguments(self):
-        return self.schema['properties']
+    def arguments(self) -> list:
+        return self.schema['properties'].keys()
 
     @property
-    def required(self):
-        return self.arguments.get('required', [])
+    def required(self) -> list:
+        return self.schema['properties'].get('required', [])
 
-    def _send_notification(self, **kwargs):
+    def _prepare_data(self, data: dict) -> dict:
         raise NotImplementedError
 
-    def _validate_required(self, **kwargs):
-        return all(req in kwargs for req in self.required)
+    def _send_notification(self, data: dict):
+        raise NotImplementedError
 
-    def notify(self, **kwargs):
-        if not self._validate_required(**kwargs):
-            raise MissingRequired(self.required)
-        self._send_notification(**kwargs)
+    def _validate_data(self, data: dict):
+        try:
+            jsonschema.validate(data, self.schema)
+        except jsonschema.ValidationError as e:
+            raise BadArguments(e.message)
+
+    def notify(self, data: dict):
+        self._validate_data(data)
+        data = self._prepare_data(data)
+        self._send_notification(data)
