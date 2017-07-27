@@ -25,7 +25,7 @@ class Pushover(Notifier):
             'sound': {'type': 'string'},
             'retry': {'type': 'integer', 'minimum': 30},
             'expire': {'type': 'integer', 'maximum': 86400},
-            'callback': {'type': 'string'},
+            'callback': {'type': 'string', 'format': 'uri'},
             'html': {'type': 'boolean'}
         },
         'required': ['user', 'message', 'title', 'token'],
