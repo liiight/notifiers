@@ -1,4 +1,4 @@
-from notifiers.exceptions import MissingRequired, BadArguments
+from notifiers.exceptions import BadArguments
 import jsonschema
 
 
@@ -33,4 +33,4 @@ class Notifier(object):
     def notify(self, data: dict):
         self._validate_data(data)
         data = self._prepare_data(data)
-        self._send_notification(data)
+        rsp = self._send_notification(data)

@@ -8,15 +8,14 @@ from notifiers.utils.json_schema import one_or_more
 
 class Pushover(Notifier):
     base_url = 'https://api.pushover.net/1/messages.json'
-    default_token = 'aPwSHwkLcNaavShxktBpgJH4bRWc3m'
 
     schema = {
         'type': 'object',
         'properties': {
-            'user_key': one_or_more({'type': 'string'}),
+            'user': {'type': 'string'},
             'message': {'type': 'string'},
             'title': {'type': 'string'},
-            'token': {'type': 'string', 'default': default_token},
+            'token': {'type': 'string'},
             'device': one_or_more({'type': 'string'}),
             'priority': {'oneOf': [
                 {'type': 'number', 'minimum': -2, 'maximum': 2},
@@ -29,13 +28,23 @@ class Pushover(Notifier):
             'callback': {'type': 'string'},
             'html': {'type': 'boolean'}
         },
-        'required': ['user_key', 'message', 'title'],
+        'required': ['user', 'message', 'title', 'token'],
         'additionalProperties': False
     }
 
-    def _send_notification(self, data):
+    def _prepare_data(self, data: dict) -> dict:
+        device = data.get('device')
+        if device and isinstance(device, list):
+            data['device'] = ','.join(device)
+        if data.get('html'):
+            data['html'] = 1
+        return data
+
+    def _send_notification(self, data: dict):
         try:
             response = requests.post(self.base_url, data=data)
+            response.raise_for_status()
+            return response
         except requests.RequestException as e:
             if e.response is not None:
                 if e.response.status_code == 429:
