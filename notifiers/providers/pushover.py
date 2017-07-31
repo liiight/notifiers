@@ -28,7 +28,7 @@ class Pushover(Notifier):
             'callback': {'type': 'string', 'format': 'uri'},
             'html': {'type': 'boolean'}
         },
-        'required': ['user', 'message', 'title', 'token'],
+        'required': ['user', 'message', 'token'],
         'additionalProperties': False
     }
 
