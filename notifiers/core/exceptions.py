@@ -15,13 +15,12 @@ class BadArguments(NotifierException):
         super().__init__(self.message.format(validation_error=validation_error))
 
 
+class SchemaError(NotifierException):
+    message = 'Schema error: {schema_error}'
+
+    def __index__(self, schema_error):
+        super().__init__(self.message.format(schema_error=schema_error))
+
+
 class NotificationError(NotifierException):
     pass
-
-
-class MissingRequired(NotifierException):
-    message = 'The following required arguments are missing: {required}'
-
-    def __init__(self, required):
-        super(NotifierException).__init__(self.message.format(required=','.join(required)))
-        self.required = required

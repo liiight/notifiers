@@ -1,6 +1,6 @@
 import jsonschema
 
-from .exceptions import BadArguments
+from .exceptions import BadArguments, SchemaError
 
 
 class Provider(object):
@@ -24,7 +24,11 @@ class Provider(object):
 
     def _validate_data(self, data: dict):
         try:
-            jsonschema.validate(data, self.schema)
+            validator = jsonschema.Draft4Validator()
+            validator.check_schema(data)
+            validator.validate(data)
+        except jsonschema.SchemaError as e:
+            raise SchemaError(e.message)
         except jsonschema.ValidationError as e:
             raise BadArguments(e.message)
 
