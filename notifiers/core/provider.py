@@ -5,15 +5,16 @@ from .exceptions import BadArguments
 
 class Provider(object):
     base_url = None
+    provider_name = None
     schema = {}
 
     @property
     def arguments(self) -> list:
-        return self.schema['properties'].keys()
+        return list(self.schema['properties'].keys())
 
     @property
     def required(self) -> list:
-        return self.schema['properties'].get('required', [])
+        return self.schemap.get('required', [])
 
     def _prepare_data(self, data: dict) -> dict:
         raise NotImplementedError

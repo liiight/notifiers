@@ -5,9 +5,12 @@ from ..exceptions import NotificationError
 from ..provider import Provider
 from ..utils.json_schema import one_or_more
 
+__all__ = ['Pushover']
+
 
 class Pushover(Provider):
     base_url = 'https://api.pushover.net/1/messages.json'
+    provider_name = 'pushover'
 
     schema = {
         'type': 'object',
@@ -20,24 +23,21 @@ class Pushover(Provider):
             'priority': {'oneOf': [
                 {'type': 'number', 'minimum': -2, 'maximum': 2},
                 {'type': 'string'}]},
-            'url': {'type': 'string'},
+            'url': {'type': 'string', 'format': 'uri'},
             'url_title': {'type': 'string'},
             'sound': {'type': 'string'},
             'retry': {'type': 'integer', 'minimum': 30},
             'expire': {'type': 'integer', 'maximum': 86400},
             'callback': {'type': 'string', 'format': 'uri'},
-            'html': {'type': 'boolean'}
+            'html': {'type': 'integer', 'minimum': 0, 'maximum': 1}
         },
         'required': ['user', 'message', 'token'],
         'additionalProperties': False
     }
 
     def _prepare_data(self, data: dict) -> dict:
-        device = data.get('device')
-        if device and isinstance(device, list):
-            data['device'] = ','.join(device)
-        if data.get('html'):
-            data['html'] = 1
+        if isinstance(data.get('device'), list):
+            data['device'] = ','.join(data['device'])
         return data
 
     def _send_notification(self, data: dict):
