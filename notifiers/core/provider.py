@@ -14,7 +14,7 @@ class Provider(object):
 
     @property
     def required(self) -> list:
-        return self.schemap.get('required', [])
+        return self.schema.get('required', [])
 
     def _prepare_data(self, data: dict) -> dict:
         raise NotImplementedError
