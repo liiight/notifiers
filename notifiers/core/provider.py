@@ -1,5 +1,6 @@
-from notifiers.exceptions import BadArguments
 import jsonschema
+
+from .exceptions import BadArguments
 
 
 class Provider(object):

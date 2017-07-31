@@ -1,9 +1,9 @@
 import maya
 import requests
 
-from notifiers.exceptions import NotificationError
-from notifiers.provider import Provider
-from notifiers.utils.json_schema import one_or_more
+from ..exceptions import NotificationError
+from ..provider import Provider
+from ..utils.json_schema import one_or_more
 
 
 class Pushover(Provider):
