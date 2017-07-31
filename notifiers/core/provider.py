@@ -35,4 +35,4 @@ class Provider(object):
     def notify(self, **kwargs: dict):
         self._validate_data(kwargs)
         data = self._prepare_data(kwargs)
-        rsp = self._send_notification(data)
+        return self._send_notification(data)
