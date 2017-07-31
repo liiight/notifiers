@@ -1,4 +1,5 @@
-import maya
+import datetime
+
 import requests
 
 from ..exceptions import NotificationError
@@ -48,7 +49,8 @@ class Pushover(Provider):
         except requests.RequestException as e:
             if e.response is not None:
                 if e.response.status_code == 429:
-                    reset_time = maya.parse(e.response.headers['X-Limit-App-Reset']).iso8601()
+                    reset_time = datetime.datetime.fromtimestamp(
+                        int(e.response.headers['X-Limit-App-Reset'])).strftime('%Y-%m-%d %H:%M:%S')
                     error_message = f'Monthly pushover message limit reached. Next reset: {reset_time}'
                 else:
                     error_message = e.response.json()['errors'][0]
