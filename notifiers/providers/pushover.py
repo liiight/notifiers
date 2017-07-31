@@ -2,11 +2,11 @@ import maya
 import requests
 
 from notifiers.exceptions import NotificationError
-from notifiers.notifier import Notifier
+from notifiers.provider import Provider
 from notifiers.utils.json_schema import one_or_more
 
 
-class Pushover(Notifier):
+class Pushover(Provider):
     base_url = 'https://api.pushover.net/1/messages.json'
 
     schema = {

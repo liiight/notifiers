@@ -2,13 +2,9 @@ from notifiers.exceptions import BadArguments
 import jsonschema
 
 
-class Notifier(object):
+class Provider(object):
     base_url = None
-    method = 'post'
-
-    @property
-    def schema(self) -> dict:
-        raise NotImplementedError
+    schema = {}
 
     @property
     def arguments(self) -> list:
@@ -30,7 +26,7 @@ class Notifier(object):
         except jsonschema.ValidationError as e:
             raise BadArguments(e.message)
 
-    def notify(self, data: dict):
-        self._validate_data(data)
-        data = self._prepare_data(data)
+    def notify(self, **kwargs: dict):
+        self._validate_data(kwargs)
+        data = self._prepare_data(kwargs)
         rsp = self._send_notification(data)
