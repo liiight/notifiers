@@ -8,6 +8,9 @@ class Provider(object):
     provider_name = None
     schema = {}
 
+    def __repr__(self):
+        return f'<Notifier: {self.provider_name.capitalize()}>'
+
     @property
     def arguments(self) -> list:
         return list(self.schema['properties'].keys())
