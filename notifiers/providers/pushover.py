@@ -2,11 +2,8 @@ import datetime
 
 import requests
 
-from ..exceptions import NotificationError
-from ..provider import Provider
+from ..core import Provider, NotificationResponse
 from ..utils.json_schema import one_or_more
-
-__all__ = ['Pushover']
 
 
 class Pushover(Provider):
@@ -42,18 +39,27 @@ class Pushover(Provider):
         return data
 
     def _send_notification(self, data):
+        status = 'Success'
+        errors = []
+        response = None
         try:
             response = requests.post(self.base_url, data=data)
             response.raise_for_status()
-            return response
         except requests.RequestException as e:
+            status = 'Failure'
             if e.response is not None:
-                if e.response.status_code == 429:
+                response = e.response
+                if response.status_code == 429:
                     reset_time = datetime.datetime.fromtimestamp(
-                        int(e.response.headers['X-Limit-App-Reset'])).strftime('%Y-%m-%d %H:%M:%S')
-                    error_message = f'Monthly pushover message limit reached. Next reset: {reset_time}'
+                        int(response.headers['X-Limit-App-Reset'])).strftime('%Y-%m-%d %H:%M:%S')
+                    errors.append(f'Monthly pushover message limit reached. Next reset: {reset_time}')
                 else:
-                    error_message = e.response.json()['errors'][0]
+                    errors = response.json()['errors']
             else:
-                error_message = str(e)
-            raise NotificationError(error_message)
+                errors.append(str(e))
+        finally:
+            return NotificationResponse(status=status,
+                                        provider=self.provider_name,
+                                        data=data,
+                                        response=response,
+                                        errors=errors)
