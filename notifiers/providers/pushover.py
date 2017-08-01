@@ -1,7 +1,7 @@
 import requests
 
 from ..core import Provider, NotificationResponse
-from ..utils.json_schema import one_or_more
+from ..utils.json_schema import one_or_more, list_to_commas
 
 
 class Pushover(Provider):
@@ -11,8 +11,8 @@ class Pushover(Provider):
     schema = {
         'type': 'object',
         'properties': {
-            'user': {'type': 'string',
-                     'title': 'the user/group key (not e-mail address) of your user (or you)'},
+            'user': one_or_more({'type': 'string',
+                                 'title': 'the user/group key (not e-mail address) of your user (or you)'}),
             'message': {'type': 'string',
                         'title': 'your message'},
             'title': {'type': 'string',
@@ -59,8 +59,9 @@ class Pushover(Provider):
     }
 
     def _prepare_data(self, data):
-        if isinstance(data.get('device'), list):
-            data['device'] = ','.join(data['device'])
+        data['user'] = list_to_commas(data['user'])
+        if data.get('device'):
+            data['device'] = list_to_commas(data['device'])
         return data
 
     def _send_notification(self, data):
