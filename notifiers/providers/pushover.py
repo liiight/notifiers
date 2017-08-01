@@ -49,12 +49,7 @@ class Pushover(Provider):
             status = 'Failure'
             if e.response is not None:
                 response = e.response
-                if response.status_code == 429:
-                    reset_time = datetime.datetime.fromtimestamp(
-                        int(response.headers['X-Limit-App-Reset'])).strftime('%Y-%m-%d %H:%M:%S')
-                    errors.append(f'Monthly pushover message limit reached. Next reset: {reset_time}')
-                else:
-                    errors = response.json()['errors']
+                errors = response.json()['errors']
             else:
                 errors.append(str(e))
         finally:
