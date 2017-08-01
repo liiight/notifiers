@@ -17,7 +17,7 @@ pytz==2017.2              # via dateparser, maya, tzlocal
 pytzdata==2017.2          # via pendulum
 regex==2017.07.28          # via dateparser
 requests==2.18.2
-ruamel.yaml==0.15.21      # via dateparser, maya
+ruamel.yaml==0.15.22      # via dateparser, maya
 six==1.10.0               # via python-dateutil
 tzlocal==1.4              # via dateparser, maya, pendulum
 urllib3==1.22             # via requests
