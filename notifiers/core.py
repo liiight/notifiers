@@ -3,8 +3,9 @@ import requests
 
 from notifiers.exceptions import NotificationError
 from .exceptions import SchemaError, BadArguments
+from .providers import _all_providers
 
-__all__ = ['get_notifier', 'Provider', 'NotificationResponse']
+__all__ = ['get_notifier', 'Provider', 'NotificationResponse', 'providers']
 
 
 class NotificationResponse(object):
@@ -62,5 +63,8 @@ class Provider(object):
 
 
 def get_notifier(provider_name: str) -> Provider:
-    from .providers import all_providers
-    return all_providers.get(provider_name)()
+    return _all_providers.get(provider_name)()
+
+
+def providers() -> list:
+    return list(_all_providers.keys())
