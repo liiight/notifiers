@@ -3,7 +3,7 @@ import requests
 
 from .exceptions import SchemaError, BadArguments, NotificationError
 
-__all__ = ['get_notifier', 'Provider', 'NotificationResponse', 'providers']
+__all__ = ['get_notifier', 'Provider', 'NotificationResponse', 'all_providers']
 
 
 class NotificationResponse(object):
