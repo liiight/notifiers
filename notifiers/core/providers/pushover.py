@@ -36,12 +36,12 @@ class Pushover(Provider):
         'additionalProperties': False
     }
 
-    def _prepare_data(self, data: dict) -> dict:
+    def _prepare_data(self, data):
         if isinstance(data.get('device'), list):
             data['device'] = ','.join(data['device'])
         return data
 
-    def _send_notification(self, data: dict):
+    def _send_notification(self, data):
         try:
             response = requests.post(self.base_url, data=data)
             response.raise_for_status()

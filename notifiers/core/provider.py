@@ -9,11 +9,11 @@ class Provider(object):
     schema = {}
 
     def __repr__(self):
-        return f'<Notifier: {self.provider_name.capitalize()}>'
+        return f'<Notifier:[{self.provider_name.capitalize()}]>'
 
     @property
     def arguments(self) -> list:
-        return list(self.schema['properties'].keys())
+        return dict(self.schema['properties'].items())
 
     @property
     def required(self) -> list:
