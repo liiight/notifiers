@@ -69,5 +69,5 @@ def get_notifier(provider_name: str) -> Provider:
     return _all_providers.get(provider_name)()
 
 
-def providers() -> list:
+def all_providers() -> list:
     return list(_all_providers.keys())
