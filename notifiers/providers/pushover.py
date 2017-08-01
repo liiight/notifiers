@@ -1,5 +1,3 @@
-import datetime
-
 import requests
 
 from ..core import Provider, NotificationResponse
