@@ -1,5 +1,6 @@
 import requests
 
+from notifiers.exceptions import NotificationError
 from ..core import Provider, NotificationResponse
 from ..utils.json_schema import one_or_more, list_to_commas
 
@@ -8,6 +9,7 @@ class Pushover(Provider):
     base_url = 'https://api.pushover.net/1/messages.json'
     site_url = 'https://pushover.net/'
     provider_name = 'pushover'
+    sounds_url = 'https://api.pushover.net/1/sounds.json?token={}'
 
     schema = {
         'type': 'object',
@@ -85,3 +87,15 @@ class Pushover(Provider):
                                         data=data,
                                         response=response,
                                         errors=errors)
+
+    def sounds(self, token):
+        url = self.sounds_url.format(token)
+        try:
+            response = requests.get(url)
+            response.raise_for_status()
+            return response.json()
+        except requests.RequestException as e:
+            errors = []
+            if e.response is not None:
+                errors = e.response.json()['errors']
+            raise NotificationError(provider=self.provider_name, message='Could not retrieve sounds', errors=errors)

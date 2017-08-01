@@ -12,15 +12,18 @@ class NotifierException(Exception):
 
 class BadArguments(NotifierException):
     def __init__(self, validation_error, *args, **kwargs):
-        super().__init__(message=f'Error with sent data: {validation_error}', *args, **kwargs)
+        kwargs['message'] = f'Error with sent data: {validation_error}'
+        super().__init__(*args, **kwargs)
 
 
 class SchemaError(NotifierException):
     def __init__(self, schema_error, *args, **kwargs):
-        super().__init__(message=f'Schema error: {schema_error}', *args, **kwargs)
+        kwargs['message'] = f'Schema error: {schema_error}'
+        super().__init__(*args, **kwargs)
 
 
 class NotificationError(NotifierException):
     def __init__(self, *args, **kwargs):
         self.errors = kwargs.pop('errors', None)
-        super().__init__(message=f'Notification errors: {",".join(self.errors)}', *args, **kwargs)
+        kwargs['message'] = f'Notification errors: {",".join(self.errors)}'
+        super().__init__(*args, **kwargs)
