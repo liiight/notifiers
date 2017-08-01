@@ -1,8 +1,7 @@
 import jsonschema
 import requests
 
-from notifiers.exceptions import NotificationError
-from .exceptions import SchemaError, BadArguments
+from .exceptions import SchemaError, BadArguments, NotificationError
 
 __all__ = ['get_notifier', 'Provider', 'NotificationResponse', 'providers']
 
@@ -24,12 +23,21 @@ class NotificationResponse(object):
 
 
 class Provider(object):
-    base_url = None
-    provider_name = None
+    base_url = ''
+    site_url = ''
+    provider_name = ''
     schema = {}
 
     def __repr__(self):
         return f'<Notifier:[{self.provider_name.capitalize()}]>'
+
+    @property
+    def metadata(self) -> dict:
+        return {
+            'base_url': self.base_url,
+            'site_url': self.site_url,
+            'provider_name': self.provider_name
+        }
 
     @property
     def arguments(self) -> dict:

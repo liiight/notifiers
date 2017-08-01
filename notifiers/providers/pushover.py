@@ -6,6 +6,7 @@ from ..utils.json_schema import one_or_more, list_to_commas
 
 class Pushover(Provider):
     base_url = 'https://api.pushover.net/1/messages.json'
+    site_url = 'https://pushover.net/'
     provider_name = 'pushover'
 
     schema = {
