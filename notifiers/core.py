@@ -3,7 +3,6 @@ import requests
 
 from notifiers.exceptions import NotificationError
 from .exceptions import SchemaError, BadArguments
-from .providers import _all_providers
 
 __all__ = ['get_notifier', 'Provider', 'NotificationResponse', 'providers']
 
@@ -60,6 +59,10 @@ class Provider(object):
         self._validate_data(kwargs)
         data = self._prepare_data(kwargs)
         return self._send_notification(data)
+
+
+# Avoid circular dependency
+from .providers import _all_providers
 
 
 def get_notifier(provider_name: str) -> Provider:
