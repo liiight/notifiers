@@ -4,7 +4,7 @@
 #
 #    pip-compile --output-file requirements.txt requirements.in
 #
-certifi==2017.4.17        # via requests
+certifi==2017.7.27.1        # via requests
 chardet==3.0.4            # via requests
 dateparser==0.6.0         # via maya
 humanize==0.5.1           # via maya
