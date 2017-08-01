@@ -61,7 +61,7 @@ class Provider(object):
         return self._send_notification(data)
 
 
-# Avoid circular dependency
+# Avoid premature import
 from .providers import _all_providers
 
 
