@@ -20,14 +20,14 @@ class NotificationResponse(object):
             raise NotificationError(provider=self.provider, data=self.data, errors=self.errors)
 
 
-class Provider(object):
+class NotificationProvider(object):
     base_url = ''
     site_url = ''
     provider_name = ''
     schema = {}
 
     def __repr__(self):
-        return f'<Notifier:[{self.provider_name.capitalize()}]>'
+        return f'<NotificationProvider:[{self.provider_name.capitalize()}]>'
 
     @property
     def metadata(self) -> dict:
@@ -71,7 +71,7 @@ class Provider(object):
 from .providers import _all_providers
 
 
-def get_notifier(provider_name: str) -> Provider:
+def get_notifier(provider_name: str) -> NotificationProvider:
     return _all_providers.get(provider_name)()
 
 

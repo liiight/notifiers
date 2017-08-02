@@ -1,11 +1,11 @@
 import requests
 
-from notifiers.exceptions import NotificationError
-from ..core import Provider, NotificationResponse
+from ..exceptions import NotificationError
+from ..core import NotificationProvider, NotificationResponse
 from ..utils.json_schema import one_or_more, list_to_commas
 
 
-class Pushover(Provider):
+class Pushover(NotificationProvider):
     base_url = 'https://api.pushover.net/1/messages.json'
     site_url = 'https://pushover.net/'
     provider_name = 'pushover'
