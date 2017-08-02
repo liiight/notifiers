@@ -9,11 +9,6 @@ pushover = notifiers.get_notifer('pushover')
 pushover.notify(title='Foo', message='Bar', token='TOKEN')
 ```
 
-From CLI: (gets token from environment variable, uses a default title. All can be overridden):
-```bash
-less file.txt | notify pushover 
-```
-
 ## Setup
 ```
 pip install notifiers
@@ -27,12 +22,12 @@ pushover = notifiers.get_notifer('pushover')
 ```
 Or:
 ```python
-pushover = notifiers.providers.Pushover
+pushover = notifiers.providers.Pushover()
 ```
 
 Send a notification:
 ```python
-resp = pushover.notify(token='TOKEN', title='Foo', message='Bar')
+pushover.notify(token='TOKEN', title='Foo', message='Bar')
 ```
 
 Get notifier metadata:
@@ -44,3 +39,11 @@ print(pushover.metadata)
     "description": "A Great notifier!"
     ..
 }
+```
+
+## In the near future
+
+- Many more notifiers
+- CLI
+- Environment variable support
+- Docs
