@@ -6,9 +6,9 @@ python:
 # command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
 install:
   - pip install --upgrade pip setuptools
+  - pip install -e .
   - pip install -r requirements.txt
   - pip install -r dev-requirements.txt
-  - pip install codecov
 # command to run tests, e.g. python setup.py test
 script: pytest
 after_success:
