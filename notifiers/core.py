@@ -46,20 +46,20 @@ class NotificationProvider(object):
         return self.schema.get('required', [])
 
     def _prepare_data(self, data: dict) -> dict:
-        raise NotImplementedError
+        return
 
     def _send_notification(self, data: dict):
         raise NotImplementedError
 
     def _validate_data(self, data: dict):
         try:
-            validator = jsonschema.Draft4Validator(data)
-            validator.check_schema(data)
+            validator = jsonschema.Draft4Validator(self.schema)
+            validator.check_schema(self.schema)
             validator.validate(data)
         except jsonschema.SchemaError as e:
-            raise SchemaError(e.message)
+            raise SchemaError(schema_error=e.message, provider=self.provider_name, data=self.schema)
         except jsonschema.ValidationError as e:
-            raise BadArguments(e.message)
+            raise BadArguments(validation_error=e.message, provider=self.provider_name, data=data)
 
     def notify(self, **kwargs: dict) -> NotificationResponse:
         self._validate_data(kwargs)
