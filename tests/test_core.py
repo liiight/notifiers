@@ -57,6 +57,7 @@ class TestCore(object):
         assert isinstance(rsp, NotificationResponse)
         assert not rsp.errors
         assert rsp.raise_on_errors() is None
+        assert repr(p) == '<NotificationProvider:[Mock_provider]>'
 
     @pytest.mark.parametrize('data', [
         pytest.param({'not_required': 'foo'}, id='Missing required'),
