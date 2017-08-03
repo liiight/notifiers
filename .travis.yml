@@ -11,4 +11,5 @@ install:
   - pip install -r dev-requirements.txt
 # command to run tests, e.g. python setup.py test
 script: pytest --cov=./
-
+after_success:
+  codecov
