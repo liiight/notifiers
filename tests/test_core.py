@@ -1,8 +1,8 @@
 import pytest
 
-from ..notifiers.core import NotificationProvider, NotificationResponse
-from ..notifiers.exceptions import BadArguments, SchemaError
-from ..notifiers.utils.json_schema import one_or_more, list_to_commas
+from notifiers.core import NotificationProvider, NotificationResponse
+from notifiers.exceptions import BadArguments, SchemaError
+from notifiers.utils.json_schema import one_or_more, list_to_commas
 
 
 @pytest.fixture
