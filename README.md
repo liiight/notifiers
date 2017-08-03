@@ -1,6 +1,8 @@
 # Notifiers
 Generic way to use notification services
 
+[![travis](https://api.travis-ci.org/liiight/notifiers.png?branch=master)](https://travis-ci.org/liiight/notifiers)
+
 From python:
 ```python
 import notifiers
