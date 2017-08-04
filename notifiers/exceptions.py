@@ -6,8 +6,10 @@ class NotifierException(Exception):
         self.message = kwargs.pop('message', None)
         self.data = kwargs.pop('data', None)
 
-    def __str__(self):
-        return f'{self.message}'
+    def __repr__(self):
+        return f'<NotificationError: {self.message}>'
+
+    __str__ = __repr__
 
 
 class BadArguments(NotifierException):

@@ -2,36 +2,6 @@ import pytest
 
 from notifiers.core import NotificationProvider, NotificationResponse
 from notifiers.exceptions import BadArguments, SchemaError, NotificationError
-from notifiers.utils.json_schema import one_or_more, list_to_commas
-
-
-@pytest.fixture
-def mock_provider() -> NotificationProvider:
-    class MockProvider(NotificationProvider):
-        base_url = 'https://api.mock.com'
-        schema = {
-            'type': 'object',
-            'properties': {
-                'not_required': one_or_more({'type': 'string'}),
-                'required': {'type': 'string'}
-            },
-            'required': ['required'],
-            'additionalProperties': False
-        }
-        site_url = 'https://www.mock.com'
-        provider_name = 'mock_provider'
-
-        def _send_notification(self, data: dict):
-            return NotificationResponse(status='success', provider=self.provider_name, data=data)
-
-        def _prepare_data(self, data: dict):
-            if data.get('not_required'):
-                data['not_required'] = list_to_commas(data['not_required'])
-            return data
-
-    from notifiers.providers import _all_providers
-    _all_providers['mock'] = MockProvider
-    return MockProvider
 
 
 class TestCore(object):
@@ -59,6 +29,7 @@ class TestCore(object):
         assert isinstance(rsp, NotificationResponse)
         assert not rsp.errors
         assert rsp.raise_on_errors() is None
+        assert repr(rsp) == '<NotificationResponse,Mock_provider,status=success>'
         assert repr(p) == '<NotificationProvider:[Mock_provider]>'
 
     @pytest.mark.parametrize('data', [
@@ -104,7 +75,13 @@ class TestCore(object):
         with pytest.raises(NotificationError) as e:
             rsp.raise_on_errors()
 
+        assert repr(e.value) == '<NotificationError: Notification errors: an error>'
         assert e.value.errors == ['an error']
         assert e.value.data == {'not_required': 'foo,bar', 'required': 'foo'}
         assert e.value.message == 'Notification errors: an error'
         assert e.value.provider == p.provider_name
+
+    def test_bad_integration(self, bad_provider):
+        p = bad_provider()
+        with pytest.raises(NotImplementedError):
+            p.notify(**self.valid_data)
