@@ -1,7 +1,8 @@
 # Notifiers
 Generic way to use notification services
 
-[![travis](https://api.travis-ci.org/liiight/notifiers.png?branch=master)](https://travis-ci.org/liiight/notifiers)
+[![travis](https://api.travis-ci.org/liiight/notifiers.png?branch=master)](https://travis-ci.org/liiight/notifiers)  [![codecov](https://codecov.io/gh/liiight/notifiers/branch/master/graph/badge.svg)](https://codecov.io/gh/liiight/notifiers)
+
 
 From python:
 ```python
