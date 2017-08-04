@@ -45,7 +45,11 @@ print(pushover.metadata)
 
 ## In the near future
 
-- Many more notifiers
+- Many more providers
 - CLI
 - Environment variable support
 - Docs
+
+### Why python 3 only?
+
+I wanted to avoid the whole unicode issue fiasco if possible, but there's not real constraint in adding python 2 support. If there's an overwhelming desire for this, i'll do it. Probably. 

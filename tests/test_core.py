@@ -1,7 +1,7 @@
 import pytest
 
 from notifiers.core import NotificationProvider, NotificationResponse
-from notifiers.exceptions import BadArguments, SchemaError
+from notifiers.exceptions import BadArguments, SchemaError, NotificationError
 from notifiers.utils.json_schema import one_or_more, list_to_commas
 
 
@@ -29,6 +29,8 @@ def mock_provider() -> NotificationProvider:
                 data['not_required'] = list_to_commas(data['not_required'])
             return data
 
+    from notifiers.providers import _all_providers
+    _all_providers['mock'] = MockProvider
     return MockProvider
 
 
@@ -82,3 +84,27 @@ class TestCore(object):
         rsp = p.notify(**self.valid_data)
         assert rsp.data == {'not_required': 'foo,bar',
                             'required': 'foo'}
+
+    def test_get_notifier(self, mock_provider):
+        from notifiers import get_notifier
+        p = get_notifier('mock')
+        assert p
+        assert isinstance(p, NotificationProvider)
+
+    def test_all_providers(self, mock_provider):
+        from notifiers import all_providers
+        assert 'mock' in all_providers()
+
+    def test_error_response(self, mock_provider):
+        p = mock_provider()
+        rsp = p.notify(**self.valid_data)
+        rsp.errors = ['an error']
+        rsp.status = 'fail'
+
+        with pytest.raises(NotificationError) as e:
+            rsp.raise_on_errors()
+
+        assert e.value.errors == ['an error']
+        assert e.value.data == {'not_required': 'foo,bar', 'required': 'foo'}
+        assert e.value.message == 'Notification errors: an error'
+        assert e.value.provider == p.provider_name
