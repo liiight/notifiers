@@ -2,7 +2,7 @@
 
 The easiest way to send push notifications!
 
-[![travis](https://img.shields.io/travis/liiight/notifiers/master.svg)](https://travis-ci.org/liiight/notifiers)  [![codecov](https://codecov.io/gh/liiight/notifiers/branch/master/graph/badge.svg)](https://codecov.io/gh/liiight/notifiers)  [![Join the chat at https://gitter.im/notifiers/Lobby](https://badges.gitter.im/notifiers/notifiers.svg)](https://gitter.im/notifiers/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![travis](https://img.shields.io/travis/liiight/notifiers/master.svg)](https://travis-ci.org/liiight/notifiers)  [![codecov](https://codecov.io/gh/liiight/notifiers/branch/master/graph/badge.svg)](https://codecov.io/gh/liiight/notifiers)  [![Join the chat at https://gitter.im/notifiers/Lobby](https://badges.gitter.im/notifiers/notifiers.svg)](https://gitter.im/notifiers/notifiers?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 
 From python:
