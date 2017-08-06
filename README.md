@@ -1,4 +1,6 @@
 # Notifiers
+
+[![Join the chat at https://gitter.im/notifiers/Lobby](https://badges.gitter.im/notifiers/Lobby.svg)](https://gitter.im/notifiers/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 Generic way to use notification services
 
 [![travis](https://api.travis-ci.org/liiight/notifiers.png?branch=master)](https://travis-ci.org/liiight/notifiers)  [![codecov](https://codecov.io/gh/liiight/notifiers/branch/master/graph/badge.svg)](https://codecov.io/gh/liiight/notifiers)
