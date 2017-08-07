@@ -7,10 +7,11 @@ The easiest way to send push notifications!
 
 From python:
 ```python
-import notifiers
+>>> from notifiers import get_notifier
 
-pushover = notifiers.get_notifer('pushover')
-pushover.notify(title='Foo', message='Bar', token='TOKEN')
+>>> pushover = get_notifer('pushover')
+>>> pushover.notify(title='Foo', message='Bar', token='TOKEN')
+
 ```
 
 ## Setup
