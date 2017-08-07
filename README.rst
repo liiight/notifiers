@@ -3,13 +3,13 @@ Notifiers
 
 The easiest way to send push notifications!
 
-.. |travis| image:: https://img.shields.io/travis/liiight/notifiers/master.svg
+.. image:: https://img.shields.io/travis/liiight/notifiers/master.svg
 :target: https://travis-ci.org/liiight/notifiers
 
-.. |codecov| image:: https://codecov.io/gh/liiight/notifiers/branch/master/graph/badge.svg
+.. image:: https://codecov.io/gh/liiight/notifiers/branch/master/graph/badge.svg
 :target: https://codecov.io/gh/liiight/notifiers
 
-.. |gitter| image:: https://img.shields.io/gitter/room/nwjs/nw.js.svg
+.. image:: https://img.shields.io/gitter/room/nwjs/nw.js.svg
 :target: https://gitter.im/notifiers/notifiers
 
 
