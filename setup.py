@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='notifiers',
-    version='0.1',
+    version='0.2',
     packages=['notifiers', 'notifiers.providers'],
     url='https://github.com/liiight/notifiers',
     license='MIT',
