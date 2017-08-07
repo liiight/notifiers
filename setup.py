@@ -4,7 +4,7 @@ from distutils.core import setup
 
 from setuptools import find_packages
 
-with io.open('README.md', encoding='utf-8') as readme:
+with io.open('README.rst', encoding='utf-8') as readme:
     long_description = readme.read()
 
 # Populates __version__ without importing the package
