@@ -4,13 +4,13 @@ Notifiers
 The easiest way to send push notifications!
 
 .. image:: https://img.shields.io/travis/liiight/notifiers/master.svg
-:target: https://travis-ci.org/liiight/notifiers
+    :target: https://travis-ci.org/liiight/notifiers
 
 .. image:: https://codecov.io/gh/liiight/notifiers/branch/master/graph/badge.svg
-:target: https://codecov.io/gh/liiight/notifiers
+    :target: https://codecov.io/gh/liiight/notifiers
 
 .. image:: https://img.shields.io/gitter/room/nwjs/nw.js.svg
-:target: https://gitter.im/notifiers/notifiers
+    :target: https://gitter.im/notifiers/notifiers
 
 
 From python:
