@@ -24,8 +24,9 @@ class Pushover(NotificationProvider):
                           'title': 'your message\'s title, otherwise your app\'s name is used'},
                 'token': {'type': 'string',
                           'title': 'your application\'s API token'},
-                'device': one_or_more({'type': 'string',
-                                       'title': 'your user\'s device name to send the message directly to that device'}),
+                'device': one_or_more(
+                    {'type': 'string',
+                     'title': 'your user\'s device name to send the message directly to that device'}),
                 'priority': {'oneOf': [
                     {'type': 'number', 'minimum': -2, 'maximum': 2},
                     {'type': 'string'}],
