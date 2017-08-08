@@ -65,22 +65,28 @@ class NotificationProvider(object):
     def _send_notification(self, data: dict):
         raise NotImplementedError
 
-    def _validate_data(self, data: dict):
+    def _validate_schema(self, validator: jsonschema.Draft4Validator):
         try:
-            validator = jsonschema.Draft4Validator(self.schema)
             validator.check_schema(self.schema)
-            validator.validate(data)
         except jsonschema.SchemaError as e:
             raise SchemaError(schema_error=e.message, provider=self.provider_name, data=self.schema)
+
+    def _validate_data(self, data: dict, validator: jsonschema.Draft4Validator):
+        try:
+            validator.validate(data)
         except jsonschema.ValidationError as e:
             raise BadArguments(validation_error=e.message, provider=self.provider_name, data=data)
 
     def notify(self, **kwargs: dict) -> NotificationResponse:
+        validator = jsonschema.Draft4Validator(self.schema)
+        self._validate_schema(validator)
+
         env_prefix = kwargs.pop('env_prefix', None)
         environs = self._get_environs(env_prefix)
         if environs:
             kwargs = {**kwargs, **environs}
-        self._validate_data(kwargs)
+
+        self._validate_data(kwargs, validator)
         data = self._prepare_data(kwargs)
         return self._send_notification(data)
 
