@@ -85,3 +85,13 @@ class TestCore(object):
         p = bad_provider()
         with pytest.raises(NotImplementedError):
             p.notify(**self.valid_data)
+
+    def test_environs(self, mock_provider, set_environs):
+        p = mock_provider()
+        prefix = f'mock_'
+        environs = {
+            f'{prefix}{p.provider_name}_required': 'foo'
+        }
+        set_environs(**environs)
+        rsp = p.notify(env_prefix=prefix)
+        assert rsp.status == 'success'

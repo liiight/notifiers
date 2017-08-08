@@ -1,7 +1,11 @@
+import os
+
 import jsonschema
 import requests
 
 from .exceptions import SchemaError, BadArguments, NotificationError
+
+DEFAULT_ENVIRON_PREFIX = 'NOTIFIERS_'
 
 
 class NotificationResponse(object):
@@ -45,6 +49,16 @@ class NotificationProvider(object):
     def required(self) -> list:
         return self.schema.get('required', [])
 
+    def _get_environs(self, prefix: str = None) -> dict:
+        if not prefix:
+            prefix = DEFAULT_ENVIRON_PREFIX
+        environs = {}
+        for arg in self.arguments:
+            environ = f'{prefix}{self.provider_name}_{arg}'
+            if os.environ.get(environ):
+                environs[arg] = os.environ[environ]
+        return environs
+
     def _prepare_data(self, data: dict) -> dict:
         return
 
@@ -62,6 +76,10 @@ class NotificationProvider(object):
             raise BadArguments(validation_error=e.message, provider=self.provider_name, data=data)
 
     def notify(self, **kwargs: dict) -> NotificationResponse:
+        env_prefix = kwargs.pop('env_prefix', None)
+        environs = self._get_environs(env_prefix)
+        if environs:
+            kwargs = {**kwargs, **environs}
         self._validate_data(kwargs)
         data = self._prepare_data(kwargs)
         return self._send_notification(data)
