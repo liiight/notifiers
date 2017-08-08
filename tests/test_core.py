@@ -29,7 +29,7 @@ class TestCore(object):
         assert isinstance(rsp, NotificationResponse)
         assert not rsp.errors
         assert rsp.raise_on_errors() is None
-        assert repr(rsp) == '<NotificationResponse,Mock_provider,status=success>'
+        assert repr(rsp) == '<NotificationResponse,provider=Mock_provider,status=success>'
         assert repr(p) == '<NotificationProvider:[Mock_provider]>'
 
     @pytest.mark.parametrize('data', [

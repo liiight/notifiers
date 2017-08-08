@@ -13,7 +13,7 @@ class NotificationResponse(object):
         self.errors = errors
 
     def __repr__(self):
-        return f'<NotificationResponse,{self.provider.capitalize()},status={self.status}>'
+        return f'<NotificationResponse,provider={self.provider.capitalize()},status={self.status}>'
 
     def raise_on_errors(self):
         if self.errors:
