@@ -28,10 +28,13 @@ class NotificationProvider(object):
     base_url = ''
     site_url = ''
     provider_name = ''
-    schema = {}
 
     def __repr__(self):
         return f'<NotificationProvider:[{self.provider_name.capitalize()}]>'
+
+    @property
+    def schema(self):
+        raise NotImplementedError
 
     @property
     def metadata(self) -> dict:
