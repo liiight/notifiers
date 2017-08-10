@@ -26,6 +26,7 @@ pytz==2017.2              # via babel
 requests==2.18.3          # via codecov, sphinx
 six==1.10.0               # via pip-tools, sphinx
 snowballstemmer==1.2.1    # via sphinx
+sphinx-autodoc-annotation==1.0.post1
 sphinx==1.6.3
 sphinxcontrib-websupport==1.0.1  # via sphinx
 urllib3==1.22             # via requests
