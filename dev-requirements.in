@@ -2,3 +2,4 @@ pip-tools
 pytest
 codecov
 pytest-cov
+Sphinx
