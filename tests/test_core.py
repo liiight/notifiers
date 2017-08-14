@@ -1,6 +1,6 @@
 import pytest
 
-from notifiers.core import NotificationProvider, NotificationResponse
+from notifiers.core import Provider, Response
 from notifiers.exceptions import BadArguments, SchemaError, NotificationError
 
 
@@ -26,11 +26,11 @@ class TestCore(object):
 
         assert p.required == ['required']
         rsp = p.notify(**self.valid_data)
-        assert isinstance(rsp, NotificationResponse)
+        assert isinstance(rsp, Response)
         assert not rsp.errors
         assert rsp.raise_on_errors() is None
-        assert repr(rsp) == '<NotificationResponse,provider=Mock_provider,status=success>'
-        assert repr(p) == '<NotificationProvider:[Mock_provider]>'
+        assert repr(rsp) == '<Response,provider=Mock_provider,status=success>'
+        assert repr(p) == '<Provider:[Mock_provider]>'
 
     @pytest.mark.parametrize('data', [
         pytest.param({'not_required': 'foo'}, id='Missing required'),
@@ -60,7 +60,7 @@ class TestCore(object):
         from notifiers import get_notifier
         p = get_notifier('mock')
         assert p
-        assert isinstance(p, NotificationProvider)
+        assert isinstance(p, Provider)
 
     def test_all_providers(self, mock_provider):
         from notifiers import all_providers

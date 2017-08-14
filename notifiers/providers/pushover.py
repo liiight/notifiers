@@ -1,11 +1,11 @@
 import requests
 
 from ..exceptions import NotificationError
-from ..core import NotificationProvider, NotificationResponse
+from ..core import Provider, Response
 from ..utils.json_schema import one_or_more, list_to_commas
 
 
-class Pushover(NotificationProvider):
+class Pushover(Provider):
     base_url = 'https://api.pushover.net/1/messages.json'
     site_url = 'https://pushover.net/'
     provider_name = 'pushover'
@@ -85,11 +85,11 @@ class Pushover(NotificationProvider):
             else:
                 errors.append(str(e))
         finally:
-            return NotificationResponse(status=status,
-                                        provider=self.provider_name,
-                                        data=data,
-                                        response=response,
-                                        errors=errors)
+            return Response(status=status,
+                            provider=self.provider_name,
+                            data=data,
+                            response=response,
+                            errors=errors)
 
     def sounds(self, token):
         url = self.sounds_url.format(token)

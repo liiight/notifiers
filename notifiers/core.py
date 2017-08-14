@@ -8,14 +8,14 @@ from .exceptions import SchemaError, BadArguments, NotificationError
 DEFAULT_ENVIRON_PREFIX = 'NOTIFIERS_'
 
 
-class NotificationResponse(object):
+class Response(object):
     def __init__(self, status: str, provider: str, data: dict, response: requests.Response = None, errors: list = None):
         """
         A wrapper for the Notification response.
 
         :param status: Response status string. ``SUCCESS`` or ``FAILED``
         :param provider: Provider name that returned that response.
-         Correlates to :class:``NotificationProvider.provider_name``
+         Correlates to :class:``Provider.provider_name``
         :param data: The notification data that was used for the notification
         :param response: The response object that was returned. Usually :class:`requests.Response`
         :param errors: Holds a list of errors if relevant
@@ -27,7 +27,7 @@ class NotificationResponse(object):
         self.errors = errors
 
     def __repr__(self):
-        return f'<NotificationResponse,provider={self.provider.capitalize()},status={self.status}>'
+        return f'<Response,provider={self.provider.capitalize()},status={self.status}>'
 
     def raise_on_errors(self):
         """
@@ -39,13 +39,13 @@ class NotificationResponse(object):
             raise NotificationError(provider=self.provider, data=self.data, errors=self.errors)
 
 
-class NotificationProvider(object):
+class Provider(object):
     base_url = ''
     site_url = ''
     provider_name = ''
 
     def __repr__(self):
-        return f'<NotificationProvider:[{self.provider_name.capitalize()}]>'
+        return f'<Provider:[{self.provider_name.capitalize()}]>'
 
     @property
     def schema(self):
@@ -95,7 +95,7 @@ class NotificationProvider(object):
         except jsonschema.ValidationError as e:
             raise BadArguments(validation_error=e.message, provider=self.provider_name, data=data)
 
-    def notify(self, **kwargs: dict) -> NotificationResponse:
+    def notify(self, **kwargs: dict) -> Response:
         validator = jsonschema.Draft4Validator(self.schema)
         self._validate_schema(validator)
 
@@ -113,7 +113,7 @@ class NotificationProvider(object):
 from .providers import _all_providers
 
 
-def get_notifier(provider_name: str) -> NotificationProvider:
+def get_notifier(provider_name: str) -> Provider:
     return _all_providers.get(provider_name)()
 
 

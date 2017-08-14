@@ -2,13 +2,13 @@ import os
 
 import pytest
 
-from notifiers.core import NotificationProvider, NotificationResponse
+from notifiers.core import Provider, Response
 from notifiers.utils.json_schema import one_or_more, list_to_commas
 
 
 @pytest.fixture
-def mock_provider() -> NotificationProvider:
-    class MockProvider(NotificationProvider):
+def mock_provider() -> Provider:
+    class MockProvider(Provider):
         base_url = 'https://api.mock.com'
         schema = {
             'type': 'object',
@@ -23,7 +23,7 @@ def mock_provider() -> NotificationProvider:
         provider_name = 'mock_provider'
 
         def _send_notification(self, data: dict):
-            return NotificationResponse(status='success', provider=self.provider_name, data=data)
+            return Response(status='success', provider=self.provider_name, data=data)
 
         def _prepare_data(self, data: dict):
             if data.get('not_required'):
@@ -37,8 +37,8 @@ def mock_provider() -> NotificationProvider:
 
 
 @pytest.fixture
-def bad_provider() -> NotificationProvider:
-    class BadProvider(NotificationProvider):
+def bad_provider() -> Provider:
+    class BadProvider(Provider):
         pass
 
     return BadProvider
