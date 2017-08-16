@@ -91,12 +91,10 @@ class TestCore(object):
         with pytest.raises(NotImplementedError):
             p.notify(**self.valid_data)
 
-    def test_environs(self, mock_provider, set_environs):
+    def test_environs(self, mock_provider, monkeypatch):
         p = mock_provider()
         prefix = f'mock_'
-        environs = {
-            f'{prefix}{p.provider_name}_required': 'foo'
-        }
-        set_environs(**environs)
+        monkeypatch.setenv(f'{prefix}{p.provider_name}_required', 'foo')
         rsp = p.notify(env_prefix=prefix)
         assert rsp.status == 'success'
+        assert rsp.data['required'] == 'foo'

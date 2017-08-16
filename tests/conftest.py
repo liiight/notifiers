@@ -42,12 +42,3 @@ def bad_provider() -> Provider:
         pass
 
     return BadProvider
-
-
-@pytest.fixture
-def set_environs():
-    def wrapper_set_environs(**kwargs):
-        for key, value in kwargs.items():
-            os.environ[key] = value
-
-    return wrapper_set_environs
