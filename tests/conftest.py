@@ -1,13 +1,14 @@
-import os
-
 import pytest
 
 from notifiers.core import Provider, Response
+from notifiers.providers import _all_providers
 from notifiers.utils.json_schema import one_or_more, list_to_commas
 
 
 @pytest.fixture
-def mock_provider() -> Provider:
+def mock_provider(monkeypatch) -> Provider:
+    """Return a generic :class:``notifiers.Provider`` class"""
+
     class MockProvider(Provider):
         base_url = 'https://api.mock.com'
         schema = {
@@ -31,13 +32,14 @@ def mock_provider() -> Provider:
             data['required'] = list_to_commas(data['required'])
             return data
 
-    from notifiers.providers import _all_providers
-    _all_providers['mock'] = MockProvider
+    monkeypatch.setitem(_all_providers, 'mock', MockProvider)
     return MockProvider
 
 
 @pytest.fixture
 def bad_provider() -> Provider:
+    """Returns an unimplemented :class:``notifiers.Provider`` class for testing"""
+
     class BadProvider(Provider):
         pass
 

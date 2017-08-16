@@ -11,6 +11,7 @@ class TestCore(object):
                   'not_required': ['foo', 'bar']}
 
     def test_sanity(self, mock_provider):
+        """Test basic notification flow"""
         p = mock_provider()
         assert p.metadata == {'base_url': 'https://api.mock.com',
                               'provider_name': 'mock_provider',
