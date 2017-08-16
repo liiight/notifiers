@@ -39,12 +39,14 @@ class TestCore(object):
         pytest.param({'foo': 6}, id='Additional properties not allowed'),
     ])
     def test_schema_validation(self, data, mock_provider):
+        """Test correct schema validations"""
         p = mock_provider()
 
         with pytest.raises(BadArguments):
             p.notify(**data)
 
     def test_bad_schema(self, mock_provider):
+        """Test illegal JSON schema"""
         p = mock_provider()
         p.schema = {'type': 'bad_schema'}
         data = {'foo': 'bar'}
@@ -52,18 +54,21 @@ class TestCore(object):
             p.notify(**data)
 
     def test_prepare_data(self, mock_provider):
+        """Test ``prepare_data()`` method"""
         p = mock_provider()
         rsp = p.notify(**self.valid_data)
         assert rsp.data == {'not_required': 'foo,bar',
                             'required': 'foo'}
 
     def test_get_notifier(self, mock_provider):
+        """Test ``get_notifier()`` helper function"""
         from notifiers import get_notifier
         p = get_notifier('mock')
         assert p
         assert isinstance(p, Provider)
 
     def test_all_providers(self, mock_provider, monkeypatch):
+        """Test ``all_providers()`` helper function"""
         def mock_providers():
             return ['mock']
 
@@ -72,6 +77,7 @@ class TestCore(object):
         assert 'mock' in notifiers.all_providers()
 
     def test_error_response(self, mock_provider):
+        """Test error notification response"""
         p = mock_provider()
         rsp = p.notify(**self.valid_data)
         rsp.errors = ['an error']
@@ -87,11 +93,13 @@ class TestCore(object):
         assert e.value.provider == p.provider_name
 
     def test_bad_integration(self, bad_provider):
+        """Test bad provider inheritance"""
         p = bad_provider()
         with pytest.raises(NotImplementedError):
             p.notify(**self.valid_data)
 
     def test_environs(self, mock_provider, monkeypatch):
+        """Test environs usage"""
         p = mock_provider()
         prefix = f'mock_'
         monkeypatch.setenv(f'{prefix}{p.provider_name}_required', 'foo')
