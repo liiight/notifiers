@@ -9,17 +9,18 @@ DEFAULT_ENVIRON_PREFIX = 'NOTIFIERS_'
 
 
 class Response(object):
-    def __init__(self, status: str, provider: str, data: dict, response: requests.Response = None, errors: list = None):
-        """
-        A wrapper for the Notification response.
+    """
+    A wrapper for the Notification response.
 
-        :param status: Response status string. ``SUCCESS`` or ``FAILED``
-        :param provider: Provider name that returned that response.
-         Correlates to :class:``Provider.provider_name``
-        :param data: The notification data that was used for the notification
-        :param response: The response object that was returned. Usually :class:`requests.Response`
-        :param errors: Holds a list of errors if relevant
-        """
+    :param status: Response status string. ``SUCCESS`` or ``FAILED``
+    :param provider: Provider name that returned that response.
+     Correlates to :class:``Provider.provider_name``
+    :param data: The notification data that was used for the notification
+    :param response: The response object that was returned. Usually :class:`requests.Response`
+    :param errors: Holds a list of errors if relevant
+    """
+
+    def __init__(self, status: str, provider: str, data: dict, response: requests.Response = None, errors: list = None):
         self.status = status
         self.provider = provider
         self.data = data
