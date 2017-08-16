@@ -1,5 +1,6 @@
 import pytest
 
+import notifiers
 from notifiers.core import Provider, Response
 from notifiers.exceptions import BadArguments, SchemaError, NotificationError
 
@@ -62,9 +63,13 @@ class TestCore(object):
         assert p
         assert isinstance(p, Provider)
 
-    def test_all_providers(self, mock_provider):
-        from notifiers import all_providers
-        assert 'mock' in all_providers()
+    def test_all_providers(self, mock_provider, monkeypatch):
+        def mock_providers():
+            return ['mock']
+
+        monkeypatch.setattr(notifiers, 'all_providers', mock_providers)
+
+        assert 'mock' in notifiers.all_providers()
 
     def test_error_response(self, mock_provider):
         p = mock_provider()

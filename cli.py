@@ -33,6 +33,8 @@ def notify(ctx, provider):
     data = dict()
     for item in ctx.args:
         data.update([item.split('=')])
+    if 'message' not in data:
+        data['message'] = click.get_text_stream('stdin')
     try:
         rsp = p.notify(**data)
         rsp.raise_on_errors()
@@ -57,6 +59,7 @@ def required(provider):
 def arguments(provider):
     """Shows the name and schema of all the  attributes of a provider.
     Example:
+
         notifiers arguments pushover
     """
     p = get_notifier(provider)
