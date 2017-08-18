@@ -30,7 +30,7 @@ def notify(ctx, provider):
 
     """
     p = get_notifier(provider)
-    data = dict()
+    data = {}
     for item in ctx.args:
         data.update([item.split('=')])
     if 'message' not in data:
@@ -80,5 +80,9 @@ def metadata(provider):
         click.echo(f'{k}: {v}')
 
 
-if __name__ == '__main__':
+def entry_point():
     cli(obj={})
+
+
+if __name__ == '__main__':
+    entry_point()

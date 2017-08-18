@@ -43,5 +43,9 @@ setup(
         "Operating System :: OS Independent",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3.6",
-    ]
+    ],
+    entry_points="""
+        [console_scripts]
+        notifiers=notifiers_cli.cli
+    """
 )
