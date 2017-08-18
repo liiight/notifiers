@@ -15,7 +15,8 @@ def mock_provider(monkeypatch) -> Provider:
             'type': 'object',
             'properties': {
                 'not_required': one_or_more({'type': 'string'}),
-                'required': {'type': 'string'}
+                'required': {'type': 'string'},
+                'message': {'type': 'string'}
             },
             'required': ['required'],
             'additionalProperties': False

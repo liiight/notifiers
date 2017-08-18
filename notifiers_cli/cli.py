@@ -34,7 +34,7 @@ def notify(ctx, provider):
     for item in ctx.args:
         data.update([item.split('=')])
     if 'message' not in data:
-        data['message'] = click.get_text_stream('stdin')
+        data['message'] = click.get_text_stream('stdin').read()
     try:
         rsp = p.notify(**data)
         rsp.raise_on_errors()
