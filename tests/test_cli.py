@@ -63,3 +63,6 @@ class TestCLI(object):
         assert 'required' in result.output
         assert 'not_required' in result.output
         assert 'message' in result.output
+
+    def test_piping_input(self):
+        """Test piping in message"""
