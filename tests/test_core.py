@@ -23,7 +23,8 @@ class TestCore(object):
                     {'type': 'string'}
                 ]
             },
-            'required': {'type': 'string'}
+            'required': {'type': 'string'},
+            'message': {'type': 'string'}
         }
 
         assert p.required == ['required']
@@ -70,6 +71,7 @@ class TestCore(object):
 
     def test_all_providers(self, mock_provider, monkeypatch):
         """Test ``all_providers()`` helper function"""
+
         def mock_providers():
             return ['mock']
 
