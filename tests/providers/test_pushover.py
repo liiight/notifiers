@@ -30,6 +30,10 @@ class TestPushover(object):
 
     def test_sanity(self):
         """Successful pushover notification"""
+        p = get_notifier('pushover')
+        data = {'message': 'foo'}
+        rsp = p.notify(**data)
+        rsp.raise_on_errors()
 
     def test_all_options(self):
         """Use all available pushover options"""

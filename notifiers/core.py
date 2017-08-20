@@ -73,7 +73,7 @@ class Provider(object):
             prefix = DEFAULT_ENVIRON_PREFIX
         environs = {}
         for arg in self.arguments:
-            environ = f'{prefix}{self.provider_name}_{arg}'
+            environ = f'{prefix}{self.provider_name}_{arg}'.upper()
             if os.environ.get(environ):
                 environs[arg] = os.environ[environ]
         return environs
