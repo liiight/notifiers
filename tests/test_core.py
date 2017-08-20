@@ -105,7 +105,7 @@ class TestCore(object):
         """Test environs usage"""
         p = mock_provider()
         prefix = f'mock_'
-        monkeypatch.setenv(f'{prefix}{p.provider_name}_required', 'foo')
+        monkeypatch.setenv(f'{prefix}{p.provider_name}_required'.upper(), 'foo')
         rsp = p.notify(env_prefix=prefix)
         assert rsp.status == 'success'
         assert rsp.data['required'] == 'foo'
