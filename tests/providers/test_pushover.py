@@ -10,19 +10,17 @@ class TestPushover(object):
     Note: These tests assume correct environs set for NOTIFIERS_PUSHOVER_TOKEN and NOTIFIERS_PUSHOVER_USER
     """
 
-    def test_missing_required(self):
+    @pytest.mark.parametrize('data, message', [
+        ({}, 'user'),
+        ({'user': 'foo'}, 'message'),
+        ({'user': 'foo', 'message': 'bla'}, 'token')
+    ])
+    def test_missing_required(self, data, message):
         p = get_notifier('pushover')
+        data['env_prefix'] = 'test'
         with pytest.raises(BadArguments) as e:
-            p.notify(env_prefix='test')
-        assert '\'user\' is a required property' in e.value.message
-
-        with pytest.raises(BadArguments) as e:
-            p.notify(user='foo', env_prefix='test')
-        assert '\'message\' is a required property' in e.value.message
-
-        with pytest.raises(BadArguments) as e:
-            p.notify(message='bla', user='foo', env_prefix='test')
-        assert '\'token\' is a required property' in e.value.message
+            p.notify(**data)
+        assert f'\'{message}\' is a required property' in e.value.message
 
     def test_pushover_restrictions(self):
         """Pushover specific API restrictions:
