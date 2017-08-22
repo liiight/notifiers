@@ -141,7 +141,7 @@ You can set ``NOTIFIER_DEFAULT_PROVIDER`` environment variable which will be use
 Supported providers
 -------------------
 
-- `Pushover <https://pushover.net/>_`
+- `Pushover <https://pushover.net/>`_
 
 In the near future
 ------------------
