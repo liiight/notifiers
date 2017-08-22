@@ -11,7 +11,7 @@ Notifiers
     :target: https://gitter.im/notifiers/notifiers
 
 The easiest way to send push notifications! Got an app or service and you want to enable your users to use push notification with their provider of choice? You don't need to implement solution yourself, or use individual provider libs. A one stop shop for all notification providers with a unified and simple interface.
-
+See below for a list of `Supported providers`_
 
 Basic Usage
 -----------
@@ -84,14 +84,70 @@ View all available providers (continuously updated):
     >>> notifiers.all_providers()
     ['pushover']
 
+Environment variables
+---------------------
+
+You can set environment variable to replace any argument that the notifier can use. The default syntax to follow is ``NOTIFIERS_[PROVIDER_NAME]_[ARGUMENT_NAME]``::
+
+    export NOTIFIERS_PUSHOVER_TOKEN=FOO
+    export NOTIFIERS_PUSHOVER_USER=BAR
+
+Then you could just use:
+
+.. code:: python
+
+    >>> p.notify(message='message')
+
+Note that you can also set ``MESSAGE`` in an environment variable.
+You can also change the default prefix of ``NOTIFIERS_`` by pass the ``env_prefix`` argument on notify:
+
+.. code:: python
+
+    >>> p.notify(message='test', env_prefix='MY_OWN_PREFIX_')
+
+Command Line Interface
+----------------------
+
+Notifiers come with CLI support::
+
+    (notifiers_venv) ip-192-168-1-169:notifiers orcarmi 🍰🍉🍪 $ notifiers
+    Usage: notifiers [OPTIONS] COMMAND [ARGS]...
+
+      Notifiers CLI operation
+
+    Options:
+      --help  Show this message and exit.
+
+    Commands:
+      arguments  Shows the name and schema of all the...
+      metadata   Shows the provider's metadata.
+      notify     Send a notification to a passed provider.
+      providers  Shows all available providers
+      required   Shows the required attributes of a provider.
+
+Because of the dynamic nature of using different provider options, those are passed in a keyword=value style to the command as so::
+
+    notifiers notify pushover token=foo user=bar message=test
+
+Environment variables are used in the CLI as well. Explicitly passing keyword values takes precedence.
+You can also pipe into the command::
+
+    cat file.txt | notifiers notify pushover token=foo user=bar
+
+You can set ``NOTIFIER_DEFAULT_PROVIDER`` environment variable which will be used by the CLI. Combining that with the other required provider arguments can lead to very succinct commands:
+
+    cat file.txt | notifiers
+
+Supported providers
+-------------------
+
+- `Pushover <https://pushover.net/>_`
 
 In the near future
 ------------------
 
 -  Many more providers
--  CLI support
--  Environment variable support
--  Docs
+-  Docs!
 
 Why python 3 only?
 ~~~~~~~~~~~~~~~~~~
@@ -99,4 +155,6 @@ Why python 3 only?
 I wanted to avoid the whole unicode issue fiasco if possible, but
 there’s not real constraint in adding python 2 support. If there’s an
 overwhelming desire for this, i’ll do it. Probably.
+
+
 

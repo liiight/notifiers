@@ -46,6 +46,6 @@ setup(
     ],
     entry_points="""
         [console_scripts]
-        notifiers=notifiers_cli.cli
+        notifiers=notifiers_cli.cli:entry_point
     """
 )
