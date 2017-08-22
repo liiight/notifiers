@@ -142,9 +142,11 @@ You can also pipe into the command::
 
     $ cat file.txt | notifiers notify pushover token=foo user=bar
 
-You can set ``NOTIFIER_DEFAULT_PROVIDER`` environment variable which will be used by the CLI. Combining that with the other required provider arguments can lead to very succinct commands::
+You can set ``NOTIFIERS_DEFAULT_PROVIDER`` environment variable which will be used by the CLI. Combining that with the other required provider arguments can lead to very succinct commands::
 
     $ cat file.txt | notifiers
+
+Note that unlike the other environment variables, you cannot change the prefix of this one.
 
 Supported providers
 -------------------

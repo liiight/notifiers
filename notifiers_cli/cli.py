@@ -19,7 +19,7 @@ def providers():
     ignore_unknown_options=True,
     allow_extra_args=True,
 ))
-@click.argument('provider', type=click.Choice(all_providers()))
+@click.argument('provider', type=click.Choice(all_providers()), envvar='NOTIFIERS_DEFAULT_PROVIDER')
 @click.pass_context
 def notify(ctx, provider):
     """Send a notification to a passed provider.
@@ -44,7 +44,7 @@ def notify(ctx, provider):
 
 
 @cli.command()
-@click.argument('provider', type=click.Choice(all_providers()))
+@click.argument('provider', type=click.Choice(all_providers()), envvar='NOTIFIERS_DEFAULT_PROVIDER')
 def required(provider):
     """Shows the required attributes of a provider.
     Example:
@@ -55,7 +55,7 @@ def required(provider):
 
 
 @cli.command()
-@click.argument('provider', type=click.Choice(all_providers()))
+@click.argument('provider', type=click.Choice(all_providers()), envvar='NOTIFIERS_DEFAULT_PROVIDER')
 def arguments(provider):
     """Shows the name and schema of all the  attributes of a provider.
     Example:
