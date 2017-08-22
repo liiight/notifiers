@@ -1,6 +1,5 @@
 import requests
 
-from ..exceptions import NotificationError
 from ..core import Provider, Response
 from ..utils.json_schema import one_or_more, list_to_commas
 
@@ -9,7 +8,9 @@ class Pushover(Provider):
     base_url = 'https://api.pushover.net/1/messages.json'
     site_url = 'https://pushover.net/'
     provider_name = 'pushover'
-    sounds_url = 'https://api.pushover.net/1/sounds.json?token={}'
+    sounds = ['pushover', 'bike', 'bugle', 'cashregister', 'classical', 'cosmic', 'falling', 'gamelan', 'incoming',
+              'intermission', 'magic', 'mechanical', 'pianobar', 'siren', 'spacealarm', 'tugboat', 'alien', 'climb',
+              'persistent', 'echo', 'updown', 'none']
 
     @property
     def schema(self):
@@ -38,7 +39,8 @@ class Pushover(Provider):
                               'title': 'a title for your supplementary URL, otherwise just the URL is shown'},
                 'sound': {'type': 'string',
                           'title': 'the name of one of the sounds supported by device clients to override the '
-                                   'user\'s default sound choice'},
+                                   'user\'s default sound choice',
+                          'enum': self.sounds},
                 'timestamp': {'type': 'integer',
                               'minimum': 0,
                               'title': 'a Unix timestamp of your message\'s date and time to display to the user, '
@@ -91,14 +93,8 @@ class Pushover(Provider):
                             response=response,
                             errors=errors)
 
-    def sounds(self, token):
-        url = self.sounds_url.format(token)
-        try:
-            response = requests.get(url)
-            response.raise_for_status()
-            return response.json()
-        except requests.RequestException as e:
-            errors = []
-            if e.response is not None:
-                errors = e.response.json()['errors']
-            raise NotificationError(provider=self.provider_name, message='Could not retrieve sounds', errors=errors)
+    @property
+    def metadata(self):
+        m = super().metadata
+        m['sounds'] = self.sounds
+        return m
