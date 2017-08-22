@@ -1,6 +1,7 @@
 Notifiers
 =========
 The easiest way to send push notifications!
+
 .. image:: https://img.shields.io/travis/liiight/notifiers/master.svg
     :target: https://travis-ci.org/liiight/notifiers
 
