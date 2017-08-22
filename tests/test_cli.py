@@ -9,7 +9,7 @@ class TestCLI(object):
 
     @pytest.mark.parametrize('command, exit_code, error', [
         ('', 2, 'invalid choice'),
-        ('mock', 1, 'Error with sent data')
+        ('mock', 1, 'Error')
     ])
     def test_bad_notify(self, command, exit_code, error):
         """Test invalid notification usage"""
@@ -24,7 +24,7 @@ class TestCLI(object):
         """Test valid notification usage"""
         from notifiers_cli.cli import notify
         runner = CliRunner()
-        result = runner.invoke(notify, ['mock', 'required=foo'])
+        result = runner.invoke(notify, ['mock', 'required=foo', 'message=bar'])
         assert result.exit_code == 0
         assert not result.output
 
