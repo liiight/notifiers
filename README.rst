@@ -1,6 +1,6 @@
 Notifiers
 =========
-
+The easiest way to send push notifications!
 .. image:: https://img.shields.io/travis/liiight/notifiers/master.svg
     :target: https://travis-ci.org/liiight/notifiers
 
@@ -10,8 +10,15 @@ Notifiers
 .. image:: https://img.shields.io/gitter/room/nwjs/nw.js.svg
     :target: https://gitter.im/notifiers/notifiers
 
-The easiest way to send push notifications! Got an app or service and you want to enable your users to use push notification with their provider of choice? You don't need to implement solution yourself, or use individual provider libs. A one stop shop for all notification providers with a unified and simple interface.
+Got an app or service and you want to enable your users to use push notification with their provider of choice? You don't need to implement solution yourself, or use individual provider libs. A one stop shop for all notification providers with a unified and simple interface.
 See below for a list of `Supported providers`_
+
+Advantages
+----------
+- Spend your precious time on your own code base, instead of chasing down 3rd party provider APIs. That's what we're here for!
+- With a minimal set of well known and stable dependencies (``requests``, ``json_schema`` and ``click``) you're better off than installing 3rd party SDKs.
+- A unified interface means that you already support any new providers that will be added, no more work needed!
+- Thorough testing means protection against any breaking API changes. We make sure your code your notifications will always get delivered!
 
 Basic Usage
 -----------
