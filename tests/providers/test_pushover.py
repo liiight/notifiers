@@ -10,6 +10,15 @@ class TestPushover(object):
     Note: These tests assume correct environs set for NOTIFIERS_PUSHOVER_TOKEN and NOTIFIERS_PUSHOVER_USER
     """
 
+    def test_pushover_metadata(self):
+        p = get_notifier('pushover')
+        assert {'base_url': 'https://api.pushover.net/1/messages.json', 'site_url': 'https://pushover.net/',
+                'provider_name': 'pushover',
+                'sounds': ['pushover', 'bike', 'bugle', 'cashregister', 'classical', 'cosmic', 'falling', 'gamelan',
+                           'incoming', 'intermission', 'magic', 'mechanical', 'pianobar', 'siren', 'spacealarm',
+                           'tugboat', 'alien', 'climb', 'persistent', 'echo', 'updown', 'none']
+                } == p.metadata
+
     @pytest.mark.parametrize('data, message', [
         ({}, 'user'),
         ({'user': 'foo'}, 'message'),
