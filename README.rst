@@ -14,7 +14,7 @@ The easiest way to send push notifications!
 .. image:: https://img.shields.io/pypi/v/nine.svg
     :target: https://pypi.python.org/pypi/notifiers
 
-See `Changelog <CHANGELOG.MD>`_ for recent changes
+See `Changelog <CHANGELOG.md>`_ for recent changes
 
 Got an app or service and you want to enable your users to use push notification with their provider of choice? You don't need to implement solution yourself, or use individual provider libs. A one stop shop for all notification providers with a unified and simple interface.
 See below for a list of `Supported providers`_
