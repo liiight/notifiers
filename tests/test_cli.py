@@ -71,3 +71,13 @@ class TestCLI(object):
         result = runner.invoke(notify, ['mock', 'required=foo'], input='bar')
         assert result.exit_code == 0
         assert not result.output
+
+    def test_default_provider(self, monkeypatch):
+        """Test default provider environ"""
+        monkeypatch.setenv('NOTIFIERS_DEFAULT_PROVIDER', 'mock')
+        monkeypatch.setenv('NOTIFIERS_MOCK_PROVIDER_REQUIRED', 'foo')
+        from notifiers_cli.cli import notify
+        runner = CliRunner()
+        result = runner.invoke(notify, [], input='foo')
+        assert result.exit_code == 0
+        assert not result.output
