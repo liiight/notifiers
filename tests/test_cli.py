@@ -66,3 +66,8 @@ class TestCLI(object):
 
     def test_piping_input(self):
         """Test piping in message"""
+        from notifiers_cli.cli import notify
+        runner = CliRunner()
+        result = runner.invoke(notify, ['mock', 'required=foo'], input='bar')
+        assert result.exit_code == 0
+        assert not result.output
