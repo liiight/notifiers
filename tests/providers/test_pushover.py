@@ -1,7 +1,7 @@
 import pytest
 
 from notifiers import get_notifier
-from notifiers.exceptions import BadArguments
+from notifiers.exceptions import BadArguments, NotificationError
 
 
 class TestPushover(object):
@@ -22,12 +22,24 @@ class TestPushover(object):
             p.notify(**data)
         assert f'\'{message}\' is a required property' in e.value.message
 
-    def test_pushover_restrictions(self):
-        """Pushover specific API restrictions:
+    @pytest.mark.parametrize('data, message', [
+        ({}, 'expire'),
+        ({'expire': 30}, 'retry'),
+    ])
+    @pytest.mark.online
+    def test_pushover_priority_2_restrictions(self, data, message):
+        """Pushover specific API restrictions when using priority 2"""
+        p = get_notifier('pushover')
+        base_data = {'message': 'foo',
+                     'priority': 2}
+        final_data = {**base_data, **data}
+        rsp = p.notify(**final_data)
+        with pytest.raises(NotificationError) as e:
+            rsp.raise_on_errors()
+        print(e.value.message)
+        assert message in e.value.message
 
-        Priority value 2
-        """
-
+    @pytest.mark.online
     def test_sanity(self):
         """Successful pushover notification"""
         p = get_notifier('pushover')
@@ -35,5 +47,20 @@ class TestPushover(object):
         rsp = p.notify(**data)
         rsp.raise_on_errors()
 
+    @pytest.mark.online
     def test_all_options(self):
         """Use all available pushover options"""
+        p = get_notifier('pushover')
+        data = {'message': 'foo',
+                'title': 'title',
+                'priority': 2,
+                'url': 'http://foo.com',
+                'url_title': 'url title',
+                'sound': 'bike',
+                'timestamp': 0,
+                'retry': 30,
+                'expire': 30,
+                'callback': 'http://callback.com',
+                'html': 1}
+        rsp = p.notify(**data)
+        rsp.raise_on_errors()
