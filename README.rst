@@ -11,7 +11,7 @@ The easiest way to send push notifications!
 .. image:: https://img.shields.io/gitter/room/nwjs/nw.js.svg
     :target: https://gitter.im/notifiers/notifiers
 
-.. image:: https://img.shields.io/pypi/notifiers/nine.svg
+.. image:: https://img.shields.io/pypi/v/notifiers.svg
     :target: https://pypi.python.org/pypi/notifiers
 
 See `Changelog <CHANGELOG.md>`_ for recent changes
