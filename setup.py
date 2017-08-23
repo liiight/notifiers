@@ -1,19 +1,10 @@
 import io
-import sys
 from distutils.core import setup
 
 from setuptools import find_packages
 
 with io.open('README.rst', encoding='utf-8') as readme:
     long_description = readme.read()
-
-# Populates __version__ without importing the package
-__version__ = None
-with io.open('notifiers/_version.py', encoding='utf-8') as ver_file:
-    exec(ver_file.read())  # pylint: disable=W0122
-if not __version__:
-    print('Could not find __version__ from notifiers/_version.py')
-    sys.exit(1)
 
 
 def load_requirements(filename):
@@ -23,7 +14,7 @@ def load_requirements(filename):
 
 setup(
     name='notifiers',
-    version=__version__,
+    version='0.4.1',
     packages=find_packages(exclude=['notifiers.tests']),
     url='https://github.com/liiight/notifiers',
     license='MIT',
