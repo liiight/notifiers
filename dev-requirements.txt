@@ -14,7 +14,7 @@ codecov==2.0.9
 coverage==4.4.1           # via codecov, pytest-cov
 docutils==0.14            # via sphinx
 first==2.0.1              # via pip-tools
-idna==2.5                 # via requests
+idna==2.6                 # via requests
 imagesize==0.7.1          # via sphinx
 jinja2==2.9.6             # via sphinx
 markupsafe==1.0           # via jinja2
