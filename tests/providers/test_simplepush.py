@@ -34,3 +34,13 @@ class TestSimplePush(object):
         data = {'message': 'foo'}
         rsp = p.notify(**data)
         rsp.raise_on_errors()
+
+    @pytest.mark.online
+    def test_simplepush_bad_request(self):
+        """Get bad request error from simplepush"""
+        p = get_notifier('simplepush')
+        data = {'message': 'foo', 'error': 'foo'}
+        rsp = p.notify(**data)
+        with pytest.raises(NotificationError) as e:
+            rsp.raise_on_errors()
+        assert 'Error' in e.value.message
