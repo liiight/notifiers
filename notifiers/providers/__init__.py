@@ -1,5 +1,6 @@
-from . import pushover
+from . import pushover, simplepush
 
 _all_providers = {
-    'pushover': pushover.Pushover
+    'pushover': pushover.Pushover,
+    'simplepush': simplepush.SimplePush
 }

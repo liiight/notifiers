@@ -157,6 +157,7 @@ Supported providers
 -------------------
 
 - `Pushover <https://pushover.net/>`_
+- `Simplepush <https://simplepush.io/>`_
 
 In the near future
 ------------------
