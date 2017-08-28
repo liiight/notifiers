@@ -73,25 +73,18 @@ class Pushover(Provider):
         return data
 
     def _send_notification(self, data):
-        status = 'Success'
-        errors = []
-        response = None
         try:
             response = requests.post(self.base_url, data=data)
             response.raise_for_status()
         except requests.RequestException as e:
-            status = 'Failure'
             if e.response is not None:
                 response = e.response
                 errors = response.json()['errors']
             else:
-                errors.append(str(e))
-        finally:
-            return Response(status=status,
-                            provider=self.provider_name,
-                            data=data,
-                            response=response,
-                            errors=errors)
+                response = None
+                errors = [(str(e))]
+            return self._create_response(data=data, response=response, failed=True, errors=errors)
+        return self._create_response(data=data, response=response)
 
     @property
     def metadata(self):
