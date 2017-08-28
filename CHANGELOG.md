@@ -1,5 +1,16 @@
 # Change Log
 
+## [v0.5.0](https://github.com/liiight/notifiers/tree/v0.5.0) (2017-08-28)
+[Full Changelog](https://github.com/liiight/notifiers/compare/v0.4.3...v0.5.0)
+
+**Implemented enhancements:**
+
+- Add simple push support [\#10](https://github.com/liiight/notifiers/issues/10)
+
+**Merged pull requests:**
+
+- Added Simplepush. Closed \#10 [\#15](https://github.com/liiight/notifiers/pull/15) ([liiight](https://github.com/liiight))
+
 ## [v0.4.3](https://github.com/liiight/notifiers/tree/v0.4.3) (2017-08-23)
 [Full Changelog](https://github.com/liiight/notifiers/compare/v0.4.2...v0.4.3)
 
