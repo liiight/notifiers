@@ -16,7 +16,7 @@ The easiest way to send push notifications!
 
 See `Changelog <CHANGELOG.md>`_ for recent changes
 
-Got an app or service and you want to enable your users to use push notification with their provider of choice? You don't need to implement solution yourself, or use individual provider libs. A one stop shop for all notification providers with a unified and simple interface.
+Got an app or service and you want to enable your users to use push notification with their provider of choice? You don't need to implement ש solution yourself, or use individual provider libs. A one stop shop for all notification providers with a unified and simple interface.
 See below for a list of `Supported providers`_
 
 Advantages
@@ -157,7 +157,7 @@ Supported providers
 -------------------
 
 - `Pushover <https://pushover.net/>`_
-- `Simplepush <https://simplepush.io/>`_
+- `SimplePush <https://simplepush.io/>`_
 
 In the near future
 ------------------
@@ -169,7 +169,7 @@ Why python 3 only?
 ~~~~~~~~~~~~~~~~~~
 
 I wanted to avoid the whole unicode issue fiasco if possible, but
-there’s not real constraint in adding python 2 support. If there’s an
+there isn't a real constraint in adding python 2 support. If there’s an
 overwhelming desire for this, i’ll do it. Probably.
 
 
