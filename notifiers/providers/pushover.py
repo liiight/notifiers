@@ -1,6 +1,6 @@
 import requests
 
-from ..core import Provider
+from ..core import Provider, Response
 from ..utils.json_schema import one_or_more, list_to_commas
 from ..utils.helpers import create_response
 
@@ -67,13 +67,13 @@ class Pushover(Provider):
             'additionalProperties': False
         }
 
-    def _prepare_data(self, data):
+    def _prepare_data(self, data: dict) -> dict:
         data['user'] = list_to_commas(data['user'])
         if data.get('device'):
             data['device'] = list_to_commas(data['device'])
         return data
 
-    def _send_notification(self, data):
+    def _send_notification(self, data: dict) -> Response:
         try:
             response = requests.post(self.base_url, data=data)
             response.raise_for_status()
@@ -89,7 +89,7 @@ class Pushover(Provider):
         return create_response(provider_name=self.provider_name, data=data, response=response)
 
     @property
-    def metadata(self):
+    def metadata(self) -> dict:
         m = super().metadata
         m['sounds'] = self.sounds
         return m
