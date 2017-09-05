@@ -13,6 +13,15 @@ The easiest way to send push notifications!
 
 .. image:: https://img.shields.io/pypi/v/notifiers.svg
     :target: https://pypi.python.org/pypi/notifiers
+    :alt: PyPi version
+
+.. image:: https://img.shields.io/pypi/pyversions/notifiers.svg?style=flat-square
+    :target: https://pypi.org/project/notifiers
+    :alt: Supported Python versions
+
+.. image:: https://img.shields.io/pypi/l/notifiers.svg?style=flat-square
+    :target: https://choosealicense.com/licenses
+    :alt: License
 
 See `Changelog <CHANGELOG.md>`_ for recent changes
 
