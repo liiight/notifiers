@@ -96,12 +96,6 @@ class Provider(object):
         except jsonschema.ValidationError as e:
             raise BadArguments(validation_error=e.message, provider=self.provider_name, data=data)
 
-    def _create_response(self, data, response=None, failed=False, errors=None):
-        if errors is None:
-            errors = []
-        status = 'Failure' if failed else 'Success'
-        return Response(status=status, provider=self.provider_name, data=data, response=response, errors=errors)
-
     def notify(self, **kwargs: dict) -> Response:
         validator = jsonschema.Draft4Validator(self.schema)
         self._validate_schema(validator)
