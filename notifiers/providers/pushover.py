@@ -1,7 +1,8 @@
 import requests
 
-from ..core import Provider, Response
+from ..core import Provider
 from ..utils.json_schema import one_or_more, list_to_commas
+from ..utils.helpers import create_response
 
 
 class Pushover(Provider):
@@ -83,8 +84,9 @@ class Pushover(Provider):
             else:
                 response = None
                 errors = [(str(e))]
-            return self._create_response(data=data, response=response, failed=True, errors=errors)
-        return self._create_response(data=data, response=response)
+            return create_response(provider_name=self.provider_name, data=data, response=response, failed=True,
+                                   errors=errors)
+        return create_response(provider_name=self.provider_name, data=data, response=response)
 
     @property
     def metadata(self):
