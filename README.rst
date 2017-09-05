@@ -2,16 +2,18 @@ Notifiers
 =========
 The easiest way to send push notifications!
 
-.. image:: https://img.shields.io/travis/liiight/notifiers/master.svg
+.. image:: https://img.shields.io/travis/liiight/notifiers/master.svg?style=flat-square
     :target: https://travis-ci.org/liiight/notifiers
+    :alt: Travis CI
 
-.. image:: https://codecov.io/gh/liiight/notifiers/branch/master/graph/badge.svg
+.. image:: https://img.shields.io/codecov/c/github/liiight/notifiers/master.svg?style=flat-square
     :target: https://codecov.io/gh/liiight/notifiers
+    :alt: Codecov
 
-.. image:: https://img.shields.io/gitter/room/nwjs/nw.js.svg
+.. image:: https://img.shields.io/gitter/room/nwjs/nw.js.svg?style=flat-square
     :target: https://gitter.im/notifiers/notifiers
 
-.. image:: https://img.shields.io/pypi/v/notifiers.svg
+.. image:: https://img.shields.io/pypi/v/notifiers.svg?style=flat-square
     :target: https://pypi.python.org/pypi/notifiers
     :alt: PyPi version
 
