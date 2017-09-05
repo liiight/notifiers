@@ -25,6 +25,10 @@ The easiest way to send push notifications!
     :target: https://choosealicense.com/licenses
     :alt: License
 
+.. image:: https://img.shields.io/pypi/status/notifiers.svg?style=flat-square
+    :target: https://pypi.python.org/pypi/notifiers
+    :alt: Status
+
 See `Changelog <CHANGELOG.md>`_ for recent changes
 
 Got an app or service and you want to enable your users to use push notification with their provider of choice? You don't need to implement ש solution yourself, or use individual provider libs. A one stop shop for all notification providers with a unified and simple interface.
