@@ -34,19 +34,58 @@ class TestSlack(object):
             'icon_emoji': 'poop',
             'username': 'test',
             'channel': 'test',
-            'attachments': {
-                'fallback': 'fallback text',
-                'text': 'attach this',
-                'pretext': 'pre-attach this',
-                'color': 'good',
-                'fields': [
-                    {
-                        'title': 'test_title',
-                        'value': 'test_value',
-                        'short': False
-                    }
-                ]
-            }
+            'attachments': [
+                {
+                    'title': 'attachment 1',
+                    'title_link': 'https://github.com/liiight/notifiers',
+                    'image_url': 'https://cdn.worldvectorlogo.com/logos/slack.svg',
+                    'thumb_url': 'http://timelinethumbnailcreator.com/img/icon-brush-256.png',
+                    'author_name': 'notifiers',
+                    'author_link': 'https://github.com/liiight/notifiers',
+                    'fallback': 'fallback text',
+                    'text': 'attach this',
+                    'footer': 'footer 1',
+                    'pretext': 'pre-attach this',
+                    'color': 'good',
+                    'fields': [
+                        {
+                            'title': 'test_field1',
+                            'value': 'test_value1',
+                            'short': False
+                        },
+                        {
+                            'title': 'test_field2',
+                            'value': 'test_value2',
+                            'short': True
+                        }
+                    ]
+                },
+                {
+                    'title': 'attachment 2',
+                    'title_link': 'https://github.com/liiight/notifiers',
+                    'image_url': 'https://cdn.worldvectorlogo.com/logos/slack.svg',
+                    'thumb_url': 'http://timelinethumbnailcreator.com/img/icon-brush-256.png',
+                    'author_name': 'notifiers',
+                    'author_link': 'https://github.com/liiight/notifiers',
+                    'fallback': 'fallback text',
+                    'text': 'attach this',
+                    'footer': 'footer 1',
+                    'pretext': 'pre-attach this',
+                    'color': 'danger',
+                    'fields': [
+                        {
+                            'title': 'test_field1',
+                            'value': 'test_value1',
+                            'short': False
+                        },
+                        {
+                            'title': 'test_field2',
+                            'value': 'test_value2',
+                            'short': True
+                        }
+                    ]
+                }
+            ]
 
         }
         rsp = p.notify(**data)
