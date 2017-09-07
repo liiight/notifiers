@@ -14,7 +14,7 @@ class Pushover(Provider):
               'persistent', 'echo', 'updown', 'none']
 
     @property
-    def schema(self):
+    def schema(self) -> dict:
         return {
             'type': 'object',
             'properties': {
