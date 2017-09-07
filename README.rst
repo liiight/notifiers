@@ -173,6 +173,7 @@ Supported providers
 
 - `Pushover <https://pushover.net/>`_
 - `SimplePush <https://simplepush.io/>`_
+- `Slack <https://api.slack.com/>`_
 
 In the near future
 ------------------
