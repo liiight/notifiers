@@ -22,7 +22,7 @@ pip-tools==1.9.0
 py==1.4.34                # via pytest
 pygments==2.2.0           # via sphinx
 pytest-cov==2.5.1
-pytest==3.1.3
+pytest==3.2.2
 pytz==2017.2              # via babel
 requests==2.18.3          # via codecov, sphinx
 six==1.10.0               # via pip-tools, sphinx
