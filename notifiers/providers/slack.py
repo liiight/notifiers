@@ -16,7 +16,8 @@ class Slack(Provider):
             'properties': {
                 'webhook_url': {
                     'type': 'string',
-                    'title': 'This is the text that will be posted to the channel'
+                    'title': 'the webhook URL to use.'
+                             ' Register one at https://my.slack.com/services/new/incoming-webhook/'
                 },
                 'icon_url': {
                     'type': 'string',
@@ -37,6 +38,10 @@ class Slack(Provider):
                 'unfurl_links': {
                     'type': 'boolean',
                     'title': 'avoid automatic attachment creation from URLs'
+                },
+                'message': {
+                    'type': 'string',
+                    'title': 'This is the text that will be posted to the channel'
                 },
                 'attachments': {
                     'type': 'object',
@@ -86,9 +91,21 @@ class Slack(Provider):
                     'additionalProperties': False
                 }
             },
-            'required': ['webhook_url'],
+            'required': ['webhook_url', 'message'],
             'additionalProperties': False
         }
+
+    def _prepare_data(self, data: dict) -> dict:
+        text = data.pop('message')
+        data['text'] = text
+        if data.get('icon_emoji'):
+            icon_emoji = data['icon_emoji']
+            if not icon_emoji.startswith(':'):
+                icon_emoji = ':' + icon_emoji
+            if not icon_emoji.endswith(':'):
+                icon_emoji += ':'
+            data['icon_emoji'] = icon_emoji
+        return data
 
     def _send_notification(self, data: dict) -> Response:
         url = data.pop('webhook_url')
@@ -100,7 +117,7 @@ class Slack(Provider):
         except requests.RequestException as e:
             if e.response is not None:
                 response_data['response'] = e.response
-                response_data['errors'] = e.response.json()
+                response_data['errors'] = [e.response.text]
             else:
                 response_data['errors'] = [(str(e))]
         return create_response(**response_data)
