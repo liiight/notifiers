@@ -28,17 +28,15 @@ class SimplePush(Provider):
         return data
 
     def _send_notification(self, data: dict) -> Response:
+        response_data = {'provider_name': self.provider_name,
+                         'data': data}
         try:
             response = requests.post(self.base_url, data=data)
             response.raise_for_status()
         except requests.RequestException as e:
             if e.response is not None:
-                response = e.response
-                errors = [response.json()['message']]
+                response_data['response'] = e.response
+                response_data['errors'] = [e.response.json()['message']]
             else:
-                response = None
-                errors = (str(e))
-            return create_response(provider_name=self.provider_name, data=data, response=response, failed=True,
-                                   errors=errors)
-
-        return create_response(provider_name=self.provider_name, data=data, response=response)
+                response_data['errors'] = [(str(e))]
+        return create_response(**response_data)
