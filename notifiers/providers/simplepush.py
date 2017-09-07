@@ -14,10 +14,14 @@ class SimplePush(Provider):
         return {
             'type': 'object',
             'properties': {
-                'key': {'type': 'string',
-                        'title': 'your user key'},
-                'message': {'type': 'string',
-                            'title': 'your message'},
+                'key': {
+                    'type': 'string',
+                    'title': 'your user key'
+                },
+                'message': {
+                    'type': 'string',
+                    'title': 'your message'
+                },
             },
             'required': ['key', 'message'],
             'additionalProperties': False
