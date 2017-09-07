@@ -13,7 +13,7 @@ def create_response(provider_name: str, data: dict, response: requests.Response 
     :param response: :class:`requests.Response` if exist
     :param failed: Flag to determine if response succeeded or not
     :param errors: List of errors if relevant
-    :return:
+    :return: A :class:`Response` object
     """
     status = 'Failure' if failed else 'Success'
     return Response(status=status, provider=provider_name, data=data, response=response, errors=errors)
