@@ -68,6 +68,16 @@ class Provider(object):
     def required(self) -> list:
         return self.schema.get('required', [])
 
+    @property
+    def defaults(self) -> dict:
+        return {}
+
+    def _merge_defaults(self, data: dict) -> dict:
+        for key, value in self.defaults.items():
+            if key not in data:
+                data[key] = value
+        return data
+
     def _get_environs(self, prefix: str = None) -> dict:
         if not prefix:
             prefix = DEFAULT_ENVIRON_PREFIX
