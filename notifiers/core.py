@@ -125,7 +125,8 @@ from .providers import _all_providers
 
 
 def get_notifier(provider_name: str) -> Provider:
-    return _all_providers.get(provider_name)()
+    if provider_name in _all_providers:
+        return _all_providers[provider_name]()
 
 
 def all_providers() -> list:
