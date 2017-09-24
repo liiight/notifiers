@@ -35,8 +35,8 @@ class TestSMTP(object):
         with pytest.raises(NotificationError) as e:
             rsp = p.notify(**data)
             rsp.raise_on_errors()
-        assert 'Errno 61' in e.value.message
-        assert any('Errno 61' in error for error in rsp.errors)
+        assert any(error in e.value.message for error in ['Errno 111', 'Errno 61'])
+        assert any(error in rsp_error for rsp_error in rsp.errors for error in ['Errno 111', 'Errno 61'])
 
     @pytest.mark.online
     def test_smtp_sanity(self):
