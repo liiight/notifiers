@@ -135,11 +135,9 @@ class SMTP(Provider):
             if not self.configuration or not self.smtp_server or self.configuration != configuration:
                 self._connect_to_server(data)
             email = self._build_email(data)
-            response_data['response'] = self.smtp_server.sendmail(data['from'], data['to'], email.as_string())
-
+            self.smtp_server.sendmail(data['from'], data['to'], email.as_string())
         except (
                 SMTPServerDisconnected, SMTPSenderRefused, socket.error, OSError, IOError, SMTPAuthenticationError
         ) as e:
-            response_data['response'] = None
             response_data['errors'] = [str(e)]
         return create_response(**response_data)
