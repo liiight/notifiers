@@ -5,17 +5,17 @@ from notifiers.exceptions import NotifierException
 
 
 @click.group()
-def cli():
+def notifiers():
     """Notifiers CLI operation"""
 
 
-@cli.command()
+@notifiers.command()
 def providers():
     """Shows all available providers"""
     click.echo(', '.join(all_providers()))
 
 
-@cli.command(context_settings=dict(
+@notifiers.command(context_settings=dict(
     ignore_unknown_options=True,
     allow_extra_args=True,
 ))
@@ -39,15 +39,12 @@ def notify(ctx, provider):
             raise click.ClickException('\'message\' option is required. '
                                        'Either pass it explicitly or pipe into the command')
         data['message'] = message
-    try:
-        rsp = p.notify(**data)
-        rsp.raise_on_errors()
-    except NotifierException as e:
-        click.secho(f'ERROR: {e.message}', bold=True, fg='red')
-        ctx.abort()
+
+    rsp = p.notify(**data)
+    rsp.raise_on_errors()
 
 
-@cli.command()
+@notifiers.command()
 @click.argument('provider', type=click.Choice(all_providers()), envvar='NOTIFIERS_DEFAULT_PROVIDER')
 def required(provider):
     """Shows the required attributes of a provider.
@@ -58,7 +55,7 @@ def required(provider):
     click.echo(', '.join(p.required))
 
 
-@cli.command()
+@notifiers.command()
 @click.argument('provider', type=click.Choice(all_providers()), envvar='NOTIFIERS_DEFAULT_PROVIDER')
 def arguments(provider):
     """Shows the name and schema of all the  attributes of a provider.
@@ -72,7 +69,7 @@ def arguments(provider):
     click.echo(', '.join(p.required))
 
 
-@cli.command()
+@notifiers.command()
 @click.argument('provider', type=click.Choice(all_providers()))
 def metadata(provider):
     """Shows the provider's metadata.
@@ -84,7 +81,7 @@ def metadata(provider):
         click.echo(f'{k}: {v}')
 
 
-@cli.command()
+@notifiers.command()
 @click.argument('provider', type=click.Choice(all_providers()))
 def defaults(provider):
     """Shows the provider's defaults.
@@ -99,7 +96,14 @@ def defaults(provider):
 
 
 def entry_point():
-    cli(obj={})
+    try:
+        from notifiers_cli.providers import provider_commands
+        for command in provider_commands:
+            notifiers.add_command(command)
+        notifiers(obj={})
+    except NotifierException as e:
+        click.secho(f'ERROR: {e.message}', bold=True, fg='red')
+        exit(1)
 
 
 if __name__ == '__main__':

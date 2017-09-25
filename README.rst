@@ -185,6 +185,7 @@ Supported providers
 - `Slack <https://api.slack.com/>`_
 - `Gmail <https://www.google.com/gmail/about/>`_
 - Email (SMTP)
+- `Telegram <https://telegram.org/>`_
 
 In the near future
 ------------------
