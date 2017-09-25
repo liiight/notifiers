@@ -13,7 +13,7 @@ class TestCLI(object):
     ])
     def test_bad_notify(self, command, exit_code, error):
         """Test invalid notification usage"""
-        from notifiers_cli.cli import notify
+        from notifiers_cli.core import notify
         runner = CliRunner()
 
         result = runner.invoke(notify, [command])
@@ -22,7 +22,7 @@ class TestCLI(object):
 
     def test_notify_sanity(self):
         """Test valid notification usage"""
-        from notifiers_cli.cli import notify
+        from notifiers_cli.core import notify
         runner = CliRunner()
         result = runner.invoke(notify, ['mock', 'required=foo', 'message=bar'])
         assert result.exit_code == 0
@@ -30,7 +30,7 @@ class TestCLI(object):
 
     def test_providers(self, ):
         """Test providers command"""
-        from notifiers_cli.cli import providers
+        from notifiers_cli.core import providers
         runner = CliRunner()
         result = runner.invoke(providers, [])
         assert result.exit_code == 0
@@ -38,7 +38,7 @@ class TestCLI(object):
 
     def test_metadata(self):
         """Test metadata command"""
-        from notifiers_cli.cli import metadata
+        from notifiers_cli.core import metadata
         runner = CliRunner()
         result = runner.invoke(metadata, ['mock'])
         assert result.exit_code == 0
@@ -48,7 +48,7 @@ class TestCLI(object):
 
     def test_required(self):
         """Test metadata command"""
-        from notifiers_cli.cli import required
+        from notifiers_cli.core import required
         runner = CliRunner()
         result = runner.invoke(required, ['mock'])
         assert result.exit_code == 0
@@ -56,7 +56,7 @@ class TestCLI(object):
 
     def test_arguments(self):
         """Test metadata command"""
-        from notifiers_cli.cli import arguments
+        from notifiers_cli.core import arguments
         runner = CliRunner()
         result = runner.invoke(arguments, ['mock'])
         assert result.exit_code == 0
@@ -66,7 +66,7 @@ class TestCLI(object):
 
     def test_no_defaults(self):
         """Test defaults command"""
-        from notifiers_cli.cli import defaults
+        from notifiers_cli.core import defaults
         runner = CliRunner()
         result = runner.invoke(defaults, ['pushover'])
         assert result.exit_code == 0
@@ -74,7 +74,7 @@ class TestCLI(object):
 
     def test_defaults(self):
         """Test defaults command"""
-        from notifiers_cli.cli import defaults
+        from notifiers_cli.core import defaults
         runner = CliRunner()
         result = runner.invoke(defaults, ['mock'])
         assert result.exit_code == 0
@@ -83,7 +83,7 @@ class TestCLI(object):
 
     def test_piping_input(self):
         """Test piping in message"""
-        from notifiers_cli.cli import notify
+        from notifiers_cli.core import notify
         runner = CliRunner()
         result = runner.invoke(notify, ['mock', 'required=foo'], input='bar')
         assert result.exit_code == 0
@@ -93,7 +93,7 @@ class TestCLI(object):
         """Test default provider environ"""
         monkeypatch.setenv('NOTIFIERS_DEFAULT_PROVIDER', 'mock')
         monkeypatch.setenv('NOTIFIERS_MOCK_PROVIDER_REQUIRED', 'foo')
-        from notifiers_cli.cli import notify
+        from notifiers_cli.core import notify
         runner = CliRunner()
         result = runner.invoke(notify, [], input='foo')
         assert result.exit_code == 0
