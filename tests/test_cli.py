@@ -64,6 +64,23 @@ class TestCLI(object):
         assert 'not_required' in result.output
         assert 'message' in result.output
 
+    def test_no_defaults(self):
+        """Test defaults command"""
+        from notifiers_cli.cli import defaults
+        runner = CliRunner()
+        result = runner.invoke(defaults, ['pushover'])
+        assert result.exit_code == 0
+        assert 'pushover has no defaults set' in result.output
+
+    def test_defaults(self):
+        """Test defaults command"""
+        from notifiers_cli.cli import defaults
+        runner = CliRunner()
+        result = runner.invoke(defaults, ['mock'])
+        assert result.exit_code == 0
+        assert 'option_with_default: foo' in result.output
+
+
     def test_piping_input(self):
         """Test piping in message"""
         from notifiers_cli.cli import notify

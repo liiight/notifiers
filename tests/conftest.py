@@ -16,6 +16,7 @@ def mock_provider(monkeypatch) -> Provider:
             'properties': {
                 'not_required': one_or_more({'type': 'string'}),
                 'required': {'type': 'string'},
+                'option_with_default': {'type': 'string'},
                 'message': {'type': 'string'}
             },
             'required': ['required'],
@@ -23,6 +24,12 @@ def mock_provider(monkeypatch) -> Provider:
         }
         site_url = 'https://www.mock.com'
         provider_name = 'mock_provider'
+
+        @property
+        def defaults(self):
+            return {
+                'option_with_default': 'foo'
+            }
 
         def _send_notification(self, data: dict):
             return Response(status='success', provider=self.provider_name, data=data)
