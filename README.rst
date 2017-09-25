@@ -174,6 +174,7 @@ Supported providers
 - `Pushover <https://pushover.net/>`_
 - `SimplePush <https://simplepush.io/>`_
 - `Slack <https://api.slack.com/>`_
+- Email (SMTP)
 
 In the near future
 ------------------
