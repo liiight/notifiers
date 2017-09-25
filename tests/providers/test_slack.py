@@ -1,7 +1,6 @@
 import pytest
 
 from notifiers import get_notifier
-from notifiers.exceptions import BadArguments, NotificationError
 
 
 class TestSlack(object):
