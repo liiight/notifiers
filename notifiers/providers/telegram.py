@@ -79,12 +79,12 @@ class Telegram(Provider):
                 response_data['errors'] = [(str(e))]
         return create_response(**response_data)
 
-    def get_me(self, token) -> dict:
-        url = self.base_url.format(token=token, method='getMe')
+    def updates(self, token) -> list:
+        url = self.base_url.format(token=token, method='getUpdates')
         try:
             response = requests.get(url)
             response.raise_for_status()
             return response.json()['result']
         except requests.RequestException as e:
             message = e.response.json()['description']
-            raise NotifierException(provider=self.provider_name, message=message, )
+            raise NotifierException(provider=self.provider_name, message=message)
