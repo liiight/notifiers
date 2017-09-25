@@ -152,8 +152,10 @@ class Slack(Provider):
 
     def _send_notification(self, data: dict) -> Response:
         url = data.pop('webhook_url')
-        response_data = {'provider_name': self.provider_name,
-                         'data': data}
+        response_data = {
+            'provider_name': self.provider_name,
+            'data': data
+        }
         try:
             response = requests.post(url, json=data)
             response.raise_for_status()

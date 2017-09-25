@@ -32,8 +32,10 @@ class SimplePush(Provider):
         return data
 
     def _send_notification(self, data: dict) -> Response:
-        response_data = {'provider_name': self.provider_name,
-                         'data': data}
+        response_data = {
+            'provider_name': self.provider_name,
+            'data': data
+        }
         try:
             response = requests.post(self.base_url, data=data)
             response.raise_for_status()

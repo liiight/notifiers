@@ -89,7 +89,7 @@ class Provider(object):
         return environs
 
     def _prepare_data(self, data: dict) -> dict:
-        return
+        return data
 
     def _send_notification(self, data: dict):
         raise NotImplementedError
@@ -117,6 +117,7 @@ class Provider(object):
 
         self._validate_data(kwargs, validator)
         data = self._prepare_data(kwargs)
+        data = self._merge_defaults(data)
         return self._send_notification(data)
 
 

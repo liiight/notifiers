@@ -99,7 +99,6 @@ class SMTP(Provider):
     def _prepare_data(self, data: dict) -> dict:
         if isinstance(data['to'], list):
             data['to'] = list_to_commas(data['to'])
-        data = self._merge_defaults(data)
         return data
 
     def _build_email(self, data: dict) -> MIMEMultipart:
@@ -128,8 +127,10 @@ class SMTP(Provider):
         return {data['host'], data['port'], data.get('username')}
 
     def _send_notification(self, data: dict) -> Response:
-        response_data = {'provider_name': self.provider_name,
-                         'data': data}
+        response_data = {
+            'provider_name': self.provider_name,
+            'data': data
+        }
         try:
             configuration = self._get_configuration(data)
             if not self.configuration or not self.smtp_server or self.configuration != configuration:
