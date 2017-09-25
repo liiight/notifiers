@@ -110,7 +110,15 @@ View all available providers (continuously updated):
 .. code:: python
 
     >>> notifiers.all_providers()
-    ['pushover']
+    ['pushover', 'simplepush', 'slack', 'email', 'gmail']
+
+Some provider have default values set:
+
+.. code:: python
+   >>> e = notifiers.get_notifier('gmail')
+   >>> e.defaults
+   {'subject': "New email from 'notifiers'!", 'from': '<USER@LOCAL_HOST>', 'host': 'smtp.gmail.com', 'port': 587, 'tls': True, 'ssl': False, 'html': False}
+
 
 Environment variables
 ---------------------
@@ -148,6 +156,7 @@ Notifiers come with CLI support::
 
     Commands:
       arguments  Shows the name and schema of all the...
+      defaults   Shows the provider's defaults.
       metadata   Shows the provider's metadata.
       notify     Send a notification to a passed provider.
       providers  Shows all available providers

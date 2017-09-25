@@ -84,6 +84,20 @@ def metadata(provider):
         click.echo(f'{k}: {v}')
 
 
+@cli.command()
+@click.argument('provider', type=click.Choice(all_providers()))
+def defaults(provider):
+    """Shows the provider's defaults.
+    Example:
+        notifiers defaults pushover
+    """
+    p = get_notifier(provider)
+    if not p.defaults:
+        click.echo(f'{provider} has no defaults set')
+    for k, v in p.defaults.items():
+        click.echo(f'{k}: {v}')
+
+
 def entry_point():
     cli(obj={})
 
