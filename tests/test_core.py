@@ -24,7 +24,8 @@ class TestCore(object):
                 ]
             },
             'required': {'type': 'string'},
-            'message': {'type': 'string'}
+            'message': {'type': 'string'},
+            'option_with_default': {'type': 'string'}
         }
 
         assert p.required == ['required']
@@ -60,7 +61,8 @@ class TestCore(object):
         p = mock_provider()
         rsp = p.notify(**self.valid_data)
         assert rsp.data == {'not_required': 'foo,bar',
-                            'required': 'foo'}
+                            'required': 'foo',
+                            'option_with_default': 'foo'}
 
     def test_get_notifier(self, mock_provider):
         """Test ``get_notifier()`` helper function"""
@@ -91,7 +93,7 @@ class TestCore(object):
 
         assert repr(e.value) == '<NotificationError: Notification errors: an error>'
         assert e.value.errors == ['an error']
-        assert e.value.data == {'not_required': 'foo,bar', 'required': 'foo'}
+        assert e.value.data == {'not_required': 'foo,bar', 'required': 'foo', 'option_with_default': 'foo'}
         assert e.value.message == 'Notification errors: an error'
         assert e.value.provider == p.provider_name
 
