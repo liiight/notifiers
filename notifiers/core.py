@@ -72,11 +72,14 @@ class Provider(object):
     def defaults(self) -> dict:
         return {}
 
+    def _merge_dict_into_dict(self, target_dict: dict, merge_dict: dict) -> dict:
+        for key, value in merge_dict.items():
+            if key not in target_dict:
+                target_dict[key] = value
+        return target_dict
+
     def _merge_defaults(self, data: dict) -> dict:
-        for key, value in self.defaults.items():
-            if key not in data:
-                data[key] = value
-        return data
+        return self._merge_dict_into_dict(data, self.defaults)
 
     def _get_environs(self, prefix: str = None) -> dict:
         if not prefix:
@@ -113,7 +116,7 @@ class Provider(object):
         env_prefix = kwargs.pop('env_prefix', None)
         environs = self._get_environs(env_prefix)
         if environs:
-            kwargs = {**kwargs, **environs}
+            kwargs = self._merge_dict_into_dict(kwargs, environs)
 
         self._validate_data(kwargs, validator)
         data = self._prepare_data(kwargs)

@@ -111,3 +111,12 @@ class TestCore(object):
         rsp = p.notify(env_prefix=prefix)
         assert rsp.status == 'success'
         assert rsp.data['required'] == 'foo'
+
+    def test_provided_data_takes_precedence_over_environ(self, mock_provider, monkeypatch):
+        """Verify that given data overrides environ"""
+        p = mock_provider()
+        prefix = f'mock_'
+        monkeypatch.setenv(f'{prefix}{p.provider_name}_required'.upper(), 'foo')
+        rsp = p.notify(required='bar', env_prefix=prefix)
+        assert rsp.status == 'success'
+        assert rsp.data['required'] == 'bar'
