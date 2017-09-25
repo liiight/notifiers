@@ -1,7 +1,7 @@
 import pytest
 
 from notifiers import get_notifier
-from notifiers.exceptions import BadArguments, NotificationError
+from notifiers.exceptions import BadArguments
 
 
 class TestSimplePush(object):
