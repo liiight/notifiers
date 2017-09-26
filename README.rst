@@ -115,9 +115,10 @@ View all available providers (continuously updated):
 Some provider have default values set:
 
 .. code:: python
->>> e = notifiers.get_notifier('gmail')
-   >>> e.defaults
-   {'subject': "New email from 'notifiers'!", 'from': '<USER@LOCAL_HOST>', 'host': 'smtp.gmail.com', 'port': 587, 'tls': True, 'ssl': False, 'html': False}
+
+    >>> e = notifiers.get_notifier('gmail')
+    >>> e.defaults
+    {'subject': "New email from 'notifiers'!", 'from': '<USER@LOCAL_HOST>', 'host': 'smtp.gmail.com', 'port': 587, 'tls': True, 'ssl': False, 'html': False}
 
 
 Environment variables
