@@ -52,11 +52,20 @@ class Provider(object):
         return f'<Provider:[{self.provider_name.capitalize()}]>'
 
     @property
-    def schema(self):
+    def schema(self) -> dict:
+        """
+        A property method that'll hold the provider schema.
+        Schema MUST be an object and this method must be overridden
+
+        :return: JSON schema of the provider
+        """
         raise NotImplementedError
 
     @property
     def metadata(self) -> dict:
+        """
+        Returns a dict of the provider metadata as declared.. Override if needed.
+        """
         return {
             'base_url': self.base_url,
             'site_url': self.site_url,
@@ -65,17 +74,36 @@ class Provider(object):
 
     @property
     def arguments(self) -> dict:
+        """
+        Returns all of the provider argument as declared in the JSON schema
+        """
         return dict(self.schema['properties'].items())
 
     @property
     def required(self) -> list:
+        """
+        Return a list of the required provider arguments. By default, it tries to access the ``required``
+         property of the JSON schema. If such a property doesn't exist (perhaps required is enforced via a
+          sophisticated schema form), override this method to return the correct list of required arguments.
+        """
         return self.schema.get('required', [])
 
     @property
     def defaults(self) -> dict:
+        """
+        A dict of default provider values if such is needed.
+        """
         return {}
 
     def _merge_dict_into_dict(self, target_dict: dict, merge_dict: dict) -> dict:
+        """
+        Merges ``merge_dict`` into ``target_dict`` if the latter does not already contain a value for each of the key
+        names in ``merge_dict``. Used to cleanly merge default and environ data into notification payload.
+
+        :param target_dict: The target dict to merge into and return, the user provided data for example
+        :param merge_dict: The data that should be merged into the target data
+        :return: A dict of merged data
+        """
         log.debug('merging dict %s into %s', merge_dict, target_dict)
         for key, value in merge_dict.items():
             if key not in target_dict:
@@ -83,10 +111,23 @@ class Provider(object):
         return target_dict
 
     def _merge_defaults(self, data: dict) -> dict:
+        """
+        Convenience method that calls :function:``_merge_dict_into_dict`` in order to merge default values
+
+        :param data: Notification data
+        :return: A merged dict of provided data with added defaults
+        """
         log.debug('merging defaults %s into data %s', self.defaults, data)
         return self._merge_dict_into_dict(data, self.defaults)
 
     def _get_environs(self, prefix: str = None) -> dict:
+        """
+        Fetches set environment variables if such exist.
+        Searches for `[PREFIX_NAME]_[PROVIDER_NAME]_[ARGUMENT]` for each of the arguments defined in the schema
+
+        :param prefix: The environ prefix to use. If not supplied, uses the default
+        :return: A dict of arguments and value retrieved from environs
+        """
         if not prefix:
             log.debug('using default environ prefix')
             prefix = DEFAULT_ENVIRON_PREFIX
@@ -99,9 +140,23 @@ class Provider(object):
         return environs
 
     def _prepare_data(self, data: dict) -> dict:
+        """
+        Use this method to manipulate data that'll fit the respected provider API.
+         For example, all provider must use the ``message`` argument but sometimes provider expects a different
+         variable name for this, like ``text``.
+
+        :param data: Notification data
+        :return: Returns manipulated data, if there's a need for such manipulations.
+        """
         return data
 
-    def _send_notification(self, data: dict):
+    def _send_notification(self, data: dict) -> Response:
+        """
+        The core method to trigger the provider notification. Must be overridden.
+
+        :param data: Notification data
+        :return: Returns a :class:``Response`` object
+        """
         raise NotImplementedError
 
     def _validate_schema(self, validator: jsonschema.Draft4Validator):
