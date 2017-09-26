@@ -29,7 +29,7 @@ The easiest way to send push notifications!
     :target: https://pypi.python.org/pypi/notifiers
     :alt: Status
 
-See `Changelog <CHANGELOG.md>`_ for recent changes
+    See `Changelog <CHANGELOG.md>`_ for recent changes
 
 Got an app or service and you want to enable your users to use push notification with their provider of choice? You don't need to implement ש solution yourself, or use individual provider libs. A one stop shop for all notification providers with a unified and simple interface.
 See below for a list of `Supported providers`_
@@ -115,7 +115,7 @@ View all available providers (continuously updated):
 Some provider have default values set:
 
 .. code:: python
-   >>> e = notifiers.get_notifier('gmail')
+>>> e = notifiers.get_notifier('gmail')
    >>> e.defaults
    {'subject': "New email from 'notifiers'!", 'from': '<USER@LOCAL_HOST>', 'host': 'smtp.gmail.com', 'port': 587, 'tls': True, 'ssl': False, 'html': False}
 
@@ -177,6 +177,23 @@ You can set ``NOTIFIERS_DEFAULT_PROVIDER`` environment variable which will be us
 
 Note that unlike the other environment variables, you cannot change the prefix of this one.
 
+Provider specific CLI
+---------------------
+
+Some providers have their own CLI commands::
+
+    $ notifiers telegram --help
+    Usage: core.py telegram [OPTIONS] COMMAND [ARGS]...
+
+      Telegram specific commands
+
+    Options:
+      --help  Show this message and exit.
+
+    Commands:
+      updates  Get a list of active chat IDs for your bot.
+
+
 Supported providers
 -------------------
 
@@ -199,6 +216,3 @@ Why python 3 only?
 I wanted to avoid the whole unicode issue fiasco if possible, but
 there isn't a real constraint in adding python 2 support. If there’s an
 overwhelming desire for this, i’ll do it. Probably.
-
-
-
