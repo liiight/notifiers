@@ -1,4 +1,5 @@
 import os
+import logging
 
 import jsonschema
 import requests
@@ -6,6 +7,8 @@ import requests
 from .exceptions import SchemaError, BadArguments, NotificationError
 
 DEFAULT_ENVIRON_PREFIX = 'NOTIFIERS_'
+
+log = logging.getLogger('notifiers')
 
 
 class Response(object):
@@ -73,18 +76,22 @@ class Provider(object):
         return {}
 
     def _merge_dict_into_dict(self, target_dict: dict, merge_dict: dict) -> dict:
+        log.debug('merging dict %s into %s', merge_dict, target_dict)
         for key, value in merge_dict.items():
             if key not in target_dict:
                 target_dict[key] = value
         return target_dict
 
     def _merge_defaults(self, data: dict) -> dict:
+        log.debug('merging defaults %s into data %s', self.defaults, data)
         return self._merge_dict_into_dict(data, self.defaults)
 
     def _get_environs(self, prefix: str = None) -> dict:
         if not prefix:
+            log.debug('using default environ prefix')
             prefix = DEFAULT_ENVIRON_PREFIX
         environs = {}
+        log.debug('starting to collect environs using prefix: \'%s\'', prefix)
         for arg in self.arguments:
             environ = f'{prefix}{self.provider_name}_{arg}'.upper()
             if os.environ.get(environ):
@@ -99,12 +106,14 @@ class Provider(object):
 
     def _validate_schema(self, validator: jsonschema.Draft4Validator):
         try:
+            log.debug('validating provider schema')
             validator.check_schema(self.schema)
         except jsonschema.SchemaError as e:
             raise SchemaError(schema_error=e.message, provider=self.provider_name, data=self.schema)
 
     def _validate_data(self, data: dict, validator: jsonschema.Draft4Validator):
         try:
+            log.debug('validating provided data')
             validator.validate(data)
         except jsonschema.ValidationError as e:
             raise BadArguments(validation_error=e.message, provider=self.provider_name, data=data)
