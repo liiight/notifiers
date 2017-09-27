@@ -18,7 +18,7 @@ idna==2.5                 # via requests
 imagesize==0.7.1          # via sphinx
 jinja2==2.9.6             # via sphinx
 markupsafe==1.0           # via jinja2
-pip-tools==1.9.0
+pip-tools==1.10.0
 py==1.4.34                # via pytest
 pygments==2.2.0           # via sphinx
 pytest-cov==2.5.1
