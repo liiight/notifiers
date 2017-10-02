@@ -29,11 +29,13 @@ setup(
         'dev': load_requirements('dev-requirements.txt')
     },
     classifiers=[
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 5 - Production/Stable",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3.6",
+        "Intended Audience :: Developers",
+        "Intended Audience :: End Users/Desktop"
     ],
     entry_points="""
         [console_scripts]
