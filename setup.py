@@ -14,7 +14,7 @@ def load_requirements(filename):
 
 setup(
     name='notifiers',
-    version='0.5.0',
+    version='0.5.1',
     packages=find_packages(exclude=['notifiers.tests']),
     url='https://github.com/liiight/notifiers',
     license='MIT',
