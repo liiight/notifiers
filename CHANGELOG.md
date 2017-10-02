@@ -1,15 +1,31 @@
 # Change Log
 
+## [Unreleased](https://github.com/liiight/notifiers/tree/HEAD)
+
+[Full Changelog](https://github.com/liiight/notifiers/compare/v0.6.0...HEAD)
+
+
 ## [v0.5.0](https://github.com/liiight/notifiers/tree/v0.5.0) (2017-08-28)
 [Full Changelog](https://github.com/liiight/notifiers/compare/v0.4.3...v0.5.0)
 
 **Implemented enhancements:**
 
+- Add SMTP support  [\#13](https://github.com/liiight/notifiers/issues/13)
+- Add Slack web-hook support [\#9](https://github.com/liiight/notifiers/issues/9)
 - Add simple push support [\#10](https://github.com/liiight/notifiers/issues/10)
+
+**Closed issues:**
+
+- Add telegram support [\#22](https://github.com/liiight/notifiers/issues/22)
+- Library layout need a few improvements [\#19](https://github.com/liiight/notifiers/issues/19)
 
 **Merged pull requests:**
 
+- Added Telegram [\#24](https://github.com/liiight/notifiers/pull/24) ([liiight](https://github.com/liiight))
+- Add - Email \(SMTP\) and Gmail [\#23](https://github.com/liiight/notifiers/pull/23) ([liiight](https://github.com/liiight))
+- Support for Slack webhooks. Closes \#9 [\#18](https://github.com/liiight/notifiers/pull/18) ([liiight](https://github.com/liiight))
 - Added Simplepush. Closed \#10 [\#15](https://github.com/liiight/notifiers/pull/15) ([liiight](https://github.com/liiight))
+
 
 ## [v0.4.3](https://github.com/liiight/notifiers/tree/v0.4.3) (2017-08-23)
 [Full Changelog](https://github.com/liiight/notifiers/compare/v0.4.2...v0.4.3)
