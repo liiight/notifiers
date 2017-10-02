@@ -193,9 +193,20 @@ from .providers import _all_providers
 
 
 def get_notifier(provider_name: str) -> Provider:
+    """
+    Convenience method to return an instantiated :class:``Provider`` object according to it ``provider_name``
+
+    :param provider_name: The ``provider_name`` of the requested :class:``Provider``
+    :return: :class:``Provider`` or None
+    """
     if provider_name in _all_providers:
+        log.debug('found a match for \'%s\', returning', provider_name)
         return _all_providers[provider_name]()
 
 
 def all_providers() -> list:
+    """
+    Returns a list of all :class:``Provider`` names
+
+    """
     return list(_all_providers.keys())
