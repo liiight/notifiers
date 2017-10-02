@@ -182,9 +182,6 @@ Supported providers
 - Email (SMTP)
 - `Telegram <https://telegram.org/>`_
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
 
 Developer information and API
 -----------------------------
@@ -194,6 +191,10 @@ TBD
 
 Indices and tables
 ==================
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
 
 * :ref:`genindex`
 * :ref:`modindex`
