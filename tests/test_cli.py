@@ -132,3 +132,22 @@ class TestProviderSpecificCLI:
         result = runner.invoke(rooms, [token, '-q', 'notifiers/testing'])
         assert result.exit_code == 0
         assert 'notifiers/testing' in result.output
+
+    def test_telegram_updates_negative(self):
+        from notifiers_cli.providers import updates
+        runner = CliRunner()
+        result = runner.invoke(updates, ['bad_token'])
+        assert result.exit_code == -1
+        assert not result.output
+
+    @pytest.mark.online
+    def test_telegram_updates_positive(self):
+        from notifiers_cli.providers import updates
+        token = os.environ.get('NOTIFIERS_TELEGRAM_TOKEN')
+        assert token
+
+        runner = CliRunner()
+        result = runner.invoke(updates, [token])
+        assert result.exit_code == 0
+        replies = ['Bot has not active chats! Send it ANY message and try again', 'Chat ID:']
+        assert any(reply in result.output for reply in replies)
