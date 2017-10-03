@@ -204,6 +204,7 @@ Supported providers
 - `Gmail <https://www.google.com/gmail/about/>`_
 - Email (SMTP)
 - `Telegram <https://telegram.org/>`_
+- `Gitter <https://gitter.im>`_
 
 In the near future
 ------------------
