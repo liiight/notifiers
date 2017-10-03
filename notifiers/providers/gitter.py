@@ -43,7 +43,13 @@ class Gitter(Provider):
         metadata['message_url'] = self.message_url
         return metadata
 
-    def _get_headers(self, token):
+    def _get_headers(self, token: str) -> dict:
+        """
+        Builds Gitter requests header bases on the token provided
+
+        :param token: App token
+        :return: Authentication header dict
+        """
         return {'Authentication': f'Bearer {token}'}
 
     def _send_notification(self, data: dict) -> Response:
@@ -65,7 +71,7 @@ class Gitter(Provider):
                 response_data['errors'] = [(str(e))]
         return create_response(**response_data)
 
-    def rooms(self, token, query=None):
+    def rooms(self, token: str, query: str = None) -> list:
         """
         Return a list of available Gitter rooms. If query param is sent, filters the list according to it
 
