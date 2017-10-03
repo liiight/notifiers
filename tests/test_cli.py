@@ -129,6 +129,6 @@ class TestProviderSpecificCLI:
         assert token
 
         runner = CliRunner()
-        result = runner.invoke(rooms, [token, 'notifiers/testing'])
+        result = runner.invoke(rooms, [token, '-q', 'notifiers/testing'])
         assert result.exit_code == 0
         assert 'notifiers/testing' in result.output
