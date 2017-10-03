@@ -50,7 +50,7 @@ class Gitter(Provider):
         :param token: App token
         :return: Authentication header dict
         """
-        return {'Authentication': f'Bearer {token}'}
+        return {'Authorization': f'Bearer {token}'}
 
     def _send_notification(self, data: dict) -> Response:
         url = self.message_url.format(data.pop('room_id'))
@@ -84,7 +84,7 @@ class Gitter(Provider):
             params = {'q': query} if query else {}
             rsp = requests.get(self.base_url, headers=headers, params=params)
             rsp.raise_for_status()
-            return rsp.json()['results']
+            return rsp.json()['results'] if query else rsp.json()
         except requests.RequestException as e:
             message = e.response.json()['error']
             raise NotifierException(provider=self.provider_name, message=message)
