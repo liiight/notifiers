@@ -49,3 +49,12 @@ class TestGitter:
             rsp = p.notify(**data)
             rsp.raise_on_errors()
         assert 'Bad Request' in e.value.message
+
+    @pytest.mark.online
+    def test_sanity(self):
+        p = get_notifier('gitter')
+        data = {
+            'message': 'bar'
+        }
+        rsp = p.notify(**data)
+        rsp.raise_on_errors()
