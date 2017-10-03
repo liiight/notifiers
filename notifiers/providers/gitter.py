@@ -66,6 +66,13 @@ class Gitter(Provider):
         return create_response(**response_data)
 
     def rooms(self, token, query=None):
+        """
+        Return a list of available Gitter rooms. If query param is sent, filters the list according to it
+
+        :param token: App token
+        :param query: Optional query string
+        :return: List of room IDs
+        """
         try:
             headers = self._get_headers(token)
             params = {'q': query} if query else {}
