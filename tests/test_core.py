@@ -5,7 +5,7 @@ from notifiers.core import Provider, Response
 from notifiers.exceptions import BadArguments, SchemaError, NotificationError
 
 
-class TestCore(object):
+class TestCore:
     """Test core classes"""
     valid_data = {'required': 'foo',
                   'not_required': ['foo', 'bar']}

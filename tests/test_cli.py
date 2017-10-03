@@ -1,10 +1,12 @@
+import os
+
 import pytest
 
 from click.testing import CliRunner
 
 
 @pytest.mark.usefixtures('mock_provider')
-class TestCLI(object):
+class TestCLI:
     """CLI tests"""
 
     @pytest.mark.parametrize('command, exit_code, error', [
@@ -80,7 +82,6 @@ class TestCLI(object):
         assert result.exit_code == 0
         assert 'option_with_default: foo' in result.output
 
-
     def test_piping_input(self):
         """Test piping in message"""
         from notifiers_cli.core import notify
@@ -98,3 +99,36 @@ class TestCLI(object):
         result = runner.invoke(notify, [], input='foo')
         assert result.exit_code == 0
         assert not result.output
+
+
+class TestProviderSpecificCLI:
+    """Test provider specific CLI commands"""
+
+    def test_gitter_rooms_negative(self):
+        from notifiers_cli.providers import rooms
+        runner = CliRunner()
+        result = runner.invoke(rooms, ['bad_token'])
+        assert result.exit_code == -1
+        assert not result.output
+
+    @pytest.mark.online
+    def test_gitter_rooms_positive(self):
+        from notifiers_cli.providers import rooms
+        token = os.environ.get('NOTIFIERS_GITTER_TOKEN')
+        assert token
+
+        runner = CliRunner()
+        result = runner.invoke(rooms, [token])
+        assert result.exit_code == 0
+        assert 'notifiers/testing' in result.output
+
+    @pytest.mark.online
+    def test_gitter_rooms_with_query(self):
+        from notifiers_cli.providers import rooms
+        token = os.environ.get('NOTIFIERS_GITTER_TOKEN')
+        assert token
+
+        runner = CliRunner()
+        result = runner.invoke(rooms, [token, '-q', 'notifiers/testing'])
+        assert result.exit_code == 0
+        assert 'notifiers/testing' in result.output
