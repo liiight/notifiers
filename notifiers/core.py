@@ -11,7 +11,7 @@ DEFAULT_ENVIRON_PREFIX = 'NOTIFIERS_'
 log = logging.getLogger('notifiers')
 
 
-class Response(object):
+class Response:
     """
     A wrapper for the Notification response.
 
@@ -43,7 +43,7 @@ class Response(object):
             raise NotificationError(provider=self.provider, data=self.data, errors=self.errors)
 
 
-class Provider(object):
+class Provider:
     base_url = ''
     site_url = ''
     provider_name = ''
