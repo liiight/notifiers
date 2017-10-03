@@ -53,7 +53,8 @@ class Gitter(Provider):
         return {'Authorization': f'Bearer {token}'}
 
     def _send_notification(self, data: dict) -> Response:
-        url = self.message_url.format(data.pop('room_id'))
+        room_id = data.pop('room_id')
+        url = self.message_url.format(room_id=room_id)
 
         response_data = {
             'provider_name': self.provider_name,
