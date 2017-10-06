@@ -31,7 +31,7 @@ The easiest way to send notifications!
 
 See `Changelog <CHANGELOG.md>`_ for recent changes
 
-Got an app or service and you want to enable your users to use notification with their provider of choice? You don't need to implement ש solution yourself, or use individual provider libs. A one stop shop for all notification providers with a unified and simple interface.
+Got an app or service and you want to enable your users to use notification with their provider of choice? You don't need to implement a solution yourself, or use individual provider libs. A one stop shop for all notification providers with a unified and simple interface.
 See below for a list of `Supported providers`_
 
 Advantages
