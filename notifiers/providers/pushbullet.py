@@ -86,8 +86,11 @@ class Pushbullet(Provider):
             'provider_name': self.provider_name,
             'data': data
         }
+        headers = {
+            'access-token': data.pop('token')
+        }
         try:
-            response = requests.post(self.base_url, jsom=data)
+            response = requests.post(self.base_url, json=data, headers=headers)
             response.raise_for_status()
             response_data['response'] = response
         except requests.RequestException as e:
