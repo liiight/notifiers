@@ -50,17 +50,17 @@ class Pushbullet(Provider):
                 },
                 'channel_tag': {
                     'type': 'string',
-                    'title': '	Channel tag of the target channel, sends a push to all people who are subscribed to '
+                    'title': 'Channel tag of the target channel, sends a push to all people who are subscribed to '
                              'this channel. The current user must own this channel.'
                 },
                 'email': {
                     'type': 'string',
-                    'title': '	Email address to send the push to. If there is a pushbullet user with this address,'
+                    'title': 'Email address to send the push to. If there is a pushbullet user with this address,'
                              ' they get a push, otherwise they get an email'
                 },
                 'guid': {
                     'type': 'string',
-                    'title': '	Unique identifier set by the client, used to identify a push in case you receive it '
+                    'title': 'Unique identifier set by the client, used to identify a push in case you receive it '
                              'from /v2/everything before the call to /v2/pushes has completed. This should be a unique'
                              ' value. Pushes with guid set are mostly idempotent, meaning that sending another push '
                              'with the same guid is unlikely to create another push (it will return the previously'
@@ -71,6 +71,7 @@ class Pushbullet(Provider):
             'additionalProperties': False
         }
 
+    @property
     def defaults(self) -> dict:
         return {
             'type': 'note'
