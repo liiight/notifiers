@@ -159,6 +159,7 @@ class Slack(Provider):
         try:
             response = requests.post(url, json=data)
             response.raise_for_status()
+            response_data['response'] = response
         except requests.RequestException as e:
             if e.response is not None:
                 response_data['response'] = e.response

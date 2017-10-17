@@ -39,6 +39,7 @@ class SimplePush(Provider):
         try:
             response = requests.post(self.base_url, data=data)
             response.raise_for_status()
+            response_data['response'] = response
         except requests.RequestException as e:
             if e.response is not None:
                 response_data['response'] = e.response
