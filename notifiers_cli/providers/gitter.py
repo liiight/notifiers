@@ -1,12 +1,12 @@
 import click
 
 
-@click.group()
+@click.group(name='gitter')
 def gitter_cmd():
     """Gitter specific commands"""
 
 
-@gitter_cmd.command()
+@gitter_cmd.command(short_help='Get available rooms')
 @click.argument('token')
 @click.option('-q', '--query', help='Search query to be used to filter results')
 @click.pass_context

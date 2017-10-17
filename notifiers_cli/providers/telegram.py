@@ -3,12 +3,12 @@ from collections import defaultdict
 import click
 
 
-@click.group()
+@click.group(name='telegram')
 def telegram_cmd():
     """Telegram specific commands"""
 
 
-@telegram_cmd.command()
+@telegram_cmd.command(short_help='Active chat IDs')
 @click.argument('token')
 @click.pass_context
 def updates(ctx, token):
