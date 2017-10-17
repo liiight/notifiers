@@ -1,7 +1,7 @@
 import pytest
 
 from notifiers import get_notifier
-from notifiers.exceptions import BadArguments, NotificationError
+from notifiers.exceptions import BadArguments
 
 
 class TestPushbullet:
@@ -37,7 +37,7 @@ class TestPushbullet:
         data = {
             'message': 'foo',
             'type': 'link',
-            'url': 'http://gogle.com',
+            'url': 'https://google.com',
             'title': '❤',
             # todo add the rest
         }
