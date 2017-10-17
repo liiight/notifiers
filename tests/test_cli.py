@@ -101,11 +101,11 @@ class TestCLI:
         assert not result.output
 
 
-class TestProviderSpecificCLI:
-    """Test provider specific CLI commands"""
+class TestGitterCLI:
+    """Test gitter specific CLI commands"""
 
     def test_gitter_rooms_negative(self):
-        from notifiers_cli.providers import rooms
+        from notifiers_cli.providers.gitter import rooms
         runner = CliRunner()
         result = runner.invoke(rooms, ['bad_token'])
         assert result.exit_code == -1
@@ -113,7 +113,7 @@ class TestProviderSpecificCLI:
 
     @pytest.mark.online
     def test_gitter_rooms_positive(self):
-        from notifiers_cli.providers import rooms
+        from notifiers_cli.providers.gitter import rooms
         token = os.environ.get('NOTIFIERS_GITTER_TOKEN')
         assert token
 
@@ -124,7 +124,7 @@ class TestProviderSpecificCLI:
 
     @pytest.mark.online
     def test_gitter_rooms_with_query(self):
-        from notifiers_cli.providers import rooms
+        from notifiers_cli.providers.gitter import rooms
         token = os.environ.get('NOTIFIERS_GITTER_TOKEN')
         assert token
 
@@ -133,8 +133,12 @@ class TestProviderSpecificCLI:
         assert result.exit_code == 0
         assert 'notifiers/testing' in result.output
 
+
+class TestTelegramCLI:
+    """Test telegram specific CLI"""
+
     def test_telegram_updates_negative(self):
-        from notifiers_cli.providers import updates
+        from notifiers_cli.providers.telegram import updates
         runner = CliRunner()
         result = runner.invoke(updates, ['bad_token'])
         assert result.exit_code == -1
@@ -142,7 +146,7 @@ class TestProviderSpecificCLI:
 
     @pytest.mark.online
     def test_telegram_updates_positive(self):
-        from notifiers_cli.providers import updates
+        from notifiers_cli.providers.telegram import updates
         token = os.environ.get('NOTIFIERS_TELEGRAM_TOKEN')
         assert token
 
@@ -150,4 +154,27 @@ class TestProviderSpecificCLI:
         result = runner.invoke(updates, [token])
         assert result.exit_code == 0
         replies = ['Bot has not active chats! Send it ANY message and try again', 'Chat ID:']
+        assert any(reply in result.output for reply in replies)
+
+
+class TestPushbulletCLI:
+    """Test pushbullet specific CLI"""
+
+    def test_pushbullet_devices_negative(self):
+        from notifiers_cli.providers.pushbullet import devices
+        runner = CliRunner()
+        result = runner.invoke(devices, ['bad_token'])
+        assert result.exit_code == -1
+        assert not result.output
+
+    @pytest.mark.online
+    def test_telegram_updates_positive(self):
+        from notifiers_cli.providers.pushbullet import devices
+        token = os.environ.get('NOTIFIERS_PUSHBULLET_TOKEN')
+        assert token
+
+        runner = CliRunner()
+        result = runner.invoke(devices, [token])
+        assert result.exit_code == 0
+        replies = ['You have no devices associated with this token', 'Nickname: ']
         assert any(reply in result.output for reply in replies)

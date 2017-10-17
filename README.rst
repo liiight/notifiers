@@ -31,7 +31,7 @@ The easiest way to send notifications!
 
 See `Changelog <CHANGELOG.md>`_ for recent changes
 
-Got an app or service and you want to enable your users to use notification with their provider of choice? You don't need to implement a solution yourself, or use individual provider libs. A one stop shop for all notification providers with a unified and simple interface.
+Got an app or service and you want to enable your users to use notifications with their provider of choice? You don't need to implement a solution yourself, or use individual provider libs. A one stop shop for all notification providers with a unified and simple interface.
 See below for a list of `Supported providers`_
 
 Advantages
@@ -110,7 +110,7 @@ View all available providers (continuously updated):
 .. code:: python
 
     >>> notifiers.all_providers()
-    ['pushover', 'simplepush', 'slack', 'email', 'gmail']
+    ['pushover', 'simplepush', 'slack', 'email', 'gmail', 'pushbullet']
 
 Some provider have default values set:
 
@@ -205,6 +205,7 @@ Supported providers
 - Email (SMTP)
 - `Telegram <https://telegram.org/>`_
 - `Gitter <https://gitter.im>`_
+- `Pushbullet <https://www.pushbullet.com>`_
 
 In the near future
 ------------------

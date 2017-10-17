@@ -194,9 +194,9 @@ from .providers import _all_providers
 
 def get_notifier(provider_name: str) -> Provider:
     """
-    Convenience method to return an instantiated :class:``Provider`` object according to it ``provider_name``
+    Convenience method to return an instantiated :class:`Provider` object according to it ``provider_name``
 
-    :param provider_name: The ``provider_name`` of the requested :class:``Provider``
+    :param provider_name: The ``provider_name`` of the requested :class:`Provider`
     :return: :class:``Provider`` or None
     """
     if provider_name in _all_providers:
@@ -206,7 +206,7 @@ def get_notifier(provider_name: str) -> Provider:
 
 def all_providers() -> list:
     """
-    Returns a list of all :class:``Provider`` names
+    Returns a list of all :class:`Provider` names
 
     """
     return list(_all_providers.keys())
