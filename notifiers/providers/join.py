@@ -183,7 +183,10 @@ class Join(Provider):
         try:
             response = requests.get(self.devices_url, params=params)
             response.raise_for_status()
-            return response.json()['records']
+            if not response['success']:
+                message = response['errorMessage']
+                raise NotifierException(provider=self.provider_name, message=message)
         except requests.RequestException as e:
             message = e.response.json()['errorMessage']
             raise NotifierException(provider=self.provider_name, message=message)
+        return response.json()['records']

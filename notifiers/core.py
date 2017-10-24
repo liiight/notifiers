@@ -161,6 +161,11 @@ class Provider:
         raise NotImplementedError
 
     def _validate_schema(self, validator: jsonschema.Draft4Validator):
+        """
+        Validates provider schema for syntax issues. Raises :class:`SchemaError` if relevant
+
+        :param validator: :class:`jsonschema.Draft4Validator`
+        """
         try:
             log.debug('validating provider schema')
             validator.check_schema(self.schema)
@@ -168,10 +173,16 @@ class Provider:
             raise SchemaError(schema_error=e.message, provider=self.provider_name, data=self.schema)
 
     def _validate_data(self, data: dict, validator: jsonschema.Draft4Validator):
+        """
+        Validates data against provider schema. Raises :class:`BadArguments` if relevant
+
+        :param data: Data to validate
+        :param validator: :class:`jsonschema.Draft4Validator`
+        """
         log.debug('validating provided data')
-        message = best_match(validator.iter_errors(data)).message
-        if message:
-            raise BadArguments(validation_error=message, provider=self.provider_name, data=data)
+        e = best_match(validator.iter_errors(data))
+        if e:
+            raise BadArguments(validation_error=e.message, provider=self.provider_name, data=data)
 
     def notify(self, **kwargs: dict) -> Response:
         validator = jsonschema.Draft4Validator(self.schema)
