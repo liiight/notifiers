@@ -2,6 +2,7 @@ import os
 import logging
 
 import jsonschema
+from jsonschema.exceptions import best_match
 import requests
 
 from .exceptions import SchemaError, BadArguments, NotificationError
@@ -167,11 +168,10 @@ class Provider:
             raise SchemaError(schema_error=e.message, provider=self.provider_name, data=self.schema)
 
     def _validate_data(self, data: dict, validator: jsonschema.Draft4Validator):
-        try:
-            log.debug('validating provided data')
-            validator.validate(data)
-        except jsonschema.ValidationError as e:
-            raise BadArguments(validation_error=e.message, provider=self.provider_name, data=data)
+        log.debug('validating provided data')
+        message = best_match(validator.iter_errors(data)).message
+        if message:
+            raise BadArguments(validation_error=message, provider=self.provider_name, data=data)
 
     def notify(self, **kwargs: dict) -> Response:
         validator = jsonschema.Draft4Validator(self.schema)

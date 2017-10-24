@@ -121,38 +121,18 @@ class Join(Provider):
                     'title': 'Notification image'
                 }
             },
-            'required': ['apikey'],
-            'all': [
-                {
-                    'anyOf': [
-                        {'required': ['deviceId']},
-                        {'required': ['deviceIds']},
-                        {'required': ['deviceNames']}
-                    ],
-                    'error_anyOf': 'One of deviceId, deviceIds, deviceNames is required'
+            'dependencies': {
+                'smstext': ['smsnumber'],
+                'callnumber': ['smsnumber']
+            },
+            'required': ['apikey', 'message'],
+            'additionalProperties': False
+        }
 
-                },
-                {
-                    'anyOf': [
-                        {'required': ['text']},
-                        {'required': ['clipboard']},
-                        {'required': ['url']},
-                        {'required': ['file']},
-                        {'required': ['callnumber']},
-                        {'required': ['smsnumber']},
-                        {'required': ['smstext']},
-                        {'required': ['wallpaper']},
-                        {'required': ['interruptionFilter']},
-                        {'required': ['mediaVolume']},
-                        {'required': ['ringVolume']},
-                        {'required': ['alarmVolume']},
-                        {'required': ['location']},
-                        {'required': ['find']}
-                    ],
-                    'error_anyOf': 'Must include at least one of text, clipboard, url, file, callnumber, smsnumber,'
-                                   ' smstext, wallpaper, interruptionFilter, mediaVolume, ringVolume, alarmVolume, '
-                                   'location or find'
-                }]
+    @property
+    def defaults(self) -> dict:
+        return {
+            'deviceId': 'group.all'
         }
 
     @property
