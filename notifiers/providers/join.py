@@ -112,11 +112,6 @@ class Join(Provider):
                     'minimum': -2,
                     'maximum': 2
                 },
-                'vibration': {
-                    'type': 'string',
-                    'title': 'if the notification is received on an Android device, the vibration pattern in this '
-                             'field will change the way the device vibrates with it'
-                },
                 'group': {
                     'type': 'string',
                     'title': 'allows you to join notifications in different groups'
