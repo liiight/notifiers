@@ -25,6 +25,10 @@ class TestJoin:
             p.notify(**data)
         assert f'\'{message}\' is a required property' in e.value.message
 
+    def test_defaults(self):
+        p = get_notifier('join')
+        assert p.defaults == {'deviceId': 'group.all'}
+
     @pytest.mark.online
     def test_sanity(self):
         p = get_notifier('join')
