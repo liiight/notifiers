@@ -59,6 +59,32 @@ class Join(Provider):
                     'type': 'string',
                     'title': 'some text to send in an SMS'
                 },
+                'callnumber': {
+                    'type': 'string',
+                    'title': 'number to call to'
+                },
+                'interruptionFilter': {
+                    'type': 'integer',
+                    'minimum': 1,
+                    'maximum': 4,
+                    'title': 'set interruption filter mode'
+                },
+                'mmsfile': {
+                    'type': 'string',
+                    'title': 'publicly accessible mms file url'
+                },
+                'mediaVolume': {
+                    'type': 'integer',
+                    'title': 'set device media volume'
+                },
+                'ringVolume': {
+                    'type': 'string',
+                    'title': 'set device ring volume'
+                },
+                'alarmVolume': {
+                    'type': 'string',
+                    'title': 'set device alarm volume'
+                },
                 'wallpaper': {
                     'type': 'string',
                     'title': 'a publicly accessible URL of an image file'
@@ -74,13 +100,11 @@ class Join(Provider):
                 },
                 'icon': {
                     'type': 'string',
-                    'title': 'If a notification is created on the receiving device and this is set, '
-                             'then it’ll be used as the notification’s icon'
+                    'title': 'notification\'s icon'
                 },
                 'smallicon': {
                     'type': 'string',
-                    'title': 'If a notification is created on the receiving device and this is set, '
-                             'then it’ll be used as the notification’s status bar icon'
+                    'title': 'Status Bar Icon'
                 },
                 'priority': {
                     'type': 'integer',
@@ -92,8 +116,48 @@ class Join(Provider):
                     'type': 'string',
                     'title': 'if the notification is received on an Android device, the vibration pattern in this '
                              'field will change the way the device vibrates with it'
+                },
+                'group': {
+                    'type': 'string',
+                    'title': 'allows you to join notifications in different groups'
+                },
+                'image': {
+                    'type': 'string',
+                    'title': 'Notification image'
                 }
-            }
+            },
+            'required': ['apikey'],
+            'all': [
+                {
+                    'anyOf': [
+                        {'required': ['deviceId']},
+                        {'required': ['deviceIds']},
+                        {'required': ['deviceNames']}
+                    ],
+                    'error_anyOf': 'One of deviceId, deviceIds, deviceNames is required'
+
+                },
+                {
+                    'anyOf': [
+                        {'required': ['text']},
+                        {'required': ['clipboard']},
+                        {'required': ['url']},
+                        {'required': ['file']},
+                        {'required': ['callnumber']},
+                        {'required': ['smsnumber']},
+                        {'required': ['smstext']},
+                        {'required': ['wallpaper']},
+                        {'required': ['interruptionFilter']},
+                        {'required': ['mediaVolume']},
+                        {'required': ['ringVolume']},
+                        {'required': ['alarmVolume']},
+                        {'required': ['location']},
+                        {'required': ['find']}
+                    ],
+                    'error_anyOf': 'Must include at least one of text, clipboard, url, file, callnumber, smsnumber,'
+                                   ' smstext, wallpaper, interruptionFilter, mediaVolume, ringVolume, alarmVolume, '
+                                   'location or find'
+                }]
         }
 
     @property
@@ -119,6 +183,9 @@ class Join(Provider):
             response = requests.get(self.base_url, params=data)
             response.raise_for_status()
             response_data['response'] = response
+            rsp = response.json()
+            if not rsp['success']:
+                response_data['errors'] = [rsp['errorMessage']]
         except requests.RequestException as e:
             if e.response is not None:
                 response_data['response'] = e.response
