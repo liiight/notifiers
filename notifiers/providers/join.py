@@ -183,8 +183,9 @@ class Join(Provider):
         try:
             response = requests.get(self.devices_url, params=params)
             response.raise_for_status()
-            if not response['success']:
-                message = response['errorMessage']
+            rsp = response.json()
+            if not rsp['success']:
+                message = rsp['errorMessage']
                 raise NotifierException(provider=self.provider_name, message=message)
         except requests.RequestException as e:
             message = e.response.json()['errorMessage']
