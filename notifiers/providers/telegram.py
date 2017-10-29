@@ -81,6 +81,12 @@ class Telegram(Provider):
         return create_response(**response_data)
 
     def updates(self, token) -> list:
+        """
+        Get a list of updates for the bot token, lets you see the relevant chat IDs
+
+        :param token: Bot token
+        :return: List of updates
+        """
         url = self.base_url.format(token=token, method='getUpdates')
         try:
             response = requests.get(url)

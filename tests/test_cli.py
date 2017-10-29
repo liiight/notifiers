@@ -178,3 +178,26 @@ class TestPushbulletCLI:
         assert result.exit_code == 0
         replies = ['You have no devices associated with this token', 'Nickname: ']
         assert any(reply in result.output for reply in replies)
+
+
+class TestJoinCLI:
+    """Test join specific CLI"""
+
+    def test_join_devices_negative(self):
+        from notifiers_cli.providers.join import devices
+        runner = CliRunner()
+        result = runner.invoke(devices, ['bad_token'])
+        assert result.exit_code == -1
+        assert not result.output
+
+    @pytest.mark.online
+    def test_join_updates_positive(self):
+        from notifiers_cli.providers.join import devices
+        token = os.environ.get('NOTIFIERS_JOIN_APIKEY')
+        assert token
+
+        runner = CliRunner()
+        result = runner.invoke(devices, [token])
+        assert result.exit_code == 0
+        replies = ['You have no devices associated with this apikey', 'Device name: ']
+        assert any(reply in result.output for reply in replies)

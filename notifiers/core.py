@@ -2,6 +2,7 @@ import os
 import logging
 
 import jsonschema
+from jsonschema.exceptions import best_match
 import requests
 
 from .exceptions import SchemaError, BadArguments, NotificationError
@@ -160,6 +161,11 @@ class Provider:
         raise NotImplementedError
 
     def _validate_schema(self, validator: jsonschema.Draft4Validator):
+        """
+        Validates provider schema for syntax issues. Raises :class:`SchemaError` if relevant
+
+        :param validator: :class:`jsonschema.Draft4Validator`
+        """
         try:
             log.debug('validating provider schema')
             validator.check_schema(self.schema)
@@ -167,10 +173,15 @@ class Provider:
             raise SchemaError(schema_error=e.message, provider=self.provider_name, data=self.schema)
 
     def _validate_data(self, data: dict, validator: jsonschema.Draft4Validator):
-        try:
-            log.debug('validating provided data')
-            validator.validate(data)
-        except jsonschema.ValidationError as e:
+        """
+        Validates data against provider schema. Raises :class:`BadArguments` if relevant
+
+        :param data: Data to validate
+        :param validator: :class:`jsonschema.Draft4Validator`
+        """
+        log.debug('validating provided data')
+        e = best_match(validator.iter_errors(data))
+        if e:
             raise BadArguments(validation_error=e.message, provider=self.provider_name, data=data)
 
     def notify(self, **kwargs: dict) -> Response:
