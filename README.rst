@@ -206,6 +206,7 @@ Supported providers
 - `Telegram <https://telegram.org/>`_
 - `Gitter <https://gitter.im>`_
 - `Pushbullet <https://www.pushbullet.com>`_
+- `Join <https://joaoapps.com/join/>`_
 
 In the near future
 ------------------
