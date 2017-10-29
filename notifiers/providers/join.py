@@ -125,6 +125,19 @@ class Join(Provider):
                 'smstext': ['smsnumber'],
                 'callnumber': ['smsnumber']
             },
+            'anyOf': [
+                {
+                    'dependencies': {
+                        'smsnumber': ['smstext']
+                    }
+                },
+                {
+                    'dependencies':{
+                        'smsnumber': ['mmsfile']
+                    }
+                }
+            ],
+            'error_anyOf': 'Must use either \'smstext\' or \'mmsfile\' with \'smsnumber\'',
             'required': ['apikey', 'message'],
             'additionalProperties': False
         }
