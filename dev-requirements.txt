@@ -23,7 +23,7 @@ py==1.4.34                # via pytest
 pygments==2.2.0           # via sphinx
 pytest-cov==2.5.1
 pytest==3.2.3
-pytz==2017.2              # via babel
+pytz==2017.3              # via babel
 requests==2.18.3          # via codecov, sphinx
 six==1.11.0               # via pip-tools, sphinx
 snowballstemmer==1.2.1    # via sphinx
