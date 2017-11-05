@@ -7,7 +7,7 @@
 alabaster==0.7.10         # via sphinx
 babel==2.5.1              # via sphinx
 bumpversion==0.5.3
-certifi==2017.7.27.1      # via requests
+certifi==2017.11.5      # via requests
 chardet==3.0.4            # via requests
 click==6.7                # via pip-tools
 codecov==2.0.9
