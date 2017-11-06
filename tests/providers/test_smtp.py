@@ -30,7 +30,8 @@ class TestSMTP(object):
         p = get_notifier('email')
         data = {
             'to': 'foo',
-            'message': 'bar'
+            'message': 'bar',
+            'host': 'http://nohost'
         }
         with pytest.raises(NotificationError) as e:
             rsp = p.notify(**data)
