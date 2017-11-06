@@ -36,7 +36,7 @@ class TestSMTP(object):
         with pytest.raises(NotificationError) as e:
             rsp = p.notify(**data)
             rsp.raise_on_errors()
-        possible_errors = ['Errno 111', 'Errno 61', 'Errno 8']
+        possible_errors = ['Errno 111', 'Errno 61', 'Errno 8', 'Errno -2']
         assert any(error in e.value.message for error in possible_errors), \
             f'Error not in expected errors; {e.value.message}'
         assert any(error in rsp_error for rsp_error in rsp.errors for error in possible_errors), \
