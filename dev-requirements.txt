@@ -16,7 +16,7 @@ docutils==0.14            # via sphinx
 first==2.0.1              # via pip-tools
 idna==2.5                 # via requests
 imagesize==0.7.1          # via sphinx
-jinja2==2.9.6             # via sphinx
+jinja2==2.10             # via sphinx
 markupsafe==1.0           # via jinja2
 pip-tools==1.10.1
 py==1.4.34                # via pytest
