@@ -19,7 +19,7 @@ imagesize==0.7.1          # via sphinx
 jinja2==2.9.6             # via sphinx
 markupsafe==1.0           # via jinja2
 pip-tools==1.10.1
-py==1.4.34                # via pytest
+py==1.5.0                # via pytest
 pygments==2.2.0           # via sphinx
 pytest-cov==2.5.1
 pytest==3.2.4
