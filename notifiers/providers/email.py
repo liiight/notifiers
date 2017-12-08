@@ -124,7 +124,7 @@ class SMTP(Provider):
             self.smtp_server.login(data['username'], data['password'])
 
     def _get_configuration(self, data: dict) -> tuple:
-        return {data['host'], data['port'], data.get('username')}
+        return data['host'], data['port'], data.get('username')
 
     def _send_notification(self, data: dict) -> Response:
         response_data = {
