@@ -46,6 +46,10 @@ class SMTP(Provider):
                     'type': 'string',
                     'title': 'the FROM address to use in the email'
                 },
+                'from_': {
+                    'type': 'string',
+                    'title': 'the FROM address to use in the email'
+                },
                 'host': {
                     'type': 'string',
                     'title': 'the host of the SMTP server'
@@ -99,6 +103,9 @@ class SMTP(Provider):
     def _prepare_data(self, data: dict) -> dict:
         if isinstance(data['to'], list):
             data['to'] = list_to_commas(data['to'])
+        # A workaround since `from` is a reserved word
+        if data.get('from_'):
+            data['from'] = data['from_']
         return data
 
     def _build_email(self, data: dict) -> MIMEMultipart:
