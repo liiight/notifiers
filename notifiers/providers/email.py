@@ -11,7 +11,7 @@ from ..utils.helpers import create_response
 from ..utils.json_schema import one_or_more, list_to_commas
 
 DEFAULT_SUBJECT = 'New email from \'notifiers\'!'
-DEFAULT_FROM = getpass.getuser() + '@' + socket.getfqdn()
+DEFAULT_FROM = f'{getpass.getuser()}@{socket.getfqdn()}'
 DEFAULT_SMTP_HOST = 'localhost'
 
 
