@@ -185,7 +185,7 @@ class HipChat(Provider):
     }
 
     @property
-    def schema(self):
+    def schema(self) -> dict:
         return {
             'type': 'object',
             'properties': {
@@ -205,6 +205,10 @@ class HipChat(Provider):
                     'title': 'The message body',
                     'maxLength': 10_000,
                     'minLength': 1
+                },
+                'token': {
+                    'type': 'string',
+                    'title': 'User token'
                 },
                 'notify': {
                     'type': 'boolean',
@@ -243,10 +247,10 @@ class HipChat(Provider):
                 'icon': self.__icon,
                 'team_server': {
                     'type': ' string',
-                    'title': 'An alternate team server'
+                    'title': 'An alternate team server. Example: \'https://hipchat.corp-domain.com\''
                 }
             },
-            'required': ['message', 'id'],
+            'required': ['message', 'id', 'token'],
             'oneOf': [
                 {
                     'required': ['room']
@@ -257,3 +261,47 @@ class HipChat(Provider):
             ],
             'additionalProperties': False
         }
+
+    def _prepare_data(self, data: dict) -> dict:
+        base_url = self.base_url if not data.get('team_server') else data.pop('team_server')
+        if data.get('room'):
+            base_url += self.room_url.format(data.pop('room'))
+        elif data.get('user'):
+            base_url += self.user_url.format(data.pop('user'))
+        data['url'] = base_url
+        return data
+
+    @property
+    def metadata(self) -> dict:
+        metadata = super().metadata
+        metadata['room_url'] = self.room_url
+        metadata['user_url'] = self.user_url
+        return metadata
+
+    def _get_headers(self, token: str) -> dict:
+        """
+        Builds hipchat requests header bases on the token provided
+
+        :param token: App token
+        :return: Authentication header dict
+        """
+        return {'Authorization': f'Bearer {token}'}
+
+    def _send_notification(self, data: dict) -> Response:
+        url = data.pop('url')
+        headers = self._get_headers(data.pop['token'])
+        response_data = {
+            'provider_name': self.provider_name,
+            'data': data
+        }
+        try:
+            response = requests.post(url, json=data, headers=headers)
+            response.raise_for_status()
+            response_data['response'] = response
+        except requests.RequestException as e:
+            if e.response is not None:
+                response_data['response'] = e.response
+                response_data['errors'] = [e.response.json()['error']['message']]
+            else:
+                response_data['errors'] = [(str(e))]
+        return create_response(**response_data)
