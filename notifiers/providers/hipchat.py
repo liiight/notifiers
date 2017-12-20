@@ -7,8 +7,10 @@ from ..exceptions import NotifierException
 
 class HipChat(Provider):
     base_url = 'https://{group}.hipchat.com'
-    room_url = '/v2/room/{room}/notification'
-    user_url = '/v2/user/{user}/message'
+    room_url = '/v2/room'
+    user_url = '/v2/user'
+    room_notification_url = room_url + '/{room}/notification'
+    user_message_url = user_url + '/{user}/message'
     site_url = 'https://www.hipchat.com/docs/apiv2'
     provider_name = 'hipchat'
 
@@ -184,9 +186,31 @@ class HipChat(Provider):
         'additionalProperties': False
     }
 
+    __required = {
+        'allOf': [
+            {'required': ['message', 'id', 'token']},
+            {'oneOf': [
+                {
+                    'required': ['room']
+                },
+                {
+                    'required': ['user']
+                }
+            ], 'error_oneOf': 'Must select one of \'room\' or \'user\''},
+            {'oneOf': [
+                {
+                    'required': ['group']
+                },
+                {
+                    'required': ['team_server']
+                }
+            ], 'error_oneOf': 'Must select one of \'group\' or \'team_server\''}
+        ]
+    }
+
     @property
     def schema(self) -> dict:
-        return {
+        schema = {
             'type': 'object',
             'properties': {
                 'room': {
@@ -248,34 +272,35 @@ class HipChat(Provider):
                 'team_server': {
                     'type': ' string',
                     'title': 'An alternate team server. Example: \'https://hipchat.corp-domain.com\''
+                },
+                'group': {
+                    'type': 'string',
+                    'title': 'HipChat group name'
                 }
             },
-            'required': ['message', 'id', 'token'],
-            'oneOf': [
-                {
-                    'required': ['room']
-                },
-                {
-                    'required': ['user']
-                }
-            ],
             'additionalProperties': False
         }
+        schema.update(self.__required)
+        return schema
+
+    @property
+    def required(self) -> dict:
+        return self.__required
 
     def _prepare_data(self, data: dict) -> dict:
-        base_url = self.base_url if not data.get('team_server') else data.pop('team_server')
+        base_url = self.base_url.format(data.pop('group')) if not data.get('team_server') else data.pop('team_server')
         if data.get('room'):
-            base_url += self.room_url.format(data.pop('room'))
+            base_url += self.room_notification_url.format(data.pop('room'))
         elif data.get('user'):
-            base_url += self.user_url.format(data.pop('user'))
+            base_url += self.user_message_url.format(data.pop('user'))
         data['url'] = base_url
         return data
 
     @property
     def metadata(self) -> dict:
         metadata = super().metadata
-        metadata['room_url'] = self.room_url
-        metadata['user_url'] = self.user_url
+        metadata['room_url'] = self.room_notification_url
+        metadata['user_url'] = self.user_message_url
         return metadata
 
     def _get_headers(self, token: str) -> dict:
@@ -305,3 +330,36 @@ class HipChat(Provider):
             else:
                 response_data['errors'] = [(str(e))]
         return create_response(**response_data)
+
+    def rooms(self, token: str, group: str = None, team_server: str = None, start: int = 1, max: int = 100,
+              private: bool = True, archived: bool = False) -> dict:
+        """
+        View all available rooms via the used Token. Requires the 'manage_rooms' scope
+
+        :param token: User token
+        :param start: Start index
+        :param max: Max results in reply. Max value is 1000
+        :param private: Include private rooms
+        :param archived: Include archived rooms
+        :return: Dict of rooms
+        """
+        options = [group, team_server]
+        if not any(options) or all(options):
+            raise NotifierException(provider=self.provider_name,
+                                    message='Must provide exactly one of \'group\' or \'team_server\'')
+        url = self.base_url.format(group) if group else team_server
+        url += self.room_url
+        headers = self._get_headers(token)
+        params = {
+            'start-index': start,
+            'max-results': max,
+            'include-private': private,
+            'include-archived': archived
+        }
+        try:
+            rsp = requests.get(url, headers=headers, params=params)
+            rsp.raise_for_status()
+            return rsp.json()
+        except requests.RequestException as e:
+            message = e.response.json()['error']['message']
+            raise NotifierException(provider=self.provider_name, message=message)
