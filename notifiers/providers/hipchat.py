@@ -339,6 +339,8 @@ class HipChat(Provider):
         :param token: User token
         :param start: Start index
         :param max: Max results in reply. Max value is 1000
+        :param group: Hipchat group name. Either this or `team_server` is required
+        :param team_server: Hipchat team server. Either this or `group` is required
         :param private: Include private rooms
         :param archived: Include archived rooms
         :return: Dict of rooms
@@ -355,6 +357,41 @@ class HipChat(Provider):
             'max-results': max,
             'include-private': private,
             'include-archived': archived
+        }
+        try:
+            rsp = requests.get(url, headers=headers, params=params)
+            rsp.raise_for_status()
+            return rsp.json()
+        except requests.RequestException as e:
+            message = e.response.json()['error']['message']
+            raise NotifierException(provider=self.provider_name, message=message)
+
+    def users(self, token: str, group: str = None, team_server: str = None, start: int = 1, max: int = 100,
+              guests: bool = False, deleted: bool = False) -> dict:
+        """
+        View all available rooms via the used Token. Requires the 'view_group' scope
+
+        :param token: User token
+        :param start: Start index
+        :param max: Max results in reply. Max value is 1000
+        :param group: Hipchat group name. Either this or `team_server` is required
+        :param team_server: Hipchat team server. Either this or `group` is required
+        :param guests: Include active guest users in response. Otherwise, no guest users will be included.
+        :param deleted: Include deleted users in response
+        :return: Dict of rooms
+        """
+        options = [group, team_server]
+        if not any(options) or all(options):
+            raise NotifierException(provider=self.provider_name,
+                                    message='Must provide exactly one of \'group\' or \'team_server\'')
+        url = self.base_url.format(group) if group else team_server
+        url += self.room_url
+        headers = self._get_headers(token)
+        params = {
+            'start-index': start,
+            'max-results': max,
+            'include-guests': guests,
+            'include-deleted': deleted
         }
         try:
             rsp = requests.get(url, headers=headers, params=params)
