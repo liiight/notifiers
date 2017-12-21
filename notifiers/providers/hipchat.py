@@ -331,33 +331,38 @@ class HipChat(Provider):
                 response_data['errors'] = [(str(e))]
         return create_response(**response_data)
 
-    def rooms(self, token: str, group: str = None, team_server: str = None, start: int = 1, max: int = 100,
-              private: bool = True, archived: bool = False) -> dict:
+    def _get_resources(self, resource_name: str, token: str, group: str = None, team_server: str = None,
+                       **kwargs) -> dict:
         """
-        View all available rooms via the used Token. Requires the 'manage_rooms' scope
-
+        Helper method to view group resources
+        :param resource_name: Resource selector, `room` or `user`
         :param token: User token
-        :param start: Start index
-        :param max: Max results in reply. Max value is 1000
         :param group: Hipchat group name. Either this or `team_server` is required
         :param team_server: Hipchat team server. Either this or `group` is required
-        :param private: Include private rooms
-        :param archived: Include archived rooms
-        :return: Dict of rooms
+        :param kwargs: Additional request options
+        :return: Dict of resources
         """
+
         options = [group, team_server]
         if not any(options) or all(options):
             raise NotifierException(provider=self.provider_name,
                                     message='Must provide exactly one of \'group\' or \'team_server\'')
         url = self.base_url.format(group) if group else team_server
-        url += self.room_url
+        url += self.room_url if resource_name == 'room' else self.user_url
         headers = self._get_headers(token)
-        params = {
-            'start-index': start,
-            'max-results': max,
-            'include-private': private,
-            'include-archived': archived
-        }
+        params = {}
+        if kwargs.get('start'):
+            params['start-index'] = kwargs['start']
+        if kwargs.get('max_results'):
+            params['max-results'] = kwargs['max_results']
+        if kwargs.get('private'):
+            params['include-private'] = kwargs['private']
+        if kwargs.get('archived'):
+            params['include-archived'] = kwargs['archived']
+        if kwargs.get('guests'):
+            params['include-guests'] = kwargs['guests']
+        if kwargs.get('deleted'):
+            params['include-deleted'] = kwargs['deleted']
         try:
             rsp = requests.get(url, headers=headers, params=params)
             rsp.raise_for_status()
@@ -366,7 +371,7 @@ class HipChat(Provider):
             message = e.response.json()['error']['message']
             raise NotifierException(provider=self.provider_name, message=message)
 
-    def users(self, token: str, group: str = None, team_server: str = None, start: int = 1, max: int = 100,
+    def users(self, token: str, group: str = None, team_server: str = None, start: int = 1, max_results: int = 100,
               guests: bool = False, deleted: bool = False) -> dict:
         """
         View all available rooms via the used Token. Requires the 'view_group' scope
@@ -380,23 +385,22 @@ class HipChat(Provider):
         :param deleted: Include deleted users in response
         :return: Dict of rooms
         """
-        options = [group, team_server]
-        if not any(options) or all(options):
-            raise NotifierException(provider=self.provider_name,
-                                    message='Must provide exactly one of \'group\' or \'team_server\'')
-        url = self.base_url.format(group) if group else team_server
-        url += self.room_url
-        headers = self._get_headers(token)
-        params = {
-            'start-index': start,
-            'max-results': max,
-            'include-guests': guests,
-            'include-deleted': deleted
-        }
-        try:
-            rsp = requests.get(url, headers=headers, params=params)
-            rsp.raise_for_status()
-            return rsp.json()
-        except requests.RequestException as e:
-            message = e.response.json()['error']['message']
-            raise NotifierException(provider=self.provider_name, message=message)
+        return self._get_resources('user', token, group=group, team_server=team_server, start=start,
+                                   max_results=max_results, guests=guests, deleted=deleted)
+
+    def rooms(self, token: str, group: str = None, team_server: str = None, start: int = 1, max_results: int = 100,
+              private: bool = True, archived: bool = False) -> dict:
+        """
+        View all available rooms via the used Token. Requires the 'manage_rooms' scope
+
+        :param token: User token
+        :param start: Start index
+        :param max: Max results in reply. Max value is 1000
+        :param group: Hipchat group name. Either this or `team_server` is required
+        :param team_server: Hipchat team server. Either this or `group` is required
+        :param private: Include private rooms
+        :param archived: Include archived rooms
+        :return: Dict of rooms
+        """
+        return self._get_resources('room', token, group=group, team_server=team_server, start=start,
+                                   max_results=max_results, private=private, archived=archived)
