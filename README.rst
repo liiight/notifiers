@@ -211,7 +211,7 @@ Supported providers
 In the near future
 ------------------
 
--  Many more providers
+-  SendGrid, Graphite, Stride, Prowl, Teams, Twilio and many more...
 -  Docs!
 
 Why python 3 only?
