@@ -202,3 +202,21 @@ class TestJoinCLI:
         assert result.exit_code == 0
         replies = ['You have no devices associated with this apikey', 'Device name: ']
         assert any(reply in result.output for reply in replies)
+
+
+class TestHipchatCLI:
+    """Test hipchat speicifc CLI"""
+
+    def test_hipchat_rooms_negative(self):
+        from notifiers_cli.providers.hipchat import rooms
+        runner = CliRunner()
+        result = runner.invoke(rooms, ['bad_token'])
+        assert result.exit_code == -1
+        assert not result.output
+
+    def test_hipchat_users_negative(self):
+        from notifiers_cli.providers.hipchat import users
+        runner = CliRunner()
+        result = runner.invoke(users, ['bad_token'])
+        assert result.exit_code == -1
+        assert not result.output
