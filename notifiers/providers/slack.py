@@ -54,7 +54,7 @@ class Slack(Provider):
                             },
                             'author_name': {
                                 'type': 'string',
-                                'title': 'Small text used to display the author\'s name'
+                                'title': "Small text used to display the author's name"
                             },
                             'author_link': {
                                 'type': 'string',
@@ -90,7 +90,7 @@ class Slack(Provider):
                             },
                             'fallback': {
                                 'type': 'string',
-                                'title': 'A plain-text summary of the attachment. This text will be used in clients that don\'t show formatted text (eg. IRC, mobile notifications) and should not contain any markup.'
+                                'title': "A plain-text summary of the attachment. This text will be used in clients that don't show formatted text (eg. IRC, mobile notifications) and should not contain any markup."
                             },
                             'text': {
                                 'type': 'string',
@@ -102,7 +102,7 @@ class Slack(Provider):
                             },
                             'color': {
                                 'type': 'string',
-                                'title': 'Can either be one of \'good\', \'warning\', \'danger\', or any hex color code'
+                                'title': "Can either be one of 'good', 'warning', 'danger', or any hex color code"
                             },
                             'fields': {
                                 'type': 'array',

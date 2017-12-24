@@ -36,8 +36,10 @@ def notify(ctx, provider):
     if 'message' not in data:
         message = click.get_text_stream('stdin').read()
         if not message:
-            raise click.ClickException('\'message\' option is required. '
-                                       'Either pass it explicitly or pipe into the command')
+            raise click.ClickException(
+                "'message' option is required. "
+                "Either pass it explicitly or pipe into the command"
+            )
         data['message'] = message
 
     rsp = p.notify(**data)
@@ -65,7 +67,7 @@ def arguments(provider):
     """
     p = get_notifier(provider)
     for name, schema in p.arguments.items():
-        click.echo(f'Name: \'{name}\', Schema: {schema}')
+        click.echo(f"Name: '{name}', Schema: {schema}")
     click.echo(', '.join(p.required))
 
 

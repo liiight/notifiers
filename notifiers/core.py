@@ -134,7 +134,7 @@ class Provider:
             log.debug('using default environ prefix')
             prefix = DEFAULT_ENVIRON_PREFIX
         environs = {}
-        log.debug('starting to collect environs using prefix: \'%s\'', prefix)
+        log.debug("starting to collect environs using prefix: '%s'", prefix)
         for arg in self.arguments:
             environ = f'{prefix}{self.provider_name}_{arg}'.upper()
             if os.environ.get(environ):
@@ -213,7 +213,7 @@ def get_notifier(provider_name: str) -> Provider:
     :return: :class:``Provider`` or None
     """
     if provider_name in _all_providers:
-        log.debug('found a match for \'%s\', returning', provider_name)
+        log.debug("found a match for '%s', returning", provider_name)
         return _all_providers[provider_name]()
 
 

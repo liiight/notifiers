@@ -100,7 +100,7 @@ class Join(Provider):
                 },
                 'icon': {
                     'type': 'string',
-                    'title': 'notification\'s icon'
+                    'title': "notification's icon"
                 },
                 'smallicon': {
                     'type': 'string',
@@ -137,7 +137,7 @@ class Join(Provider):
                     }
                 }
             ],
-            'error_anyOf': 'Must use either \'smstext\' or \'mmsfile\' with \'smsnumber\'',
+            'error_anyOf': "Must use either 'smstext' or 'mmsfile' with 'smsnumber'",
             'required': ['apikey', 'message'],
             'additionalProperties': False
         }

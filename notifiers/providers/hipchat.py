@@ -213,8 +213,8 @@ class HipChat(Provider):
                 },
                 'user': {
                     'type': 'string',
-                    'title': 'The id, email address, or mention name (beginning with an \'@\') of the user to send a '
-                             'message to.'
+                    'title': "The id, email address, or mention name (beginning with an '@') "
+                             "of the user to send a message to."
                 },
                 'message': {
                     'type': 'string',
@@ -228,9 +228,9 @@ class HipChat(Provider):
                 },
                 'notify': {
                     'type': 'boolean',
-                    'title': 'Whether this message should trigger a user notification (change the tab color,'
-                             ' play a sound, notify mobile phones, etc). Each recipient\'s notification preferences '
-                             'are taken into account.'
+                    'title': "Whether this message should trigger a user notification (change the tab color,"
+                             " play a sound, notify mobile phones, etc). Each recipient's notification preferences "
+                             "are taken into account."
                 },
                 'message_format': {
                     'type': 'string',
@@ -242,7 +242,7 @@ class HipChat(Provider):
                 },
                 'from': {
                     'type': 'string',
-                    'title': 'A label to be shown in addition to the sender\'s name'
+                    'title': "A label to be shown in addition to the sender's name"
                 },
                 'color': {
                     'type': 'string',
@@ -263,7 +263,7 @@ class HipChat(Provider):
                 'icon': self.__icon,
                 'team_server': {
                     'type': 'string',
-                    'title': 'An alternate team server. Example: \'https://hipchat.corp-domain.com\''
+                    'title': "An alternate team server. Example: 'https://hipchat.corp-domain.com'"
                 },
                 'group': {
                     'type': 'string',
@@ -338,8 +338,10 @@ class HipChat(Provider):
 
         options = [group, team_server]
         if not any(options) or all(options):
-            raise NotifierException(provider=self.provider_name,
-                                    message='Must provide exactly one of \'group\' or \'team_server\'')
+            raise NotifierException(
+                provider=self.provider_name,
+                message="Must provide exactly one of 'group' or 'team_server'"
+            )
         url = self.base_url.format(group) if group else team_server
         url += self.room_url if resource_name == 'room' else self.user_url
         headers = self._get_headers(token)
