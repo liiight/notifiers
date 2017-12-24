@@ -4,7 +4,7 @@ from notifiers import get_notifier
 from notifiers.exceptions import BadArguments, NotificationError
 
 
-class TestGmmail(object):
+class TestGmail(object):
     """Gmail tests"""
 
     def test_gmail_metadata(self):
