@@ -205,7 +205,7 @@ class TestJoinCLI:
 
 
 class TestHipchatCLI:
-    """Test hipchat speicifc CLI"""
+    """Test hipchat specific CLI"""
 
     def test_hipchat_rooms_negative(self):
         from notifiers_cli.providers.hipchat import rooms
