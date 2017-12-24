@@ -207,6 +207,7 @@ Supported providers
 - `Gitter <https://gitter.im>`_
 - `Pushbullet <https://www.pushbullet.com>`_
 - `Join <https://joaoapps.com/join/>`_
+- `Hipchat <https://www.hipchat.com/docs/apiv2>`_
 
 In the near future
 ------------------

@@ -105,6 +105,7 @@ class Provider:
         :param merge_dict: The data that should be merged into the target data
         :return: A dict of merged data
         """
+        # todo move this into utils
         log.debug('merging dict %s into %s', merge_dict, target_dict)
         for key, value in merge_dict.items():
             if key not in target_dict:
@@ -170,6 +171,7 @@ class Provider:
             log.debug('validating provider schema')
             validator.check_schema(self.schema)
         except jsonschema.SchemaError as e:
+            # todo generate custom errors when relevant
             raise SchemaError(schema_error=e.message, provider=self.provider_name, data=self.schema)
 
     def _validate_data(self, data: dict, validator: jsonschema.Draft4Validator):

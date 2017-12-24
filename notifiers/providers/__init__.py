@@ -1,4 +1,4 @@
-from . import pushover, simplepush, slack, email, gmail, telegram, gitter, pushbullet, join
+from . import pushover, simplepush, slack, email, gmail, telegram, gitter, pushbullet, join, hipchat
 
 _all_providers = {
     'pushover': pushover.Pushover,
@@ -9,5 +9,6 @@ _all_providers = {
     'telegram': telegram.Telegram,
     'gitter': gitter.Gitter,
     'pushbullet': pushbullet.Pushbullet,
-    'join': join.Join
+    'join': join.Join,
+    'hipchat': hipchat.HipChat
 }
