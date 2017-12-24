@@ -110,7 +110,7 @@ View all available providers (continuously updated):
 .. code:: python
 
     >>> notifiers.all_providers()
-    ['pushover', 'simplepush', 'slack', 'email', 'gmail', 'pushbullet']
+    ['pushover', 'simplepush', 'slack', 'email', 'gmail', 'telegram', 'gitter', 'pushbullet', 'join', 'hipchat']
 
 Some provider have default values set:
 
