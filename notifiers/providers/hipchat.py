@@ -190,20 +190,12 @@ class HipChat(Provider):
         'allOf': [
             {'required': ['message', 'id', 'token']},
             {'oneOf': [
-                {
-                    'required': ['room']
-                },
-                {
-                    'required': ['user']
-                }
+                {'required': ['room']},
+                {'required': ['user']}
             ], 'error_oneOf': 'Must select one of \'room\' or \'user\''},
             {'oneOf': [
-                {
-                    'required': ['group']
-                },
-                {
-                    'required': ['team_server']
-                }
+                {'required': ['group']},
+                {'required': ['team_server']}
             ], 'error_oneOf': 'Must select one of \'group\' or \'team_server\''}
         ]
     }
@@ -270,7 +262,7 @@ class HipChat(Provider):
                 },
                 'icon': self.__icon,
                 'team_server': {
-                    'type': ' string',
+                    'type': 'string',
                     'title': 'An alternate team server. Example: \'https://hipchat.corp-domain.com\''
                 },
                 'group': {
@@ -288,11 +280,11 @@ class HipChat(Provider):
         return self.__required
 
     def _prepare_data(self, data: dict) -> dict:
-        base_url = self.base_url.format(data.pop('group')) if not data.get('team_server') else data.pop('team_server')
+        base_url = self.base_url.format(group=data.pop('group')) if not data.get('team_server') else data.pop('team_server')
         if data.get('room'):
-            base_url += self.room_notification_url.format(data.pop('room'))
+            base_url += self.room_notification_url.format(room=data.pop('room'))
         elif data.get('user'):
-            base_url += self.user_message_url.format(data.pop('user'))
+            base_url += self.user_message_url.format(user=data.pop('user'))
         data['url'] = base_url
         return data
 
@@ -314,7 +306,7 @@ class HipChat(Provider):
 
     def _send_notification(self, data: dict) -> Response:
         url = data.pop('url')
-        headers = self._get_headers(data.pop['token'])
+        headers = self._get_headers(data.pop('token'))
         response_data = {
             'provider_name': self.provider_name,
             'data': data
