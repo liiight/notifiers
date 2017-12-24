@@ -33,8 +33,8 @@ class Telegram(Provider):
                 },
                 'parse_mode': {
                     'type': 'string',
-                    'title': 'Send Markdown or HTML, if you want Telegram apps to show bold, italic,'
-                             ' fixed-width text or inline URLs in your bot\'s message.',
+                    'title': "Send Markdown or HTML, if you want Telegram apps to show bold, italic,"
+                             " fixed-width text or inline URLs in your bot's message.",
                     'enum': [
                         'markdown',
                         'html'

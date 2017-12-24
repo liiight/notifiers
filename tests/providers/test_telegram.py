@@ -27,7 +27,7 @@ class TestTelegram:
         data['env_prefix'] = 'test'
         with pytest.raises(BadArguments) as e:
             p.notify(**data)
-        assert f'\'{message}\' is a required property' in e.value.message
+        assert f"'{message}' is a required property" in e.value.message
 
     def test_bad_token(self):
         p = get_notifier('telegram')

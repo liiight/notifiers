@@ -28,15 +28,15 @@ class Pushover(Provider):
                 },
                 'title': {
                     'type': 'string',
-                    'title': 'your message\'s title, otherwise your app\'s name is used'
+                    'title': "your message's title, otherwise your app's name is used"
                 },
                 'token': {
                     'type': 'string',
-                    'title': 'your application\'s API token'
+                    'title': "your application's API token"
                 },
                 'device': one_or_more({
                     'type': 'string',
-                    'title': 'your user\'s device name to send the message directly to that device'
+                    'title': "your user's device name to send the message directly to that device"
                 }),
                 'priority': {
                     'type': 'number',
@@ -55,15 +55,15 @@ class Pushover(Provider):
                 },
                 'sound': {
                     'type': 'string',
-                    'title': 'the name of one of the sounds supported by device clients to override the '
-                             'user\'s default sound choice',
+                    'title': "the name of one of the sounds supported by device clients to override the "
+                             "user's default sound choice",
                     'enum': self.sounds
                 },
                 'timestamp': {
                     'type': 'integer',
                     'minimum': 0,
-                    'title': 'a Unix timestamp of your message\'s date and time to display to the user, '
-                             'rather than the time your message is received by our API'
+                    'title': "a Unix timestamp of your message's date and time to display to the user, "
+                             "rather than the time your message is received by our API"
                 },
                 'retry': {
                     'type': 'integer',

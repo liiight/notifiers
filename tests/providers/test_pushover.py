@@ -29,7 +29,7 @@ class TestPushover(object):
         data['env_prefix'] = 'test'
         with pytest.raises(BadArguments) as e:
             p.notify(**data)
-        assert f'\'{message}\' is a required property' in e.value.message
+        assert f"'{message}' is a required property" in e.value.message
 
     @pytest.mark.parametrize('data, message', [
         ({}, 'expire'),
