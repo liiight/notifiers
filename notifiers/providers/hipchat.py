@@ -371,7 +371,7 @@ class HipChat(Provider):
 
         :param token: User token
         :param start: Start index
-        :param max: Max results in reply. Max value is 1000
+        :param max_results: Max results in reply. Max value is 1000
         :param group: Hipchat group name. Either this or `team_server` is required
         :param team_server: Hipchat team server. Either this or `group` is required
         :param guests: Include active guest users in response. Otherwise, no guest users will be included.
@@ -388,7 +388,7 @@ class HipChat(Provider):
 
         :param token: User token
         :param start: Start index
-        :param max: Max results in reply. Max value is 1000
+        :param max_results: Max results in reply. Max value is 1000
         :param group: Hipchat group name. Either this or `team_server` is required
         :param team_server: Hipchat team server. Either this or `group` is required
         :param private: Include private rooms
