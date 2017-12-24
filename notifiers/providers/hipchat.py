@@ -192,11 +192,11 @@ class HipChat(Provider):
             {'oneOf': [
                 {'required': ['room']},
                 {'required': ['user']}
-            ], 'error_oneOf': 'Must select one of \'room\' or \'user\''},
+            ]},
             {'oneOf': [
                 {'required': ['group']},
                 {'required': ['team_server']}
-            ], 'error_oneOf': 'Must select one of \'group\' or \'team_server\''}
+            ]}
         ]
     }
 
@@ -280,7 +280,8 @@ class HipChat(Provider):
         return self.__required
 
     def _prepare_data(self, data: dict) -> dict:
-        base_url = self.base_url.format(group=data.pop('group')) if not data.get('team_server') else data.pop('team_server')
+        base_url = self.base_url.format(group=data.pop('group')) if not data.get('team_server') else data.pop(
+            'team_server')
         if data.get('room'):
             base_url += self.room_notification_url.format(room=data.pop('room'))
         elif data.get('user'):
