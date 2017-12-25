@@ -22,6 +22,14 @@ class SimplePush(Provider):
                     'type': 'string',
                     'title': 'your message'
                 },
+                'title': {
+                    'type': 'string',
+                    'title': 'message title'
+                },
+                'event': {
+                    'type': 'string',
+                    'title': 'Event ID'
+                },
             },
             'required': ['key', 'message'],
             'additionalProperties': False
