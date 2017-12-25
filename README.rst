@@ -32,7 +32,20 @@ The easiest way to send notifications!
 See `Changelog <https://github.com/liiight/notifiers/blob/master/CHANGELOG.md>`_ for recent changes
 
 Got an app or service and you want to enable your users to use notifications with their provider of choice? You don't need to implement a solution yourself, or use individual provider libs. A one stop shop for all notification providers with a unified and simple interface.
-See below for a list of `Supported providers`_
+
+Supported providers
+-------------------
+
+- `Pushover <https://pushover.net/>`_
+- `SimplePush <https://simplepush.io/>`_
+- `Slack <https://api.slack.com/>`_
+- `Gmail <https://www.google.com/gmail/about/>`_
+- Email (SMTP)
+- `Telegram <https://telegram.org/>`_
+- `Gitter <https://gitter.im>`_
+- `Pushbullet <https://www.pushbullet.com>`_
+- `Join <https://joaoapps.com/join/>`_
+- `Hipchat <https://www.hipchat.com/docs/apiv2>`_
 
 Advantages
 ----------
@@ -195,24 +208,11 @@ Some providers have their own CLI commands::
       updates  Get a list of active chat IDs for your bot.
 
 
-Supported providers
--------------------
-
-- `Pushover <https://pushover.net/>`_
-- `SimplePush <https://simplepush.io/>`_
-- `Slack <https://api.slack.com/>`_
-- `Gmail <https://www.google.com/gmail/about/>`_
-- Email (SMTP)
-- `Telegram <https://telegram.org/>`_
-- `Gitter <https://gitter.im>`_
-- `Pushbullet <https://www.pushbullet.com>`_
-- `Join <https://joaoapps.com/join/>`_
-- `Hipchat <https://www.hipchat.com/docs/apiv2>`_
-
 In the near future
 ------------------
 
 -  SendGrid, Graphite, Stride, Prowl, Teams, Twilio and many more...
+-  Low level providers (Amazon SNS, Google FCM, OS Toast messages) via ``extra`` dependencies
 -  Docs!
 
 Why python 3 only?
