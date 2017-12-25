@@ -1,8 +1,11 @@
+import os
+
 import pytest
 
 from notifiers.core import Provider, Response
 from notifiers.providers import _all_providers
 from notifiers.utils.json_schema import one_or_more, list_to_commas
+from notifiers.utils.helpers import text_to_bool
 
 
 @pytest.fixture
@@ -52,3 +55,14 @@ def bad_provider() -> Provider:
         pass
 
     return BadProvider
+
+
+def pytest_runtest_setup(item):
+    """
+    Skips PRs if secure env vars are set and test is marked as online
+    """
+    pull_request = text_to_bool(os.environ.get('TRAVIS_PULL_REQUEST'))
+    secure_env_vars = text_to_bool(os.environ.get('TRAVIS_SECURE_ENV_VARS'))
+    online = item.get_marker('online') is not None
+    if online and secure_env_vars and pull_request:
+        pytest.skip('skipping online tests via PRs')
