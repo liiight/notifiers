@@ -46,6 +46,7 @@ Supported providers
 - `Pushbullet <https://www.pushbullet.com>`_
 - `Join <https://joaoapps.com/join/>`_
 - `Hipchat <https://www.hipchat.com/docs/apiv2>`_
+- `Zulip <https://zulipchat.com/>`_
 
 Advantages
 ----------
