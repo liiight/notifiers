@@ -1,4 +1,5 @@
 import pytest
+from click.testing import CliRunner
 
 from notifiers import get_notifier
 from notifiers.exceptions import BadArguments, NotificationError
@@ -43,3 +44,21 @@ class TestHipchat:
             rsp = p.notify(**data)
             rsp.raise_on_errors()
         assert 'Invalid OAuth session' in e.value.message
+
+
+class TestHipchatCLI:
+    """Test hipchat specific CLI"""
+
+    def test_hipchat_rooms_negative(self):
+        from notifiers_cli.providers.hipchat import rooms
+        runner = CliRunner()
+        result = runner.invoke(rooms, ['bad_token'])
+        assert result.exit_code == -1
+        assert not result.output
+
+    def test_hipchat_users_negative(self):
+        from notifiers_cli.providers.hipchat import users
+        runner = CliRunner()
+        result = runner.invoke(users, ['bad_token'])
+        assert result.exit_code == -1
+        assert not result.output
