@@ -186,6 +186,17 @@ class Provider:
         if e:
             raise BadArguments(validation_error=e.message, provider=self.provider_name, data=data)
 
+    def _validate_data_dependencies(self, data: dict) -> dict:
+        """
+        Validates specific dependencies based on the content of the data, as opposed to its structure which can be
+        verified on the schema level
+
+        :param data: Data to validate
+        :return: Return data if its valid
+        :raises: :class:`NotifierException`
+        """
+        return data
+
     def notify(self, **kwargs: dict) -> Response:
         validator = jsonschema.Draft4Validator(self.schema)
         self._validate_schema(validator)
@@ -198,6 +209,7 @@ class Provider:
         self._validate_data(kwargs, validator)
         data = self._prepare_data(kwargs)
         data = self._merge_defaults(data)
+        data = self._validate_data_dependencies(data)
         return self._send_notification(data)
 
 

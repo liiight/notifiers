@@ -4,6 +4,9 @@ import requests
 
 from ..core import Response
 
+FAILURE_STATUS = 'Failure'
+SUCCESS_STATUS = 'Success'
+
 
 def create_response(provider_name: str, data: dict, response: requests.Response = None, failed: bool = False,
                     errors: list = None) -> Response:
@@ -17,7 +20,7 @@ def create_response(provider_name: str, data: dict, response: requests.Response 
     :param errors: List of errors if relevant
     :return: A :class:`Response` object
     """
-    status = 'Failure' if failed else 'Success'
+    status = FAILURE_STATUS if failed else SUCCESS_STATUS
     return Response(status=status, provider=provider_name, data=data, response=response, errors=errors)
 
 
