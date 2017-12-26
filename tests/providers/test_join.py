@@ -32,7 +32,7 @@ class TestJoin:
         p = get_notifier('join')
         assert p.defaults == {'deviceId': 'group.all'}
 
-    @pytest.mark.skip('tests fail due to no device connected')
+    @pytest.mark.xfail('tests fail due to no device connected')
     @pytest.mark.online
     def test_sanity(self):
         p = get_notifier('join')
@@ -51,7 +51,7 @@ class TestJoinCLI:
         assert result.exit_code == -1
         assert not result.output
 
-    @pytest.mark.skip('tests fail due to no device connected')
+    @pytest.mark.xfail('tests fail due to no device connected')
     @pytest.mark.online
     def test_join_updates_positive(self):
         from notifiers_cli.providers.join import devices

@@ -1,7 +1,7 @@
 import os
 
 import pytest
-
+from click.testing import CliRunner
 
 from notifiers import get_notifier
 from notifiers.exceptions import BadArguments
@@ -35,7 +35,7 @@ class TestPushbullet:
         rsp = p.notify(**data)
         rsp.raise_on_errors()
 
-    @pytest.mark.skip('Account is inactive for over a month, figure out how to get around this')
+    @pytest.mark.xfail('Account is inactive for over a month, figure out how to get around this')
     @pytest.mark.online
     def test_all_options(self):
         p = get_notifier('pushbullet')
