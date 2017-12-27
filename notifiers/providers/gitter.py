@@ -11,27 +11,26 @@ class Gitter(Provider):
     site_url = 'https://gitter.im'
     provider_name = 'gitter'
 
-    @property
-    def schema(self) -> dict:
-        return {
-            'type': 'object',
-            'properties': {
-                'message': {
-                    'type': 'string',
-                    'title': 'Body of the message'
-                },
-                'token': {
-                    'type': 'string',
-                    'title': 'access token'
-                },
-                'room_id': {
-                    'type': 'string',
-                    'title': 'ID of the room to send the notification to'
-                }
+    _required = {'required': ['message', 'token', 'room_id']}
+    _schema = {
+        'type': 'object',
+        'properties': {
+            'message': {
+                'type': 'string',
+                'title': 'Body of the message'
             },
-            'required': ['message', 'token', 'room_id'],
-            'additionalProperties': False
-        }
+            'token': {
+                'type': 'string',
+                'title': 'access token'
+            },
+            'room_id': {
+                'type': 'string',
+                'title': 'ID of the room to send the notification to'
+            }
+        },
+        'required': ['message', 'token', 'room_id'],
+        'additionalProperties': False
+    }
 
     def _prepare_data(self, data: dict) -> dict:
         data['text'] = data.pop('message')

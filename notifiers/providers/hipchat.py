@@ -14,7 +14,7 @@ class HipChat(Provider):
     site_url = 'https://www.hipchat.com/docs/apiv2'
     provider_name = 'hipchat'
 
-    __icon = {
+    _icon = {
         'oneOf': [
             {
                 'type': 'string'
@@ -37,7 +37,7 @@ class HipChat(Provider):
         ]
     }
 
-    __value = {
+    _value = {
         'type': 'object',
         'properties': {
             'url': {
@@ -56,17 +56,17 @@ class HipChat(Provider):
                 'type': 'string',
                 'title': 'The text representation of the value'
             },
-            'icon': __icon
+            'icon': _icon
         }
     }
 
-    __attributes = {
+    _attributes = {
         'type': 'array',
         'title': 'List of attributes to show below the card',
         'items': {
             'type': 'object',
             'properties': {
-                'value': __value,
+                'value': _value,
                 'label': {
                     'type': 'string',
                     'title': 'Attribute label',
@@ -79,20 +79,20 @@ class HipChat(Provider):
         }
     }
 
-    __activity = {
+    _activity = {
         'type': 'object',
         'properties': {
             'html': {
                 'type': 'string',
                 'title': 'Html for the activity to show in one line a summary of the action that happened'
             },
-            'icon': __icon,
+            'icon': _icon,
         },
         'required': ['html'],
         'additionalProperties': False
     }
 
-    __thumbnail = {
+    _thumbnail = {
         'type': 'object',
         'properties': {
             'url': {
@@ -120,7 +120,7 @@ class HipChat(Provider):
         'additionalProperties': False
     }
 
-    __format = {
+    _format = {
         'type': 'string',
         'enum': [
             'text', 'html'
@@ -129,7 +129,7 @@ class HipChat(Provider):
                  'applications'
     }
 
-    __description = {
+    _description = {
         'oneOf': [
             {
                 'type': 'string'
@@ -142,7 +142,7 @@ class HipChat(Provider):
                         'minLength': 1,
                         'maxLength': 1000
                     },
-                    'format': __format
+                    'format': _format
                 },
                 'required': ['value', 'format'],
                 'additionalProperties': False
@@ -150,7 +150,7 @@ class HipChat(Provider):
         ]
     }
 
-    __card = {
+    _card = {
         'type': 'object',
         'properties': {
             'style': {
@@ -160,7 +160,7 @@ class HipChat(Provider):
                 ],
                 'title': 'Type of the card'
             },
-            'description': __description,
+            'description': _description,
             'format': {
                 'type': 'string',
                 'enum': [
@@ -178,15 +178,15 @@ class HipChat(Provider):
                 'maxLength': 500,
                 'title': 'The title of the card'
             },
-            'thumbnail': __thumbnail,
-            'activity': __activity,
-            'attributes': __attributes,
+            'thumbnail': _thumbnail,
+            'activity': _activity,
+            'attributes': _attributes,
         },
         'required': ['style', 'title'],
         'additionalProperties': False
     }
 
-    __required = {
+    _required = {
         'allOf': [
             {'required': ['message', 'id', 'token']},
             {'oneOf': [
@@ -199,85 +199,76 @@ class HipChat(Provider):
             ]}
         ]
     }
-
-    @property
-    def schema(self) -> dict:
-        schema = {
-            'type': 'object',
-            'properties': {
-                'room': {
-                    'type': 'string',
-                    'title': 'The id or url encoded name of the room',
-                    'maxLength': 100,
-                    'minLength': 1
-                },
-                'user': {
-                    'type': 'string',
-                    'title': "The id, email address, or mention name (beginning with an '@') "
-                             "of the user to send a message to."
-                },
-                'message': {
-                    'type': 'string',
-                    'title': 'The message body',
-                    'maxLength': 10_000,
-                    'minLength': 1
-                },
-                'token': {
-                    'type': 'string',
-                    'title': 'User token'
-                },
-                'notify': {
-                    'type': 'boolean',
-                    'title': "Whether this message should trigger a user notification (change the tab color,"
-                             " play a sound, notify mobile phones, etc). Each recipient's notification preferences "
-                             "are taken into account."
-                },
-                'message_format': {
-                    'type': 'string',
-                    'enum': [
-                        'text', 'html'
-                    ],
-                    'title': 'Determines how the message is treated by our server and rendered inside HipChat '
-                             'applications'
-                },
-                'from': {
-                    'type': 'string',
-                    'title': "A label to be shown in addition to the sender's name"
-                },
-                'color': {
-                    'type': 'string',
-                    'enum': [
-                        'yellow', 'green', 'red', 'purple', 'gray', 'random'
-                    ],
-                    'title': 'Background color for message'
-                },
-                'attach_to': {
-                    'type': 'string',
-                    'title': 'The message id to to attach this notification to'
-                },
-                'card': self.__card,
-                'id': {
-                    'type': 'string',
-                    'title': 'An id that will help HipChat recognise the same card when it is sent multiple times'
-                },
-                'icon': self.__icon,
-                'team_server': {
-                    'type': 'string',
-                    'title': "An alternate team server. Example: 'https://hipchat.corp-domain.com'"
-                },
-                'group': {
-                    'type': 'string',
-                    'title': 'HipChat group name'
-                }
+    _schema = {
+        'type': 'object',
+        'properties': {
+            'room': {
+                'type': 'string',
+                'title': 'The id or url encoded name of the room',
+                'maxLength': 100,
+                'minLength': 1
             },
-            'additionalProperties': False
-        }
-        schema.update(self.__required)
-        return schema
-
-    @property
-    def required(self) -> dict:
-        return self.__required
+            'user': {
+                'type': 'string',
+                'title': "The id, email address, or mention name (beginning with an '@') "
+                         "of the user to send a message to."
+            },
+            'message': {
+                'type': 'string',
+                'title': 'The message body',
+                'maxLength': 10_000,
+                'minLength': 1
+            },
+            'token': {
+                'type': 'string',
+                'title': 'User token'
+            },
+            'notify': {
+                'type': 'boolean',
+                'title': "Whether this message should trigger a user notification (change the tab color,"
+                         " play a sound, notify mobile phones, etc). Each recipient's notification preferences "
+                         "are taken into account."
+            },
+            'message_format': {
+                'type': 'string',
+                'enum': [
+                    'text', 'html'
+                ],
+                'title': 'Determines how the message is treated by our server and rendered inside HipChat '
+                         'applications'
+            },
+            'from': {
+                'type': 'string',
+                'title': "A label to be shown in addition to the sender's name"
+            },
+            'color': {
+                'type': 'string',
+                'enum': [
+                    'yellow', 'green', 'red', 'purple', 'gray', 'random'
+                ],
+                'title': 'Background color for message'
+            },
+            'attach_to': {
+                'type': 'string',
+                'title': 'The message id to to attach this notification to'
+            },
+            'card': _card,
+            'id': {
+                'type': 'string',
+                'title': 'An id that will help HipChat recognise the same card when it is sent multiple times'
+            },
+            'icon': _icon,
+            'team_server': {
+                'type': 'string',
+                'title': "An alternate team server. Example: 'https://hipchat.corp-domain.com'"
+            },
+            'group': {
+                'type': 'string',
+                'title': 'HipChat group name'
+            }
+        },
+        'additionalProperties': False
+    }
 
     def _prepare_data(self, data: dict) -> dict:
         base_url = self.base_url.format(group=data.pop('group')) if not data.get('team_server') else data.pop(

@@ -28,7 +28,7 @@ class TestCore:
             'option_with_default': {'type': 'string'}
         }
 
-        assert p.required == ['required']
+        assert p.required == {'required': ['required']}
         rsp = p.notify(**self.valid_data)
         assert isinstance(rsp, Response)
         assert not rsp.errors
@@ -51,7 +51,7 @@ class TestCore:
     def test_bad_schema(self, mock_provider):
         """Test illegal JSON schema"""
         p = mock_provider()
-        p.schema = {'type': 'bad_schema'}
+        p._schema = {'type': 'bad_schema'}
         data = {'foo': 'bar'}
         with pytest.raises(SchemaError):
             p.notify(**data)

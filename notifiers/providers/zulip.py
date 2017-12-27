@@ -11,7 +11,7 @@ class Zulip(Provider):
     api_endpoint = '/api/v1/messages'
     base_url = 'https://{domain}.zulipchat.com'
 
-    __required = {
+    _required = {
         'allOf': [
             {'required': ['message', 'email', 'api_key', 'to']},
             {'oneOf': [
@@ -20,13 +20,13 @@ class Zulip(Provider):
             ]}
         ]
     }
-    __type = {
+    _type = {
         'type': 'string',
         'enum': ['stream', 'private'],
         'title': 'Type of message to send'
     }
 
-    __schema = {
+    _schema = {
         'type': 'object',
         'properties': {
             'message': {
@@ -41,8 +41,8 @@ class Zulip(Provider):
                 'type': 'string',
                 'title': 'User API Key'
             },
-            'type': __type,
-            'type_': __type,
+            'type': _type,
+            'type_': _type,
             'to': {
                 'type': 'string',
                 'title': 'Target of the message'
@@ -62,12 +62,6 @@ class Zulip(Provider):
         },
         'additionalProperties': False
     }
-
-    @property
-    def schema(self) -> dict:
-        schema = self.__schema
-        schema.update(self.__required)
-        return schema
 
     @property
     def defaults(self) -> dict:

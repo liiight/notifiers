@@ -49,6 +49,9 @@ class Provider:
     site_url = ''
     provider_name = ''
 
+    _required = {}
+    _schema = {}
+
     def __repr__(self):
         return f'<Provider:[{self.provider_name.capitalize()}]>'
 
@@ -60,7 +63,10 @@ class Provider:
 
         :return: JSON schema of the provider
         """
-        raise NotImplementedError
+        if not self._required or not self._schema:
+            raise NotImplementedError
+        self._schema.update(self._required)
+        return self._schema
 
     @property
     def metadata(self) -> dict:
@@ -81,13 +87,11 @@ class Provider:
         return dict(self.schema['properties'].items())
 
     @property
-    def required(self) -> list:
+    def required(self) -> dict:
         """
-        Return a list of the required provider arguments. By default, it tries to access the ``required``
-         property of the JSON schema. If such a property doesn't exist (perhaps required is enforced via a
-          sophisticated schema form), override this method to return the correct list of required arguments.
+        Returns a dict of the relevant required parts of the schema
         """
-        return self.schema.get('required', [])
+        return self._required
 
     @property
     def defaults(self) -> dict:
