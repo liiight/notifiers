@@ -105,12 +105,21 @@ Get notifier metadata:
     >>> pushover.metadata
     {'base_url': 'https://api.pushover.net/1/messages.json', 'site_url': 'https://pushover.net/', 'provider_name': 'pushover'}
 
-Required schema:
+Required properties:
 
 .. code:: python
 
     >>> pushover.required
     {'required': ['user', 'message', 'token']}
+
+Required properties schema can be complex at times, depending on the API itself:
+
+.. code:: python
+
+    >>> hipchat = get_notifier('hipchat')
+    >>> hipchat.required
+    {'allOf': [{'required': ['message', 'id', 'token']}, {'oneOf': [{'required': ['room']}, {'required': ['user']}]}, {'oneOf': [{'required': ['group']}, {'required': ['team_server']}]}]}
+
 
 All arguments (in JSON schema format):
 
