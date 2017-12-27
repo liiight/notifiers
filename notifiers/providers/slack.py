@@ -9,7 +9,7 @@ class Slack(Provider):
     site_url = 'https://api.slack.com/incoming-webhooks'
     provider_name = 'slack'
 
-    _fields = {
+    __fields = {
         'type': 'array',
         'title': 'Fields are displayed in a table on the message',
         'minItems': 1,
@@ -35,7 +35,7 @@ class Slack(Provider):
             'additionalProperties': False
         }
     }
-    _attachments = {
+    __attachments = {
         'type': 'array',
         'items': {
             'type': 'object',
@@ -99,7 +99,7 @@ class Slack(Provider):
                     'type': 'string',
                     'title': "Can either be one of 'good', 'warning', 'danger', or any hex color code"
                 },
-                'fields': _fields
+                'fields': __fields
             },
             'required': ['fallback'],
             'additionalProperties': False
@@ -137,7 +137,7 @@ class Slack(Provider):
                 'type': 'string',
                 'title': 'This is the text that will be posted to the channel'
             },
-            'attachments': _attachments
+            'attachments': __attachments
         },
         'additionalProperties': False
     }

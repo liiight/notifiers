@@ -10,7 +10,7 @@ class Pushover(Provider):
     site_url = 'https://pushover.net/'
     provider_name = 'pushover'
 
-    _sounds = ['pushover', 'bike', 'bugle', 'cashregister', 'classical', 'cosmic', 'falling', 'gamelan', 'incoming',
+    __sounds = ['pushover', 'bike', 'bugle', 'cashregister', 'classical', 'cosmic', 'falling', 'gamelan', 'incoming',
                'intermission', 'magic', 'mechanical', 'pianobar', 'siren', 'spacealarm', 'tugboat', 'alien', 'climb',
                'persistent', 'echo', 'updown', 'none']
     _required = {'required': ['user', 'message', 'token']}
@@ -56,7 +56,7 @@ class Pushover(Provider):
                 'type': 'string',
                 'title': "the name of one of the sounds supported by device clients to override the "
                          "user's default sound choice",
-                'enum': _sounds
+                'enum': __sounds
             },
             'timestamp': {
                 'type': 'integer',
@@ -118,5 +118,5 @@ class Pushover(Provider):
     @property
     def metadata(self) -> dict:
         m = super().metadata
-        m['sounds'] = self._sounds
+        m['sounds'] = self.__sounds
         return m

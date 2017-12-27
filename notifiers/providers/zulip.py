@@ -11,6 +11,11 @@ class Zulip(Provider):
     api_endpoint = '/api/v1/messages'
     base_url = 'https://{domain}.zulipchat.com'
 
+    __type = {
+        'type': 'string',
+        'enum': ['stream', 'private'],
+        'title': 'Type of message to send'
+    }
     _required = {
         'allOf': [
             {'required': ['message', 'email', 'api_key', 'to']},
@@ -19,11 +24,6 @@ class Zulip(Provider):
                 {'required': ['server']}
             ]}
         ]
-    }
-    _type = {
-        'type': 'string',
-        'enum': ['stream', 'private'],
-        'title': 'Type of message to send'
     }
 
     _schema = {
@@ -41,8 +41,8 @@ class Zulip(Provider):
                 'type': 'string',
                 'title': 'User API Key'
             },
-            'type': _type,
-            'type_': _type,
+            'type': __type,
+            'type_': __type,
             'to': {
                 'type': 'string',
                 'title': 'Target of the message'

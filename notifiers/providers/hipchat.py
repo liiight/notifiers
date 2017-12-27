@@ -14,7 +14,7 @@ class HipChat(Provider):
     site_url = 'https://www.hipchat.com/docs/apiv2'
     provider_name = 'hipchat'
 
-    _icon = {
+    __icon = {
         'oneOf': [
             {
                 'type': 'string'
@@ -37,7 +37,7 @@ class HipChat(Provider):
         ]
     }
 
-    _value = {
+    __value = {
         'type': 'object',
         'properties': {
             'url': {
@@ -56,17 +56,17 @@ class HipChat(Provider):
                 'type': 'string',
                 'title': 'The text representation of the value'
             },
-            'icon': _icon
+            'icon': __icon
         }
     }
 
-    _attributes = {
+    __attributes = {
         'type': 'array',
         'title': 'List of attributes to show below the card',
         'items': {
             'type': 'object',
             'properties': {
-                'value': _value,
+                'value': __value,
                 'label': {
                     'type': 'string',
                     'title': 'Attribute label',
@@ -79,20 +79,20 @@ class HipChat(Provider):
         }
     }
 
-    _activity = {
+    __activity = {
         'type': 'object',
         'properties': {
             'html': {
                 'type': 'string',
                 'title': 'Html for the activity to show in one line a summary of the action that happened'
             },
-            'icon': _icon,
+            'icon': __icon,
         },
         'required': ['html'],
         'additionalProperties': False
     }
 
-    _thumbnail = {
+    __thumbnail = {
         'type': 'object',
         'properties': {
             'url': {
@@ -120,7 +120,7 @@ class HipChat(Provider):
         'additionalProperties': False
     }
 
-    _format = {
+    __format = {
         'type': 'string',
         'enum': [
             'text', 'html'
@@ -129,7 +129,7 @@ class HipChat(Provider):
                  'applications'
     }
 
-    _description = {
+    __description = {
         'oneOf': [
             {
                 'type': 'string'
@@ -142,7 +142,7 @@ class HipChat(Provider):
                         'minLength': 1,
                         'maxLength': 1000
                     },
-                    'format': _format
+                    'format': __format
                 },
                 'required': ['value', 'format'],
                 'additionalProperties': False
@@ -150,7 +150,7 @@ class HipChat(Provider):
         ]
     }
 
-    _card = {
+    __card = {
         'type': 'object',
         'properties': {
             'style': {
@@ -160,7 +160,7 @@ class HipChat(Provider):
                 ],
                 'title': 'Type of the card'
             },
-            'description': _description,
+            'description': __description,
             'format': {
                 'type': 'string',
                 'enum': [
@@ -178,9 +178,9 @@ class HipChat(Provider):
                 'maxLength': 500,
                 'title': 'The title of the card'
             },
-            'thumbnail': _thumbnail,
-            'activity': _activity,
-            'attributes': _attributes,
+            'thumbnail': __thumbnail,
+            'activity': __activity,
+            'attributes': __attributes,
         },
         'required': ['style', 'title'],
         'additionalProperties': False
@@ -252,12 +252,12 @@ class HipChat(Provider):
                 'type': 'string',
                 'title': 'The message id to to attach this notification to'
             },
-            'card': _card,
+            'card': __card,
             'id': {
                 'type': 'string',
                 'title': 'An id that will help HipChat recognise the same card when it is sent multiple times'
             },
-            'icon': _icon,
+            'icon': __icon,
             'team_server': {
                 'type': 'string',
                 'title': "An alternate team server. Example: 'https://hipchat.corp-domain.com'"

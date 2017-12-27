@@ -11,7 +11,7 @@ class Pushbullet(Provider):
     site_url = 'https://www.pushbullet.com'
     provider_name = 'pushbullet'
 
-    _type = {
+    __type = {
         'type': 'string',
         'title': 'Type of the push, one of "note" or "link"',
         'enum': ['note', 'link']
@@ -32,8 +32,8 @@ class Pushbullet(Provider):
                 'type': 'string',
                 'title': 'Title of the push'
             },
-            'type': _type,
-            'type_': _type,
+            'type': __type,
+            'type_': __type,
             'url': {
                 'type': 'string',
                 'title': 'URL field, used for type="link" pushes'
