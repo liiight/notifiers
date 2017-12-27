@@ -9,12 +9,13 @@ from notifiers.utils.helpers import text_to_bool
 
 
 @pytest.fixture
-def mock_provider(monkeypatch) -> Provider:
+def mock_provider(monkeypatch):
     """Return a generic :class:``notifiers.Provider`` class"""
 
     class MockProvider(Provider):
         base_url = 'https://api.mock.com'
-        schema = {
+        _required = {'required': ['required']}
+        _schema = {
             'type': 'object',
             'properties': {
                 'not_required': one_or_more({'type': 'string'}),
@@ -22,7 +23,6 @@ def mock_provider(monkeypatch) -> Provider:
                 'option_with_default': {'type': 'string'},
                 'message': {'type': 'string'}
             },
-            'required': ['required'],
             'additionalProperties': False
         }
         site_url = 'https://www.mock.com'

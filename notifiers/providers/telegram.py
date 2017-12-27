@@ -10,52 +10,50 @@ class Telegram(Provider):
     provider_name = 'telegram'
     site_url = 'https://core.telegram.org/'
 
-    @property
-    def schema(self) -> dict:
-        return {
-            'type': 'object',
-            'properties': {
-                'message': {
-                    'type': 'string',
-                    'title': 'Text of the message to be sent'
-                },
-                'token': {
-                    'type': 'string',
-                    'title': 'Bot token'
-                },
-                'chat_id': {
-                    'type': [
-                        'string',
-                        'integer'
-                    ],
-                    'title': 'Unique identifier for the target chat or username of the target channel '
-                             '(in the format @channelusername)'
-                },
-                'parse_mode': {
-                    'type': 'string',
-                    'title': "Send Markdown or HTML, if you want Telegram apps to show bold, italic,"
-                             " fixed-width text or inline URLs in your bot's message.",
-                    'enum': [
-                        'markdown',
-                        'html'
-                    ]
-                },
-                'disable_web_page_preview': {
-                    'type': 'boolean',
-                    'title': 'Disables link previews for links in this message'
-                },
-                'disable_notification': {
-                    'type': 'boolean',
-                    'title': 'Sends the message silently. Users will receive a notification with no sound.'
-                },
-                'reply_to_message_id': {
-                    'type': 'integer',
-                    'title': 'If the message is a reply, ID of the original message'
-                }
+    _required = {'required': ['message', 'chat_id', 'token']}
+    _schema = {
+        'type': 'object',
+        'properties': {
+            'message': {
+                'type': 'string',
+                'title': 'Text of the message to be sent'
             },
-            'required': ['message', 'chat_id', 'token'],
-            'additionalProperties': False
-        }
+            'token': {
+                'type': 'string',
+                'title': 'Bot token'
+            },
+            'chat_id': {
+                'type': [
+                    'string',
+                    'integer'
+                ],
+                'title': 'Unique identifier for the target chat or username of the target channel '
+                         '(in the format @channelusername)'
+            },
+            'parse_mode': {
+                'type': 'string',
+                'title': "Send Markdown or HTML, if you want Telegram apps to show bold, italic,"
+                         " fixed-width text or inline URLs in your bot's message.",
+                'enum': [
+                    'markdown',
+                    'html'
+                ]
+            },
+            'disable_web_page_preview': {
+                'type': 'boolean',
+                'title': 'Disables link previews for links in this message'
+            },
+            'disable_notification': {
+                'type': 'boolean',
+                'title': 'Sends the message silently. Users will receive a notification with no sound.'
+            },
+            'reply_to_message_id': {
+                'type': 'integer',
+                'title': 'If the message is a reply, ID of the original message'
+            }
+        },
+        'additionalProperties': False
+    }
 
     def _prepare_data(self, data: dict) -> dict:
         data['text'] = data.pop('message')

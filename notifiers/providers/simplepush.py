@@ -9,31 +9,29 @@ class SimplePush(Provider):
     site_url = 'https://simplepush.io/'
     provider_name = 'simplepush'
 
-    @property
-    def schema(self) -> dict:
-        return {
-            'type': 'object',
-            'properties': {
-                'key': {
-                    'type': 'string',
-                    'title': 'your user key'
-                },
-                'message': {
-                    'type': 'string',
-                    'title': 'your message'
-                },
-                'title': {
-                    'type': 'string',
-                    'title': 'message title'
-                },
-                'event': {
-                    'type': 'string',
-                    'title': 'Event ID'
-                },
+    _required = {'required': ['key', 'message']}
+    _schema = {
+        'type': 'object',
+        'properties': {
+            'key': {
+                'type': 'string',
+                'title': 'your user key'
             },
-            'required': ['key', 'message'],
-            'additionalProperties': False
-        }
+            'message': {
+                'type': 'string',
+                'title': 'your message'
+            },
+            'title': {
+                'type': 'string',
+                'title': 'message title'
+            },
+            'event': {
+                'type': 'string',
+                'title': 'Event ID'
+            },
+        },
+        'additionalProperties': False
+    }
 
     def _prepare_data(self, data: dict) -> dict:
         data['msg'] = data.pop('message')

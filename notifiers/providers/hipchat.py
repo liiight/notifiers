@@ -186,7 +186,7 @@ class HipChat(Provider):
         'additionalProperties': False
     }
 
-    __required = {
+    _required = {
         'allOf': [
             {'required': ['message', 'id', 'token']},
             {'oneOf': [
@@ -199,85 +199,76 @@ class HipChat(Provider):
             ]}
         ]
     }
-
-    @property
-    def schema(self) -> dict:
-        schema = {
-            'type': 'object',
-            'properties': {
-                'room': {
-                    'type': 'string',
-                    'title': 'The id or url encoded name of the room',
-                    'maxLength': 100,
-                    'minLength': 1
-                },
-                'user': {
-                    'type': 'string',
-                    'title': "The id, email address, or mention name (beginning with an '@') "
-                             "of the user to send a message to."
-                },
-                'message': {
-                    'type': 'string',
-                    'title': 'The message body',
-                    'maxLength': 10_000,
-                    'minLength': 1
-                },
-                'token': {
-                    'type': 'string',
-                    'title': 'User token'
-                },
-                'notify': {
-                    'type': 'boolean',
-                    'title': "Whether this message should trigger a user notification (change the tab color,"
-                             " play a sound, notify mobile phones, etc). Each recipient's notification preferences "
-                             "are taken into account."
-                },
-                'message_format': {
-                    'type': 'string',
-                    'enum': [
-                        'text', 'html'
-                    ],
-                    'title': 'Determines how the message is treated by our server and rendered inside HipChat '
-                             'applications'
-                },
-                'from': {
-                    'type': 'string',
-                    'title': "A label to be shown in addition to the sender's name"
-                },
-                'color': {
-                    'type': 'string',
-                    'enum': [
-                        'yellow', 'green', 'red', 'purple', 'gray', 'random'
-                    ],
-                    'title': 'Background color for message'
-                },
-                'attach_to': {
-                    'type': 'string',
-                    'title': 'The message id to to attach this notification to'
-                },
-                'card': self.__card,
-                'id': {
-                    'type': 'string',
-                    'title': 'An id that will help HipChat recognise the same card when it is sent multiple times'
-                },
-                'icon': self.__icon,
-                'team_server': {
-                    'type': 'string',
-                    'title': "An alternate team server. Example: 'https://hipchat.corp-domain.com'"
-                },
-                'group': {
-                    'type': 'string',
-                    'title': 'HipChat group name'
-                }
+    _schema = {
+        'type': 'object',
+        'properties': {
+            'room': {
+                'type': 'string',
+                'title': 'The id or url encoded name of the room',
+                'maxLength': 100,
+                'minLength': 1
             },
-            'additionalProperties': False
-        }
-        schema.update(self.__required)
-        return schema
-
-    @property
-    def required(self) -> dict:
-        return self.__required
+            'user': {
+                'type': 'string',
+                'title': "The id, email address, or mention name (beginning with an '@') "
+                         "of the user to send a message to."
+            },
+            'message': {
+                'type': 'string',
+                'title': 'The message body',
+                'maxLength': 10_000,
+                'minLength': 1
+            },
+            'token': {
+                'type': 'string',
+                'title': 'User token'
+            },
+            'notify': {
+                'type': 'boolean',
+                'title': "Whether this message should trigger a user notification (change the tab color,"
+                         " play a sound, notify mobile phones, etc). Each recipient's notification preferences "
+                         "are taken into account."
+            },
+            'message_format': {
+                'type': 'string',
+                'enum': [
+                    'text', 'html'
+                ],
+                'title': 'Determines how the message is treated by our server and rendered inside HipChat '
+                         'applications'
+            },
+            'from': {
+                'type': 'string',
+                'title': "A label to be shown in addition to the sender's name"
+            },
+            'color': {
+                'type': 'string',
+                'enum': [
+                    'yellow', 'green', 'red', 'purple', 'gray', 'random'
+                ],
+                'title': 'Background color for message'
+            },
+            'attach_to': {
+                'type': 'string',
+                'title': 'The message id to to attach this notification to'
+            },
+            'card': __card,
+            'id': {
+                'type': 'string',
+                'title': 'An id that will help HipChat recognise the same card when it is sent multiple times'
+            },
+            'icon': __icon,
+            'team_server': {
+                'type': 'string',
+                'title': "An alternate team server. Example: 'https://hipchat.corp-domain.com'"
+            },
+            'group': {
+                'type': 'string',
+                'title': 'HipChat group name'
+            }
+        },
+        'additionalProperties': False
+    }
 
     def _prepare_data(self, data: dict) -> dict:
         base_url = self.base_url.format(group=data.pop('group')) if not data.get('team_server') else data.pop(

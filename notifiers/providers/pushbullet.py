@@ -11,67 +11,67 @@ class Pushbullet(Provider):
     site_url = 'https://www.pushbullet.com'
     provider_name = 'pushbullet'
 
-    @property
-    def schema(self) -> dict:
-        return {
-            'type': 'object',
-            'properties': {
-                'message': {
-                    'type': 'string',
-                    'title': 'Body of the push'
-                },
-                'token': {
-                    'type': 'string',
-                    'title': 'API access token'
-                },
-                'title': {
-                    'type': 'string',
-                    'title': 'Title of the push'
-                },
-                'type': {
-                    'type': 'string',
-                    'title': 'Type of the push, one of "note" or "link"',
-                    'enum': ['note', 'link']
-                },
-                'url': {
-                    'type': 'string',
-                    'title': 'URL field, used for type="link" pushes'
-                },
-                'source_device_iden': {
-                    'type': 'string',
-                    'title': 'Device iden of the sending device'
-                },
-                'device_iden': {
-                    'type': 'string',
-                    'title': 'Device iden of the target device, if sending to a single device'
-                },
-                'client_iden': {
-                    'type': 'string',
-                    'title': 'Client iden of the target client, sends a push to all users who have granted access to '
-                             'this client. The current user must own this client'
-                },
-                'channel_tag': {
-                    'type': 'string',
-                    'title': 'Channel tag of the target channel, sends a push to all people who are subscribed to '
-                             'this channel. The current user must own this channel.'
-                },
-                'email': {
-                    'type': 'string',
-                    'title': 'Email address to send the push to. If there is a pushbullet user with this address,'
-                             ' they get a push, otherwise they get an email'
-                },
-                'guid': {
-                    'type': 'string',
-                    'title': 'Unique identifier set by the client, used to identify a push in case you receive it '
-                             'from /v2/everything before the call to /v2/pushes has completed. This should be a unique'
-                             ' value. Pushes with guid set are mostly idempotent, meaning that sending another push '
-                             'with the same guid is unlikely to create another push (it will return the previously'
-                             ' created push).'
-                }
+    __type = {
+        'type': 'string',
+        'title': 'Type of the push, one of "note" or "link"',
+        'enum': ['note', 'link']
+    }
+    _required = {'required': ['message', 'token']}
+    _schema = {
+        'type': 'object',
+        'properties': {
+            'message': {
+                'type': 'string',
+                'title': 'Body of the push'
             },
-            'required': ['message', 'token'],
-            'additionalProperties': False
-        }
+            'token': {
+                'type': 'string',
+                'title': 'API access token'
+            },
+            'title': {
+                'type': 'string',
+                'title': 'Title of the push'
+            },
+            'type': __type,
+            'type_': __type,
+            'url': {
+                'type': 'string',
+                'title': 'URL field, used for type="link" pushes'
+            },
+            'source_device_iden': {
+                'type': 'string',
+                'title': 'Device iden of the sending device'
+            },
+            'device_iden': {
+                'type': 'string',
+                'title': 'Device iden of the target device, if sending to a single device'
+            },
+            'client_iden': {
+                'type': 'string',
+                'title': 'Client iden of the target client, sends a push to all users who have granted access to '
+                         'this client. The current user must own this client'
+            },
+            'channel_tag': {
+                'type': 'string',
+                'title': 'Channel tag of the target channel, sends a push to all people who are subscribed to '
+                         'this channel. The current user must own this channel.'
+            },
+            'email': {
+                'type': 'string',
+                'title': 'Email address to send the push to. If there is a pushbullet user with this address,'
+                         ' they get a push, otherwise they get an email'
+            },
+            'guid': {
+                'type': 'string',
+                'title': 'Unique identifier set by the client, used to identify a push in case you receive it '
+                         'from /v2/everything before the call to /v2/pushes has completed. This should be a unique'
+                         ' value. Pushes with guid set are mostly idempotent, meaning that sending another push '
+                         'with the same guid is unlikely to create another push (it will return the previously'
+                         ' created push).'
+            }
+        },
+        'additionalProperties': False
+    }
 
     def _get_headers(self, token: str) -> dict:
         return {'Access-Token': token}
@@ -84,6 +84,10 @@ class Pushbullet(Provider):
 
     def _prepare_data(self, data: dict) -> dict:
         data['body'] = data.pop('message')
+
+        # Workaround since `type` is a reserved word
+        if data.get('type_'):
+            data['type'] = data.pop('type_')
         return data
 
     def _send_notification(self, data: dict) -> Response:

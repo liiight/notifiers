@@ -20,73 +20,74 @@ class SMTP(Provider):
     site_url = 'https://en.wikipedia.org/wiki/Email'
     provider_name = 'email'
 
+    _required = {
+        'required': ['message', 'to'],
+        'dependencies': {
+            'username': ['password'],
+            'password': ['username'],
+            'ssl': ['tls']
+        }
+    }
+
+    _schema = {
+        'type': 'object',
+        'properties': {
+            'message': {
+                'type': 'string',
+                'title': 'the content of the email message'
+            },
+            'subject': {
+                'type': 'string',
+                'title': 'the subject of the email message'
+            },
+            'to': one_or_more({
+                'type': 'string',
+                'format': 'email',
+                'title': 'one or more email addresses to use'
+            }),
+            'from': {
+                'type': 'string',
+                'title': 'the FROM address to use in the email'
+            },
+            'from_': {
+                'type': 'string',
+                'title': 'the FROM address to use in the email'
+            },
+            'host': {
+                'type': 'string',
+                'title': 'the host of the SMTP server'
+            },
+            'port': {
+                'type': 'integer',
+                'title': 'the port number to use'
+            },
+            'username': {
+                'type': 'string',
+                'title': 'username if relevant'
+            },
+            'password': {
+                'type': 'string',
+                'title': 'password if relevant'
+            },
+            'tls': {
+                'type': 'boolean',
+                'title': 'should TLS be used'
+            },
+            'ssl': {
+                'type': 'boolean',
+                'title': 'should SSL be used'
+            },
+            'html': {
+                'type': 'boolean',
+                'title': 'should the email be parse as an HTML file'
+            }
+        },
+        'additionalProperties': False,
+    }
+
     def __init__(self):
         self.smtp_server = None
         self.configuration = None
-
-    @property
-    def schema(self) -> dict:
-        return {
-            'type': 'object',
-            'properties': {
-                'message': {
-                    'type': 'string',
-                    'title': 'the content of the email message'
-                },
-                'subject': {
-                    'type': 'string',
-                    'title': 'the subject of the email message'
-                },
-                'to': one_or_more({
-                    'type': 'string',
-                    'format': 'email',
-                    'title': 'one or more email addresses to use'
-                }),
-                'from': {
-                    'type': 'string',
-                    'title': 'the FROM address to use in the email'
-                },
-                'from_': {
-                    'type': 'string',
-                    'title': 'the FROM address to use in the email'
-                },
-                'host': {
-                    'type': 'string',
-                    'title': 'the host of the SMTP server'
-                },
-                'port': {
-                    'type': 'integer',
-                    'title': 'the port number to use'
-                },
-                'username': {
-                    'type': 'string',
-                    'title': 'username if relevant'
-                },
-                'password': {
-                    'type': 'string',
-                    'title': 'password if relevant'
-                },
-                'tls': {
-                    'type': 'boolean',
-                    'title': 'should TLS be used'
-                },
-                'ssl': {
-                    'type': 'boolean',
-                    'title': 'should SSL be used'
-                },
-                'html': {
-                    'type': 'boolean',
-                    'title': 'should the email be parse as an HTML file'
-                }
-            },
-            'required': ['message', 'to'],
-            'dependencies': {
-                'username': ['password'],
-                'password': ['username'],
-                'ssl': ['tls']
-            },
-            'additionalProperties': False,
-        }
 
     @property
     def defaults(self) -> dict:
