@@ -201,7 +201,7 @@ class Provider:
         """
         return data
 
-    def notify(self, **kwargs: dict) -> Response:
+    def notify(self, **kwargs) -> Response:
         validator = jsonschema.Draft4Validator(self.schema)
         self._validate_schema(validator)
 

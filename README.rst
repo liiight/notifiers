@@ -105,12 +105,12 @@ Get notifier metadata:
     >>> pushover.metadata
     {'base_url': 'https://api.pushover.net/1/messages.json', 'site_url': 'https://pushover.net/', 'provider_name': 'pushover'}
 
-Required arguments:
+Required schema:
 
 .. code:: python
 
     >>> pushover.required
-    ['user', 'message', 'token']
+    {'required': ['user', 'message', 'token']}
 
 All arguments (in JSON schema format):
 
