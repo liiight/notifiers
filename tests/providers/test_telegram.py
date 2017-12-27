@@ -1,4 +1,7 @@
+import os
+
 import pytest
+from click.testing import CliRunner
 
 from notifiers import get_notifier
 from notifiers.exceptions import BadArguments, NotificationError
@@ -70,3 +73,26 @@ class TestTelegram:
         }
         rsp = p.notify(**data)
         rsp.raise_on_errors()
+
+
+class TestTelegramCLI:
+    """Test telegram specific CLI"""
+
+    def test_telegram_updates_negative(self):
+        from notifiers_cli.providers.telegram import updates
+        runner = CliRunner()
+        result = runner.invoke(updates, ['bad_token'])
+        assert result.exit_code == -1
+        assert not result.output
+
+    @pytest.mark.online
+    def test_telegram_updates_positive(self):
+        from notifiers_cli.providers.telegram import updates
+        token = os.environ.get('NOTIFIERS_TELEGRAM_TOKEN')
+        assert token
+
+        runner = CliRunner()
+        result = runner.invoke(updates, [token])
+        assert result.exit_code == 0
+        replies = ['Bot has not active chats! Send it ANY message and try again', 'Chat ID:']
+        assert any(reply in result.output for reply in replies)

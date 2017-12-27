@@ -1,4 +1,7 @@
+import os
+
 import pytest
+from click.testing import CliRunner
 
 from notifiers import get_notifier
 from notifiers.exceptions import BadArguments, NotificationError
@@ -58,3 +61,36 @@ class TestGitter:
         }
         rsp = p.notify(**data)
         rsp.raise_on_errors()
+
+
+class TestGitterCLI:
+    """Test gitter specific CLI commands"""
+
+    def test_gitter_rooms_negative(self):
+        from notifiers_cli.providers.gitter import rooms
+        runner = CliRunner()
+        result = runner.invoke(rooms, ['bad_token'])
+        assert result.exit_code == -1
+        assert not result.output
+
+    @pytest.mark.online
+    def test_gitter_rooms_positive(self):
+        from notifiers_cli.providers.gitter import rooms
+        token = os.environ.get('NOTIFIERS_GITTER_TOKEN')
+        assert token
+
+        runner = CliRunner()
+        result = runner.invoke(rooms, [token])
+        assert result.exit_code == 0
+        assert 'notifiers/testing' in result.output
+
+    @pytest.mark.online
+    def test_gitter_rooms_with_query(self):
+        from notifiers_cli.providers.gitter import rooms
+        token = os.environ.get('NOTIFIERS_GITTER_TOKEN')
+        assert token
+
+        runner = CliRunner()
+        result = runner.invoke(rooms, [token, '-q', 'notifiers/testing'])
+        assert result.exit_code == 0
+        assert 'notifiers/testing' in result.output
