@@ -27,7 +27,7 @@ class TestZulip:
         data['env_prefix'] = 'test'
         with pytest.raises(BadArguments) as e:
             p.notify(**data)
-        assert f'{message}' in e.value.message
+        assert message in e.value.message
 
     @pytest.mark.online
     def test_sanity(self):

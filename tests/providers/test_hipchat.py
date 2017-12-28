@@ -30,7 +30,7 @@ class TestHipchat:
         data['env_prefix'] = 'test'
         with pytest.raises(BadArguments) as e:
             p.notify(**data)
-        assert f'{message}' in e.value.message
+        assert message in e.value.message
 
     def test_bad_request(self):
         p = get_notifier(self.notifier_name)
