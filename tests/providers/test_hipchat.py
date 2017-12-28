@@ -20,9 +20,10 @@ class TestHipchat:
         }
 
     @pytest.mark.parametrize('data, message', [
-        ({'id': 'foo', 'token': 'bar', 'message': 'boo', 'room': 'bla', 'user': 'gg'}, 'is valid under each of'),
+        ({'id': 'foo', 'token': 'bar', 'message': 'boo', 'room': 'bla', 'user': 'gg'},
+         "Only one of 'room' or 'user' is allowed"),
         ({'id': 'foo', 'token': 'bar', 'message': 'boo', 'room': 'bla', 'team_server': 'gg', 'group': 'gg'},
-         'is valid under each of'),
+         "Only one 'group' or 'team_server' is allowed"),
     ])
     def test_missing_required(self, data, message):
         p = get_notifier(self.notifier_name)

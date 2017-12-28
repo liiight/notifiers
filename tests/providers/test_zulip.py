@@ -20,7 +20,7 @@ class TestZulip:
     @pytest.mark.parametrize('data, message', [
         ({'email': 'foo', 'api_key': 'bar', 'message': 'boo', 'to': 'bla'}, 'domain'),
         ({'email': 'foo', 'api_key': 'bar', 'message': 'boo', 'to': 'bla', 'domain': 'bla', 'server': 'fop'},
-         'is valid under each of'),
+         "Only one of 'domain' or 'server' is allowed"),
     ])
     def test_missing_required(self, data, message):
         p = get_notifier(self.notifier_name)
