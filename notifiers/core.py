@@ -188,7 +188,9 @@ class Provider:
         log.debug('validating provided data')
         e = best_match(validator.iter_errors(data))
         if e:
-            raise BadArguments(validation_error=e.message, provider=self.provider_name, data=data)
+            custom_error_key = f'error_{e.validator}'
+            msg = e.schema[custom_error_key] if e.schema.get(custom_error_key) else e.message
+            raise BadArguments(validation_error=msg, provider=self.provider_name, data=data)
 
     def _validate_data_dependencies(self, data: dict) -> dict:
         """

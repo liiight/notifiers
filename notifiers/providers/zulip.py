@@ -22,7 +22,8 @@ class Zulip(Provider):
             {'oneOf': [
                 {'required': ['domain']},
                 {'required': ['server']}
-            ]}
+            ],
+                'error_oneOf': "Only one of 'domain' or 'server' is allowed"}
         ]
     }
 
