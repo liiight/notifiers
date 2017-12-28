@@ -192,11 +192,13 @@ class HipChat(Provider):
             {'oneOf': [
                 {'required': ['room']},
                 {'required': ['user']}
-            ]},
+            ],
+                'error_oneOf': "Only one of 'room' or 'user' is allowed"},
             {'oneOf': [
                 {'required': ['group']},
                 {'required': ['team_server']}
-            ]}
+            ],
+                'error_oneOf': "Only one 'group' or 'team_server' is allowed"}
         ]
     }
     _schema = {
