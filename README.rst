@@ -67,7 +67,7 @@ Basic Usage
     >>> from notifiers import get_notifier
     >>> p = get_notifier('pushover')
     >>> p.required
-    ['user', 'message', 'token']
+    {'required': ['user', 'message', 'token']}
     >>> p.notify(user='foo', token='bar', message='test')
     <NotificationResponse,provider=Pushover,status=Success>
 
