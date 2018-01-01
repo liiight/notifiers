@@ -33,6 +33,10 @@ The easiest way to send notifications!
     :target: https://hub.docker.com/r/liiight/notifiers/
     :alt: Docker build
 
+.. image:: https://img.shields.io/readthedocs/notifiers.svg?style=flat-square
+    :target: https://readthedocs.org/projects/notifiers/badge/?version=latest
+    :alt: RTD
+
 See `Releases <https://github.com/liiight/notifiers/releases>`_ for recent changes
 
 .. inclusion-start
