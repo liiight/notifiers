@@ -17,6 +17,11 @@ Indices and tables
    :maxdepth: 2
    :caption: Contents:
 
+   about
+   installation
+   usage
+
+
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`

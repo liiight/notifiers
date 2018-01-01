@@ -32,9 +32,9 @@
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = ['sphinx.ext.autodoc',
-    'sphinx.ext.doctest',
-    'sphinx.ext.coverage',
-    'sphinx.ext.viewcode']
+              'sphinx.ext.doctest',
+              'sphinx.ext.coverage',
+              'sphinx.ext.viewcode']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -80,7 +80,6 @@ pygments_style = 'sphinx'
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = False
 
-
 # -- Options for HTML output ----------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
@@ -114,12 +113,10 @@ html_sidebars = {
     ]
 }
 
-
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'notifiersdoc'
-
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -149,7 +146,6 @@ latex_documents = [
      'Or Carmi', 'manual'),
 ]
 
-
 # -- Options for manual page output ---------------------------------------
 
 # One entry per manual page. List of tuples
@@ -158,7 +154,6 @@ man_pages = [
     (master_doc, 'notifiers', 'notifiers Documentation',
      [author], 1)
 ]
-
 
 # -- Options for Texinfo output -------------------------------------------
 
@@ -171,5 +166,9 @@ texinfo_documents = [
      'Miscellaneous'),
 ]
 
-
-
+intersphinx_mapping = {
+    'jsonschema': ('http://python-jsonschema.readthedocs.org/en/latest/', None),
+    'requests': ('http://docs.python-requests.org/en/latest/', None),
+    'notifiers': ('https://github.com/liiight/notifiers', None),
+    'click': ('http://click.pocoo.org/5/', None)
+}
