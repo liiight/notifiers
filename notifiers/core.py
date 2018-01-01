@@ -18,7 +18,7 @@ class Response:
 
     :param status: Response status string. ``SUCCESS`` or ``FAILED``
     :param provider: Provider name that returned that response.
-     Correlates to :class:``Provider.provider_name``
+     Correlates to :class:`Provider.provider_name`
     :param data: The notification data that was used for the notification
     :param response: The response object that was returned. Usually :class:`requests.Response`
     :param errors: Holds a list of errors if relevant
@@ -45,6 +45,10 @@ class Response:
 
 
 class Provider:
+    """
+    The Base class all notification providers inherit from.
+
+    """
     base_url = ''
     site_url = ''
     provider_name = ''
@@ -71,7 +75,7 @@ class Provider:
     @property
     def metadata(self) -> dict:
         """
-        Returns a dict of the provider metadata as declared.. Override if needed.
+        Returns a dict of the provider metadata as declared. Override if needed.
         """
         return {
             'base_url': self.base_url,
@@ -118,7 +122,7 @@ class Provider:
 
     def _merge_defaults(self, data: dict) -> dict:
         """
-        Convenience method that calls :function:``_merge_dict_into_dict`` in order to merge default values
+        Convenience method that calls :func:`_merge_dict_into_dict` in order to merge default values
 
         :param data: Notification data
         :return: A merged dict of provided data with added defaults
@@ -161,7 +165,6 @@ class Provider:
         The core method to trigger the provider notification. Must be overridden.
 
         :param data: Notification data
-        :return: Returns a :class:``Response`` object
         """
         raise NotImplementedError
 
@@ -228,7 +231,7 @@ def get_notifier(provider_name: str) -> Provider:
     Convenience method to return an instantiated :class:`Provider` object according to it ``provider_name``
 
     :param provider_name: The ``provider_name`` of the requested :class:`Provider`
-    :return: :class:``Provider`` or None
+    :return: :class:`Provider` or None
     """
     if provider_name in _all_providers:
         log.debug("found a match for '%s', returning", provider_name)

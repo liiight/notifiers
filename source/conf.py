@@ -17,10 +17,10 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
+import os
+import sys
 
+sys.path.insert(0, os.path.abspath('.'))
 
 # -- General configuration ------------------------------------------------
 
@@ -34,7 +34,9 @@
 extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.doctest',
               'sphinx.ext.coverage',
-              'sphinx.ext.viewcode']
+              'sphinx.ext.viewcode',
+              'sphinx.ext.intersphinx',
+              'sphinx_autodoc_annotation']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -169,6 +171,5 @@ texinfo_documents = [
 intersphinx_mapping = {
     'jsonschema': ('http://python-jsonschema.readthedocs.org/en/latest/', None),
     'requests': ('http://docs.python-requests.org/en/latest/', None),
-    'notifiers': ('https://github.com/liiight/notifiers', None),
     'click': ('http://click.pocoo.org/5/', None)
 }

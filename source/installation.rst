@@ -15,6 +15,7 @@ Use ``develop`` branch for cutting edge (not recommended)::
 
     pip install https://github.com/liiight/notifiers/develop.zip
 
+.. note:: Python 3.6 and higher is required when installing via pip
 
 Via docker
 ==========

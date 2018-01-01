@@ -120,3 +120,5 @@ class Pushover(Provider):
         m = super().metadata
         m['sounds'] = self.__sounds
         return m
+
+    # todo create devices method

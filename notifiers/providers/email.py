@@ -16,6 +16,9 @@ DEFAULT_SMTP_HOST = 'localhost'
 
 
 class SMTP(Provider):
+    """
+    Send emails via SMTP
+    """
     base_url = None
     site_url = 'https://en.wikipedia.org/wiki/Email'
     provider_name = 'email'

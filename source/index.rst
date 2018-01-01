@@ -20,6 +20,8 @@ Indices and tables
    about
    installation
    usage
+   CLI
+   API
 
 
 * :ref:`genindex`
