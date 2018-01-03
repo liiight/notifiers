@@ -5,15 +5,9 @@ The easiest way to send notifications!
 
 [![Travis CI](https://img.shields.io/travis/liiight/notifiers/master.svg?style=flat-square)](https://travis-ci.org/liiight/notifiers)[![Codecov](https://img.shields.io/codecov/c/github/liiight/notifiers/master.svg?style=flat-square)](https://codecov.io/gh/liiight/notifiers)[![image](https://img.shields.io/gitter/room/nwjs/nw.js.svg?style=flat-square)](https://gitter.im/notifiers/notifiers)[![PyPi version](https://img.shields.io/pypi/v/notifiers.svg?style=flat-square)](https://pypi.python.org/pypi/notifiers)[![Supported Python versions](https://img.shields.io/pypi/pyversions/notifiers.svg?style=flat-square)](https://pypi.org/project/notifiers)[![License](https://img.shields.io/pypi/l/notifiers.svg?style=flat-square)](https://choosealicense.com/licenses)[![Status](https://img.shields.io/pypi/status/notifiers.svg?style=flat-square)](https://pypi.python.org/pypi/notifiers)[![Docker build](https://img.shields.io/docker/build/liiight/notifiers.svg?style=flat-square)](https://hub.docker.com/r/liiight/notifiers/)[![RTD](https://img.shields.io/readthedocs/notifiers.svg?style=flat-square)](https://readthedocs.org/projects/notifiers/badge/?version=latest)
 
-See [Releases](https://github.com/liiight/notifiers/releases) for recent
-changes
+See [Releases](https://github.com/liiight/notifiers/releases) for recent changesץ
 
-Got an app or service and you want to enable your users to use
-notifications with their provider of choice? Working on a script and you
-want to receive notification based on its output? You don\'t need to
-implement a solution yourself, or use individual provider libs. A one
-stop shop for all notification providers with a unified and simple
-interface.
+Got an app or service and you want to enable your users to use notifications with their provider of choice? Working on a script and you want to receive notification based on its output? You don't need to implement a solution yourself, or use individual provider libs. A one stop shop for all notification providers with a unified and simple interface.
 
 Supported providers
 -------------------
@@ -33,9 +27,8 @@ Supported providers
 Advantages
 ----------
 
--   Spend your precious time on your own code base, instead of chasing down 3rd party provider APIs. That\'s what we\'re here for!
--   With a minimal set of well known and stable dependencies ([requests](https://pypi.python.org/pypi/requests), [jsonschema](https://pypi.python.org/pypi/jsonschema/2.6.0) and [click](https://pypi.python.org/pypi/click/6.7)) you\'re better off
-    than installing 3rd party SDKs.
+-   Spend your precious time on your own code base, instead of chasing down 3rd party provider APIs. That's what we're here for!
+-   With a minimal set of well known and stable dependencies ([requests](https://pypi.python.org/pypi/requests), [jsonschema](https://pypi.python.org/pypi/jsonschema/2.6.0) and [click](https://pypi.python.org/pypi/click/6.7)) you're better off than installing 3rd party SDKs.
 -   A unified interface means that you already support any new providers that will be added, no more work needed!
 -   Thorough testing means protection against any breaking API changes. We make sure your code your notifications will always get delivered!
 
@@ -43,13 +36,13 @@ Installation
 ------------
 
 Via pip:
-
-    pip install notifiers
-
+```
+pip install notifiers
+```
 Or Dockerhub:
-
-    docker pull liiight/notifiers
-
+```
+docker pull liiight/notifiers
+```
 Basic Usage
 -----------
 
@@ -65,7 +58,7 @@ Basic Usage
 In the near future 
 ------------------
 
--   SendGrid, Graphite, Stride, Prowl, Teams, Twilio and many more\...
+-   SendGrid, Graphite, Stride, Prowl, Teams, Twilio and many more...
 -   Low level providers (Amazon SNS, Google FCM, OS Toast messages) via `extra` dependencies
 -   Docs!
 
