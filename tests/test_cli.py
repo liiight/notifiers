@@ -1,5 +1,7 @@
 import pytest
+import re
 
+from notifiers import __version__
 from click.testing import CliRunner
 
 
@@ -97,3 +99,12 @@ class TestCLI:
         result = runner.invoke(notify, [], input='foo')
         assert result.exit_code == 0
         assert not result.output
+
+    def test_version_command(self):
+        from notifiers_cli.core import notifiers
+        runner = CliRunner()
+        result = runner.invoke(notifiers, ['--version'])
+        assert result.exit_code == 0
+        version_re = re.search('(\d+\.\d+\.\d+)', result.output)
+        assert version_re
+        assert version_re.group(1) == __version__

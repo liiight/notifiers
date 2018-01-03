@@ -1,10 +1,12 @@
 import click
 
+from notifiers import __version__
 from notifiers.core import all_providers, get_notifier
 from notifiers.exceptions import NotifierException
 
 
 @click.group()
+@click.version_option(version=__version__, prog_name='notifiers', message=('%(prog)s %(version)s'))
 def notifiers():
     """Notifiers CLI operation"""
 

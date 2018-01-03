@@ -18,7 +18,6 @@ def create_response(provider_name: str, data: dict, response: requests.Response 
     :param response: :class:`requests.Response` if exist
     :param failed: Flag to determine if response succeeded or not
     :param errors: List of errors if relevant
-    :return: A :class:`Response` object
     """
     status = FAILURE_STATUS if failed else SUCCESS_STATUS
     return Response(status=status, provider=provider_name, data=data, response=response, errors=errors)
@@ -29,7 +28,6 @@ def text_to_bool(value: str) -> bool:
     Tries to convert a text value to a bool. If unsuccessful returns if value is None or not
 
     :param value: Value to check
-    :return: Bool
     """
     try:
         return bool(strtobool(value))
