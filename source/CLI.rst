@@ -35,3 +35,8 @@ You can set ``NOTIFIERS_DEFAULT_PROVIDER`` environment variable which will be us
     $ cat file.txt | notifiers notify
 
 Note that unlike the other environment variables, you cannot change the prefix of this one.
+
+Get installed ``notifiers`` version via the ``--version`` flag::
+
+    $ notifiers --version
+    notifiers 0.6.3
