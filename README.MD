@@ -33,17 +33,11 @@ Supported providers
 Advantages
 ----------
 
--   Spend your precious time on your own code base, instead of chasing
-    down 3rd party provider APIs. That\'s what we\'re here for!
--   With a minimal set of well known and stable dependencies
-    ([requests](https://pypi.python.org/pypi/requests),
-    [jsonschema](https://pypi.python.org/pypi/jsonschema/2.6.0) and
-    [click](https://pypi.python.org/pypi/click/6.7)) you\'re better off
+-   Spend your precious time on your own code base, instead of chasing down 3rd party provider APIs. That\'s what we\'re here for!
+-   With a minimal set of well known and stable dependencies ([requests](https://pypi.python.org/pypi/requests), [jsonschema](https://pypi.python.org/pypi/jsonschema/2.6.0) and [click](https://pypi.python.org/pypi/click/6.7)) you\'re better off
     than installing 3rd party SDKs.
--   A unified interface means that you already support any new providers
-    that will be added, no more work needed!
--   Thorough testing means protection against any breaking API changes.
-    We make sure your code your notifications will always get delivered!
+-   A unified interface means that you already support any new providers that will be added, no more work needed!
+-   Thorough testing means protection against any breaking API changes. We make sure your code your notifications will always get delivered!
 
 Installation
 ------------
@@ -72,14 +66,12 @@ In the near future
 ------------------
 
 -   SendGrid, Graphite, Stride, Prowl, Teams, Twilio and many more\...
--   Low level providers (Amazon SNS, Google FCM, OS Toast messages) via
-    `extra` dependencies
+-   Low level providers (Amazon SNS, Google FCM, OS Toast messages) via `extra` dependencies
 -   Docs!
 
 ### Why python 3 only?
 
-I wanted to avoid the whole unicode issue fiasco if possible, but there
-isn\'t a real constraint in adding python 2 support. If there's an
+I wanted to avoid the whole unicode issue fiasco if possible, but there isn't a real constraint in adding python 2 support. If there's an
 overwhelming desire for this, i'll do it. Probably.
 
 See [Docs](http://notifiers.readthedocs.io/) for more information
