@@ -48,5 +48,6 @@ setup(
     entry_points="""
         [console_scripts]
         notifiers=notifiers_cli.core:entry_point
-    """
+    """,
+    python_requires='>=3.6'
 )
