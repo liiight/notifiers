@@ -2,6 +2,12 @@ API
 ---
 This part of the documentation will describe the full API reference for classes and function.
 
+Base usage
+==========
+.. automethod:: notifiers.core.Provider.notify
+.. autofunction:: notifiers.core.get_notifier
+.. autofunction:: notifiers.core.all_providers
+
 Core
 ====
 
@@ -11,10 +17,6 @@ Core
 
 .. autoclass:: notifiers.core.Response
    :members:
-
-.. autofunction:: notifiers.core.get_notifier
-
-.. autofunction:: notifiers.core.all_providers
 
 Exceptions
 ==========

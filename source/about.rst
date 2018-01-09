@@ -1,5 +1,5 @@
-About :mod:`notifiers`
-======================
+About
+=====
 
 The problem
 -----------
@@ -28,7 +28,7 @@ Who is this for
 ---------------
 * Developers aiming to integrate 3rd party notifications into their application
 * Script makes aiming to enable 3rd party notification abilities, either via python script or any CLI script
-* Anyone that want to programmeticaly send notification and not be concerned about familiarizing themselves with 3rd party APIs or built in abilities
+* Anyone that want to programmatically send notification and not be concerned about familiarizing themselves with 3rd party APIs or built in abilities
 
 What this isn't
 ---------------
