@@ -3,5 +3,8 @@ build:
 
 python:
   version: 3.6
+  pip_install: true
+  extra_requirements:
+  - dev
 
-pip_install: true
+requirements_file: requirements.txt
