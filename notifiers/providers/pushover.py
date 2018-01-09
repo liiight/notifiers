@@ -6,6 +6,7 @@ from ..utils.helpers import create_response
 
 
 class Pushover(Provider):
+    """Send notifications via Pushover"""
     base_url = 'https://api.pushover.net/1/messages.json'
     site_url = 'https://pushover.net/'
     provider_name = 'pushover'
@@ -38,7 +39,7 @@ class Pushover(Provider):
                 'title': "your user's device name to send the message directly to that device"
             }),
             'priority': {
-                'type': 'number',
+                'type': 'integer',
                 'minimum': -2,
                 'maximum': 2,
                 'title': 'notification priority'
