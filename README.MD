@@ -3,9 +3,9 @@ Notifiers
 
 The easiest way to send notifications!
 
-[![Travis CI](https://img.shields.io/travis/liiight/notifiers/master.svg?style=flat-square)](https://travis-ci.org/liiight/notifiers)[![Codecov](https://img.shields.io/codecov/c/github/liiight/notifiers/master.svg?style=flat-square)](https://codecov.io/gh/liiight/notifiers)[![image](https://img.shields.io/gitter/room/nwjs/nw.js.svg?style=flat-square)](https://gitter.im/notifiers/notifiers)[![PyPi version](https://img.shields.io/pypi/v/notifiers.svg?style=flat-square)](https://pypi.python.org/pypi/notifiers)[![Supported Python versions](https://img.shields.io/pypi/pyversions/notifiers.svg?style=flat-square)](https://pypi.org/project/notifiers)[![License](https://img.shields.io/pypi/l/notifiers.svg?style=flat-square)](https://choosealicense.com/licenses)[![Status](https://img.shields.io/pypi/status/notifiers.svg?style=flat-square)](https://pypi.python.org/pypi/notifiers)[![Docker build](https://img.shields.io/docker/build/liiight/notifiers.svg?style=flat-square)](https://hub.docker.com/r/liiight/notifiers/)[![RTD](https://img.shields.io/readthedocs/notifiers.svg?style=flat-square)](https://readthedocs.org/projects/notifiers/badge/?version=latest)
+[![Travis CI](https://img.shields.io/travis/liiight/notifiers/master.svg?style=flat-square) ](https://travis-ci.org/liiight/notifiers) [![Codecov](https://img.shields.io/codecov/c/github/liiight/notifiers/master.svg?style=flat-square) ](https://codecov.io/gh/liiight/notifiers) [![image](https://img.shields.io/gitter/room/nwjs/nw.js.svg?style=flat-square) ](https://gitter.im/notifiers/notifiers) [![PyPi version](https://img.shields.io/pypi/v/notifiers.svg?style=flat-square) ](https://pypi.python.org/pypi/notifiers) [![Supported Python versions](https://img.shields.io/pypi/pyversions/notifiers.svg?style=flat-square) ](https://pypi.org/project/notifiers) [![License](https://img.shields.io/pypi/l/notifiers.svg?style=flat-square) ](https://choosealicense.com/licenses) [![Status](https://img.shields.io/pypi/status/notifiers.svg?style=flat-square) ](https://pypi.python.org/pypi/notifiers) [![Docker build](https://img.shields.io/docker/build/liiight/notifiers.svg?style=flat-square) ](https://hub.docker.com/r/liiight/notifiers/) [![RTD](https://img.shields.io/readthedocs/notifiers.svg?style=flat-square) ](https://readthedocs.org/projects/notifiers/badge/?version=latest) 
 
-See [Releases](https://github.com/liiight/notifiers/releases) for recent changesץ
+See [Releases](https://github.com/liiight/notifiers/releases) for recent changes
 
 Got an app or service and you want to enable your users to use notifications with their provider of choice? Working on a script and you want to receive notification based on its output? You don't need to implement a solution yourself, or use individual provider libs. A one stop shop for all notification providers with a unified and simple interface.
 
@@ -46,7 +46,7 @@ docker pull liiight/notifiers
 Basic Usage
 -----------
 
-```
+```python
 >>> from notifiers import get_notifier
 >>> p = get_notifier('pushover')
 >>> p.required
