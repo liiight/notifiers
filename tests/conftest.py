@@ -1,8 +1,8 @@
 import logging
 import os
-
+from functools import partial
 import pytest
-
+from click.testing import CliRunner
 from notifiers.core import Provider, Response
 from notifiers.providers import _all_providers
 from notifiers.utils.helpers import text_to_bool
@@ -65,15 +65,11 @@ def bad_provider() -> Provider:
 
 
 @pytest.fixture(scope='session')
-def load_cli_providers():
-    from notifiers_cli.core import provider_group_factory
+def cli_runner():
+    from notifiers_cli.core import notifiers_cli, provider_group_factory
     provider_group_factory()
-
-
-@pytest.fixture(scope='session')
-def notifiers_cli_main():
-    from notifiers_cli.core import notifiers_cli
-    return notifiers_cli
+    runner = CliRunner()
+    return partial(runner.invoke, notifiers_cli)
 
 
 def pytest_runtest_setup(item):
