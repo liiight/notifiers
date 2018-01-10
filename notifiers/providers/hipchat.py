@@ -6,6 +6,7 @@ from ..exceptions import NotifierException
 
 
 class HipChat(Provider):
+    """Send HipChat notifications"""
     base_url = 'https://{group}.hipchat.com'
     room_url = '/v2/room'
     user_url = '/v2/user'

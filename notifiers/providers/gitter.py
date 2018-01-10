@@ -6,6 +6,7 @@ from ..exceptions import NotifierException
 
 
 class Gitter(Provider):
+    """Send Gitter notifications"""
     base_url = 'https://api.gitter.im/v1/rooms'
     message_url = base_url + '/{room_id}/chatMessages'
     site_url = 'https://gitter.im'

@@ -6,6 +6,7 @@ from ..utils.helpers import create_response
 
 
 class Pushover(Provider):
+    """Send Pushover notifications"""
     base_url = 'https://api.pushover.net/1/messages.json'
     site_url = 'https://pushover.net/'
     provider_name = 'pushover'

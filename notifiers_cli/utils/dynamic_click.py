@@ -6,6 +6,12 @@ import click
 
 from notifiers_cli.utils.json_schema import COMPLEX_TYPES, json_schema_to_click_type, handle_oneof
 
+CORE_COMMANDS = {
+    'required': "'{}' required schema",
+    'schema': "'{}' full schema",
+    'metadata': "'{}' metadata"
+}
+
 
 def params_factory(schema):
     params = []
@@ -32,6 +38,13 @@ def params_factory(schema):
 
 
 def provider_notify_command_factory(p):
+    """
+    Generates a ``notify`` :class:`click.Command` for :class:`~notifiers.core.Provider`
+
+    :param p: Relevant Provider
+    :return: A ``notify`` :class:`click.Command`
+    :rtype: :class:`click.Command`
+    """
     params = params_factory(p.schema['properties'])
     name = 'notify'
     help = p.__doc__
@@ -41,6 +54,13 @@ def provider_notify_command_factory(p):
 
 
 def func_factory(p, method):
+    """
+    Dynamically generates callback commands to correlate to
+    :param p:
+    :param method:
+    :return:
+    """
+
     def callback():
         meth = getattr(p, method)
         pretty = json.dumps(meth, indent=4)
@@ -50,6 +70,7 @@ def func_factory(p, method):
 
 
 def _notify(p, **data):
+    """The callback func that will be hooked to the ``notify`` command"""
     message = data.get('message')
     if not message and not sys.stdin.isatty():
         message = click.get_text_stream('stdin').read()
@@ -59,6 +80,7 @@ def _notify(p, **data):
 
     new_data = {}
     for key, value in data.items():
+        # Verify that only explicitly passed args get passed on
         if not isinstance(value, bool) and not value:
             continue
         if isinstance(value, tuple):
@@ -71,10 +93,3 @@ def _notify(p, **data):
 
 def get_param_decals_from_name(option_name):
     return f'--{option_name.replace("_", "-")}'
-
-
-CORE_COMMANDS = {
-    'required': "'{}' required schema",
-    'schema': "'{}' full schema",
-    'metadata': "'{}' metadata"
-}

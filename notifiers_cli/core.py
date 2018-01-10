@@ -1,12 +1,13 @@
 import click
 
-from notifiers import __version__, all_providers, get_notifier
+from notifiers import __version__, get_notifier
 from notifiers.core import all_providers
 from notifiers.exceptions import NotifierException
 from notifiers_cli.utils.dynamic_click import provider_notify_command_factory, CORE_COMMANDS, func_factory
 
 
 def provider_group_factory():
+    """Dynamically generate provider groups for all providers, and add all basic command to it"""
     for provider in all_providers():
         p = get_notifier(provider)
         provider_name = p.provider_name

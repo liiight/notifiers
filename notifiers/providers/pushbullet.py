@@ -6,6 +6,7 @@ from ..exceptions import NotifierException
 
 
 class Pushbullet(Provider):
+    """Send Pushbullet notifications"""
     base_url = 'https://api.pushbullet.com/v2/pushes'
     devices_url = 'https://api.pushbullet.com/v2/devices'
     site_url = 'https://www.pushbullet.com'

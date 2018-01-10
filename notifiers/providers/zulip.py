@@ -6,6 +6,7 @@ from ..exceptions import NotifierException
 
 
 class Zulip(Provider):
+    """Send Zulip notifications"""
     provider_name = 'zulip'
     site_url = 'https://zulipchat.com/api/'
     api_endpoint = '/api/v1/messages'

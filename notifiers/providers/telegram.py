@@ -6,6 +6,7 @@ from ..exceptions import NotifierException
 
 
 class Telegram(Provider):
+    """Send Telegram notifications"""
     base_url = 'https://api.telegram.org/bot{token}/{method}'
     provider_name = 'telegram'
     site_url = 'https://core.telegram.org/'
