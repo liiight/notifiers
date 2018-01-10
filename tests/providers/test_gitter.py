@@ -62,7 +62,7 @@ class TestGitter:
         rsp.raise_on_errors()
 
 
-@pytest.skip('Provider resources CLI command are not ready yet')
+@pytest.mark.skip('Provider resources CLI command are not ready yet')
 class TestGitterCLI:
     """Test Gitter specific CLI commands"""
 

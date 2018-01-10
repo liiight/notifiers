@@ -40,7 +40,7 @@ class TestJoin:
         rsp.raise_on_errors()
 
 
-@pytest.skip('Provider resources CLI command are not ready yet')
+@pytest.mark.skip('Provider resources CLI command are not ready yet')
 class TestJoinCLI:
     """Test Join specific CLI"""
 

@@ -49,7 +49,7 @@ class TestPushbullet:
         rsp.raise_on_errors()
 
 
-@pytest.skip('Provider resources CLI command are not ready yet')
+@pytest.mark.skip('Provider resources CLI command are not ready yet')
 class TestPushbulletCLI:
     """Test Pushbullet specific CLI"""
 

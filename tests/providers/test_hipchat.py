@@ -46,7 +46,7 @@ class TestHipchat:
         assert 'Invalid OAuth session' in e.value.message
 
 
-@pytest.skip('Provider resources CLI command are not ready yet')
+@pytest.mark.skip('Provider resources CLI command are not ready yet')
 class TestHipchatCLI:
     """Test hipchat specific CLI"""
 
