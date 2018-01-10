@@ -79,7 +79,7 @@ Or Dockerhub::
 Basic Usage
 -----------
 
-.. code:: python
+.. code-block:::: python
 
     >>> from notifiers import get_notifier
     >>> p = get_notifier('pushover')

@@ -39,7 +39,7 @@ class Pushover(Provider):
                 'title': "your user's device name to send the message directly to that device"
             }),
             'priority': {
-                'type': 'number',
+                'type': 'integer',
                 'minimum': -2,
                 'maximum': 2,
                 'title': 'notification priority'

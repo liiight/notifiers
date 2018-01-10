@@ -4,7 +4,7 @@ Usage
 Basic Usage
 -----------
 
-The easiest way to initialize a notifier is via the :meth:`~notifiers.get_notifier` helper:
+The easiest way to initialize a notifier is via the :func:`~notifiers.core.get_notifier` helper:
 
 .. code-block:: python
 
@@ -17,13 +17,13 @@ Or import it directly::
     from notifiers.providers.pushover import Pushover
     pushover = Pushover()
 
-To send a notification invoke the :func:`notify` method::
+To send a notification invoke the :meth:`~notifiers.core.Provider.notify` method::
 
     pushover.notify(apikey='FOO', user='BAR', message='BAZ)
 
-The :func:`notify` takes key word arguments based on the provider's schema. The ``message`` key word is used in all notifiers.
+The :meth:`~notifiers.core.Provider.notify` takes key word arguments based on the provider's schema. The ``message`` key word is used in all notifiers.
 
-If there's a problem with sent key words, a :class:`NotifierException` will be thrown::
+If there's a problem with sent key words, a :class:`~notifiers.exceptions.NotifierException` will be thrown::
 
     import notifiers
     pushover = notifiers.get_notifier('pushover')
@@ -36,7 +36,7 @@ If there's a problem with sent key words, a :class:`NotifierException` will be t
         raise BadArguments(validation_error=msg, provider=self.provider_name, data=data)
     notifiers.exceptions.BadArguments: <NotificationError: Error with sent data: 'user' is a required property>
 
-In this case, a :class:`notifiers.exceptions.BadArguments` exception was thrown since not all required key words were sent.
+In this case, a :class:`~notifiers.exceptions.BadArguments` exception was thrown since not all required key words were sent.
 
 Provider schema
 ---------------

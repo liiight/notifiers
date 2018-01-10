@@ -207,6 +207,14 @@ class Provider:
         return data
 
     def notify(self, **kwargs) -> Response:
+        """
+        The main method to send notifications. Validates provider schema, loads data from environmental variables,
+         validates and prepare data, try to set defaults, checks for data dependencies and then sends the notification
+          via the :meth:`~notifiers.core.Providers._send_notification` method
+
+        :param kwargs: Notification data
+        :return: A :class:`~notifiers.core.Response` object
+        """
         validator = jsonschema.Draft4Validator(self.schema)
         self._validate_schema(validator)
 
