@@ -17,7 +17,8 @@ class HipChat(Provider):
     __icon = {
         'oneOf': [
             {
-                'type': 'string'
+                'type': 'string',
+                'title': 'The url where the icon is'
             },
             {
                 'type': 'object',

@@ -54,7 +54,8 @@ class SMTP(Provider):
             },
             'from_': {
                 'type': 'string',
-                'title': 'the FROM address to use in the email'
+                'title': 'the FROM address to use in the email',
+                'duplicate': True
             },
             'host': {
                 'type': 'string',
