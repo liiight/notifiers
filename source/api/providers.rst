@@ -1,31 +1,3 @@
-API
----
-This part of the documentation will describe the full API reference for classes and function.
-
-Base usage
-==========
-.. automethod:: notifiers.core.Provider.notify
-.. autofunction:: notifiers.core.get_notifier
-.. autofunction:: notifiers.core.all_providers
-
-Core
-====
-
-.. autoclass:: notifiers.core.Provider
-   :members:
-   :private-members:
-
-.. autoclass:: notifiers.core.Response
-   :members:
-
-Exceptions
-==========
-
-.. autoexception:: notifiers.exceptions.NotifierException
-.. autoexception:: notifiers.exceptions.BadArguments
-.. autoexception:: notifiers.exceptions.SchemaError
-.. autoexception:: notifiers.exceptions.NotificationError
-
 Providers
 =========
 API documentation for the different providers.
@@ -73,12 +45,3 @@ API documentation for the different providers.
 .. automodule:: notifiers.providers.zulip
    :members:
    :undoc-members:
-
-
-
-
-
-
-
-
-
