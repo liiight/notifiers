@@ -1,7 +1,6 @@
 import os
 
 import pytest
-from click.testing import CliRunner
 
 from notifiers import get_notifier
 from notifiers.exceptions import BadArguments
@@ -41,25 +40,24 @@ class TestJoin:
         rsp.raise_on_errors()
 
 
+@pytest.skip('Provider resources CLI command are not ready yet')
 class TestJoinCLI:
-    """Test join specific CLI"""
+    """Test Join specific CLI"""
 
-    def test_join_devices_negative(self):
-        from notifiers_cli.providers.join import devices
-        runner = CliRunner()
-        result = runner.invoke(devices, ['bad_token'])
+    def test_join_devices_negative(self, cli_runner):
+        cmd = 'join devices --token bad_token'.split()
+        result = cli_runner(cmd)
         assert result.exit_code == -1
         assert not result.output
 
     @pytest.mark.skip('tests fail due to no device connected')
     @pytest.mark.online
-    def test_join_updates_positive(self):
-        from notifiers_cli.providers.join import devices
+    def test_join_updates_positive(self, cli_runner):
         token = os.environ.get('NOTIFIERS_JOIN_APIKEY')
         assert token
 
-        runner = CliRunner()
-        result = runner.invoke(devices, [token])
+        cmd = f'join devices --token {token}'.split()
+        result = cli_runner(cmd)
         assert result.exit_code == 0
         replies = ['You have no devices associated with this apikey', 'Device name: ']
         assert any(reply in result.output for reply in replies)

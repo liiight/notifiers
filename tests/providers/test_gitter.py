@@ -1,7 +1,6 @@
 import os
 
 import pytest
-from click.testing import CliRunner
 
 from notifiers import get_notifier
 from notifiers.exceptions import BadArguments, NotificationError
@@ -63,34 +62,32 @@ class TestGitter:
         rsp.raise_on_errors()
 
 
+@pytest.skip('Provider resources CLI command are not ready yet')
 class TestGitterCLI:
-    """Test gitter specific CLI commands"""
+    """Test Gitter specific CLI commands"""
 
-    def test_gitter_rooms_negative(self):
-        from notifiers_cli.providers.gitter import rooms
-        runner = CliRunner()
-        result = runner.invoke(rooms, ['bad_token'])
+    def test_gitter_rooms_negative(self, cli_runner):
+        cmd = 'gitter rooms --token bad_token'.split()
+        result = cli_runner(cmd)
         assert result.exit_code == -1
         assert not result.output
 
     @pytest.mark.online
-    def test_gitter_rooms_positive(self):
-        from notifiers_cli.providers.gitter import rooms
+    def test_gitter_rooms_positive(self, cli_runner):
         token = os.environ.get('NOTIFIERS_GITTER_TOKEN')
         assert token
 
-        runner = CliRunner()
-        result = runner.invoke(rooms, [token])
+        cmd = f'gitter rooms --token {token}'.split()
+        result = cli_runner(cmd)
         assert result.exit_code == 0
         assert 'notifiers/testing' in result.output
 
     @pytest.mark.online
-    def test_gitter_rooms_with_query(self):
-        from notifiers_cli.providers.gitter import rooms
+    def test_gitter_rooms_with_query(self, cli_runner):
         token = os.environ.get('NOTIFIERS_GITTER_TOKEN')
         assert token
 
-        runner = CliRunner()
-        result = runner.invoke(rooms, [token, '-q', 'notifiers/testing'])
+        cmd = f'gitter rooms --token {token} --query notifiers/testing'.split()
+        result = cli_runner(cmd)
         assert result.exit_code == 0
         assert 'notifiers/testing' in result.output

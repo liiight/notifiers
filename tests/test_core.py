@@ -19,14 +19,17 @@ class TestCore:
         assert p.arguments == {
             'not_required': {
                 'oneOf': [
-                    {'items': {'type': 'string'}, 'minItems': 1, 'type': 'array', 'uniqueItems': True},
-                    {'type': 'string'}
+                    {
+                        'type': 'array', 'items': {
+                        'type': 'string', 'title': 'example for not required arg'},
+                        'minItems': 1,
+                        'uniqueItems': True
+                    },
+                    {'type': 'string', 'title': 'example for not required arg'}
                 ]
             },
-            'required': {'type': 'string'},
-            'message': {'type': 'string'},
-            'option_with_default': {'type': 'string'}
-        }
+            'required': {'type': 'string'}, 'option_with_default': {'type': 'string'},
+            'message': {'type': 'string'}}
 
         assert p.required == {'required': ['required']}
         rsp = p.notify(**self.valid_data)
