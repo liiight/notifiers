@@ -13,15 +13,19 @@ log = logging.getLogger(__name__)
 
 @pytest.fixture
 def mock_provider(monkeypatch):
-    """Return a generic :class:``notifiers.Provider`` class"""
+    """Return a generic :class:`notifiers.Provider` class"""
 
     class MockProvider(Provider):
+        """Mock Provider"""
         base_url = 'https://api.mock.com'
         _required = {'required': ['required']}
         _schema = {
             'type': 'object',
             'properties': {
-                'not_required': one_or_more({'type': 'string'}),
+                'not_required': one_or_more({
+                    'type': 'string',
+                    'title': 'example for not required arg'
+                }),
                 'required': {'type': 'string'},
                 'option_with_default': {'type': 'string'},
                 'message': {'type': 'string'}
@@ -58,6 +62,18 @@ def bad_provider() -> Provider:
         pass
 
     return BadProvider
+
+
+@pytest.fixture(scope='session')
+def load_cli_providers():
+    from notifiers_cli.core import provider_group_factory
+    provider_group_factory()
+
+
+@pytest.fixture(scope='session')
+def notifiers_cli_main():
+    from notifiers_cli.core import notifiers_cli
+    return notifiers_cli
 
 
 def pytest_runtest_setup(item):

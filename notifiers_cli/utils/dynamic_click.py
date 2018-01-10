@@ -9,7 +9,8 @@ from notifiers_cli.utils.json_schema import COMPLEX_TYPES, json_schema_to_click_
 CORE_COMMANDS = {
     'required': "'{}' required schema",
     'schema': "'{}' full schema",
-    'metadata': "'{}' metadata"
+    'metadata': "'{}' metadata",
+    'defaults': "'{}' default values"
 }
 
 
@@ -28,7 +29,9 @@ def params_factory(schema):
             if not click_type:
                 continue
         param_decls = [get_param_decals_from_name(property)]
-        option = partial(click.Option, param_decls=param_decls, help=description.capitalize(), multiple=multiple)
+        if description:
+            description = description.capitalize()
+        option = partial(click.Option, param_decls=param_decls, help=description, multiple=multiple)
         if choices:
             option = option(type=choices)
         else:
@@ -74,8 +77,6 @@ def _notify(p, **data):
     message = data.get('message')
     if not message and not sys.stdin.isatty():
         message = click.get_text_stream('stdin').read()
-    if not message:
-        raise click.ClickException("'message' option is required. Either pass it explicitly or pipe into the command")
     data['message'] = message
 
     new_data = {}

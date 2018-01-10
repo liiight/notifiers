@@ -1,109 +1,100 @@
-import pytest
 import re
 
-from notifiers import __version__
+import pytest
 from click.testing import CliRunner
 
+from notifiers import __version__
 
-@pytest.mark.usefixtures('mock_provider')
+mock_name = 'mock_provider'
+
+
+@pytest.mark.usefixtures('mock_provider', 'load_cli_providers')
 class TestCLI:
     """CLI tests"""
 
     @pytest.mark.parametrize('command, exit_code, error', [
-        ('', 2, 'invalid choice'),
-        ('mock', 1, 'Error')
+        ('', 2, 'Got unexpected extra argument'),
     ])
-    def test_bad_notify(self, command, exit_code, error):
+    def test_bad_notify(self, command, exit_code, error, notifiers_cli_main):
         """Test invalid notification usage"""
-        from notifiers_cli.core import notify
         runner = CliRunner()
 
-        result = runner.invoke(notify, [command])
+        result = runner.invoke(notifiers_cli_main, [mock_name, 'notify', command])
         assert result.exit_code == exit_code
         assert error in result.output
 
-    def test_notify_sanity(self):
+    def test_notify_sanity(self, notifiers_cli_main):
         """Test valid notification usage"""
-        from notifiers_cli.core import notify
         runner = CliRunner()
-        result = runner.invoke(notify, ['mock', 'required=foo', 'message=bar'])
+        result = runner.invoke(notifiers_cli_main, [mock_name, 'notify', '--message', 'foo', '--required', 'bar'])
         assert result.exit_code == 0
         assert not result.output
 
-    def test_providers(self, ):
+    def test_providers(self, notifiers_cli_main):
         """Test providers command"""
-        from notifiers_cli.core import providers
         runner = CliRunner()
-        result = runner.invoke(providers, [])
+        result = runner.invoke(notifiers_cli_main, ['providers'])
         assert result.exit_code == 0
         assert 'mock' in result.output
 
-    def test_metadata(self):
+    def test_metadata(self, notifiers_cli_main):
         """Test metadata command"""
-        from notifiers_cli.core import metadata
         runner = CliRunner()
-        result = runner.invoke(metadata, ['mock'])
+        result = runner.invoke(notifiers_cli_main, [mock_name, 'metadata'])
         assert result.exit_code == 0
-        assert "base_url: https://api.mock.com" in result.output
-        assert "site_url: https://www.mock.com" in result.output
-        assert "provider_name: mock_provide" in result.output
+        assert '"base_url": "https://api.mock.com"' in result.output
+        assert '"site_url": "https://www.mock.com"' in result.output
+        assert '"provider_name": "mock_provider"' in result.output
 
-    def test_required(self):
-        """Test metadata command"""
-        from notifiers_cli.core import required
+    def test_required(self, notifiers_cli_main):
+        """Test required command"""
         runner = CliRunner()
-        result = runner.invoke(required, ['mock'])
+        result = runner.invoke(notifiers_cli_main, [mock_name, 'required'])
         assert result.exit_code == 0
         assert 'required' in result.output
 
-    def test_arguments(self):
-        """Test metadata command"""
-        from notifiers_cli.core import arguments
+    def test_help(self, notifiers_cli_main):
+        """Test help command"""
         runner = CliRunner()
-        result = runner.invoke(arguments, ['mock'])
+        result = runner.invoke(notifiers_cli_main, [mock_name, 'notify', '--help'])
         assert result.exit_code == 0
-        assert 'required' in result.output
-        assert 'not_required' in result.output
-        assert 'message' in result.output
+        assert '--required' in result.output
+        assert '--not-required' in result.output
+        assert '--message' in result.output
 
-    def test_no_defaults(self):
+    def test_no_defaults(self, notifiers_cli_main):
         """Test defaults command"""
-        from notifiers_cli.core import defaults
         runner = CliRunner()
-        result = runner.invoke(defaults, ['pushover'])
+        result = runner.invoke(notifiers_cli_main, ['pushover', 'defaults'])
         assert result.exit_code == 0
-        assert 'pushover has no defaults set' in result.output
+        assert '{}' in result.output
 
-    def test_defaults(self):
+    def test_defaults(self, notifiers_cli_main):
         """Test defaults command"""
-        from notifiers_cli.core import defaults
         runner = CliRunner()
-        result = runner.invoke(defaults, ['mock'])
+        result = runner.invoke(notifiers_cli_main, [mock_name, 'defaults'])
         assert result.exit_code == 0
-        assert 'option_with_default: foo' in result.output
+        assert '"option_with_default": "foo"' in result.output
 
-    def test_piping_input(self):
+    def test_piping_input(self, notifiers_cli_main):
         """Test piping in message"""
-        from notifiers_cli.core import notify
         runner = CliRunner()
-        result = runner.invoke(notify, ['mock', 'required=foo'], input='bar')
+        result = runner.invoke(notifiers_cli_main, [mock_name, 'notify', '--required', 'foo'], input='bar')
         assert result.exit_code == 0
         assert not result.output
 
-    def test_default_provider(self, monkeypatch):
-        """Test default provider environ"""
-        monkeypatch.setenv('NOTIFIERS_DEFAULT_PROVIDER', 'mock')
+    def test_environ(self, monkeypatch, notifiers_cli_main):
+        """Test provider environ usage """
         monkeypatch.setenv('NOTIFIERS_MOCK_PROVIDER_REQUIRED', 'foo')
-        from notifiers_cli.core import notify
+        monkeypatch.setenv('NOTIFIERS_MOCK_PROVIDER_MESSAGE', 'foo')
         runner = CliRunner()
-        result = runner.invoke(notify, [], input='foo')
+        result = runner.invoke(notifiers_cli_main, [mock_name, 'notify'])
         assert result.exit_code == 0
         assert not result.output
 
-    def test_version_command(self):
-        from notifiers_cli.core import notifiers
+    def test_version_command(self, notifiers_cli_main):
         runner = CliRunner()
-        result = runner.invoke(notifiers, ['--version'])
+        result = runner.invoke(notifiers_cli_main, ['--version'])
         assert result.exit_code == 0
         version_re = re.search('(\d+\.\d+\.\d+)', result.output)
         assert version_re
