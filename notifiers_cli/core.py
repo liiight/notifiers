@@ -16,7 +16,9 @@ def provider_group_factory():
         group.add_command(provider_notify_command_factory(p))
         for name, description in CORE_COMMANDS.items():
             callback = func_factory(p, name)
-            command = click.Command(name, callback=callback, help=description.format(provider_name))
+            pretty_opt = click.Option(['--pretty/--not-pretty'], help='Output a pretty version of the JSON')
+            params = [pretty_opt]
+            command = click.Command(name, callback=callback, help=description.format(provider_name), params=params)
             group.add_command(command)
 
         notifiers_cli.add_command(group)

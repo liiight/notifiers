@@ -21,27 +21,49 @@ def params_factory(schema: dict) -> list:
     :param schema:  JSON schema to operate on
     :return: Lists of created :class:`click.Option` object to be added to a :class:`click.Command`
     """
-    params = []
+
+    # Immediately create message as an argument
+    message_arg = click.Argument(['message'], required=False)
+    params = [message_arg]
+
     for property, prpty_schema in schema.items():
         multiple = False
         choices = None
-        if prpty_schema.get('type') and any(char in property for char in ['@']) \
-                or prpty_schema.get('type') in COMPLEX_TYPES or prpty_schema.get('duplicate'):
+
+        if any(char in property for char in ['@']):
             continue
+        if prpty_schema.get('type') in COMPLEX_TYPES:
+            continue
+        if prpty_schema.get('duplicate'):
+            continue
+        if property == 'message':
+            continue
+
         elif not prpty_schema.get('oneOf'):
             click_type, description, choices = json_schema_to_click_type(prpty_schema)
         else:
             click_type, multiple, description = handle_oneof(prpty_schema['oneOf'])
+            # Not all oneOf schema can be handled by click
             if not click_type:
                 continue
+
+        # Convert bool values into flags
         if click_type == click.BOOL:
             param_decls = [get_flag_param_decals_from_bool(property)]
             click_type = None
         else:
             param_decls = [get_param_decals_from_name(property)]
+
         if description:
             description = description.capitalize()
+
+            if multiple:
+                if not description.endswith('.'):
+                    description += '.'
+                description += ' Multiple usages of this option are allowed'
+        # Construct the base command options
         option = partial(click.Option, param_decls=param_decls, help=description, multiple=multiple)
+
         if choices:
             option = option(type=choices)
         elif click_type:
@@ -67,18 +89,19 @@ def provider_notify_command_factory(p) -> click.Command:
     return cmd
 
 
-def func_factory(p, method):
+def func_factory(p, method: str) -> callable:
     """
-    Dynamically generates callback commands to correlate to
-    :param p:
-    :param method:
-    :return:
+    Dynamically generates callback commands to correlate to provider public methods
+
+    :param p: A :class:`notifiers.core.Provider` object
+    :param method: A string correlating to a provider method
+    :return: A callback func
     """
 
-    def callback():
-        meth = getattr(p, method)
-        pretty = json.dumps(meth, indent=4)
-        click.echo(pretty)
+    def callback(pretty: bool = False):
+        res = getattr(p, method)
+        dump = partial(json.dumps, indent=4) if pretty else partial(json.dumps)
+        click.echo(dump(res))
 
     return callback
 
@@ -95,12 +118,15 @@ def _notify(p, **data):
         # Verify that only explicitly passed args get passed on
         if not isinstance(value, bool) and not value:
             continue
+
+        # Multiple choice command are passed as tuples, convert to list to match schema
         if isinstance(value, tuple):
             value = list(value)
         new_data[key] = value
 
     rsp = p.notify(**new_data)
     rsp.raise_on_errors()
+    click.secho(f'Succesfully sent a notification to {p.provider_name}!', fg='green')
 
 
 def get_param_decals_from_name(option_name: str) -> str:
