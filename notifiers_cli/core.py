@@ -35,6 +35,7 @@ def providers():
 
 
 def entry_point():
+    """The entry that CLI is executed from"""
     try:
         provider_group_factory()
         notifiers_cli()

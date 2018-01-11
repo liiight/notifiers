@@ -9,7 +9,14 @@ SCHEMA_BASE_MAP = {
 COMPLEX_TYPES = ['object', 'array']
 
 
-def handle_oneof(oneof_schema):
+def handle_oneof(oneof_schema: list) -> tuple:
+    """
+    Custom handle of `oneOf` JSON schema validator. Tried to match primitive type and see if it should be allowed
+     to be passed multiple timns into a command
+
+    :param oneof_schema: `oneOf` JSON schema
+    :return: Tuple of :class:`click.ParamType`, ``multiple`` flag and ``description`` of option
+    """
     oneof_dict = {schema['type']: schema for schema in oneof_schema}
     click_type = None
     multiple = False
@@ -27,7 +34,14 @@ def handle_oneof(oneof_schema):
     return click_type, multiple, description
 
 
-def json_schema_to_click_type(schema):
+def json_schema_to_click_type(schema: dict) -> tuple:
+    """
+    A generic handler of a single property JSON schema to :class:`click.ParamType` converter
+
+    :param schema: JSON schema property to operate on
+    :return: Tuple of :class:`click.ParamType`, `description`` of option and optionally a :class:`click.Choice`
+     if the allowed values are a closed list (JSON schema ``enum``)
+    """
     choices = None
     if isinstance(schema['type'], list):
         if 'string' in schema['type']:

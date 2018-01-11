@@ -14,7 +14,13 @@ CORE_COMMANDS = {
 }
 
 
-def params_factory(schema):
+def params_factory(schema: dict) -> list:
+    """
+    Generates list of :class:`click.Option` based on a JSON schema
+
+    :param schema:  JSON schema to operate on
+    :return: Lists of created :class:`click.Option` object to be added to a :class:`click.Command`
+    """
     params = []
     for property, prpty_schema in schema.items():
         multiple = False
@@ -40,13 +46,12 @@ def params_factory(schema):
     return params
 
 
-def provider_notify_command_factory(p):
+def provider_notify_command_factory(p) -> click.Command:
     """
     Generates a ``notify`` :class:`click.Command` for :class:`~notifiers.core.Provider`
 
     :param p: Relevant Provider
     :return: A ``notify`` :class:`click.Command`
-    :rtype: :class:`click.Command`
     """
     params = params_factory(p.schema['properties'])
     name = 'notify'
@@ -92,5 +97,6 @@ def _notify(p, **data):
     rsp.raise_on_errors()
 
 
-def get_param_decals_from_name(option_name):
+def get_param_decals_from_name(option_name: str) -> str:
+    """Converts a name to a param name"""
     return f'--{option_name.replace("_", "-")}'
