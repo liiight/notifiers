@@ -34,14 +34,20 @@ def params_factory(schema: dict) -> list:
             click_type, multiple, description = handle_oneof(prpty_schema['oneOf'])
             if not click_type:
                 continue
-        param_decls = [get_param_decals_from_name(property)]
+        if click_type == click.BOOL:
+            param_decls = [get_flag_param_decals_from_bool(property)]
+            click_type = None
+        else:
+            param_decls = [get_param_decals_from_name(property)]
         if description:
             description = description.capitalize()
         option = partial(click.Option, param_decls=param_decls, help=description, multiple=multiple)
         if choices:
             option = option(type=choices)
-        else:
+        elif click_type:
             option = option(type=click_type)
+        else:
+            option = option()
         params.append(option)
     return params
 
@@ -99,4 +105,11 @@ def _notify(p, **data):
 
 def get_param_decals_from_name(option_name: str) -> str:
     """Converts a name to a param name"""
-    return f'--{option_name.replace("_", "-")}'
+    name = option_name.replace("_", "-")
+    return f'--{name}'
+
+
+def get_flag_param_decals_from_bool(option_name: str) -> str:
+    """Return a '--do/not-do' style flag param"""
+    name = option_name.replace("_", "-")
+    return f'--{name}/--no-{name}'

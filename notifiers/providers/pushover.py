@@ -12,8 +12,8 @@ class Pushover(Provider):
     provider_name = 'pushover'
 
     __sounds = ['pushover', 'bike', 'bugle', 'cashregister', 'classical', 'cosmic', 'falling', 'gamelan', 'incoming',
-               'intermission', 'magic', 'mechanical', 'pianobar', 'siren', 'spacealarm', 'tugboat', 'alien', 'climb',
-               'persistent', 'echo', 'updown', 'none']
+                'intermission', 'magic', 'mechanical', 'pianobar', 'siren', 'spacealarm', 'tugboat', 'alien', 'climb',
+                'persistent', 'echo', 'updown', 'none']
     _required = {'required': ['user', 'message', 'token']}
     _schema = {
         'type': 'object',
@@ -84,9 +84,7 @@ class Pushover(Provider):
                          ' has acknowledged your notification. priority must be set to 2'
             },
             'html': {
-                'type': 'integer',
-                'minimum': 0,
-                'maximum': 1,
+                'type': 'boolean',
                 'title': 'enable HTML formatting'
             }
         },
@@ -97,6 +95,8 @@ class Pushover(Provider):
         data['user'] = list_to_commas(data['user'])
         if data.get('device'):
             data['device'] = list_to_commas(data['device'])
+        if data.get('html') is not None:
+            data['html'] = int(data['html'])
         return data
 
     def _send_notification(self, data: dict) -> Response:
