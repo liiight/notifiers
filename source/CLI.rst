@@ -14,8 +14,10 @@ To view the main help just enter ``notifier`` or ``notifiers --help``::
       Notifiers CLI operation
 
     Options:
-      --version  Show the version and exit.
-      --help     Show this message and exit.
+     --version          Show the version and exit.
+     --env-prefix TEXT  Set a custom prefix for env vars usage
+     --help             Show this message and exit.
+
 
     Commands:
       email       Options for 'email'
@@ -113,9 +115,13 @@ If you defined for example ``NOTIFIERS_PUSHOVER_TOKEN`` and ``NOTIFIERS_PUSHOVER
 
     notifiers notify pushover "wow, this is easy!"
 
+You can change the default env var prefix (wnich is ``NOTIFIERS_``) by sending the ``--env-prefix`` option::
+
+   notifiers --env-prefix FOO_ notify pushover "Yep, easy stuff!"
+
 .. note::
 
-   You can create a convinence alias for your used provider to even simplify this further::
+   You can create a convenience alias for your used provider to even simplify this further::
 
         alias not="notifiers notify pushover"
 
