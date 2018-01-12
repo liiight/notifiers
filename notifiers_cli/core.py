@@ -26,8 +26,11 @@ def provider_group_factory():
 
 @click.group()
 @click.version_option(version=__version__, prog_name='notifiers', message=('%(prog)s %(version)s'))
-def notifiers_cli():
+@click.option('--env-prefix', help='Set a custom prefix for env vars usage')
+@click.pass_context
+def notifiers_cli(ctx, env_prefix):
     """Notifiers CLI operation"""
+    ctx.obj['env_prefix'] = env_prefix
 
 
 @notifiers_cli.command()
@@ -40,7 +43,7 @@ def entry_point():
     """The entry that CLI is executed from"""
     try:
         provider_group_factory()
-        notifiers_cli()
+        notifiers_cli(obj={})
     except NotifierException as e:
         click.secho(f'ERROR: {e.message}', bold=True, fg='red')
         exit(1)

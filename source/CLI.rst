@@ -117,7 +117,7 @@ If you defined for example ``NOTIFIERS_PUSHOVER_TOKEN`` and ``NOTIFIERS_PUSHOVER
 
    You can create a convinence alias for your used provider to even simplify this further::
 
-        alias not="notifiers notify pushoverx"
+        alias not="notifiers notify pushover"
 
    Then just use::
 
@@ -125,7 +125,7 @@ If you defined for example ``NOTIFIERS_PUSHOVER_TOKEN`` and ``NOTIFIERS_PUSHOVER
 
 Version
 =======
-Get installed ``notifiers`` version via the ``--version`` flag::
+Get installed ``notifiers`` version via the ``--version`` flag:
 
     $ notifiers --version
     notifiers 0.6.3

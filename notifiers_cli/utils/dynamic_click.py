@@ -124,6 +124,10 @@ def _notify(p, **data):
             value = list(value)
         new_data[key] = value
 
+    ctx = click.get_current_context()
+    if ctx.obj.get('env_prefix'):
+        new_data['env_prefix'] = ctx.obj['env_prefix']
+
     rsp = p.notify(**new_data)
     rsp.raise_on_errors()
     click.secho(f'Succesfully sent a notification to {p.provider_name}!', fg='green')
