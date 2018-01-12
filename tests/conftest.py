@@ -69,7 +69,7 @@ def cli_runner():
     from notifiers_cli.core import notifiers_cli, provider_group_factory
     provider_group_factory()
     runner = CliRunner()
-    return partial(runner.invoke, notifiers_cli)
+    return partial(runner.invoke, notifiers_cli, obj={})
 
 
 def pytest_runtest_setup(item):

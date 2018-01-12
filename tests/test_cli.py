@@ -20,10 +20,10 @@ class TestCLI:
 
     def test_notify_sanity(self, cli_runner):
         """Test valid notification usage"""
-        cmd = f'{mock_name} notify --message foo --required bar'.split()
+        cmd = f'{mock_name} notify --required bar foo'.split()
         result = cli_runner(cmd)
         assert result.exit_code == 0
-        assert not result.output
+        assert 'Succesfully sent a notification' in result.output
 
     def test_providers(self, cli_runner):
         """Test providers command"""
@@ -54,7 +54,7 @@ class TestCLI:
         assert result.exit_code == 0
         assert '--required' in result.output
         assert '--not-required' in result.output
-        assert '--message' in result.output
+        assert 'MESSAGE' in result.output
 
     def test_no_defaults(self, cli_runner):
         """Test defaults command"""
@@ -75,16 +75,20 @@ class TestCLI:
         cmd = f'{mock_name} notify --required foo'.split()
         result = cli_runner(cmd, input='bar')
         assert result.exit_code == 0
-        assert not result.output
+        assert 'Succesfully sent a notification' in result.output
 
-    def test_environ(self, monkeypatch, cli_runner):
+    @pytest.mark.parametrize('prefix, command', [
+        (None, f'{mock_name} notify'.split()),
+        ('FOO_', f'--env-prefix FOO_ {mock_name} notify'.split())
+    ])
+    def test_environ(self, prefix, command, monkeypatch, cli_runner):
         """Test provider environ usage """
-        monkeypatch.setenv('NOTIFIERS_MOCK_PROVIDER_REQUIRED', 'foo')
-        monkeypatch.setenv('NOTIFIERS_MOCK_PROVIDER_MESSAGE', 'foo')
-        cmd = f'{mock_name} notify'.split()
-        result = cli_runner(cmd)
+        prefix = prefix if prefix else 'NOTIFIERS_'
+        monkeypatch.setenv(f'{prefix}MOCK_PROVIDER_REQUIRED', 'foo')
+        monkeypatch.setenv(f'{prefix}MOCK_PROVIDER_MESSAGE', 'foo')
+        result = cli_runner(command)
         assert result.exit_code == 0
-        assert not result.output
+        assert 'Succesfully sent a notification' in result.output
 
     def test_version_command(self, cli_runner):
         result = cli_runner(['--version'])
@@ -94,7 +98,7 @@ class TestCLI:
         assert version_re.group(1) == notifiers.__version__
 
     def test_multiple_option(self, cli_runner):
-        cmd = f'{mock_name} notify --required foo --message bar --not-required baz --not-required piz'
+        cmd = f'{mock_name} notify --required foo --not-required baz --not-required piz bar'
         result = cli_runner(cmd.split())
         assert result.exit_code == 0
-        assert not result.output
+        assert 'Succesfully sent a notification' in result.output
