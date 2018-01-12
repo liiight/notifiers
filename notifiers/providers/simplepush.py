@@ -5,6 +5,7 @@ from ..utils.helpers import create_response
 
 
 class SimplePush(Provider):
+    """Send SimplePush notifications"""
     base_url = 'https://api.simplepush.io/send'
     site_url = 'https://simplepush.io/'
     provider_name = 'simplepush'

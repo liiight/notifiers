@@ -10,8 +10,14 @@ Welcome to notifiers's documentation!
   :start-after: inclusion-start
   :end-before: inclusion-end
 
-Indices and tables
-==================
+**Indices and tables**
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
+
+Documentation
+-------------
 
 .. toctree::
    :maxdepth: 3
@@ -21,9 +27,21 @@ Indices and tables
    installation
    usage
    CLI
-   API
+
+API documentation
+-----------------
+
+.. toctree::
+   :maxdepth: 2
+
+   api/core
+   api/exceptions
+   api/providers
+   api/cli
+
+Development documentation
+-------------------------
+TBD
 
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+

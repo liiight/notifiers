@@ -70,6 +70,6 @@ class TestPushover(object):
                 'retry': 30,
                 'expire': 30,
                 'callback': 'http://callback.com',
-                'html': 1}
+                'html': True}
         rsp = p.notify(**data)
         rsp.raise_on_errors()

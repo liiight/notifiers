@@ -75,24 +75,23 @@ class TestTelegram:
         rsp.raise_on_errors()
 
 
+@pytest.mark.skip('Provider resources CLI command are not ready yet')
 class TestTelegramCLI:
     """Test telegram specific CLI"""
 
-    def test_telegram_updates_negative(self):
-        from notifiers_cli.providers.telegram import updates
-        runner = CliRunner()
-        result = runner.invoke(updates, ['bad_token'])
+    def test_telegram_updates_negative(self, cli_runner):
+        cmd = 'telegram updates --token bad_token'.split()
+        result = cli_runner(cmd)
         assert result.exit_code == -1
         assert not result.output
 
     @pytest.mark.online
-    def test_telegram_updates_positive(self):
-        from notifiers_cli.providers.telegram import updates
+    def test_telegram_updates_positive(self, cli_runner):
         token = os.environ.get('NOTIFIERS_TELEGRAM_TOKEN')
         assert token
 
-        runner = CliRunner()
-        result = runner.invoke(updates, [token])
+        cmd = f'telegram updates --token {token}'.split()
+        result = cli_runner(cmd)
         assert result.exit_code == 0
         replies = ['Bot has not active chats! Send it ANY message and try again', 'Chat ID:']
         assert any(reply in result.output for reply in replies)

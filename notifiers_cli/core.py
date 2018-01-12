@@ -1,110 +1,49 @@
 import click
 
-from notifiers import __version__
-from notifiers.core import all_providers, get_notifier
+from notifiers import __version__, get_notifier
+from notifiers.core import all_providers
 from notifiers.exceptions import NotifierException
+from notifiers_cli.utils.dynamic_click import provider_notify_command_factory, CORE_COMMANDS, func_factory
+
+
+def provider_group_factory():
+    """Dynamically generate provider groups for all providers, and add all basic command to it"""
+    for provider in all_providers():
+        p = get_notifier(provider)
+        provider_name = p.provider_name
+        help = f"Options for '{provider_name}'"
+        group = click.Group(name=provider_name, help=help)
+        group.add_command(provider_notify_command_factory(p))
+        for name, description in CORE_COMMANDS.items():
+            callback = func_factory(p, name)
+            pretty_opt = click.Option(['--pretty/--not-pretty'], help='Output a pretty version of the JSON')
+            params = [pretty_opt]
+            command = click.Command(name, callback=callback, help=description.format(provider_name), params=params)
+            group.add_command(command)
+
+        notifiers_cli.add_command(group)
 
 
 @click.group()
 @click.version_option(version=__version__, prog_name='notifiers', message=('%(prog)s %(version)s'))
-def notifiers():
+@click.option('--env-prefix', help='Set a custom prefix for env vars usage')
+@click.pass_context
+def notifiers_cli(ctx, env_prefix):
     """Notifiers CLI operation"""
+    ctx.obj['env_prefix'] = env_prefix
 
 
-@notifiers.command()
+@notifiers_cli.command()
 def providers():
     """Shows all available providers"""
     click.echo(', '.join(all_providers()))
 
 
-@notifiers.command(context_settings=dict(
-    ignore_unknown_options=True,
-    allow_extra_args=True,
-))
-@click.argument('provider', type=click.Choice(all_providers()), envvar='NOTIFIERS_DEFAULT_PROVIDER')
-@click.pass_context
-def notify(ctx, provider):
-    """Send a notification to a passed provider.
-
-    Data should be passed via a key=value input like so:
-
-        notifiers notify pushover token=foo user=bar message=test
-
-    """
-    p = get_notifier(provider)
-    data = {}
-    for item in ctx.args:
-        data.update([item.split('=')])
-    if 'message' not in data:
-        message = click.get_text_stream('stdin').read()
-        if not message:
-            raise click.ClickException(
-                "'message' option is required. "
-                "Either pass it explicitly or pipe into the command"
-            )
-        data['message'] = message
-
-    rsp = p.notify(**data)
-    rsp.raise_on_errors()
-
-
-@notifiers.command()
-@click.argument('provider', type=click.Choice(all_providers()), envvar='NOTIFIERS_DEFAULT_PROVIDER')
-def required(provider):
-    """Shows the required attributes of a provider.
-    Example:
-        notifiers required pushover
-    """
-    p = get_notifier(provider)
-    click.echo(', '.join(p.required))
-
-
-@notifiers.command()
-@click.argument('provider', type=click.Choice(all_providers()), envvar='NOTIFIERS_DEFAULT_PROVIDER')
-def arguments(provider):
-    """Shows the name and schema of all the  attributes of a provider.
-    Example:
-
-        notifiers arguments pushover
-    """
-    p = get_notifier(provider)
-    for name, schema in p.arguments.items():
-        click.echo(f"Name: '{name}', Schema: {schema}")
-    click.echo(', '.join(p.required))
-
-
-@notifiers.command()
-@click.argument('provider', type=click.Choice(all_providers()))
-def metadata(provider):
-    """Shows the provider's metadata.
-    Example:
-        notifiers metadata pushover
-    """
-    p = get_notifier(provider)
-    for k, v in p.metadata.items():
-        click.echo(f'{k}: {v}')
-
-
-@notifiers.command()
-@click.argument('provider', type=click.Choice(all_providers()))
-def defaults(provider):
-    """Shows the provider's defaults.
-    Example:
-        notifiers defaults pushover
-    """
-    p = get_notifier(provider)
-    if not p.defaults:
-        click.echo(f'{provider} has no defaults set')
-    for k, v in p.defaults.items():
-        click.echo(f'{k}: {v}')
-
-
 def entry_point():
+    """The entry that CLI is executed from"""
     try:
-        from notifiers_cli.providers import provider_commands
-        for command in provider_commands:
-            notifiers.add_command(command)
-        notifiers(obj={})
+        provider_group_factory()
+        notifiers_cli(obj={})
     except NotifierException as e:
         click.secho(f'ERROR: {e.message}', bold=True, fg='red')
         exit(1)

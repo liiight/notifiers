@@ -1,8 +1,8 @@
 import logging
 import os
-
+from functools import partial
 import pytest
-
+from click.testing import CliRunner
 from notifiers.core import Provider, Response
 from notifiers.providers import _all_providers
 from notifiers.utils.helpers import text_to_bool
@@ -13,15 +13,19 @@ log = logging.getLogger(__name__)
 
 @pytest.fixture
 def mock_provider(monkeypatch):
-    """Return a generic :class:``notifiers.Provider`` class"""
+    """Return a generic :class:`notifiers.Provider` class"""
 
     class MockProvider(Provider):
+        """Mock Provider"""
         base_url = 'https://api.mock.com'
         _required = {'required': ['required']}
         _schema = {
             'type': 'object',
             'properties': {
-                'not_required': one_or_more({'type': 'string'}),
+                'not_required': one_or_more({
+                    'type': 'string',
+                    'title': 'example for not required arg'
+                }),
                 'required': {'type': 'string'},
                 'option_with_default': {'type': 'string'},
                 'message': {'type': 'string'}
@@ -58,6 +62,14 @@ def bad_provider() -> Provider:
         pass
 
     return BadProvider
+
+
+@pytest.fixture(scope='session')
+def cli_runner():
+    from notifiers_cli.core import notifiers_cli, provider_group_factory
+    provider_group_factory()
+    runner = CliRunner()
+    return partial(runner.invoke, notifiers_cli, obj={})
 
 
 def pytest_runtest_setup(item):

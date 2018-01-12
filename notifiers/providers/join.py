@@ -7,6 +7,7 @@ from ..exceptions import NotifierException
 
 
 class Join(Provider):
+    """Send Join notifications"""
     base_url = 'https://joinjoaomgcd.appspot.com/_ah/api/messaging/v1/sendPush'
     devices_url = 'https://joinjoaomgcd.appspot.com/_ah/api/registration/v1/listDevices'
     site_url = 'https://joaoapps.com/join/api/'

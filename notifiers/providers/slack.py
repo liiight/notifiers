@@ -5,6 +5,7 @@ from ..utils.helpers import create_response
 
 
 class Slack(Provider):
+    """Send Slack webhook notifications"""
     base_url = 'https://hooks.slack.com/services/'
     site_url = 'https://api.slack.com/incoming-webhooks'
     provider_name = 'slack'

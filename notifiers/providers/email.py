@@ -16,9 +16,7 @@ DEFAULT_SMTP_HOST = 'localhost'
 
 
 class SMTP(Provider):
-    """
-    Send emails via SMTP
-    """
+    """Send emails via SMTP"""
     base_url = None
     site_url = 'https://en.wikipedia.org/wiki/Email'
     provider_name = 'email'
@@ -54,7 +52,8 @@ class SMTP(Provider):
             },
             'from_': {
                 'type': 'string',
-                'title': 'the FROM address to use in the email'
+                'title': 'the FROM address to use in the email',
+                'duplicate': True
             },
             'host': {
                 'type': 'string',
