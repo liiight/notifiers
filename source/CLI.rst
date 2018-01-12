@@ -6,9 +6,11 @@ Notifiers come with CLI support
 Main view
 =========
 
-To view the main help just enter ``notifier`` or ``notifiers --help``::
+To view the main help just enter ``notifiers`` or ``notifiers --help``:
 
-    (notifiers_venv) ip-192-168-1-169:notifiers $ notifiers
+.. code-block:: console
+
+    $ notifiers
     Usage: notifiers [OPTIONS] COMMAND [ARGS]...
 
       Notifiers CLI operation
@@ -34,9 +36,11 @@ To view the main help just enter ``notifier`` or ``notifiers --help``::
       zulip       Options for 'zulip'
 
 
-To view all providers use the ``providers`` command like so::
+To view all providers use the ``providers`` command like so:
 
-        (notifiers_venv) ip-192-168-1-169:notifiers $ notifiers providers
+.. code-block:: console
+
+        $ notifiers providers
         pushover, simplepush, slack, email, gmail, telegram, gitter, pushbullet, join, hipchat, zulip
 
 This will return all available provider names
@@ -44,9 +48,11 @@ This will return all available provider names
 Provider groups
 ===============
 
-Each provider correlates to a group of actions it can perform. Due to the generic nature that providers are implemented in, these actions are usually shared among all providers. To access available commands, use the ``notifiers [PROVIDER_NAME] --help`` command::
+Each provider correlates to a group of actions it can perform. Due to the generic nature that providers are implemented in, these actions are usually shared among all providers. To access available commands, use the ``notifiers [PROVIDER_NAME] --help`` command:
 
-    (notifiers_venv) ip-192-168-1-169:notifiers $ notifiers email --help
+.. code-block:: console
+
+    $ notifiers email --help
     Usage: notifiers email [OPTIONS] COMMAND [ARGS]...
 
       Options for 'email'
@@ -61,14 +67,18 @@ Each provider correlates to a group of actions it can perform. Due to the generi
       required  'email' required schema
       schema    'email' full schema
 
-The ``defaults``, ``metadata``, ``required`` and ``schema`` command all return a JSON dump of the relevant provider property::
+The ``defaults``, ``metadata``, ``required`` and ``schema`` command all return a JSON dump of the relevant provider property:
 
-    (notifiers_venv) ip-192-168-1-169:notifiers $ notifiers email metadata
+.. code-block:: console
+
+    $ notifiers email metadata
     {"base_url": null, "site_url": "https://en.wikipedia.org/wiki/Email", "provider_name": "email"}
 
-These helper method can also accept a ``--pretty`` flag which will out a nicely indented JSON::
+These helper method can also accept a ``--pretty`` flag which will out a nicely indented JSON:
 
-    (notifiers_venv) ip-192-168-1-169:notifiers $ notifiers email metadata
+.. code-block:: console
+
+    $ notifiers email metadata --pretty
     {
         "base_url": null,
         "site_url": "https://en.wikipedia.org/wiki/Email",
@@ -77,9 +87,11 @@ These helper method can also accept a ``--pretty`` flag which will out a nicely 
 
 Sending a notification
 ======================
-To send a notification you use the ``notify`` command. Each notifier has its own set of relevant options it can take. View them by sending the ``notifiers [PROVIDER_NAME] notify --help``::
+To send a notification you use the ``notify`` command. Each notifier has its own set of relevant options it can take. View them by sending the ``notifiers [PROVIDER_NAME] notify --help``:
 
-    (notifiers_venv) ip-192-168-1-169:notifiers $ notifiers email notify --help
+.. code-block:: console
+
+    $ notifiers email notify --help
     Usage: core.py email notify [OPTIONS] [MESSAGE]
 
       Send emails via SMTP
@@ -103,35 +115,49 @@ Note that ``message`` is an expected argument that need to be either explicitly 
 
 Piping into a notification
 ==========================
-Notifiers CLI enable using pipe to directly pass value to the ``message`` argument::
+Notifiers CLI enable using pipe to directly pass value to the ``message`` argument:
 
-    cat file.txt | notifiers notify email --to blah@foo.com
+.. code-block:: console
+
+    $ cat file.txt | notifiers notify email --to blah@foo.com
 
 Environment variables
 =====================
 
 Environment variables are respected by all means of notification by :mod:`notifiers` and the CLI is no different to that aspect.
-If you defined for example ``NOTIFIERS_PUSHOVER_TOKEN`` and ``NOTIFIERS_PUSHOVER_USER`` you can simply run::
+If you defined for example ``NOTIFIERS_PUSHOVER_TOKEN`` and ``NOTIFIERS_PUSHOVER_USER`` you can simply run:
 
-    notifiers notify pushover "wow, this is easy!"
+.. code-block:: console
 
-You can change the default env var prefix (wnich is ``NOTIFIERS_``) by sending the ``--env-prefix`` option::
+    $ export NOTIFIERS_PUSHOVER_TOKEN=FOO
+    $ export NOTIFIERS_PUSHOVER_USER=BAR
+    $ notifiers notify pushover "wow, this is easy!"
 
-   notifiers --env-prefix FOO_ notify pushover "Yep, easy stuff!"
+You can change the default env var prefix (which is ``NOTIFIERS_``) by sending the ``--env-prefix`` option:
+
+.. code-block:: console
+
+   $ notifiers --env-prefix FOO_ notify pushover "Yep, easy stuff!"
 
 .. note::
 
-   You can create a convenience alias for your used provider to even simplify this further::
+   You can create a convenience alias for your used provider to even simplify this further:
 
-        alias not="notifiers notify pushover"
+   .. code-block:: console
 
-   Then just use::
+        $ alias notify="notifiers notify pushover"
 
-        not "this is even easier!"
+   And when combining this with setting environment variables, you can run:
+
+   .. code-block:: console
+
+        $ notify "this is even easier!"
 
 Version
 =======
 Get installed ``notifiers`` version via the ``--version`` flag:
+
+.. code-block:: console
 
     $ notifiers --version
     notifiers 0.6.3
