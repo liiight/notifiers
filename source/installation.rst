@@ -3,28 +3,38 @@ Installation
 
 Via pip
 =======
-You can install via pip::
+You can install via pip:
 
-    pip install notifiers
+.. code-block:: console
 
-Or install from source::
+    $ pip install notifiers
 
-    pip install https://github.com/liiight/notifiers/master.zip
+Or install from source:
 
-Use ``develop`` branch for cutting edge (not recommended)::
+.. code-block:: console
 
-    pip install https://github.com/liiight/notifiers/develop.zip
+    $ pip install https://github.com/liiight/notifiers/master.zip
+
+Use ``develop`` branch for cutting edge (not recommended):
+
+.. code-block:: console
+
+    $ pip install https://github.com/liiight/notifiers/develop.zip
 
 .. note:: Python 3.6 and higher is required when installing via pip
 
 Via docker
 ==========
-Alternatively, use DockerHub::
+Alternatively, use DockerHub:
 
-    docker pull liiight/notifiers
+.. code-block:: console
 
-Use ``develop`` tag for cutting edge (still not recommended)::
+    $ docker pull liiight/notifiers
 
-    docker pull liiight/notifiers:develop
+Use ``develop`` tag for cutting edge (still not recommended):
 
-Or build from `DockerFile` locally
+.. code-block:: console
+
+    $ docker pull liiight/notifiers:develop
+
+Or build from ``DockerFile`` locally

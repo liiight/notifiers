@@ -10,12 +10,6 @@ Welcome to notifiers's documentation!
   :start-after: inclusion-start
   :end-before: inclusion-end
 
-**Indices and tables**
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
 Documentation
 -------------
 
@@ -43,5 +37,8 @@ Development documentation
 -------------------------
 TBD
 
+**Indices and tables**
 
-
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
