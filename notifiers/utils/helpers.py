@@ -8,18 +8,16 @@ FAILURE_STATUS = 'Failure'
 SUCCESS_STATUS = 'Success'
 
 
-def create_response(name: str, data: dict, response: requests.Response = None, failed: bool = False,
-                    errors: list = None) -> Response:
+def create_response(name: str, data: dict, response: requests.Response = None, errors: list = None) -> Response:
     """
     Helper function to generate a :class:`Response` object
 
     :param name: Name of the provider creating the response
     :param data: The data that was used to send the notification
     :param response: :class:`requests.Response` if exist
-    :param failed: Flag to determine if response succeeded or not
     :param errors: List of errors if relevant
     """
-    status = FAILURE_STATUS if failed else SUCCESS_STATUS
+    status = FAILURE_STATUS if errors else SUCCESS_STATUS
     return Response(status=status, provider=name, data=data, response=response, errors=errors)
 
 

@@ -60,21 +60,18 @@ class Telegram(Provider):
     def _send_notification(self, data: dict) -> Response:
         token = data.pop('token')
         url = self.base_url.format(token=token, method='sendMessage')
-        response_data = {
-            'name': self.name,
-            'data': data
-        }
+        errors = None
         try:
             response = requests.post(url, json=data)
             response.raise_for_status()
-            response_data['response'] = response
         except requests.RequestException as e:
             if e.response is not None:
-                response_data['response'] = e.response
-                response_data['errors'] = [e.response.json()['description']]
+                response = e.response
+                errors = [e.response.json()['description']]
             else:
-                response_data['errors'] = [(str(e))]
-        return create_response(**response_data)
+                response = None
+                errors = [(str(e))]
+        return create_response(self.name, data, response, errors)
 
     def updates(self, token) -> list:
         """

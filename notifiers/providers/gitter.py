@@ -56,22 +56,19 @@ class Gitter(Provider):
         room_id = data.pop('room_id')
         url = self.message_url.format(room_id=room_id)
 
-        response_data = {
-            'name': self.name,
-            'data': data
-        }
         headers = self._get_headers(data.pop('token'))
         try:
             response = requests.post(url, json=data, headers=headers)
             response.raise_for_status()
-            response_data['response'] = response
+            errors = None
         except requests.RequestException as e:
             if e.response is not None:
-                response_data['response'] = e.response
-                response_data['errors'] = [e.response.json()['error']]
+                response = e.response
+                errors = [e.response.json()['error']]
             else:
-                response_data['errors'] = [(str(e))]
-        return create_response(**response_data)
+                response = None
+                errors = [(str(e))]
+        return create_response(self.name, data, response, errors=errors)
 
     def rooms(self, token: str, query: str = None) -> list:
         """

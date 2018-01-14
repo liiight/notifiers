@@ -92,22 +92,18 @@ class Pushbullet(Provider):
         return data
 
     def _send_notification(self, data: dict) -> Response:
-        response_data = {
-            'provider_name': self.provider_name,
-            'data': data
-        }
         headers = self._get_headers(data.pop('token'))
+        errors = None
         try:
             response = requests.post(self.base_url, json=data, headers=headers)
             response.raise_for_status()
-            response_data['response'] = response
         except requests.RequestException as e:
             if e.response is not None:
-                response_data['response'] = e.response
-                response_data['errors'] = [e.response.json()['error']['message']]
+                response = e.response
+                errors = [e.response.json()['error']['message']]
             else:
-                response_data['errors'] = [(str(e))]
-        return create_response(**response_data)
+                response = [(str(e))]
+        return create_response(self.name, data, response, errors)
 
     def devices(self, token: str) -> list:
         """
@@ -123,4 +119,4 @@ class Pushbullet(Provider):
             return response.json()['devices']
         except requests.RequestException as e:
             message = e.response.json()['error']['message']
-            raise NotifierException(provider=self.provider_name, message=message)
+            raise NotifierException(provider=self.name, message=message)

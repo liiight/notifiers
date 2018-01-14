@@ -90,19 +90,16 @@ class Zulip(Provider):
 
     def _send_notification(self, data: dict) -> Response:
         url = data.pop('url')
-        response_data = {
-            'name': self.name,
-            'data': data
-        }
         auth = (data.pop('email'), data.pop('api_key'))
+        errors = None
         try:
             response = requests.post(url, data=data, auth=auth)
             response.raise_for_status()
-            response_data['response'] = response
         except requests.RequestException as e:
             if e.response is not None:
-                response_data['response'] = e.response
-                response_data['errors'] = [e.response.json()['msg']]
+                response = e.response
+                errors = [e.response.json()['msg']]
             else:
-                response_data['errors'] = [(str(e))]
-        return create_response(**response_data)
+                response = None
+                errors = [(str(e))]
+        return create_response(self.name, data, response, errors)

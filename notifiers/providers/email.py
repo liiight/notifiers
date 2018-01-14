@@ -137,10 +137,7 @@ class SMTP(Provider):
         return data['host'], data['port'], data.get('username')
 
     def _send_notification(self, data: dict) -> Response:
-        response_data = {
-            'name': self.name,
-            'data': data
-        }
+        errors = None
         try:
             configuration = self._get_configuration(data)
             if not self.configuration or not self.smtp_server or self.configuration != configuration:
@@ -150,5 +147,5 @@ class SMTP(Provider):
         except (
                 SMTPServerDisconnected, SMTPSenderRefused, socket.error, OSError, IOError, SMTPAuthenticationError
         ) as e:
-            response_data['errors'] = [str(e)]
-        return create_response(**response_data)
+            errors = [str(e)]
+        return create_response(self.name, data, errors=errors)

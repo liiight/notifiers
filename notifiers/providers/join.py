@@ -165,25 +165,22 @@ class Join(Provider):
         return data
 
     def _send_notification(self, data: dict) -> Response:
-        response_data = {
-            'name': self.name,
-            'data': data
-        }
+        errors = None
         try:
             response = requests.get(self.base_url, params=data)
             response.raise_for_status()
-            response_data['response'] = response
             rsp = response.json()
             if not rsp['success']:
-                response_data['errors'] = [rsp['errorMessage']]
+                errors = [rsp['errorMessage']]
         except requests.RequestException as e:
             if e.response is not None:
-                response_data['response'] = e.response
-                response_data['errors'] = [e.response.json()['errorMessage']]
+                response = e.response
+                errors = [e.response.json()['errorMessage']]
             else:
-                response_data['errors'] = [(str(e))]
+                response = None
+                errors = [(str(e))]
 
-        return create_response(**response_data)
+        return create_response(self.name, data, response, errors=errors)
 
     def devices(self, apikey: str) -> list:
         """
