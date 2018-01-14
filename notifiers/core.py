@@ -12,6 +12,41 @@ DEFAULT_ENVIRON_PREFIX = 'NOTIFIERS_'
 
 log = logging.getLogger('notifiers')
 
+FAILURE_STATUS = 'Failure'
+SUCCESS_STATUS = 'Success'
+
+
+class Response:
+    """
+    A wrapper for the Notification response.
+
+    :param status: Response status string. ``SUCCESS`` or ``FAILED``
+    :param provider: Provider name that returned that response.
+     Correlates to :class:`Provider.name`
+    :param data: The notification data that was used for the notification
+    :param response: The response object that was returned. Usually :class:`requests.Response`
+    :param errors: Holds a list of errors if relevant
+    """
+
+    def __init__(self, status: str, provider: str, data: dict, response: requests.Response = None, errors: list = None):
+        self.status = status
+        self.provider = provider
+        self.data = data
+        self.response = response
+        self.errors = errors
+
+    def __repr__(self):
+        return f'<Response,provider={self.provider.capitalize()},status={self.status}>'
+
+    def raise_on_errors(self):
+        """
+        Raises a :class:`NotificationError` if response hold errors
+
+        :raise NotificationError:
+        """
+        if self.errors:
+            raise NotificationError(provider=self.provider, data=self.data, errors=self.errors)
+
 
 class SchemaResource(ABC):
     """Base class that represent an object schema and its utility methods"""
@@ -30,7 +65,7 @@ class SchemaResource(ABC):
 
     @property
     @abstractmethod
-    def name(self):
+    def name(self) -> str:
         pass
 
     @property
@@ -64,6 +99,18 @@ class SchemaResource(ABC):
         A dict of default provider values if such is needed.
         """
         return {}
+
+    def create_response(self, data: dict, response: requests.Response = None, errors: list = None) -> Response:
+        """
+        Helper function to generate a :class:`~notifiers.core.Response` object
+
+        :param name: Name of the provider creating the response
+        :param data: The data that was used to send the notification
+        :param response: :class:`requests.Response` if exist
+        :param errors: List of errors if relevant
+        """
+        status = FAILURE_STATUS if errors else SUCCESS_STATUS
+        return Response(status=status, provider=self.name, data=data, response=response, errors=errors)
 
     def _merge_dict_into_dict(self, target_dict: dict, merge_dict: dict) -> dict:
         """
@@ -179,38 +226,6 @@ class SchemaResource(ABC):
         data = self._merge_defaults(data)
         data = self._validate_data_dependencies(data)
         return data
-
-
-class Response:
-    """
-    A wrapper for the Notification response.
-
-    :param status: Response status string. ``SUCCESS`` or ``FAILED``
-    :param provider: Provider name that returned that response.
-     Correlates to :class:`Provider.name`
-    :param data: The notification data that was used for the notification
-    :param response: The response object that was returned. Usually :class:`requests.Response`
-    :param errors: Holds a list of errors if relevant
-    """
-
-    def __init__(self, status: str, provider: str, data: dict, response: requests.Response = None, errors: list = None):
-        self.status = status
-        self.provider = provider
-        self.data = data
-        self.response = response
-        self.errors = errors
-
-    def __repr__(self):
-        return f'<Response,provider={self.provider.capitalize()},status={self.status}>'
-
-    def raise_on_errors(self):
-        """
-        Raises a :class:`NotificationError` if response hold errors
-
-        :raise NotificationError:
-        """
-        if self.errors:
-            raise NotificationError(provider=self.provider, data=self.data, errors=self.errors)
 
 
 class Provider(SchemaResource, ABC):

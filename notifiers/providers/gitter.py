@@ -1,7 +1,6 @@
 import requests
 
 from ..core import Provider, Response
-from ..utils.helpers import create_response
 from ..exceptions import NotifierException
 
 
@@ -68,7 +67,7 @@ class Gitter(Provider):
             else:
                 response = None
                 errors = [(str(e))]
-        return create_response(self.name, data, response, errors=errors)
+        return self.create_response(data, response, errors)
 
     def rooms(self, token: str, query: str = None) -> list:
         """

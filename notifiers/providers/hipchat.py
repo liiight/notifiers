@@ -1,7 +1,6 @@
 import requests
 
 from ..core import Provider, Response
-from ..utils.helpers import create_response
 from ..exceptions import NotifierException
 
 
@@ -314,7 +313,7 @@ class HipChat(Provider):
             else:
                 response = None
                 errors = [(str(e))]
-        return create_response(self.name, data, response, errors=errors)
+        return self.create_response(data, response, errors)
 
     def _get_resources(self, resource_name: str, token: str, group: str = None, team_server: str = None,
                        **kwargs) -> dict:

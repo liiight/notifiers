@@ -7,7 +7,6 @@ from email.utils import formatdate
 from smtplib import SMTPAuthenticationError, SMTPServerDisconnected, SMTPSenderRefused
 
 from ..core import Provider, Response
-from ..utils.helpers import create_response
 from ..utils.json_schema import one_or_more, list_to_commas
 
 DEFAULT_SUBJECT = "New email from 'notifiers'!"
@@ -148,4 +147,4 @@ class SMTP(Provider):
                 SMTPServerDisconnected, SMTPSenderRefused, socket.error, OSError, IOError, SMTPAuthenticationError
         ) as e:
             errors = [str(e)]
-        return create_response(self.name, data, errors=errors)
+        return self.create_response(data, errors=errors)

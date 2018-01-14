@@ -1,9 +1,8 @@
 import requests
 
 from ..core import Provider, Response
-from ..utils.json_schema import one_or_more, list_to_commas
-from ..utils.helpers import create_response
 from ..exceptions import NotifierException
+from ..utils.json_schema import one_or_more, list_to_commas
 
 
 class Join(Provider):
@@ -180,7 +179,7 @@ class Join(Provider):
                 response = None
                 errors = [(str(e))]
 
-        return create_response(self.name, data, response, errors=errors)
+        return self.create_response(data, response, errors)
 
     def devices(self, apikey: str) -> list:
         """

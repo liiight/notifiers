@@ -1,7 +1,6 @@
 import requests
 
 from ..core import Provider, Response
-from ..utils.helpers import create_response
 from ..exceptions import NotifierException
 
 
@@ -103,7 +102,7 @@ class Pushbullet(Provider):
                 errors = [e.response.json()['error']['message']]
             else:
                 response = [(str(e))]
-        return create_response(self.name, data, response, errors)
+        return self.create_response(data, response, errors)
 
     def devices(self, token: str) -> list:
         """

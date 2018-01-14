@@ -1,25 +1,5 @@
 from distutils.util import strtobool
 
-import requests
-
-from ..core import Response
-
-FAILURE_STATUS = 'Failure'
-SUCCESS_STATUS = 'Success'
-
-
-def create_response(name: str, data: dict, response: requests.Response = None, errors: list = None) -> Response:
-    """
-    Helper function to generate a :class:`Response` object
-
-    :param name: Name of the provider creating the response
-    :param data: The data that was used to send the notification
-    :param response: :class:`requests.Response` if exist
-    :param errors: List of errors if relevant
-    """
-    status = FAILURE_STATUS if errors else SUCCESS_STATUS
-    return Response(status=status, provider=name, data=data, response=response, errors=errors)
-
 
 def text_to_bool(value: str) -> bool:
     """

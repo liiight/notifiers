@@ -11,7 +11,7 @@ class Pushover(Provider):
     site_url = 'https://pushover.net/'
     name = 'pushover'
 
-    #todo move to be resource
+    # todo move to be resource
     __sounds = ['pushover', 'bike', 'bugle', 'cashregister', 'classical', 'cosmic', 'falling', 'gamelan', 'incoming',
                 'intermission', 'magic', 'mechanical', 'pianobar', 'siren', 'spacealarm', 'tugboat', 'alien', 'climb',
                 'persistent', 'echo', 'updown', 'none']
@@ -112,7 +112,7 @@ class Pushover(Provider):
             else:
                 response = None
                 errors = [(str(e))]
-        return create_response(self.name, data, response, errors=errors)
+        return self.create_response(data, response, errors)
 
     @property
     def metadata(self) -> dict:

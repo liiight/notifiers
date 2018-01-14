@@ -50,4 +50,4 @@ class SimplePush(Provider):
             else:
                 response = None
                 errors = [(str(e))]
-        return create_response(self.name, data, response, errors=errors)
+        return self.create_response(data, response, errors)
