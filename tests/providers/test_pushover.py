@@ -45,7 +45,6 @@ class TestPushover(object):
         rsp = p.notify(**final_data)
         with pytest.raises(NotificationError) as e:
             rsp.raise_on_errors()
-        print(e.value.message)
         assert message in e.value.message
 
     @pytest.mark.online

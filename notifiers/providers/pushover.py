@@ -99,7 +99,7 @@ class Pushover(Provider):
         return data
 
     def _send_notification(self, data: dict) -> Response:
-        path_to_errors = ('errors')
+        path_to_errors = 'errors',
         response, errors = requests.post(self.base_url, data=data, path_to_errors=path_to_errors)
         return self.create_response(data, response, errors)
 
