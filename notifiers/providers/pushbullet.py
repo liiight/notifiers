@@ -1,4 +1,3 @@
-from .. import logger as log
 from ..core import Provider, Response
 from ..utils import requests
 
@@ -95,8 +94,7 @@ class Pushbullet(Provider):
         response, errors = requests.post(self.base_url,
                                          json=data,
                                          headers=headers,
-                                         path_to_errors=self.path_to_errors,
-                                         logger=log)
+                                         path_to_errors=self.path_to_errors)
         return self.create_response(data, response, errors)
 
     def devices(self, token: str) -> list:
@@ -107,7 +105,6 @@ class Pushbullet(Provider):
         :return: A list of associated devices
         """
         headers = self._get_headers(token)
-        response, errors = requests.get(self.devices_url, headers=headers, path_to_errors=self.path_to_errors,
-                                        logger=log)
+        response, errors = requests.get(self.devices_url, headers=headers, path_to_errors=self.path_to_errors)
         self.create_response(response=response, errors=errors).raise_on_errors()
         return response.json()['devices']

@@ -1,7 +1,6 @@
 from ..core import Provider, Response
-from ..utils.json_schema import one_or_more, list_to_commas
 from ..utils import requests
-from .. import logger as log
+from ..utils.json_schema import one_or_more, list_to_commas
 
 
 class Pushover(Provider):
@@ -101,7 +100,7 @@ class Pushover(Provider):
 
     def _send_notification(self, data: dict) -> Response:
         path_to_errors = ('errors')
-        response, errors = requests.post(self.base_url, data=data, path_to_errors=path_to_errors, logger=log)
+        response, errors = requests.post(self.base_url, data=data, path_to_errors=path_to_errors)
         return self.create_response(data, response, errors)
 
     @property
