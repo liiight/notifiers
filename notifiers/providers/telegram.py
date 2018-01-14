@@ -1,7 +1,6 @@
 import requests
 
 from ..core import Provider, Response
-from ..utils.helpers import create_response
 from ..exceptions import NotifierException
 
 

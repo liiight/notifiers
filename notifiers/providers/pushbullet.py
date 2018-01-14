@@ -2,6 +2,8 @@ import requests
 
 from ..core import Provider, Response
 from ..exceptions import NotifierException
+from ..utils import requests
+from .. import logger as log
 
 
 class Pushbullet(Provider):
@@ -92,16 +94,12 @@ class Pushbullet(Provider):
 
     def _send_notification(self, data: dict) -> Response:
         headers = self._get_headers(data.pop('token'))
-        errors = None
-        try:
-            response = requests.post(self.base_url, json=data, headers=headers)
-            response.raise_for_status()
-        except requests.RequestException as e:
-            if e.response is not None:
-                response = e.response
-                errors = [e.response.json()['error']['message']]
-            else:
-                response = [(str(e))]
+        path_to_errors = 'error', 'message'
+        response, errors = requests.post(self.base_url,
+                                         json=data,
+                                         headers=headers,
+                                         path_to_errors=path_to_errors,
+                                         logger=log)
         return self.create_response(data, response, errors)
 
     def devices(self, token: str) -> list:
