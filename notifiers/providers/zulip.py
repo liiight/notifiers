@@ -7,7 +7,7 @@ from ..exceptions import NotifierException
 
 class Zulip(Provider):
     """Send Zulip notifications"""
-    provider_name = 'zulip'
+    name = 'zulip'
     site_url = 'https://zulipchat.com/api/'
     api_endpoint = '/api/v1/messages'
     base_url = 'https://{domain}.zulipchat.com'
@@ -83,7 +83,7 @@ class Zulip(Provider):
 
     def _validate_data_dependencies(self, data: dict) -> dict:
         if data['type'] == 'stream' and not data.get('subject'):
-            raise NotifierException(provider=self.provider_name,
+            raise NotifierException(provider=self.name,
                                     message="'subject' is required when 'type' is 'stream'",
                                     data=data)
         return data
@@ -91,7 +91,7 @@ class Zulip(Provider):
     def _send_notification(self, data: dict) -> Response:
         url = data.pop('url')
         response_data = {
-            'provider_name': self.provider_name,
+            'name': self.name,
             'data': data
         }
         auth = (data.pop('email'), data.pop('api_key'))

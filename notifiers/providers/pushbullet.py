@@ -10,7 +10,7 @@ class Pushbullet(Provider):
     base_url = 'https://api.pushbullet.com/v2/pushes'
     devices_url = 'https://api.pushbullet.com/v2/devices'
     site_url = 'https://www.pushbullet.com'
-    provider_name = 'pushbullet'
+    name = 'pushbullet'
 
     __type = {
         'type': 'string',

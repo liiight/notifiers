@@ -12,7 +12,7 @@ class TestHipchat:
         p = get_notifier(self.notifier_name)
         assert p.metadata == {
             'base_url': 'https://{group}.hipchat.com',
-            'provider_name': 'hipchat',
+            'name': 'hipchat',
             'room_url': '/v2/room/{room}/notification',
             'site_url': 'https://www.hipchat.com/docs/apiv2',
             'user_url': '/v2/user/{user}/message'

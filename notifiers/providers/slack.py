@@ -8,7 +8,7 @@ class Slack(Provider):
     """Send Slack webhook notifications"""
     base_url = 'https://hooks.slack.com/services/'
     site_url = 'https://api.slack.com/incoming-webhooks'
-    provider_name = 'slack'
+    name = 'slack'
 
     __fields = {
         'type': 'array',
@@ -158,7 +158,7 @@ class Slack(Provider):
     def _send_notification(self, data: dict) -> Response:
         url = data.pop('webhook_url')
         response_data = {
-            'provider_name': self.provider_name,
+            'name': self.name,
             'data': data
         }
         try:

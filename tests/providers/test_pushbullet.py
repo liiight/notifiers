@@ -11,7 +11,7 @@ class TestPushbullet:
         p = get_notifier('pushbullet')
         assert p.metadata == {
             'base_url': 'https://api.pushbullet.com/v2/pushes',
-            'provider_name': 'pushbullet',
+            'name': 'pushbullet',
             'site_url': 'https://www.pushbullet.com'
         }
 

@@ -16,7 +16,7 @@ class TestTelegram:
         t = get_notifier('telegram')
         assert t.metadata == {
             'base_url': 'https://api.telegram.org/bot{token}/{method}',
-            'provider_name': 'telegram',
+            'name': 'telegram',
             'site_url': 'https://core.telegram.org/'
         }
 

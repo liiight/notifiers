@@ -12,7 +12,7 @@ class TestJoin:
         assert j.metadata == {
             'base_url': 'https://joinjoaomgcd.appspot.com/_ah/api/messaging/v1/sendPush',
             'devices_url': 'https://joinjoaomgcd.appspot.com/_ah/api/registration/v1/listDevices',
-            'provider_name': 'join',
+            'name': 'join',
             'site_url': 'https://joaoapps.com/join/api/'
         }
 

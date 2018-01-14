@@ -130,7 +130,7 @@ def _notify(p, **data):
 
     rsp = p.notify(**new_data)
     rsp.raise_on_errors()
-    click.secho(f'Succesfully sent a notification to {p.provider_name}!', fg='green')
+    click.secho(f'Succesfully sent a notification to {p.name}!', fg='green')
 
 
 def get_param_decals_from_name(option_name: str) -> str:

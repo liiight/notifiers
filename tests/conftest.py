@@ -13,7 +13,7 @@ log = logging.getLogger(__name__)
 
 @pytest.fixture
 def mock_provider(monkeypatch):
-    """Return a generic :class:`notifiers.Provider` class"""
+    """Return a generic :class:`notifiers.core.Provider` class"""
 
     class MockProvider(Provider):
         """Mock Provider"""
@@ -33,7 +33,7 @@ def mock_provider(monkeypatch):
             'additionalProperties': False
         }
         site_url = 'https://www.mock.com'
-        provider_name = 'mock_provider'
+        name = 'mock_provider'
 
         @property
         def defaults(self):
@@ -42,7 +42,7 @@ def mock_provider(monkeypatch):
             }
 
         def _send_notification(self, data: dict):
-            return Response(status='success', provider=self.provider_name, data=data)
+            return Response(status='success', provider=self.name, data=data)
 
         def _prepare_data(self, data: dict):
             if data.get('not_required'):
@@ -50,13 +50,13 @@ def mock_provider(monkeypatch):
             data['required'] = list_to_commas(data['required'])
             return data
 
-    monkeypatch.setitem(_all_providers, 'mock', MockProvider)
+    monkeypatch.setitem(_all_providers, MockProvider.name, MockProvider)
     return MockProvider
 
 
 @pytest.fixture
 def bad_provider() -> Provider:
-    """Returns an unimplemented :class:``notifiers.Provider`` class for testing"""
+    """Returns an unimplemented :class:`notifiers.core.Provider` class for testing"""
 
     class BadProvider(Provider):
         pass

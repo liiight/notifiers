@@ -11,7 +11,7 @@ class TestGmail(object):
         p = get_notifier('gmail')
         assert p.metadata == {
             'base_url': 'smtp.gmail.com',
-            'provider_name': 'gmail',
+            'name': 'gmail',
             'site_url': 'https://www.google.com/gmail/about/'
         }
 

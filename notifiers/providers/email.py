@@ -19,7 +19,7 @@ class SMTP(Provider):
     """Send emails via SMTP"""
     base_url = None
     site_url = 'https://en.wikipedia.org/wiki/Email'
-    provider_name = 'email'
+    name = 'email'
 
     _required = {
         'required': ['message', 'to'],
@@ -138,7 +138,7 @@ class SMTP(Provider):
 
     def _send_notification(self, data: dict) -> Response:
         response_data = {
-            'provider_name': self.provider_name,
+            'name': self.name,
             'data': data
         }
         try:

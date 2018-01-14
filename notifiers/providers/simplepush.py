@@ -8,7 +8,7 @@ class SimplePush(Provider):
     """Send SimplePush notifications"""
     base_url = 'https://api.simplepush.io/send'
     site_url = 'https://simplepush.io/'
-    provider_name = 'simplepush'
+    name = 'simplepush'
 
     _required = {'required': ['key', 'message']}
     _schema = {

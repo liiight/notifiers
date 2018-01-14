@@ -11,7 +11,7 @@ class Join(Provider):
     base_url = 'https://joinjoaomgcd.appspot.com/_ah/api/messaging/v1/sendPush'
     devices_url = 'https://joinjoaomgcd.appspot.com/_ah/api/registration/v1/listDevices'
     site_url = 'https://joaoapps.com/join/api/'
-    provider_name = 'join'
+    name = 'join'
 
     _required = {
         'dependencies': {
@@ -166,7 +166,7 @@ class Join(Provider):
 
     def _send_notification(self, data: dict) -> Response:
         response_data = {
-            'provider_name': self.provider_name,
+            'name': self.name,
             'data': data
         }
         try:
@@ -201,8 +201,8 @@ class Join(Provider):
             rsp = response.json()
             if not rsp['success']:
                 message = rsp['errorMessage']
-                raise NotifierException(provider=self.provider_name, message=message)
+                raise NotifierException(provider=self.name, message=message)
         except requests.RequestException as e:
             message = e.response.json()['errorMessage']
-            raise NotifierException(provider=self.provider_name, message=message)
+            raise NotifierException(provider=self.name, message=message)
         return response.json()['records']

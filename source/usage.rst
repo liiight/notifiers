@@ -37,7 +37,7 @@ If there's a problem with sent key words, a :class:`~notifiers.exceptions.Notifi
       File "/Users/liiight/PycharmProjects/notifiers/notifiers/core.py", line 215, in notify
         self._validate_data(kwargs, validator)
       File "/Users/liiight/PycharmProjects/notifiers/notifiers/core.py", line 193, in _validate_data
-        raise BadArguments(validation_error=msg, provider=self.provider_name, data=data)
+        raise BadArguments(validation_error=msg, provider=self.name, data=data)
     notifiers.exceptions.BadArguments: <NotificationError: Error with sent data: 'user' is a required property>
 
 In this case, a :class:`~notifiers.exceptions.BadArguments` exception was thrown since not all required key words were sent.

@@ -10,7 +10,7 @@ def provider_group_factory():
     """Dynamically generate provider groups for all providers, and add all basic command to it"""
     for provider in all_providers():
         p = get_notifier(provider)
-        provider_name = p.provider_name
+        provider_name = p.name
         help = f"Options for '{provider_name}'"
         group = click.Group(name=provider_name, help=help)
         group.add_command(provider_notify_command_factory(p))

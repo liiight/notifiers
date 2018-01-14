@@ -14,7 +14,7 @@ class TestZulip:
         assert p.metadata == {
             'base_url': 'https://{domain}.zulipchat.com',
             'site_url': 'https://zulipchat.com/api/',
-            'provider_name': 'zulip'
+            'name': 'zulip'
         }
 
     @pytest.mark.parametrize('data, message', [

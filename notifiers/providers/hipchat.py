@@ -13,7 +13,7 @@ class HipChat(Provider):
     room_notification_url = room_url + '/{room}/notification'
     user_message_url = user_url + '/{user}/message'
     site_url = 'https://www.hipchat.com/docs/apiv2'
-    provider_name = 'hipchat'
+    name = 'hipchat'
 
     __icon = {
         'oneOf': [
@@ -304,7 +304,7 @@ class HipChat(Provider):
         url = data.pop('url')
         headers = self._get_headers(data.pop('token'))
         response_data = {
-            'provider_name': self.provider_name,
+            'name': self.name,
             'data': data
         }
         try:

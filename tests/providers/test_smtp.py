@@ -11,7 +11,7 @@ class TestSMTP(object):
         p = get_notifier('email')
         assert p.metadata == {
             'base_url': None,
-            'provider_name': 'email',
+            'name': 'email',
             'site_url': 'https://en.wikipedia.org/wiki/Email'
         }
 

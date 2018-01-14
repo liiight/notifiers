@@ -38,7 +38,7 @@ class TestCLI:
         assert result.exit_code == 0
         assert '"base_url": "https://api.mock.com"' in result.output
         assert '"site_url": "https://www.mock.com"' in result.output
-        assert '"provider_name": "mock_provider"' in result.output
+        assert '"name": "mock_provider"' in result.output
 
     def test_required(self, cli_runner):
         """Test required command"""

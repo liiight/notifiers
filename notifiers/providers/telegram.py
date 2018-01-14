@@ -8,7 +8,7 @@ from ..exceptions import NotifierException
 class Telegram(Provider):
     """Send Telegram notifications"""
     base_url = 'https://api.telegram.org/bot{token}/{method}'
-    provider_name = 'telegram'
+    name = 'telegram'
     site_url = 'https://core.telegram.org/'
 
     _required = {'required': ['message', 'chat_id', 'token']}
@@ -61,7 +61,7 @@ class Telegram(Provider):
         token = data.pop('token')
         url = self.base_url.format(token=token, method='sendMessage')
         response_data = {
-            'provider_name': self.provider_name,
+            'name': self.name,
             'data': data
         }
         try:
@@ -90,4 +90,4 @@ class Telegram(Provider):
             return response.json()['result']
         except requests.RequestException as e:
             message = e.response.json()['description']
-            raise NotifierException(provider=self.provider_name, message=message)
+            raise NotifierException(provider=self.name, message=message)

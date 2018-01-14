@@ -10,7 +10,7 @@ class Gitter(Provider):
     base_url = 'https://api.gitter.im/v1/rooms'
     message_url = base_url + '/{room_id}/chatMessages'
     site_url = 'https://gitter.im'
-    provider_name = 'gitter'
+    name = 'gitter'
 
     _required = {'required': ['message', 'token', 'room_id']}
     _schema = {
@@ -57,7 +57,7 @@ class Gitter(Provider):
         url = self.message_url.format(room_id=room_id)
 
         response_data = {
-            'provider_name': self.provider_name,
+            'name': self.name,
             'data': data
         }
         headers = self._get_headers(data.pop('token'))
@@ -89,4 +89,4 @@ class Gitter(Provider):
             return rsp.json()['results'] if query else rsp.json()
         except requests.RequestException as e:
             message = e.response.json()['error']
-            raise NotifierException(provider=self.provider_name, message=message)
+            raise NotifierException(provider=self.name, message=message)

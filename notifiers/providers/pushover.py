@@ -9,7 +9,7 @@ class Pushover(Provider):
     """Send Pushover notifications"""
     base_url = 'https://api.pushover.net/1/messages.json'
     site_url = 'https://pushover.net/'
-    provider_name = 'pushover'
+    name = 'pushover'
 
     __sounds = ['pushover', 'bike', 'bugle', 'cashregister', 'classical', 'cosmic', 'falling', 'gamelan', 'incoming',
                 'intermission', 'magic', 'mechanical', 'pianobar', 'siren', 'spacealarm', 'tugboat', 'alien', 'climb',
@@ -101,7 +101,7 @@ class Pushover(Provider):
 
     def _send_notification(self, data: dict) -> Response:
         response_data = {
-            'provider_name': self.provider_name,
+            'name': self.name,
             'data': data
         }
         try:

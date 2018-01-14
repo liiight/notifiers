@@ -14,7 +14,7 @@ class TestCore:
         """Test basic notification flow"""
         p = mock_provider()
         assert p.metadata == {'base_url': 'https://api.mock.com',
-                              'provider_name': 'mock_provider',
+                              'name': 'mock_provider',
                               'site_url': 'https://www.mock.com'}
         assert p.arguments == {
             'not_required': {
@@ -70,7 +70,7 @@ class TestCore:
     def test_get_notifier(self, mock_provider):
         """Test ``get_notifier()`` helper function"""
         from notifiers import get_notifier
-        p = get_notifier('mock')
+        p = get_notifier('mock_provider')
         assert p
         assert isinstance(p, Provider)
 
@@ -98,19 +98,20 @@ class TestCore:
         assert e.value.errors == ['an error']
         assert e.value.data == {'not_required': 'foo,bar', 'required': 'foo', 'option_with_default': 'foo'}
         assert e.value.message == 'Notification errors: an error'
-        assert e.value.provider == p.provider_name
+        assert e.value.provider == p.name
 
     def test_bad_integration(self, bad_provider):
         """Test bad provider inheritance"""
-        p = bad_provider()
-        with pytest.raises(NotImplementedError):
-            p.notify(**self.valid_data)
+        with pytest.raises(TypeError) as e:
+            bad_provider()
+        assert ("Can't instantiate abstract class BadProvider with abstract methods _required,"
+                " _schema, _send_notification, base_url, name, site_url") in str(e)
 
     def test_environs(self, mock_provider, monkeypatch):
         """Test environs usage"""
         p = mock_provider()
         prefix = f'mock_'
-        monkeypatch.setenv(f'{prefix}{p.provider_name}_required'.upper(), 'foo')
+        monkeypatch.setenv(f'{prefix}{p.name}_required'.upper(), 'foo')
         rsp = p.notify(env_prefix=prefix)
         assert rsp.status == 'success'
         assert rsp.data['required'] == 'foo'
@@ -119,7 +120,7 @@ class TestCore:
         """Verify that given data overrides environ"""
         p = mock_provider()
         prefix = f'mock_'
-        monkeypatch.setenv(f'{prefix}{p.provider_name}_required'.upper(), 'foo')
+        monkeypatch.setenv(f'{prefix}{p.name}_required'.upper(), 'foo')
         rsp = p.notify(required='bar', env_prefix=prefix)
         assert rsp.status == 'success'
         assert rsp.data['required'] == 'bar'

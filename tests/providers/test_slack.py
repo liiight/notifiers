@@ -14,7 +14,7 @@ class TestSlack(object):
         p = get_notifier('slack')
         assert p.metadata == {
             'base_url': 'https://hooks.slack.com/services/',
-            'provider_name': 'slack',
+            'name': 'slack',
             'site_url': 'https://api.slack.com/incoming-webhooks'
         }
 

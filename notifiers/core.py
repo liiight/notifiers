@@ -1,5 +1,6 @@
 import os
 import logging
+from abc import ABC, abstractmethod
 
 import jsonschema
 from jsonschema.exceptions import best_match
@@ -12,76 +13,36 @@ DEFAULT_ENVIRON_PREFIX = 'NOTIFIERS_'
 log = logging.getLogger('notifiers')
 
 
-class Response:
-    """
-    A wrapper for the Notification response.
+class SchemaResource(ABC):
+    """Base class that represent an object schema and its utility methods"""
 
-    :param status: Response status string. ``SUCCESS`` or ``FAILED``
-    :param provider: Provider name that returned that response.
-     Correlates to :class:`Provider.provider_name`
-    :param data: The notification data that was used for the notification
-    :param response: The response object that was returned. Usually :class:`requests.Response`
-    :param errors: Holds a list of errors if relevant
-    """
+    @property
+    @abstractmethod
+    def _required(self) -> dict:
+        """Will hold the schema's required part"""
+        pass
 
-    def __init__(self, status: str, provider: str, data: dict, response: requests.Response = None, errors: list = None):
-        self.status = status
-        self.provider = provider
-        self.data = data
-        self.response = response
-        self.errors = errors
+    @property
+    @abstractmethod
+    def _schema(self) -> dict:
+        """Resource JSON schema"""
+        pass
 
-    def __repr__(self):
-        return f'<Response,provider={self.provider.capitalize()},status={self.status}>'
-
-    def raise_on_errors(self):
-        """
-        Raises a :class:`NotificationError` if response hold errors
-
-        :raise NotificationError:
-        """
-        if self.errors:
-            raise NotificationError(provider=self.provider, data=self.data, errors=self.errors)
-
-
-class Provider:
-    """
-    The Base class all notification providers inherit from.
-
-    """
-    base_url = ''
-    site_url = ''
-    provider_name = ''
-
-    _required = {}
-    _schema = {}
-
-    def __repr__(self):
-        return f'<Provider:[{self.provider_name.capitalize()}]>'
+    @property
+    @abstractmethod
+    def name(self):
+        pass
 
     @property
     def schema(self) -> dict:
         """
-        A property method that'll hold the provider schema.
+        A property method that'll return the constructed provider schema.
         Schema MUST be an object and this method must be overridden
 
         :return: JSON schema of the provider
         """
-        if not self._required or not self._schema:
-            raise NotImplementedError
         self._schema.update(self._required)
         return self._schema
-
-    @property
-    def metadata(self) -> dict:
-        """
-        Returns a dict of the provider metadata as declared. Override if needed.
-        """
-        return {
-            'base_url': self.base_url,
-            'site_url': self.site_url,
-            'provider_name': self.provider_name
-        }
 
     @property
     def arguments(self) -> dict:
@@ -144,7 +105,7 @@ class Provider:
         environs = {}
         log.debug("starting to collect environs using prefix: '%s'", prefix)
         for arg in self.arguments:
-            environ = f'{prefix}{self.provider_name}_{arg}'.upper()
+            environ = f'{prefix}{self.name}_{arg}'.upper()
             if os.environ.get(environ):
                 environs[arg] = os.environ[environ]
         return environs
@@ -160,14 +121,6 @@ class Provider:
         """
         return data
 
-    def _send_notification(self, data: dict) -> Response:
-        """
-        The core method to trigger the provider notification. Must be overridden.
-
-        :param data: Notification data
-        """
-        raise NotImplementedError
-
     def _validate_schema(self, validator: jsonschema.Draft4Validator):
         """
         Validates provider schema for syntax issues. Raises :class:`SchemaError` if relevant
@@ -178,8 +131,7 @@ class Provider:
             log.debug('validating provider schema')
             validator.check_schema(self.schema)
         except jsonschema.SchemaError as e:
-            # todo generate custom errors when relevant
-            raise SchemaError(schema_error=e.message, provider=self.provider_name, data=self.schema)
+            raise SchemaError(schema_error=e.message, provider=self.name, data=self.schema)
 
     def _validate_data(self, data: dict, validator: jsonschema.Draft4Validator):
         """
@@ -193,7 +145,7 @@ class Provider:
         if e:
             custom_error_key = f'error_{e.validator}'
             msg = e.schema[custom_error_key] if e.schema.get(custom_error_key) else e.message
-            raise BadArguments(validation_error=msg, provider=self.provider_name, data=data)
+            raise BadArguments(validation_error=msg, provider=self.name, data=data)
 
     def _validate_data_dependencies(self, data: dict) -> dict:
         """
@@ -206,27 +158,107 @@ class Provider:
         """
         return data
 
+    def _process_data(self, **data) -> dict:
+        """
+        The main method that process all resources data. Validated schema, gets environs, validates data, prepares
+         it via provider requirements, merges defaults and check for data dependencies
+
+        :param data: The raw data passed by the notifiers client
+        :return: Processed data
+        """
+        validator = jsonschema.Draft4Validator(self.schema)
+        self._validate_schema(validator)
+
+        env_prefix = data.pop('env_prefix', None)
+        environs = self._get_environs(env_prefix)
+        if environs:
+            kwargs = self._merge_dict_into_dict(data, environs)
+
+        self._validate_data(data, validator)
+        data = self._prepare_data(data)
+        data = self._merge_defaults(data)
+        data = self._validate_data_dependencies(data)
+        return data
+
+
+class Response:
+    """
+    A wrapper for the Notification response.
+
+    :param status: Response status string. ``SUCCESS`` or ``FAILED``
+    :param provider: Provider name that returned that response.
+     Correlates to :class:`Provider.name`
+    :param data: The notification data that was used for the notification
+    :param response: The response object that was returned. Usually :class:`requests.Response`
+    :param errors: Holds a list of errors if relevant
+    """
+
+    def __init__(self, status: str, provider: str, data: dict, response: requests.Response = None, errors: list = None):
+        self.status = status
+        self.provider = provider
+        self.data = data
+        self.response = response
+        self.errors = errors
+
+    def __repr__(self):
+        return f'<Response,provider={self.provider.capitalize()},status={self.status}>'
+
+    def raise_on_errors(self):
+        """
+        Raises a :class:`NotificationError` if response hold errors
+
+        :raise NotificationError:
+        """
+        if self.errors:
+            raise NotificationError(provider=self.provider, data=self.data, errors=self.errors)
+
+
+class Provider(SchemaResource, ABC):
+    """The Base class all notification providers inherit from."""
+
+    @property
+    @abstractmethod
+    def base_url(self):
+        pass
+
+    @property
+    @abstractmethod
+    def site_url(self):
+        pass
+
+    def __repr__(self):
+        return f'<Provider:[{self.name.capitalize()}]>'
+
+    @property
+    def metadata(self) -> dict:
+        """
+        Returns a dict of the provider metadata as declared. Override if needed.
+        """
+        return {
+            'base_url': self.base_url,
+            'site_url': self.site_url,
+            'name': self.name
+        }
+
+    @abstractmethod
+    def _send_notification(self, data: dict) -> Response:
+        """
+        The core method to trigger the provider notification. Must be overridden.
+
+        :param data: Notification data
+        """
+        pass
+
     def notify(self, **kwargs) -> Response:
         """
-        The main method to send notifications. Validates provider schema, loads data from environmental variables,
-         validates and prepare data, try to set defaults, checks for data dependencies and then sends the notification
+        The main method to send notifications. Prepares the data via the
+        :meth:`~notifiers.core.SchemaResource._prepare_data` method and then sends the notification
           via the :meth:`~notifiers.core.Providers._send_notification` method
 
         :param kwargs: Notification data
         :return: A :class:`~notifiers.core.Response` object
         """
-        validator = jsonschema.Draft4Validator(self.schema)
-        self._validate_schema(validator)
-
-        env_prefix = kwargs.pop('env_prefix', None)
-        environs = self._get_environs(env_prefix)
-        if environs:
-            kwargs = self._merge_dict_into_dict(kwargs, environs)
-
-        self._validate_data(kwargs, validator)
-        data = self._prepare_data(kwargs)
-        data = self._merge_defaults(data)
-        data = self._validate_data_dependencies(data)
+        data = self._process_data(**kwargs)
         return self._send_notification(data)
 
 

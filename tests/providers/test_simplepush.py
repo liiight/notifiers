@@ -14,7 +14,7 @@ class TestSimplePush(object):
         p = get_notifier('simplepush')
         assert p.metadata == {'base_url': 'https://api.simplepush.io/send',
                               'site_url': 'https://simplepush.io/',
-                              'provider_name': 'simplepush'}
+                              'name': 'simplepush'}
 
     @pytest.mark.parametrize('data, message', [
         ({}, 'key'),
