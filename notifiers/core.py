@@ -76,28 +76,23 @@ class SchemaResource(ABC):
 
         :return: JSON schema of the provider
         """
+        log.debug('merging required dict into schema for %s', self.name)
         self._schema.update(self._required)
         return self._schema
 
     @property
     def arguments(self) -> dict:
-        """
-        Returns all of the provider argument as declared in the JSON schema
-        """
+        """Returns all of the provider argument as declared in the JSON schema"""
         return dict(self.schema['properties'].items())
 
     @property
     def required(self) -> dict:
-        """
-        Returns a dict of the relevant required parts of the schema
-        """
+        """Returns a dict of the relevant required parts of the schema"""
         return self._required
 
     @property
     def defaults(self) -> dict:
-        """
-        A dict of default provider values if such is needed.
-        """
+        """A dict of default provider values if such is needed"""
         return {}
 
     def create_response(self, data: dict = None, response: requests.Response = None, errors: list = None) -> Response:

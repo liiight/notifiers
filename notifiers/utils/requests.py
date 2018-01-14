@@ -1,13 +1,15 @@
 import logging
+
 import requests
+
+log = logging.getLogger('notifiers')
 
 
 class RequestsHelper:
     """A wrapper around :class:`requests.Session` which enables generically handling HTTP requests"""
 
     @classmethod
-    def request(self, url: str, method: str, logger: logging.Logger, raise_for_status: bool = True,
-                path_to_errors: tuple = None, *args,
+    def request(self, url: str, method: str, raise_for_status: bool = True, path_to_errors: tuple = None, *args,
                 **kwargs) -> tuple:
         """
         A wrapper method for :meth:`~requests.Session.request``, which adds some defaults and logging
@@ -20,10 +22,10 @@ class RequestsHelper:
         :return: Dict of response body or original :class:`requests.Response <Response>`
         """
         session = kwargs.get('session', requests.Session())
-        logger.debug('sending a %s request to %s with args: %s kwargs: %s', method.upper(), url, args, kwargs)
+        log.debug('sending a %s request to %s with args: %s kwargs: %s', method.upper(), url, args, kwargs)
         rsp = session.request(method, url, *args, **kwargs)
 
-        logger.debug('response: %s', rsp.text)
+        log.debug('response: %s', rsp.text)
         errors = None
         if raise_for_status:
             try:
@@ -31,16 +33,19 @@ class RequestsHelper:
             except requests.RequestException as e:
                 if e.response is not None:
                     rsp = e.response
-                    errors = rsp.json()
-                    for arg in path_to_errors:
-                        if errors.get(arg):
-                            errors = errors[arg]
+                    if path_to_errors:
+                        errors = rsp.json()
+                        for arg in path_to_errors:
+                            if errors.get(arg):
+                                errors = errors[arg]
+                    else:
+                        errors = [rsp.text]
                     if not isinstance(errors, list):
                         errors = [errors]
                 else:
                     rsp = None
                     errors = [str(e)]
-                logger.debug('errors when trying to access %s: %s', url, errors)
+                log.debug('errors when trying to access %s: %s', url, errors)
         return rsp, errors
 
 
