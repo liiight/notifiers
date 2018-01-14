@@ -100,9 +100,9 @@ class SchemaResource(ABC):
         """
         return {}
 
-    def create_response(self, data: dict, response: requests.Response = None, errors: list = None) -> Response:
+    def create_response(self, data: dict = None, response: requests.Response = None, errors: list = None) -> Response:
         """
-        Helper function to generate a :class:`~notifiers.core.Response` object
+        Helper function to generate a :class:`Response` object
 
         :param name: Name of the provider creating the response
         :param data: The data that was used to send the notification

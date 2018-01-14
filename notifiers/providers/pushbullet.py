@@ -1,9 +1,6 @@
-import requests
-
-from ..core import Provider, Response
-from ..exceptions import NotifierException
-from ..utils import requests
 from .. import logger as log
+from ..core import Provider, Response
+from ..utils import requests
 
 
 class Pushbullet(Provider):
@@ -12,6 +9,7 @@ class Pushbullet(Provider):
     devices_url = 'https://api.pushbullet.com/v2/devices'
     site_url = 'https://www.pushbullet.com'
     name = 'pushbullet'
+    path_to_errors = 'error', 'message'
 
     __type = {
         'type': 'string',
@@ -94,11 +92,10 @@ class Pushbullet(Provider):
 
     def _send_notification(self, data: dict) -> Response:
         headers = self._get_headers(data.pop('token'))
-        path_to_errors = 'error', 'message'
         response, errors = requests.post(self.base_url,
                                          json=data,
                                          headers=headers,
-                                         path_to_errors=path_to_errors,
+                                         path_to_errors=self.path_to_errors,
                                          logger=log)
         return self.create_response(data, response, errors)
 
@@ -110,10 +107,7 @@ class Pushbullet(Provider):
         :return: A list of associated devices
         """
         headers = self._get_headers(token)
-        try:
-            response = requests.get(self.devices_url, headers=headers)
-            response.raise_for_status()
-            return response.json()['devices']
-        except requests.RequestException as e:
-            message = e.response.json()['error']['message']
-            raise NotifierException(provider=self.name, message=message)
+        response, errors = requests.get(self.devices_url, headers=headers, path_to_errors=self.path_to_errors,
+                                        logger=log)
+        self.create_response(response=response, errors=errors).raise_on_errors()
+        return response.json()['devices']

@@ -3,6 +3,7 @@ import requests
 from ..core import Provider, Response
 from ..exceptions import NotifierException
 from ..utils.json_schema import one_or_more, list_to_commas
+from ..utils import requests
 
 
 class Join(Provider):
@@ -164,6 +165,7 @@ class Join(Provider):
         return data
 
     def _send_notification(self, data: dict) -> Response:
+        # Can 't use generic requests util since API doesn't always return error status
         errors = None
         try:
             response = requests.get(self.base_url, params=data)
