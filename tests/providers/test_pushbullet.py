@@ -26,7 +26,6 @@ class TestPushbullet:
             p.notify(**data)
         assert f"'{message}' is a required property" in e.value.message
 
-    @pytest.mark.skip('Account is inactive for over a month, figure out how to get around this')
     @pytest.mark.online
     def test_sanity(self):
         p = get_notifier('pushbullet')
@@ -34,7 +33,6 @@ class TestPushbullet:
         rsp = p.notify(**data)
         rsp.raise_on_errors()
 
-    @pytest.mark.skip('Account is inactive for over a month, figure out how to get around this')
     @pytest.mark.online
     def test_all_options(self):
         p = get_notifier('pushbullet')
