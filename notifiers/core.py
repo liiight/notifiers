@@ -42,7 +42,7 @@ class Response:
         """
         Raises a :class:`NotificationError` if response hold errors
 
-        :raise NotificationError:
+        :raise :class:`NotificationError`:
         """
         if self.errors:
             raise NotificationError(provider=self.provider, data=self.data, errors=self.errors)
@@ -66,6 +66,7 @@ class SchemaResource(ABC):
     @property
     @abstractmethod
     def name(self) -> str:
+        """Resource provider name"""
         pass
 
     @property
@@ -146,6 +147,7 @@ class SchemaResource(ABC):
         Validates provider schema for syntax issues. Raises :class:`SchemaError` if relevant
 
         :param validator: :class:`jsonschema.Draft4Validator`
+        :raises: :class:`SchemaError`
         """
         try:
             log.debug('validating provider schema')
@@ -159,6 +161,7 @@ class SchemaResource(ABC):
 
         :param data: Data to validate
         :param validator: :class:`jsonschema.Draft4Validator`
+        :raises: :class:`BadArguments`
         """
         log.debug('validating provided data')
         e = best_match(validator.iter_errors(data))
