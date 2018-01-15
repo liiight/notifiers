@@ -4,12 +4,12 @@ from ..utils import requests
 
 
 class HipChatProxy:
-    """Shared attributed between resources and HipChat"""
+    """Shared attributed between resources and HipChatResourceProxy"""
     base_url = 'https://{group}.hipchat.com'
     name = 'hipchat'
     path_to_errors = 'error', 'message'
     users_url = '/v2/user'
-    room_url = '/v2/room'
+    rooms_url = '/v2/room'
 
     def _get_headers(self, token: str) -> dict:
         """
@@ -22,6 +22,7 @@ class HipChatProxy:
 
 
 class HipChatResourceProxy(HipChatProxy):
+    """Common resources attributes that should not override HipChat attributes"""
     _required = {
         'allOf': [
             {
@@ -107,6 +108,31 @@ class HipChatUsers(HipChatResourceProxy, ProviderResource):
 
     def _get_resource(self, data: dict):
         response, errors = self._get_resources(self.users_url, data)
+        self.create_response(response=response, errors=errors).raise_on_errors()
+        return response.json()
+
+
+class HipChatRooms(HipChatResourceProxy, ProviderResource):
+    resource_name = 'rooms'
+
+    @property
+    def _schema(self):
+        user_schema = {
+            'private': {
+                'type': 'boolean',
+                'title': 'Include private rooms'
+            },
+            'archived': {
+                'type': 'boolean',
+                'title': 'Include archive rooms'
+            }
+        }
+        schema = super()._schema
+        schema['properties'].update(user_schema)
+        return schema
+
+    def _get_resource(self, data: dict):
+        response, errors = self._get_resources(self.rooms_url, data)
         self.create_response(response=response, errors=errors).raise_on_errors()
         return response.json()
 
@@ -381,7 +407,7 @@ class HipChat(HipChatProxy, Provider):
         base_url = self.base_url.format(group=data.pop('group')) if not data.get('team_server') else data.pop(
             'team_server')
         if data.get('room'):
-            url = base_url + self.room_url + self.room_notification.format(room=data.pop('room'))
+            url = base_url + self.rooms_url + self.room_notification.format(room=data.pop('room'))
         else:
             url = base_url + self.users_url + self.user_message.format(user=data.pop('user'))
         data['url'] = url
@@ -403,3 +429,7 @@ class HipChat(HipChatProxy, Provider):
     @property
     def users(self) -> HipChatUsers:
         return HipChatUsers()
+
+    @property
+    def rooms(self) -> HipChatRooms:
+        return HipChatRooms()
