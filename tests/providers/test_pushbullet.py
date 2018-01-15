@@ -46,6 +46,11 @@ class TestPushbullet:
         rsp = p.notify(**data)
         rsp.raise_on_errors()
 
+    @pytest.mark.online
+    def test_pushbullet_devices(self):
+        p = get_notifier('pushbullet')
+        assert p.devices()
+
 
 @pytest.mark.skip('Provider resources CLI command are not ready yet')
 class TestPushbulletCLI:

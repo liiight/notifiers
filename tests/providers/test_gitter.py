@@ -61,6 +61,11 @@ class TestGitter:
         rsp = p.notify(**data)
         rsp.raise_on_errors()
 
+    @pytest.mark.online
+    def test_gitter_rooms(self):
+        p = get_notifier('gitter')
+        assert p.rooms()
+
 
 @pytest.mark.skip('Provider resources CLI command are not ready yet')
 class TestGitterCLI:
@@ -74,20 +79,14 @@ class TestGitterCLI:
 
     @pytest.mark.online
     def test_gitter_rooms_positive(self, cli_runner):
-        token = os.environ.get('NOTIFIERS_GITTER_TOKEN')
-        assert token
-
-        cmd = f'gitter rooms --token {token}'.split()
+        cmd = 'gitter rooms'.split()
         result = cli_runner(cmd)
         assert result.exit_code == 0
         assert 'notifiers/testing' in result.output
 
     @pytest.mark.online
     def test_gitter_rooms_with_query(self, cli_runner):
-        token = os.environ.get('NOTIFIERS_GITTER_TOKEN')
-        assert token
-
-        cmd = f'gitter rooms --token {token} --query notifiers/testing'.split()
+        cmd = f'gitter rooms --filter notifiers/testing'.split()
         result = cli_runner(cmd)
         assert result.exit_code == 0
         assert 'notifiers/testing' in result.output

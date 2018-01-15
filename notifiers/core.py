@@ -286,7 +286,7 @@ class ProviderResource(SchemaResource, ABC):
         pass
 
     @abstractmethod
-    def _get_resource(self, *args, **kwargs):
+    def _get_resource(self, data: dict):
         pass
 
     def __call__(self, **kwargs):

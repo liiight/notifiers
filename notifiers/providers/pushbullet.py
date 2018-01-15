@@ -135,5 +135,5 @@ class Pushbullet(PushbulletProxy, Provider):
         return self.create_response(data, response, errors)
 
     @property
-    def devices(self) -> ProviderResource:
+    def devices(self) -> PushbulletDevices:
         return PushbulletDevices()
