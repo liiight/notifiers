@@ -1,7 +1,6 @@
-import requests
-
 from ..core import Provider, Response
 from ..exceptions import NotifierException
+from ..utils import requests
 
 
 class HipChat(Provider):
@@ -13,6 +12,7 @@ class HipChat(Provider):
     user_message_url = user_url + '/{user}/message'
     site_url = 'https://www.hipchat.com/docs/apiv2'
     name = 'hipchat'
+    path_to_errors = 'error', 'message'
 
     __icon = {
         'oneOf': [
@@ -302,17 +302,7 @@ class HipChat(Provider):
     def _send_notification(self, data: dict) -> Response:
         url = data.pop('url')
         headers = self._get_headers(data.pop('token'))
-        try:
-            response = requests.post(url, json=data, headers=headers)
-            response.raise_for_status()
-            errors = None
-        except requests.RequestException as e:
-            if e.response is not None:
-                response = e.response
-                errors = [e.response.json()['error']['message']]
-            else:
-                response = None
-                errors = [(str(e))]
+        response, errors = requests.post(url, json=data, headers=headers, path_to_errors=self.path_to_errors)
         return self.create_response(data, response, errors)
 
     def _get_resources(self, resource_name: str, token: str, group: str = None, team_server: str = None,
@@ -349,13 +339,9 @@ class HipChat(Provider):
             params['include-guests'] = kwargs['guests']
         if kwargs.get('deleted'):
             params['include-deleted'] = kwargs['deleted']
-        try:
-            rsp = requests.get(url, headers=headers, params=params)
-            rsp.raise_for_status()
-            return rsp.json()
-        except requests.RequestException as e:
-            message = e.response.json()['error']['message']
-            raise NotifierException(provider=self.name, message=message)
+        response, errors = requests.get(url, headers=headers, params=params, path_to_errors=self.path_to_errors)
+        self.create_response(response=response, errors=errors).raise_on_errors()
+        return response.json()
 
     def users(self, token: str, group: str = None, team_server: str = None, start: int = 1, max_results: int = 100,
               guests: bool = False, deleted: bool = False) -> dict:
