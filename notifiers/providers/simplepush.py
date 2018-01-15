@@ -1,6 +1,5 @@
-import requests
-
 from ..core import Provider, Response
+from ..utils import requests
 
 
 class SimplePush(Provider):
@@ -38,15 +37,6 @@ class SimplePush(Provider):
         return data
 
     def _send_notification(self, data: dict) -> Response:
-        errors = None
-        try:
-            response = requests.post(self.base_url, data=data)
-            response.raise_for_status()
-        except requests.RequestException as e:
-            if e.response is not None:
-                response = e.response
-                errors = [e.response.json()['message']]
-            else:
-                response = None
-                errors = [(str(e))]
+        path_to_errors = 'message',
+        response, errors = requests.post(self.base_url, data=data, path_to_errors=path_to_errors)
         return self.create_response(data, response, errors)
