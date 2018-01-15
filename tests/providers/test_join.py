@@ -10,8 +10,7 @@ class TestJoin:
 
     def test_metadata(self, provider):
         assert provider.metadata == {
-            'base_url': 'https://joinjoaomgcd.appspot.com/_ah/api/messaging/v1/sendPush',
-            'devices_url': 'https://joinjoaomgcd.appspot.com/_ah/api/registration/v1/listDevices',
+            'base_url': 'https://joinjoaomgcd.appspot.com/_ah/api/messaging/v1',
             'name': 'join',
             'site_url': 'https://joaoapps.com/join/api/'
         }
