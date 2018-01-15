@@ -2,14 +2,14 @@ import os
 
 import pytest
 
-from notifiers import get_notifier
 from notifiers.exceptions import BadArguments
 
 
 class TestJoin:
-    def test_metadata(self):
-        j = get_notifier('join')
-        assert j.metadata == {
+    provider = 'join'
+
+    def test_metadata(self, provider):
+        assert provider.metadata == {
             'base_url': 'https://joinjoaomgcd.appspot.com/_ah/api/messaging/v1/sendPush',
             'devices_url': 'https://joinjoaomgcd.appspot.com/_ah/api/registration/v1/listDevices',
             'name': 'join',
@@ -20,23 +20,20 @@ class TestJoin:
         ({}, 'apikey'),
         ({'apikey': 'foo'}, 'message'),
     ])
-    def test_missing_required(self, data, message):
-        p = get_notifier('join')
+    def test_missing_required(self, data, message, provider):
         data['env_prefix'] = 'test'
         with pytest.raises(BadArguments) as e:
-            p.notify(**data)
+            provider.notify(**data)
         assert f"'{message}' is a required property" in e.value.message
 
-    def test_defaults(self):
-        p = get_notifier('join')
-        assert p.defaults == {'deviceId': 'group.all'}
+    def test_defaults(self, provider):
+        assert provider.defaults == {'deviceId': 'group.all'}
 
     @pytest.mark.skip('tests fail due to no device connected')
     @pytest.mark.online
-    def test_sanity(self):
-        p = get_notifier('join')
+    def test_sanity(self, provider):
         data = {'message': 'foo'}
-        rsp = p.notify(**data)
+        rsp = provider.notify(**data)
         rsp.raise_on_errors()
 
 

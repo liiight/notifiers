@@ -1,9 +1,11 @@
 import logging
 import os
 from functools import partial
+
 import pytest
 from click.testing import CliRunner
-from notifiers.core import Provider, Response
+
+from notifiers.core import Provider, Response, get_notifier
 from notifiers.providers import _all_providers
 from notifiers.utils.helpers import text_to_bool
 from notifiers.utils.json_schema import one_or_more, list_to_commas
@@ -64,6 +66,17 @@ def bad_provider() -> Provider:
     return BadProvider
 
 
+@pytest.fixture(scope='class')
+def provider(request):
+    if not getattr(request.cls, 'provider', None):
+        pytest.fail(f"Test class '{request.cls}' has not 'provider' attribute set")
+    name = request.cls.provider
+    p = get_notifier(name)
+    if not p:
+        pytest.fail(f"No notifier with name '{name}'")
+    return p
+
+
 @pytest.fixture(scope='session')
 def cli_runner():
     from notifiers_cli.core import notifiers_cli, provider_group_factory
@@ -73,9 +86,7 @@ def cli_runner():
 
 
 def pytest_runtest_setup(item):
-    """
-    Skips PRs if secure env vars are set and test is marked as online
-    """
+    """Skips PRs if secure env vars are set and test is marked as online"""
     pull_request = text_to_bool(os.environ.get('TRAVIS_PULL_REQUEST'))
     secure_env_vars = text_to_bool(os.environ.get('TRAVIS_SECURE_ENV_VARS'))
     online = item.get_marker('online') is not None

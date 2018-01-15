@@ -2,14 +2,14 @@ import os
 
 import pytest
 
-from notifiers import get_notifier
 from notifiers.exceptions import BadArguments
 
 
 class TestPushbullet:
-    def test_metadata(self):
-        p = get_notifier('pushbullet')
-        assert p.metadata == {
+    provider = 'pushbullet'
+
+    def test_metadata(self, provider):
+        assert provider.metadata == {
             'base_url': 'https://api.pushbullet.com/v2/pushes',
             'name': 'pushbullet',
             'site_url': 'https://www.pushbullet.com'
@@ -19,23 +19,20 @@ class TestPushbullet:
         ({}, 'message'),
         ({'message': 'foo'}, 'token'),
     ])
-    def test_missing_required(self, data, message):
-        p = get_notifier('pushbullet')
+    def test_missing_required(self, data, message, provider):
         data['env_prefix'] = 'test'
         with pytest.raises(BadArguments) as e:
-            p.notify(**data)
+            provider.notify(**data)
         assert f"'{message}' is a required property" in e.value.message
 
     @pytest.mark.online
-    def test_sanity(self):
-        p = get_notifier('pushbullet')
+    def test_sanity(self, provider):
         data = {'message': 'foo'}
-        rsp = p.notify(**data)
+        rsp = provider.notify(**data)
         rsp.raise_on_errors()
 
     @pytest.mark.online
-    def test_all_options(self):
-        p = get_notifier('pushbullet')
+    def test_all_options(self, provider):
         data = {
             'message': 'foo',
             'type': 'link',
@@ -43,13 +40,12 @@ class TestPushbullet:
             'title': '❤',
             # todo add the rest
         }
-        rsp = p.notify(**data)
+        rsp = provider.notify(**data)
         rsp.raise_on_errors()
 
     @pytest.mark.online
-    def test_pushbullet_devices(self):
-        p = get_notifier('pushbullet')
-        assert p.devices()
+    def test_pushbullet_devices(self, provider):
+        assert provider.devices()
 
 
 @pytest.mark.skip('Provider resources CLI command are not ready yet')

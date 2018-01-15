@@ -1,15 +1,15 @@
 import pytest
 
-from notifiers import get_notifier
-from notifiers.exceptions import BadArguments, NotificationError
+from notifiers.exceptions import BadArguments
 
 
-class TestGmail(object):
+class TestGmail:
     """Gmail tests"""
 
-    def test_gmail_metadata(self):
-        p = get_notifier('gmail')
-        assert p.metadata == {
+    provider = 'gmail'
+
+    def test_gmail_metadata(self, provider):
+        assert provider.metadata == {
             'base_url': 'smtp.gmail.com',
             'name': 'gmail',
             'site_url': 'https://www.google.com/gmail/about/'
@@ -19,20 +19,18 @@ class TestGmail(object):
         ({}, 'message'),
         ({'message': 'foo'}, 'to')
     ])
-    def test_gmail_missing_required(self, data, message):
-        p = get_notifier('gmail')
+    def test_gmail_missing_required(self, data, message, provider):
         data['env_prefix'] = 'test'
         with pytest.raises(BadArguments) as e:
-            p.notify(**data)
+            provider.notify(**data)
         assert f"'{message}' is a required property" in e.value.message
 
     @pytest.mark.online
-    def test_smtp_sanity(self):
+    def test_smtp_sanity(self, provider):
         """using Gmail SMTP"""
         data = {
             'message': '<b>foo</b>',
             'html': True
         }
-        p = get_notifier('gmail')
-        rsp = p.notify(**data)
+        rsp = provider.notify(**data)
         rsp.raise_on_errors()

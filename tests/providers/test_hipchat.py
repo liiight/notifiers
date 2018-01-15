@@ -1,16 +1,14 @@
 import pytest
 
-from notifiers import get_notifier
 from notifiers.exceptions import BadArguments, NotificationError
 
 
 class TestHipchat:
-    # No online tess for hipchat since they're deprecated and denies new signups
-    notifier_name = 'hipchat'
+    # No online test for hipchat since they're deprecated and denies new signups
+    provider = 'hipchat'
 
-    def test_metadata(self):
-        p = get_notifier(self.notifier_name)
-        assert p.metadata == {
+    def test_metadata(self, provider):
+        assert provider.metadata == {
             'base_url': 'https://{group}.hipchat.com',
             'name': 'hipchat',
             'room_url': '/v2/room/{room}/notification',
@@ -24,15 +22,13 @@ class TestHipchat:
         ({'id': 'foo', 'token': 'bar', 'message': 'boo', 'room': 'bla', 'team_server': 'gg', 'group': 'gg'},
          "Only one 'group' or 'team_server' is allowed"),
     ])
-    def test_missing_required(self, data, message):
-        p = get_notifier(self.notifier_name)
+    def test_missing_required(self, data, message, provider):
         data['env_prefix'] = 'test'
         with pytest.raises(BadArguments) as e:
-            p.notify(**data)
+            provider.notify(**data)
         assert message in e.value.message
 
-    def test_bad_request(self):
-        p = get_notifier(self.notifier_name)
+    def test_bad_request(self, provider):
         data = {
             'token': 'foo',
             'room': 'baz',
@@ -41,7 +37,7 @@ class TestHipchat:
             'group': 'nada'
         }
         with pytest.raises(NotificationError) as e:
-            rsp = p.notify(**data)
+            rsp = provider.notify(**data)
             rsp.raise_on_errors()
         assert 'Invalid OAuth session' in e.value.message
 
