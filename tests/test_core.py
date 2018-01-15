@@ -7,16 +7,22 @@ from notifiers.exceptions import BadArguments, SchemaError, NotificationError
 
 class TestCore:
     """Test core classes"""
-    valid_data = {'required': 'foo',
-                  'not_required': ['foo', 'bar']}
+    valid_data = {
+        'required': 'foo',
+        'not_required': [
+            'foo',
+            'bar'
+        ]
+    }
 
     def test_sanity(self, mock_provider):
         """Test basic notification flow"""
-        p = mock_provider()
-        assert p.metadata == {'base_url': 'https://api.mock.com',
-                              'name': 'mock_provider',
-                              'site_url': 'https://www.mock.com'}
-        assert p.arguments == {
+        assert mock_provider.metadata == {
+            'base_url': 'https://api.mock.com',
+            'name': 'mock_provider',
+            'site_url': 'https://www.mock.com'
+        }
+        assert mock_provider.arguments == {
             'not_required': {
                 'oneOf': [
                     {
@@ -31,13 +37,13 @@ class TestCore:
             'required': {'type': 'string'}, 'option_with_default': {'type': 'string'},
             'message': {'type': 'string'}}
 
-        assert p.required == {'required': ['required']}
-        rsp = p.notify(**self.valid_data)
+        assert mock_provider.required == {'required': ['required']}
+        rsp = mock_provider.notify(**self.valid_data)
         assert isinstance(rsp, Response)
         assert not rsp.errors
         assert rsp.raise_on_errors() is None
         assert repr(rsp) == '<Response,provider=Mock_provider,status=success>'
-        assert repr(p) == '<Provider:[Mock_provider]>'
+        assert repr(mock_provider) == '<Provider:[Mock_provider]>'
 
     @pytest.mark.parametrize('data', [
         pytest.param({'not_required': 'foo'}, id='Missing required'),
@@ -46,26 +52,23 @@ class TestCore:
     ])
     def test_schema_validation(self, data, mock_provider):
         """Test correct schema validations"""
-        p = mock_provider()
-
         with pytest.raises(BadArguments):
-            p.notify(**data)
+            mock_provider.notify(**data)
 
     def test_bad_schema(self, mock_provider):
         """Test illegal JSON schema"""
-        p = mock_provider()
-        p._schema = {'type': 'bad_schema'}
+        mock_provider._schema = {'type': 'bad_schema'}
         data = {'foo': 'bar'}
         with pytest.raises(SchemaError):
-            p.notify(**data)
+            mock_provider.notify(**data)
 
     def test_prepare_data(self, mock_provider):
         """Test ``prepare_data()`` method"""
-        p = mock_provider()
-        rsp = p.notify(**self.valid_data)
-        assert rsp.data == {'not_required': 'foo,bar',
-                            'required': 'foo',
-                            'option_with_default': 'foo'}
+        rsp = mock_provider.notify(**self.valid_data)
+        assert rsp.data == {
+            'not_required': 'foo,bar',
+            'required': 'foo',
+            'option_with_default': 'foo'}
 
     def test_get_notifier(self, mock_provider):
         """Test ``get_notifier()`` helper function"""
@@ -86,8 +89,7 @@ class TestCore:
 
     def test_error_response(self, mock_provider):
         """Test error notification response"""
-        p = mock_provider()
-        rsp = p.notify(**self.valid_data)
+        rsp = mock_provider.notify(**self.valid_data)
         rsp.errors = ['an error']
         rsp.status = 'fail'
 
@@ -98,7 +100,7 @@ class TestCore:
         assert e.value.errors == ['an error']
         assert e.value.data == {'not_required': 'foo,bar', 'required': 'foo', 'option_with_default': 'foo'}
         assert e.value.message == 'Notification errors: an error'
-        assert e.value.provider == p.name
+        assert e.value.provider == mock_provider.name
 
     def test_bad_integration(self, bad_provider):
         """Test bad provider inheritance"""
@@ -109,18 +111,16 @@ class TestCore:
 
     def test_environs(self, mock_provider, monkeypatch):
         """Test environs usage"""
-        p = mock_provider()
         prefix = f'mock_'
-        monkeypatch.setenv(f'{prefix}{p.name}_required'.upper(), 'foo')
-        rsp = p.notify(env_prefix=prefix)
+        monkeypatch.setenv(f'{prefix}{mock_provider.name}_required'.upper(), 'foo')
+        rsp = mock_provider.notify(env_prefix=prefix)
         assert rsp.status == 'success'
         assert rsp.data['required'] == 'foo'
 
     def test_provided_data_takes_precedence_over_environ(self, mock_provider, monkeypatch):
         """Verify that given data overrides environ"""
-        p = mock_provider()
         prefix = f'mock_'
-        monkeypatch.setenv(f'{prefix}{p.name}_required'.upper(), 'foo')
-        rsp = p.notify(required='bar', env_prefix=prefix)
+        monkeypatch.setenv(f'{prefix}{mock_provider.name}_required'.upper(), 'foo')
+        rsp = mock_provider.notify(required='bar', env_prefix=prefix)
         assert rsp.status == 'success'
         assert rsp.data['required'] == 'bar'

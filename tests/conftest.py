@@ -53,7 +53,7 @@ def mock_provider(monkeypatch):
             return data
 
     monkeypatch.setitem(_all_providers, MockProvider.name, MockProvider)
-    return MockProvider
+    return MockProvider()
 
 
 @pytest.fixture
