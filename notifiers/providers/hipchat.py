@@ -1,5 +1,4 @@
 from ..core import Provider, Response, ProviderResource
-from ..exceptions import NotifierException
 from ..utils import requests
 
 
