@@ -1,7 +1,6 @@
-import requests
-
 from ..core import Provider, Response
 from ..exceptions import NotifierException
+from ..utils import requests
 
 
 class Zulip(Provider):
@@ -10,6 +9,7 @@ class Zulip(Provider):
     site_url = 'https://zulipchat.com/api/'
     api_endpoint = '/api/v1/messages'
     base_url = 'https://{domain}.zulipchat.com'
+    path_to_errors = 'msg',
 
     __type = {
         'type': 'string',
@@ -90,15 +90,5 @@ class Zulip(Provider):
     def _send_notification(self, data: dict) -> Response:
         url = data.pop('url')
         auth = (data.pop('email'), data.pop('api_key'))
-        errors = None
-        try:
-            response = requests.post(url, data=data, auth=auth)
-            response.raise_for_status()
-        except requests.RequestException as e:
-            if e.response is not None:
-                response = e.response
-                errors = [e.response.json()['msg']]
-            else:
-                response = None
-                errors = [(str(e))]
+        response, errors = requests.post(url, data=data, auth=auth, path_to_errors=self.path_to_errors)
         return self.create_response(data, response, errors)
