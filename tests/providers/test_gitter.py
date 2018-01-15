@@ -11,7 +11,7 @@ class TestGitter:
         p = get_notifier('gitter')
         assert p.metadata == {
             'base_url': 'https://api.gitter.im/v1/rooms',
-            'message_url': 'https://api.gitter.im/v1/rooms/{room_id}/chatMessages',
+            'message_url': '/{room_id}/chatMessages',
             'name': 'gitter',
             'site_url': 'https://gitter.im'
         }
