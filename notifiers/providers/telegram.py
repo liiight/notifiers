@@ -1,13 +1,52 @@
-from ..core import Provider, Response
+from ..core import Provider, Response, ProviderResource
 from ..utils import requests
+from ..exceptions import ResourceError
 
 
-class Telegram(Provider):
-    """Send Telegram notifications"""
-    base_url = 'https://api.telegram.org/bot{token}/{method}'
+class TelegramProxy:
+    base_url = 'https://api.telegram.org/bot{token}'
     name = 'telegram'
-    site_url = 'https://core.telegram.org/'
     path_to_errors = 'description',
+
+
+class TelegramUpdates(TelegramProxy, ProviderResource):
+    resource_name = 'updates'
+    updates_endpoint = '/getUpdates'
+
+    _required = {
+        'required': [
+            'token'
+        ]
+    }
+
+    _schema = {
+        'type': 'object',
+        'properties': {
+            'token': {
+                'type': 'string',
+                'title': 'Bot token'
+            }
+        },
+        'additionalProperties': False
+    }
+
+    def _get_resource(self, data: dict) -> list:
+        url = self.base_url.format(token=data['token']) + self.updates_endpoint
+        response, errors = requests.get(url, path_to_errors=self.path_to_errors)
+        if errors:
+            raise ResourceError(errors=errors,
+                                resource=self.resource_name,
+                                provider=self.name,
+                                data=data,
+                                response=response)
+        return response.json()['result']
+
+
+class Telegram(TelegramProxy, Provider):
+    """Send Telegram notifications"""
+
+    site_url = 'https://core.telegram.org/'
+    push_endpoint = '/sendMessage'
 
     _required = {'required': ['message', 'chat_id', 'token']}
     _schema = {
@@ -61,14 +100,12 @@ class Telegram(Provider):
         response, errors = requests.post(url, json=data, path_to_errors=self.path_to_errors)
         return self.create_response(data, response, errors)
 
-    def updates(self, token) -> list:
-        """
-        Get a list of updates for the bot token, lets you see the relevant chat IDs
+    @property
+    def resources(self):
+        return [
+            'updates'
+        ]
 
-        :param token: Bot token
-        :return: List of updates
-        """
-        url = self.base_url.format(token=token, method='getUpdates')
-        response, errors = requests.get(url, path_to_errors=self.path_to_errors)
-        self.create_response(response=response, errors=errors).raise_on_errors()
-        return response.json()['result']
+    @property
+    def updates(self) -> TelegramUpdates:
+        return TelegramUpdates()
