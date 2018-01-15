@@ -1,5 +1,3 @@
-import os
-
 import pytest
 
 from notifiers.exceptions import BadArguments
@@ -49,10 +47,7 @@ class TestJoinCLI:
     @pytest.mark.skip('tests fail due to no device connected')
     @pytest.mark.online
     def test_join_updates_positive(self, cli_runner):
-        token = os.environ.get('NOTIFIERS_JOIN_APIKEY')
-        assert token
-
-        cmd = f'join devices --token {token}'.split()
+        cmd = f'join devices'.split()
         result = cli_runner(cmd)
         assert result.exit_code == 0
         replies = ['You have no devices associated with this apikey', 'Device name: ']
