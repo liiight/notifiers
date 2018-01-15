@@ -1,7 +1,5 @@
-import requests
-
 from ..core import Provider, Response
-from ..exceptions import NotifierException
+from ..utils import requests
 
 
 class Telegram(Provider):
@@ -9,6 +7,7 @@ class Telegram(Provider):
     base_url = 'https://api.telegram.org/bot{token}/{method}'
     name = 'telegram'
     site_url = 'https://core.telegram.org/'
+    path_to_errors = 'description',
 
     _required = {'required': ['message', 'chat_id', 'token']}
     _schema = {
@@ -59,17 +58,7 @@ class Telegram(Provider):
     def _send_notification(self, data: dict) -> Response:
         token = data.pop('token')
         url = self.base_url.format(token=token, method='sendMessage')
-        errors = None
-        try:
-            response = requests.post(url, json=data)
-            response.raise_for_status()
-        except requests.RequestException as e:
-            if e.response is not None:
-                response = e.response
-                errors = [e.response.json()['description']]
-            else:
-                response = None
-                errors = [(str(e))]
+        response, errors = requests.post(url, json=data, path_to_errors=self.path_to_errors)
         return self.create_response(data, response, errors)
 
     def updates(self, token) -> list:
@@ -80,10 +69,6 @@ class Telegram(Provider):
         :return: List of updates
         """
         url = self.base_url.format(token=token, method='getUpdates')
-        try:
-            response = requests.get(url)
-            response.raise_for_status()
-            return response.json()['result']
-        except requests.RequestException as e:
-            message = e.response.json()['description']
-            raise NotifierException(provider=self.name, message=message)
+        response, errors = requests.get(url, path_to_errors=self.path_to_errors)
+        self.create_response(response=response, errors=errors).raise_on_errors()
+        return response.json()['result']
