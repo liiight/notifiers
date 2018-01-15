@@ -1,12 +1,13 @@
-import os
 import logging
+import os
 from abc import ABC, abstractmethod
 
 import jsonschema
-from jsonschema.exceptions import best_match
 import requests
+from jsonschema.exceptions import best_match
 
 from .exceptions import SchemaError, BadArguments, NotificationError
+from .utils.helpers import merge_dicts
 
 DEFAULT_ENVIRON_PREFIX = 'NOTIFIERS_'
 
@@ -22,7 +23,7 @@ class Response:
 
     :param status: Response status string. ``SUCCESS`` or ``FAILED``
     :param provider: Provider name that returned that response.
-     Correlates to :class:`Provider.name`
+     Correlates to :attrib:`Provider.name`
     :param data: The notification data that was used for the notification
     :param response: The response object that was returned. Usually :class:`requests.Response`
     :param errors: Holds a list of errors if relevant
@@ -107,22 +108,6 @@ class SchemaResource(ABC):
         status = FAILURE_STATUS if errors else SUCCESS_STATUS
         return Response(status=status, provider=self.name, data=data, response=response, errors=errors)
 
-    def _merge_dict_into_dict(self, target_dict: dict, merge_dict: dict) -> dict:
-        """
-        Merges ``merge_dict`` into ``target_dict`` if the latter does not already contain a value for each of the key
-        names in ``merge_dict``. Used to cleanly merge default and environ data into notification payload.
-
-        :param target_dict: The target dict to merge into and return, the user provided data for example
-        :param merge_dict: The data that should be merged into the target data
-        :return: A dict of merged data
-        """
-        # todo move this into utils
-        log.debug('merging dict %s into %s', merge_dict, target_dict)
-        for key, value in merge_dict.items():
-            if key not in target_dict:
-                target_dict[key] = value
-        return target_dict
-
     def _merge_defaults(self, data: dict) -> dict:
         """
         Convenience method that calls :func:`_merge_dict_into_dict` in order to merge default values
@@ -131,7 +116,7 @@ class SchemaResource(ABC):
         :return: A merged dict of provided data with added defaults
         """
         log.debug('merging defaults %s into data %s', self.defaults, data)
-        return self._merge_dict_into_dict(data, self.defaults)
+        return merge_dicts(data, self.defaults)
 
     def _get_environs(self, prefix: str = None) -> dict:
         """
@@ -214,7 +199,7 @@ class SchemaResource(ABC):
         env_prefix = data.pop('env_prefix', None)
         environs = self._get_environs(env_prefix)
         if environs:
-            data = self._merge_dict_into_dict(data, environs)
+            data = merge_dicts(data, environs)
 
         self._validate_data(data, validator)
         data = self._prepare_data(data)
@@ -305,7 +290,7 @@ def get_notifier(provider_name: str) -> Provider:
     """
     Convenience method to return an instantiated :class:`Provider` object according to it ``provider_name``
 
-    :param provider_name: The ``provider_name`` of the requested :class:`Provider`
+    :param provider_name: The ``name`` of the requested :class:`Provider`
     :return: :class:`Provider` or None
     """
     if provider_name in _all_providers:
@@ -314,8 +299,5 @@ def get_notifier(provider_name: str) -> Provider:
 
 
 def all_providers() -> list:
-    """
-    Returns a list of all :class:`Provider` names
-
-    """
+    """Returns a list of all :class:`Provider` names"""
     return list(_all_providers.keys())
