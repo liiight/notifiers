@@ -1,11 +1,42 @@
-from ..core import Provider, Response
+from ..core import Provider, Response, ProviderResource
 from ..utils import requests
+
+
+class PushbulletDevices(ProviderResource):
+    """Return a list of Pushbullet devices associated to a token"""
+    name = 'pushbullet'
+    resource_name = 'devices'
+    devices_url = 'https://api.pushbullet.com/v2/devices'
+    path_to_errors = 'error', 'message'
+    _required = {
+        'required': [
+            'token'
+        ]
+    }
+    _schema = {
+        'type': 'object',
+        'properties': {
+            'token': {
+                'type': 'string',
+                'title': 'API access token'
+            }
+        },
+        'additionalProperties': False
+    }
+
+    def _get_headers(self, token: str) -> dict:
+        return {'Access-Token': token}
+
+    def _get_resource(self, data: dict) -> list:
+        headers = self._get_headers(data['token'])
+        response, errors = requests.get(self.devices_url, headers=headers, path_to_errors=self.path_to_errors)
+        self.create_response(response=response, errors=errors).raise_on_errors()
+        return response.json()['devices']
 
 
 class Pushbullet(Provider):
     """Send Pushbullet notifications"""
     base_url = 'https://api.pushbullet.com/v2/pushes'
-    devices_url = 'https://api.pushbullet.com/v2/devices'
     site_url = 'https://www.pushbullet.com'
     name = 'pushbullet'
     path_to_errors = 'error', 'message'
@@ -72,14 +103,15 @@ class Pushbullet(Provider):
         'additionalProperties': False
     }
 
-    def _get_headers(self, token: str) -> dict:
-        return {'Access-Token': token}
-
     @property
     def defaults(self) -> dict:
         return {
             'type': 'note'
         }
+
+    @property
+    def resources(self) -> list:
+        return ['devices']
 
     def _prepare_data(self, data: dict) -> dict:
         data['body'] = data.pop('message')
@@ -89,6 +121,9 @@ class Pushbullet(Provider):
             data['type'] = data.pop('type_')
         return data
 
+    def _get_headers(self, token: str) -> dict:
+        return {'Access-Token': token}
+
     def _send_notification(self, data: dict) -> Response:
         headers = self._get_headers(data.pop('token'))
         response, errors = requests.post(self.base_url,
@@ -97,14 +132,6 @@ class Pushbullet(Provider):
                                          path_to_errors=self.path_to_errors)
         return self.create_response(data, response, errors)
 
-    def devices(self, token: str) -> list:
-        """
-        Returns a list of devices associated with the token
-
-        :param token: Access token
-        :return: A list of associated devices
-        """
-        headers = self._get_headers(token)
-        response, errors = requests.get(self.devices_url, headers=headers, path_to_errors=self.path_to_errors)
-        self.create_response(response=response, errors=errors).raise_on_errors()
-        return response.json()['devices']
+    @property
+    def devices(self) -> ProviderResource:
+        return PushbulletDevices()

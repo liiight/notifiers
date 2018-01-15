@@ -214,7 +214,7 @@ class SchemaResource(ABC):
         env_prefix = data.pop('env_prefix', None)
         environs = self._get_environs(env_prefix)
         if environs:
-            kwargs = self._merge_dict_into_dict(data, environs)
+            data = self._merge_dict_into_dict(data, environs)
 
         self._validate_data(data, validator)
         data = self._prepare_data(data)
@@ -250,6 +250,11 @@ class Provider(SchemaResource, ABC):
             'name': self.name
         }
 
+    @property
+    def resources(self) -> list:
+        """Return a list of names of relevant :class:`~notifiers.core.ProviderResource` objects"""
+        return []
+
     @abstractmethod
     def _send_notification(self, data: dict) -> Response:
         """
@@ -270,6 +275,26 @@ class Provider(SchemaResource, ABC):
         """
         data = self._process_data(**kwargs)
         return self._send_notification(data)
+
+
+class ProviderResource(SchemaResource, ABC):
+    """The base class that is used to fetch provider related resources like rooms, channels, users etc."""
+
+    @property
+    @abstractmethod
+    def resource_name(self):
+        pass
+
+    @abstractmethod
+    def _get_resource(self, *args, **kwargs):
+        pass
+
+    def __call__(self, **kwargs):
+        data = self._process_data(**kwargs)
+        return self._get_resource(data)
+
+    def __repr__(self):
+        return f'<ProviderResource,provider={self.name},resource={self.resource_name}>'
 
 
 # Avoid premature import
