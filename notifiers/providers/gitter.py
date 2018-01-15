@@ -1,7 +1,5 @@
-import requests
-
 from ..core import Provider, Response
-from ..exceptions import NotifierException
+from ..utils import requests
 
 
 class Gitter(Provider):
@@ -10,6 +8,7 @@ class Gitter(Provider):
     message_url = base_url + '/{room_id}/chatMessages'
     site_url = 'https://gitter.im'
     name = 'gitter'
+    path_to_errors = 'errors',
 
     _required = {'required': ['message', 'token', 'room_id']}
     _schema = {
@@ -56,17 +55,7 @@ class Gitter(Provider):
         url = self.message_url.format(room_id=room_id)
 
         headers = self._get_headers(data.pop('token'))
-        try:
-            response = requests.post(url, json=data, headers=headers)
-            response.raise_for_status()
-            errors = None
-        except requests.RequestException as e:
-            if e.response is not None:
-                response = e.response
-                errors = [e.response.json()['error']]
-            else:
-                response = None
-                errors = [(str(e))]
+        response, errors = requests.post(url, json=data, headers=headers, path_to_errors=self.path_to_errors)
         return self.create_response(data, response, errors)
 
     def rooms(self, token: str, query: str = None) -> list:
@@ -77,12 +66,12 @@ class Gitter(Provider):
         :param query: Optional query string
         :return: List of room IDs
         """
-        try:
-            headers = self._get_headers(token)
-            params = {'q': query} if query else {}
-            rsp = requests.get(self.base_url, headers=headers, params=params)
-            rsp.raise_for_status()
-            return rsp.json()['results'] if query else rsp.json()
-        except requests.RequestException as e:
-            message = e.response.json()['error']
-            raise NotifierException(provider=self.name, message=message)
+        headers = self._get_headers(token)
+        params = {'q': query} if query else {}
+        response, errors = requests.get(self.base_url,
+                                        headers=headers,
+                                        params=params,
+                                        path_to_errors=self.path_to_errors)
+        self.create_response(response=response, errors=errors).raise_on_errors()
+        rsp = response.json()
+        return rsp['results'] if query else rsp
