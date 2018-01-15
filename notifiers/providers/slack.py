@@ -1,6 +1,5 @@
-import requests
-
 from ..core import Provider, Response
+from ..utils import requests
 
 
 class Slack(Provider):
@@ -162,15 +161,5 @@ class Slack(Provider):
 
     def _send_notification(self, data: dict) -> Response:
         url = data.pop('webhook_url')
-        errors = None
-        try:
-            response = requests.post(url, json=data)
-            response.raise_for_status()
-        except requests.RequestException as e:
-            if e.response is not None:
-                response = e.response
-                errors = [e.response.text]
-            else:
-                response = None
-                errors = [(str(e))]
+        response, errors = requests.post(url, json=data)
         return self.create_response(data, response, errors)
