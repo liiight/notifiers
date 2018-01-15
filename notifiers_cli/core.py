@@ -5,7 +5,9 @@ import click
 from notifiers import __version__, get_notifier
 from notifiers.core import all_providers
 from notifiers.exceptions import NotifierException
-from notifiers_cli.utils.dynamic_click import schema_to_command, CORE_COMMANDS, func_factory, _notify, _resource
+from notifiers_cli.utils.dynamic_click import (
+    schema_to_command, CORE_COMMANDS, func_factory, _notify, _resource, _resources
+)
 
 
 def provider_group_factory():
@@ -20,11 +22,16 @@ def provider_group_factory():
         notify = partial(_notify, p=p)
         group.add_command(schema_to_command(p, 'notify', notify, add_message=True))
 
+        # Resources command
+        resources_callback = partial(_resources, p=p)
+        resources_cmd = click.Command('resources', callback=resources_callback, help='Show provider resources list')
+        group.add_command(resources_cmd)
+
         # Add any provider resources
         for resource in p.resources:
             rsc = getattr(p, resource)
-            callback = partial(_resource, rsc)
-            group.add_command(schema_to_command(rsc, resource, callback, add_message=False))
+            rsrc_callback = partial(_resource, rsc)
+            group.add_command(schema_to_command(rsc, resource, rsrc_callback, add_message=False))
 
         for name, description in CORE_COMMANDS.items():
             callback = func_factory(p, name)

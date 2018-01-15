@@ -11,7 +11,6 @@ CORE_COMMANDS = {
     'schema': "'{}' full schema",
     'metadata': "'{}' metadata",
     'defaults': "'{}' default values",
-    'resources': "'{}' additional resources"
 }
 
 
@@ -150,6 +149,14 @@ def _resource(resource, pretty: bool = None, **data):
 
     rsp = resource(**data)
     click.echo(json.dumps(rsp))
+
+
+def _resources(p):
+    """Callback func to display provider resources"""
+    if p.resources:
+        click.echo(','.join(p.resources))
+    else:
+        click.echo(f"Provider '{p.name}' does not have resource helpers")
 
 
 def get_param_decals_from_name(option_name: str) -> str:
