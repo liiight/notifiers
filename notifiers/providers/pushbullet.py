@@ -2,12 +2,20 @@ from ..core import Provider, Response, ProviderResource
 from ..utils import requests
 
 
-class PushbulletDevices(ProviderResource):
-    """Return a list of Pushbullet devices associated to a token"""
+class PushbulletProxy:
+    """Share attributes between PushbulletDevices and Pushbullet"""
     name = 'pushbullet'
+    path_to_errors = 'error', 'message'
+
+    def _get_headers(self, token: str) -> dict:
+        return {'Access-Token': token}
+
+
+class PushbulletDevices(PushbulletProxy, ProviderResource):
+    """Return a list of Pushbullet devices associated to a token"""
     resource_name = 'devices'
     devices_url = 'https://api.pushbullet.com/v2/devices'
-    path_to_errors = 'error', 'message'
+
     _required = {
         'required': [
             'token'
@@ -24,9 +32,6 @@ class PushbulletDevices(ProviderResource):
         'additionalProperties': False
     }
 
-    def _get_headers(self, token: str) -> dict:
-        return {'Access-Token': token}
-
     def _get_resource(self, data: dict) -> list:
         headers = self._get_headers(data['token'])
         response, errors = requests.get(self.devices_url, headers=headers, path_to_errors=self.path_to_errors)
@@ -34,12 +39,10 @@ class PushbulletDevices(ProviderResource):
         return response.json()['devices']
 
 
-class Pushbullet(Provider):
+class Pushbullet(PushbulletProxy, Provider):
     """Send Pushbullet notifications"""
     base_url = 'https://api.pushbullet.com/v2/pushes'
     site_url = 'https://www.pushbullet.com'
-    name = 'pushbullet'
-    path_to_errors = 'error', 'message'
 
     __type = {
         'type': 'string',
@@ -111,7 +114,9 @@ class Pushbullet(Provider):
 
     @property
     def resources(self) -> list:
-        return ['devices']
+        return [
+            'devices'
+        ]
 
     def _prepare_data(self, data: dict) -> dict:
         data['body'] = data.pop('message')
@@ -120,9 +125,6 @@ class Pushbullet(Provider):
         if data.get('type_'):
             data['type'] = data.pop('type_')
         return data
-
-    def _get_headers(self, token: str) -> dict:
-        return {'Access-Token': token}
 
     def _send_notification(self, data: dict) -> Response:
         headers = self._get_headers(data.pop('token'))
