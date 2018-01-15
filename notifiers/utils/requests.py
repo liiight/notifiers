@@ -46,6 +46,7 @@ class RequestsHelper:
                     rsp = None
                     errors = [str(e)]
                 log.debug('errors when trying to access %s: %s', url, errors)
+        log.debug('returning response %s, errors %s', rsp, errors)
         return rsp, errors
 
 
