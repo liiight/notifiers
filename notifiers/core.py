@@ -1,5 +1,4 @@
 import logging
-import os
 from abc import ABC, abstractmethod
 
 import jsonschema
@@ -7,7 +6,7 @@ import requests
 from jsonschema.exceptions import best_match
 
 from .exceptions import SchemaError, BadArguments, NotificationError
-from .utils.helpers import merge_dicts
+from .utils.helpers import merge_dicts, dict_from_environs
 
 DEFAULT_ENVIRON_PREFIX = 'NOTIFIERS_'
 
@@ -129,13 +128,7 @@ class SchemaResource(ABC):
         if not prefix:
             log.debug('using default environ prefix')
             prefix = DEFAULT_ENVIRON_PREFIX
-        environs = {}
-        log.debug("starting to collect environs using prefix: '%s'", prefix)
-        for arg in self.arguments:
-            environ = f'{prefix}{self.name}_{arg}'.upper()
-            if os.environ.get(environ):
-                environs[arg] = os.environ[environ]
-        return environs
+        return dict_from_environs(prefix, self.name, list(self.arguments.keys()))
 
     def _prepare_data(self, data: dict) -> dict:
         """

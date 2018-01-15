@@ -1,4 +1,5 @@
 import logging
+import os
 from distutils.util import strtobool
 
 log = logging.getLogger('notifiers')
@@ -30,3 +31,22 @@ def merge_dicts(target_dict: dict, merge_dict: dict) -> dict:
         if key not in target_dict:
             target_dict[key] = value
     return target_dict
+
+
+def dict_from_environs(prefix: str, name: str, args: list) -> dict:
+    """
+    Return a dict of environment variables correlating to the arguments list, main name and prefix like so:
+    [prefix]_[name]_[arg]
+
+    :param prefix: The environ prefix to use
+    :param name: Main part
+    :param args: List of args to iterate over
+    :return: A dict of found environ values
+    """
+    environs = {}
+    log.debug("starting to collect environs using prefix: '%s'", prefix)
+    for arg in args:
+        environ = f'{prefix}{name}_{arg}'.upper()
+        if os.environ.get(environ):
+            environs[arg] = os.environ[environ]
+    return environs
