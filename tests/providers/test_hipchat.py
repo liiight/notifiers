@@ -11,9 +11,7 @@ class TestHipchat:
         assert provider.metadata == {
             'base_url': 'https://{group}.hipchat.com',
             'name': 'hipchat',
-            'room_url': '/v2/room/{room}/notification',
             'site_url': 'https://www.hipchat.com/docs/apiv2',
-            'user_url': '/v2/user/{user}/message'
         }
 
     @pytest.mark.parametrize('data, message', [
