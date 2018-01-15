@@ -8,7 +8,7 @@ class Gitter(Provider):
     message_url = base_url + '/{room_id}/chatMessages'
     site_url = 'https://gitter.im'
     name = 'gitter'
-    path_to_errors = 'errors',
+    path_to_errors = 'errors', 'error'
 
     _required = {'required': ['message', 'token', 'room_id']}
     _schema = {
