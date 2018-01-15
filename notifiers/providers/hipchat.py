@@ -404,8 +404,10 @@ class HipChat(HipChatProxy, Provider):
     }
 
     def _prepare_data(self, data: dict) -> dict:
-        base_url = self.base_url.format(group=data.pop('group')) if not data.get('team_server') else data.pop(
-            'team_server')
+        if data.get('team_server'):
+            base_url = data['team_server']
+        else:
+            base_url = self.base_url.format(group=data.pop('group'))
         if data.get('room'):
             url = base_url + self.rooms_url + self.room_notification.format(room=data.pop('room'))
         else:
