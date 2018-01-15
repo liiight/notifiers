@@ -1,9 +1,11 @@
+from functools import partial
+
 import click
 
 from notifiers import __version__, get_notifier
 from notifiers.core import all_providers
 from notifiers.exceptions import NotifierException
-from notifiers_cli.utils.dynamic_click import provider_notify_command_factory, CORE_COMMANDS, func_factory
+from notifiers_cli.utils.dynamic_click import schema_to_command, CORE_COMMANDS, func_factory, _notify, _resource
 
 
 def provider_group_factory():
@@ -13,7 +15,17 @@ def provider_group_factory():
         provider_name = p.name
         help = f"Options for '{provider_name}'"
         group = click.Group(name=provider_name, help=help)
-        group.add_command(provider_notify_command_factory(p))
+
+        # Notify command
+        notify = partial(_notify, p=p)
+        group.add_command(schema_to_command(p, 'notify', notify, add_message=True))
+
+        # Add any provider resources
+        for resource in p.resources:
+            rsc = getattr(p, resource)
+            callback = partial(_resource, rsc)
+            group.add_command(schema_to_command(rsc, resource, callback, add_message=False))
+
         for name, description in CORE_COMMANDS.items():
             callback = func_factory(p, name)
             pretty_opt = click.Option(['--pretty/--not-pretty'], help='Output a pretty version of the JSON')

@@ -10,11 +10,27 @@ CORE_COMMANDS = {
     'required': "'{}' required schema",
     'schema': "'{}' full schema",
     'metadata': "'{}' metadata",
-    'defaults': "'{}' default values"
+    'defaults': "'{}' default values",
+    'resources': "'{}' additional resources"
 }
 
 
-def params_factory(schema: dict) -> list:
+def clean_data(data: dict) -> dict:
+    """Removes all empty values and converts tuples into lists"""
+    new_data = {}
+    for key, value in data.items():
+        # Verify that only explicitly passed args get passed on
+        if not isinstance(value, bool) and not value:
+            continue
+
+        # Multiple choice command are passed as tuples, convert to list to match schema
+        if isinstance(value, tuple):
+            value = list(value)
+        new_data[key] = value
+    return new_data
+
+
+def params_factory(schema: dict, add_message: bool) -> list:
     """
     Generates list of :class:`click.Option` based on a JSON schema
 
@@ -23,8 +39,9 @@ def params_factory(schema: dict) -> list:
     """
 
     # Immediately create message as an argument
-    message_arg = click.Argument(['message'], required=False)
-    params = [message_arg]
+    params = []
+    if add_message:
+        params.append(click.Argument(['message'], required=False))
 
     for property, prpty_schema in schema.items():
         multiple = False
@@ -74,18 +91,17 @@ def params_factory(schema: dict) -> list:
     return params
 
 
-def provider_notify_command_factory(p) -> click.Command:
+def schema_to_command(p, name: str, callback: callable, add_message: bool) -> click.Command:
     """
     Generates a ``notify`` :class:`click.Command` for :class:`~notifiers.core.Provider`
 
     :param p: Relevant Provider
+    :param name: Command name
     :return: A ``notify`` :class:`click.Command`
     """
-    params = params_factory(p.schema['properties'])
-    name = 'notify'
+    params = params_factory(p.schema['properties'], add_message=add_message)
     help = p.__doc__
-    notify = partial(_notify, p=p)
-    cmd = click.Command(name=name, callback=notify, params=params, help=help)
+    cmd = click.Command(name=name, callback=callback, params=params, help=help)
     return cmd
 
 
@@ -113,24 +129,27 @@ def _notify(p, **data):
         message = click.get_text_stream('stdin').read()
     data['message'] = message
 
-    new_data = {}
-    for key, value in data.items():
-        # Verify that only explicitly passed args get passed on
-        if not isinstance(value, bool) and not value:
-            continue
-
-        # Multiple choice command are passed as tuples, convert to list to match schema
-        if isinstance(value, tuple):
-            value = list(value)
-        new_data[key] = value
+    data = clean_data(data)
 
     ctx = click.get_current_context()
     if ctx.obj.get('env_prefix'):
-        new_data['env_prefix'] = ctx.obj['env_prefix']
+        data['env_prefix'] = ctx.obj['env_prefix']
 
-    rsp = p.notify(**new_data)
+    rsp = p.notify(**data)
     rsp.raise_on_errors()
     click.secho(f'Succesfully sent a notification to {p.name}!', fg='green')
+
+
+def _resource(resource, pretty: bool = None, **data):
+    """The callback func that will be hooked to the generic resource commands"""
+    data = clean_data(data)
+
+    ctx = click.get_current_context()
+    if ctx.obj.get('env_prefix'):
+        data['env_prefix'] = ctx.obj['env_prefix']
+
+    rsp = resource(**data)
+    click.echo(json.dumps(rsp))
 
 
 def get_param_decals_from_name(option_name: str) -> str:
