@@ -1,18 +1,122 @@
-from ..core import Provider, Response
+from ..core import Provider, Response, ProviderResource
 from ..exceptions import NotifierException
 from ..utils import requests
 
 
-class HipChat(Provider):
-    """Send HipChat notifications"""
+class HipChatProxy:
+    """Shared attributed between resources and HipChat"""
     base_url = 'https://{group}.hipchat.com'
-    room_url = '/v2/room'
-    user_url = '/v2/user'
-    room_notification_url = room_url + '/{room}/notification'
-    user_message_url = user_url + '/{user}/message'
-    site_url = 'https://www.hipchat.com/docs/apiv2'
     name = 'hipchat'
     path_to_errors = 'error', 'message'
+    users_url = '/v2/user'
+    room_url = '/v2/room'
+
+    def _get_headers(self, token: str) -> dict:
+        """
+        Builds hipchat requests header bases on the token provided
+
+        :param token: App token
+        :return: Authentication header dict
+        """
+        return {'Authorization': f'Bearer {token}'}
+
+
+class HipChatResourceProxy(HipChatProxy):
+    _required = {
+        'allOf': [
+            {
+                'required': [
+                    'token'
+                ]
+            },
+            {
+                'oneOf': [
+                    {'required': ['group']},
+                    {'required': ['team_server']}
+                ],
+                'error_oneOf': "Only one 'group' or 'team_server' is allowed"
+            }
+        ]
+    }
+
+    _schema = {
+        'type': 'object',
+        'properties': {
+            'token': {
+                'type': 'string',
+                'title': 'User token'
+            },
+            'start': {
+                'type': 'integer',
+                'title': 'Start index'
+            },
+            'max_results': {
+                'type': 'integer',
+                'title': 'Max results in reply'
+            },
+            'group': {
+                'type': 'string',
+                'title': 'Hipchat group name',
+            },
+            'team_server': {
+                'type': 'string',
+                'title': 'Hipchat team server'
+            }
+        },
+        'additionalProperties': False
+    }
+
+    def _get_resources(self, endpoint: str, data: dict) -> tuple:
+        url = self.base_url.format(data['group']) if data.get('group') else data['team_server']
+        url += endpoint
+        headers = self._get_headers(data['token'])
+        params = {}
+        if data.get('start'):
+            params['start-index'] = data['start']
+        if data.get('max_results'):
+            params['max-results'] = data['max_results']
+        if data.get('private'):
+            params['include-private'] = data['private']
+        if data.get('archived'):
+            params['include-archived'] = data['archived']
+        if data.get('guests'):
+            params['include-guests'] = data['guests']
+        if data.get('deleted'):
+            params['include-deleted'] = data['deleted']
+        return requests.get(url, headers=headers, params=params, path_to_errors=self.path_to_errors)
+
+
+class HipChatUsers(HipChatResourceProxy, ProviderResource):
+    resource_name = 'users'
+
+    @property
+    def _schema(self):
+        user_schema = {
+            'guests': {
+                'type': 'boolean',
+                'title': 'Include active guest users in response. Otherwise, no guest users will be included'
+            },
+            'deleted': {
+                'type': 'boolean',
+                'title': 'Include deleted users'
+            }
+        }
+        schema = super()._schema
+        schema['properties'].update(user_schema)
+        return schema
+
+    def _get_resource(self, data: dict):
+        response, errors = self._get_resources(self.users_url, data)
+        self.create_response(response=response, errors=errors).raise_on_errors()
+        return response.json()
+
+
+class HipChat(HipChatProxy, Provider):
+    """Send HipChat notifications"""
+
+    room_notification = '/{room}/notification'
+    user_message = '/{user}/message'
+    site_url = 'https://www.hipchat.com/docs/apiv2'
 
     __icon = {
         'oneOf': [
@@ -277,27 +381,11 @@ class HipChat(Provider):
         base_url = self.base_url.format(group=data.pop('group')) if not data.get('team_server') else data.pop(
             'team_server')
         if data.get('room'):
-            base_url += self.room_notification_url.format(room=data.pop('room'))
-        elif data.get('user'):
-            base_url += self.user_message_url.format(user=data.pop('user'))
-        data['url'] = base_url
+            url = base_url + self.room_url + self.room_notification.format(room=data.pop('room'))
+        else:
+            url = base_url + self.users_url + self.user_message.format(user=data.pop('user'))
+        data['url'] = url
         return data
-
-    @property
-    def metadata(self) -> dict:
-        metadata = super().metadata
-        metadata['room_url'] = self.room_notification_url
-        metadata['user_url'] = self.user_message_url
-        return metadata
-
-    def _get_headers(self, token: str) -> dict:
-        """
-        Builds hipchat requests header bases on the token provided
-
-        :param token: App token
-        :return: Authentication header dict
-        """
-        return {'Authorization': f'Bearer {token}'}
 
     def _send_notification(self, data: dict) -> Response:
         url = data.pop('url')
@@ -305,74 +393,13 @@ class HipChat(Provider):
         response, errors = requests.post(url, json=data, headers=headers, path_to_errors=self.path_to_errors)
         return self.create_response(data, response, errors)
 
-    def _get_resources(self, resource_name: str, token: str, group: str = None, team_server: str = None,
-                       **kwargs) -> dict:
-        """
-        Helper method to view group resources
-        :param resource_name: Resource selector, `room` or `user`
-        :param token: User token
-        :param group: Hipchat group name. Either this or `team_server` is required
-        :param team_server: Hipchat team server. Either this or `group` is required
-        :param kwargs: Additional request options
-        :return: Dict of resources
-        """
+    @property
+    def resources(self) -> list:
+        return [
+            'rooms',
+            'users'
+        ]
 
-        options = [group, team_server]
-        if not any(options) or all(options):
-            raise NotifierException(
-                provider=self.name,
-                message="Must provide exactly one of 'group' or 'team_server'"
-            )
-        url = self.base_url.format(group) if group else team_server
-        url += self.room_url if resource_name == 'room' else self.user_url
-        headers = self._get_headers(token)
-        params = {}
-        if kwargs.get('start'):
-            params['start-index'] = kwargs['start']
-        if kwargs.get('max_results'):
-            params['max-results'] = kwargs['max_results']
-        if kwargs.get('private'):
-            params['include-private'] = kwargs['private']
-        if kwargs.get('archived'):
-            params['include-archived'] = kwargs['archived']
-        if kwargs.get('guests'):
-            params['include-guests'] = kwargs['guests']
-        if kwargs.get('deleted'):
-            params['include-deleted'] = kwargs['deleted']
-        response, errors = requests.get(url, headers=headers, params=params, path_to_errors=self.path_to_errors)
-        self.create_response(response=response, errors=errors).raise_on_errors()
-        return response.json()
-
-    def users(self, token: str, group: str = None, team_server: str = None, start: int = 1, max_results: int = 100,
-              guests: bool = False, deleted: bool = False) -> dict:
-        """
-        View all available rooms via the used Token. Requires the 'view_group' scope
-
-        :param token: User token
-        :param start: Start index
-        :param max_results: Max results in reply. Max value is 1000
-        :param group: Hipchat group name. Either this or `team_server` is required
-        :param team_server: Hipchat team server. Either this or `group` is required
-        :param guests: Include active guest users in response. Otherwise, no guest users will be included.
-        :param deleted: Include deleted users in response
-        :return: Dict of rooms
-        """
-        return self._get_resources('user', token, group=group, team_server=team_server, start=start,
-                                   max_results=max_results, guests=guests, deleted=deleted)
-
-    def rooms(self, token: str, group: str = None, team_server: str = None, start: int = 1, max_results: int = 100,
-              private: bool = True, archived: bool = False) -> dict:
-        """
-        View all available rooms via the used Token. Requires the 'manage_rooms' scope
-
-        :param token: User token
-        :param start: Start index
-        :param max_results: Max results in reply. Max value is 1000
-        :param group: Hipchat group name. Either this or `team_server` is required
-        :param team_server: Hipchat team server. Either this or `group` is required
-        :param private: Include private rooms
-        :param archived: Include archived rooms
-        :return: Dict of rooms
-        """
-        return self._get_resources('room', token, group=group, team_server=team_server, start=start,
-                                   max_results=max_results, private=private, archived=archived)
+    @property
+    def users(self) -> HipChatUsers:
+        return HipChatUsers()

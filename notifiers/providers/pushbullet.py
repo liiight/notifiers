@@ -3,7 +3,7 @@ from ..utils import requests
 
 
 class PushbulletProxy:
-    """Share attributes between PushbulletDevices and Pushbullet"""
+    """Shared attributes between PushbulletDevices and Pushbullet"""
     name = 'pushbullet'
     path_to_errors = 'error', 'message'
 
