@@ -39,6 +39,12 @@ class TestHipchat:
             rsp.raise_on_errors()
         assert 'Invalid OAuth session' in e.value.message
 
+    def test_hipchat_resources(self, provider):
+        assert provider.resources
+        assert len(provider.resources) == 2
+        for resource in provider.resources:
+            assert getattr(provider, resource)
+
 
 @pytest.mark.skip('Provider resources CLI command are not ready yet')
 class TestHipchatCLI:
