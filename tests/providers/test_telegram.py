@@ -1,8 +1,6 @@
-import os
-
 import pytest
+import json
 
-from notifiers import get_notifier
 from notifiers.exceptions import BadArguments, NotificationError
 
 
@@ -92,7 +90,6 @@ class TestTelegramResources:
         assert isinstance(rsp, list)
 
 
-@pytest.mark.skip('Provider resources CLI command are not ready yet')
 class TestTelegramCLI:
     """Test telegram specific CLI"""
 
@@ -104,11 +101,8 @@ class TestTelegramCLI:
 
     @pytest.mark.online
     def test_telegram_updates_positive(self, cli_runner):
-        token = os.environ.get('NOTIFIERS_TELEGRAM_TOKEN')
-        assert token
-
-        cmd = f'telegram updates --token {token}'.split()
+        cmd = f'telegram updates'.split()
         result = cli_runner(cmd)
         assert result.exit_code == 0
-        replies = ['Bot has not active chats! Send it ANY message and try again', 'Chat ID:']
-        assert any(reply in result.output for reply in replies)
+        reply = json.loads(result.output)
+        assert reply == [] or reply[0]['message']['chat']['id']
