@@ -2,13 +2,14 @@ import pytest
 
 from notifiers.exceptions import BadArguments, NotificationError
 
+provider = 'pushover'
+
 
 class TestPushover:
     """Pushover notifier tests
 
     Note: These tests assume correct environs set for NOTIFIERS_PUSHOVER_TOKEN and NOTIFIERS_PUSHOVER_USER
     """
-    provider = 'pushover'
 
     def test_pushover_metadata(self, provider):
         assert provider.metadata == {

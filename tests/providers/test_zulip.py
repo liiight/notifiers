@@ -4,9 +4,10 @@ import pytest
 
 from notifiers.exceptions import BadArguments
 
+provider = 'zulip'
+
 
 class TestZulip:
-    provider = 'zulip'
 
     def test_metadata(self, provider):
         assert provider.metadata == {

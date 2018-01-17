@@ -2,9 +2,10 @@ import pytest
 
 from notifiers.exceptions import BadArguments, NotificationError
 
+provider = 'gitter'
+
 
 class TestGitter:
-    provider = 'gitter'
 
     def test_metadata(self, provider):
         assert provider.metadata == {
@@ -82,7 +83,7 @@ class TestGitterResources:
             'required': ['token'],
             'additionalProperties': False
         }
-        assert resource.name == self.provider
+        assert resource.name == provider
         assert resource.required == {'required': ['token']}
 
     def test_gitter_rooms_negative(self, resource):

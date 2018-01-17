@@ -3,11 +3,11 @@ import json
 
 from notifiers.exceptions import BadArguments, NotificationError
 
+provider = 'telegram'
+
 
 class TestTelegram:
     """Telegram related tests"""
-
-    provider = 'telegram'
 
     def test_metadata(self, provider):
         assert provider.metadata == {
@@ -67,7 +67,6 @@ class TestTelegram:
 
 
 class TestTelegramResources:
-    provider = 'telegram'
     resource = 'updates'
 
     def test_telegram_updates_attribs(self, resource):
@@ -77,7 +76,7 @@ class TestTelegramResources:
             'required': ['token'],
             'type': 'object'
         }
-        assert resource.name == self.provider
+        assert resource.name == provider
         assert resource.required == {'required': ['token']}
 
     def test_telegram_updates_negative(self, resource):

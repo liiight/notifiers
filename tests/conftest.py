@@ -103,9 +103,9 @@ def bad_provider() -> Provider:
 
 @pytest.fixture(scope='class')
 def provider(request):
-    name = getattr(request.cls, 'provider', None)
+    name = getattr(request.module, 'provider', None)
     if not name:
-        pytest.fail(f"Test class '{request.cls}' has not 'provider' attribute set")
+        pytest.fail(f"Test class '{request.module}' has not 'provider' attribute set")
     p = get_notifier(name)
     if not p:
         pytest.fail(f"No notifier with name '{name}'")

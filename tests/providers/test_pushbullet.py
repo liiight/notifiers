@@ -4,9 +4,10 @@ import pytest
 
 from notifiers.exceptions import BadArguments
 
+provider = 'pushbullet'
+
 
 class TestPushbullet:
-    provider = 'pushbullet'
 
     def test_metadata(self, provider):
         assert provider.metadata == {

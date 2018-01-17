@@ -2,11 +2,11 @@ import pytest
 
 from notifiers.exceptions import BadArguments
 
+provider = 'gmail'
+
 
 class TestGmail:
     """Gmail tests"""
-
-    provider = 'gmail'
 
     def test_gmail_metadata(self, provider):
         assert provider.metadata == {

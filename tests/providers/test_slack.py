@@ -1,5 +1,7 @@
 import pytest
 
+provider = 'slack'
+
 
 class TestSlack(object):
     """
@@ -7,8 +9,6 @@ class TestSlack(object):
 
     Online test rely on setting the env variable NOTIFIERS_SLACK_WEBHOOK_URL
     """
-
-    provider = 'slack'
 
     def test_slack_metadata(self, provider):
         assert provider.metadata == {

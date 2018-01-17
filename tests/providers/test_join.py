@@ -2,9 +2,10 @@ import pytest
 
 from notifiers.exceptions import BadArguments
 
+provider = 'join'
+
 
 class TestJoin:
-    provider = 'join'
 
     def test_metadata(self, provider):
         assert provider.metadata == {

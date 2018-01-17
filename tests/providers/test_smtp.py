@@ -2,10 +2,11 @@ import pytest
 
 from notifiers.exceptions import BadArguments, NotificationError
 
+provider = 'email'
+
 
 class TestSMTP(object):
     """SMTP tests"""
-    provider = 'email'
 
     def test_smtp_metadata(self, provider):
         assert provider.metadata == {

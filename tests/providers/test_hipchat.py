@@ -2,10 +2,11 @@ import pytest
 
 from notifiers.exceptions import BadArguments, NotificationError
 
+provider = 'hipchat'
+
 
 class TestHipchat:
     # No online test for hipchat since they're deprecated and denies new signups
-    provider = 'hipchat'
 
     def test_metadata(self, provider):
         assert provider.metadata == {
@@ -47,7 +48,6 @@ class TestHipchat:
 
 
 class TestHipChatRooms:
-    provider = 'hipchat'
     resource = 'rooms'
 
     def test_hipchat_rooms_attribs(self, resource):
@@ -84,7 +84,7 @@ class TestHipChatRooms:
             , {'oneOf': [{'required': ['group']},
                          {'required': ['team_server']}],
                'error_oneOf': "Only one 'group' or 'team_server' is allowed"}]}
-        assert resource.name == self.provider
+        assert resource.name == provider
 
     def test_hipchat_rooms_negative(self, resource):
         with pytest.raises(BadArguments):
@@ -92,7 +92,6 @@ class TestHipChatRooms:
 
 
 class TestHipChatUsers:
-    provider = 'hipchat'
     resource = 'users'
 
     def test_hipchat_users_attribs(self, resource):
@@ -124,7 +123,7 @@ class TestHipChatUsers:
             , {'oneOf': [{'required': ['group']},
                          {'required': ['team_server']}],
                'error_oneOf': "Only one 'group' or 'team_server' is allowed"}]}
-        assert resource.name == self.provider
+        assert resource.name == provider
 
     def test_hipchat_users_negative(self, resource):
         with pytest.raises(BadArguments):

@@ -2,13 +2,14 @@ import pytest
 
 from notifiers.exceptions import BadArguments
 
+provider = 'simplepush'
+
 
 class TestSimplePush(object):
     """SimplePush notifier tests
 
     Note: These tests assume correct environs set for NOTIFIERS_SIMPLEPUSH_KEY
     """
-    provider = 'simplepush'
 
     def test_simplepush_metadata(self, provider):
         assert provider.metadata == {
