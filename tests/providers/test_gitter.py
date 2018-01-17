@@ -61,12 +61,44 @@ class TestGitter:
             assert getattr(provider, resource)
         assert 'rooms' in provider.resources
 
+
+class TestGitterResources:
+    provider = 'gitter'
+    resource = 'rooms'
+
+    def test_gitter_rooms_attribs(self, resource):
+        assert resource.schema == {
+            'type': 'object',
+            'properties': {
+                'token': {
+                    'type': 'string',
+                    'title': 'access token'
+                },
+                'filter': {
+                    'type': 'string',
+                    'title': 'Filter results'
+                }
+            },
+            'required': ['token'],
+            'additionalProperties': False
+        }
+        assert resource.name == self.provider
+        assert resource.required == {'required': ['token']}
+
+    def test_gitter_rooms_negative(self, resource):
+        with pytest.raises(BadArguments):
+            resource(env_prefix='foo')
+
     @pytest.mark.online
-    def test_gitter_rooms(self, provider):
-        assert provider.rooms()
+    def test_gitter_rooms_positive(self, resource):
+        rsp = resource()
+        assert isinstance(rsp, list)
+
+    @pytest.mark.online
+    def test_gitter_rooms_positive_with_filter(self, resource):
+        assert resource(filter='notifiers/testing')
 
 
-@pytest.mark.skip('Provider resources CLI command are not ready yet')
 class TestGitterCLI:
     """Test Gitter specific CLI commands"""
 
