@@ -97,7 +97,7 @@ class Telegram(TelegramProxy, Provider):
 
     def _send_notification(self, data: dict) -> Response:
         token = data.pop('token')
-        url = self.base_url.format(token=token, method='sendMessage')
+        url = self.base_url.format(token=token) + self.push_endpoint
         response, errors = requests.post(url, json=data, path_to_errors=self.path_to_errors)
         return self.create_response(data, response, errors)
 
