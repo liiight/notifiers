@@ -46,7 +46,89 @@ class TestHipchat:
             assert getattr(provider, resource)
 
 
-@pytest.mark.skip('Provider resources CLI command are not ready yet')
+class TestHipChatRooms:
+    provider = 'hipchat'
+    resource = 'rooms'
+
+    def test_hipchat_rooms_attribs(self, resource):
+        assert resource.schema == {
+            'type': 'object',
+            'properties': {
+                'token': {
+                    'type': 'string',
+                    'title': 'User token'
+                },
+                'start': {'type': 'integer',
+                          'title': 'Start index'},
+                'max_results': {'type': 'integer',
+                                'title': 'Max results in reply'},
+                'group': {'type': 'string',
+                          'title': 'Hipchat group name'},
+                'team_server': {'type': 'string',
+                                'title': 'Hipchat team server'},
+                'private': {'type': 'boolean',
+                            'title': 'Include private rooms'},
+                'archived': {'type': 'boolean',
+                             'title': 'Include archive rooms'}},
+            'additionalProperties': False,
+            'allOf': [
+                {'required': ['token']}
+                , {'oneOf': [{'required': ['group']},
+                             {'required': ['team_server']}],
+                   'error_oneOf': "Only one 'group' or 'team_server' is allowed"}
+            ]
+        }
+
+        assert resource.required == {'allOf': [
+            {'required': ['token']}
+            , {'oneOf': [{'required': ['group']},
+                         {'required': ['team_server']}],
+               'error_oneOf': "Only one 'group' or 'team_server' is allowed"}]}
+        assert resource.name == self.provider
+
+    def test_hipchat_rooms_negative(self, resource):
+        with pytest.raises(BadArguments):
+            resource(env_prefix='foo')
+
+
+class TestHipChatUserss:
+    provider = 'hipchat'
+    resource = 'users'
+
+    def test_hipchat_users_attribs(self, resource):
+        assert resource.schema == {
+            'type': 'object',
+            'properties': {
+                'token': {'type': 'string', 'title': 'User token'},
+                'start': {'type': 'integer',
+                          'title': 'Start index'},
+                'max_results': {'type': 'integer',
+                                'title': 'Max results in reply'},
+                'group': {'type': 'string',
+                          'title': 'Hipchat group name'},
+                'team_server': {'type': 'string',
+                                'title': 'Hipchat team server'},
+                'guests': {
+                    'type': 'boolean',
+                    'title': 'Include active guest users in response. Otherwise, no guest users will be included'},
+                'deleted': {'type': 'boolean',
+                            'title': 'Include deleted users'}},
+            'additionalProperties': False, 'allOf': [{'required': ['token']}, {
+                'oneOf': [{'required': ['group']}, {'required': ['team_server']}],
+                'error_oneOf': "Only one 'group' or 'team_server' is allowed"}]}
+
+        assert resource.required == {'allOf': [
+            {'required': ['token']}
+            , {'oneOf': [{'required': ['group']},
+                         {'required': ['team_server']}],
+               'error_oneOf': "Only one 'group' or 'team_server' is allowed"}]}
+        assert resource.name == self.provider
+
+    def test_hipchat_users_negative(self, resource):
+        with pytest.raises(BadArguments):
+            resource(env_prefix='foo')
+
+
 class TestHipchatCLI:
     """Test hipchat specific CLI"""
 
