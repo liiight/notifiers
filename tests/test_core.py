@@ -2,7 +2,7 @@ import pytest
 
 import notifiers
 from notifiers.core import Provider, Response
-from notifiers.exceptions import BadArguments, SchemaError, NotificationError
+from notifiers.exceptions import BadArguments, SchemaError, NotificationError, ResourceError
 
 
 class TestCore:
@@ -124,3 +124,40 @@ class TestCore:
         rsp = mock_provider.notify(required='bar', env_prefix=prefix)
         assert rsp.status == 'success'
         assert rsp.data['required'] == 'bar'
+
+    def test_resources(self, mock_provider):
+        resources = getattr(mock_provider, 'resources', None)
+        assert resources is not None
+        assert isinstance(resources, list)
+        assert 'mock_rsrc' in resources
+
+        rsrc = resources[0]
+        resource = getattr(mock_provider, rsrc)
+        assert resource
+        assert resource.resource_name == 'mock_resource'
+        assert resource.name == mock_provider.name
+        assert resource.schema == {
+            'type': 'object',
+            'properties': {
+                'key': {
+                    'type': 'string',
+                    'title': 'required key'
+                },
+                'another_key': {
+                    'type': 'integer',
+                    'title': 'non-required key'
+                }
+            },
+            'required': ['key'],
+            'additionalProperties': False
+        }
+
+        assert resource.required == {
+            'required': ['key']
+        }
+
+        with pytest.raises(BadArguments):
+            resource()
+
+        rsp = resource(key='fpp')
+        assert rsp == {'status': 'success'}

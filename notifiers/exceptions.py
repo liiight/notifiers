@@ -30,6 +30,9 @@ class BadArguments(NotifierException):
         kwargs['message'] = f'Error with sent data: {validation_error}'
         super().__init__(*args, **kwargs)
 
+    def __repr__(self):
+        return f'<BadArguments: {self.message}>'
+
 
 class SchemaError(NotifierException):
     """
@@ -43,6 +46,9 @@ class SchemaError(NotifierException):
     def __init__(self, schema_error: str, *args, **kwargs):
         kwargs['message'] = f'Schema error: {schema_error}'
         super().__init__(*args, **kwargs)
+
+    def __repr__(self):
+        return f'<SchemaError: {self.message}>'
 
 
 class NotificationError(NotifierException):
@@ -59,6 +65,9 @@ class NotificationError(NotifierException):
         kwargs['message'] = f'Notification errors: {",".join(self.errors)}'
         super().__init__(*args, **kwargs)
 
+    def __repr__(self):
+        return f'<NotificationError: {self.message}>'
+
 
 class ResourceError(NotifierException):
     """
@@ -71,3 +80,6 @@ class ResourceError(NotifierException):
         self.resource = kwargs.pop('resource', None)
         kwargs['message'] = f'Notifier resource errors: {",".join(self.errors)}'
         super().__init__(*args, **kwargs)
+
+    def __repr__(self):
+        return f'<ResourceError: {self.message}>'

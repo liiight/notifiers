@@ -5,10 +5,11 @@ from functools import partial
 import pytest
 from click.testing import CliRunner
 
-from notifiers.core import Provider, Response, get_notifier
+from notifiers.core import Provider, Response, get_notifier, ProviderResource
 from notifiers.providers import _all_providers
 from notifiers.utils.helpers import text_to_bool
 from notifiers.utils.json_schema import one_or_more, list_to_commas
+from notifiers.exceptions import ResourceError
 
 log = logging.getLogger(__name__)
 
@@ -17,7 +18,32 @@ log = logging.getLogger(__name__)
 def mock_provider(monkeypatch):
     """Return a generic :class:`notifiers.core.Provider` class"""
 
-    class MockProvider(Provider):
+    class MockProxy:
+        name = 'mock_provider'
+
+    class MockResource(MockProxy, ProviderResource):
+        resource_name = 'mock_resource'
+
+        _required = {'required': ['key']}
+        _schema = {
+            'type': 'object',
+            'properties': {
+                'key': {
+                    'type': 'string',
+                    'title': 'required key'
+                },
+                'another_key': {
+                    'type': 'integer',
+                    'title': 'non-required key'
+                }
+            },
+            'additionalProperties': False
+        }
+
+        def _get_resource(self, data: dict):
+            return {'status': 'success'}
+
+    class MockProvider(MockProxy, Provider):
         """Mock Provider"""
         base_url = 'https://api.mock.com'
         _required = {'required': ['required']}
@@ -35,7 +61,6 @@ def mock_provider(monkeypatch):
             'additionalProperties': False
         }
         site_url = 'https://www.mock.com'
-        name = 'mock_provider'
 
         @property
         def defaults(self):
@@ -51,6 +76,16 @@ def mock_provider(monkeypatch):
                 data['not_required'] = list_to_commas(data['not_required'])
             data['required'] = list_to_commas(data['required'])
             return data
+
+        @property
+        def resources(self):
+            return [
+                'mock_rsrc'
+            ]
+
+        @property
+        def mock_rsrc(self):
+            return MockResource()
 
     monkeypatch.setitem(_all_providers, MockProvider.name, MockProvider)
     return MockProvider()
