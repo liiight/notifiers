@@ -1,6 +1,6 @@
 import pytest
 
-from notifiers.exceptions import BadArguments, ResourceError
+from notifiers.exceptions import BadArguments, ResourceError, NotificationError
 
 provider = 'join'
 
@@ -34,6 +34,17 @@ class TestJoin:
         rsp = provider.notify(**data)
         rsp.raise_on_errors()
 
+    def test_negative(self, provider):
+        data = {
+            'message': 'foo',
+            'apikey': 'bar'
+        }
+        rsp = provider.notify(**data)
+        with pytest.raises(NotificationError) as e:
+            rsp.raise_on_errors()
+
+        assert e.value.errors == ['User Not Authenticated']
+
 
 class TestJoinDevices:
     resource = 'devices'
@@ -51,7 +62,7 @@ class TestJoinDevices:
         with pytest.raises(BadArguments):
             resource(env_prefix='foo')
 
-    def test_join_negative(self, resource):
+    def test_join_devices_negative_online(self, resource):
         with pytest.raises(ResourceError) as e:
             resource(apikey='foo')
         assert e.value.errors == ['Not Found']

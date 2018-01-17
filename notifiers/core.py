@@ -45,7 +45,7 @@ class Response:
         :raise :class:`NotificationError`:
         """
         if self.errors:
-            raise NotificationError(provider=self.provider, data=self.data, errors=self.errors)
+            raise NotificationError(provider=self.provider, data=self.data, errors=self.errors, response=self.response)
 
 
 class SchemaResource(ABC):
