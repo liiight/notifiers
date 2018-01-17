@@ -1,6 +1,6 @@
 import pytest
 
-from notifiers.exceptions import BadArguments
+from notifiers.exceptions import BadArguments, NotificationError
 
 provider = 'gmail'
 
@@ -34,3 +34,17 @@ class TestGmail:
         }
         rsp = provider.notify(**data)
         rsp.raise_on_errors()
+
+    def test_gmail_negative(self, provider):
+        data = {
+            'username': 'foo',
+            'password': 'foo',
+            'to': 'foo',
+            'message': 'bar'
+        }
+        rsp = provider.notify(**data)
+        with pytest.raises(NotificationError) as e:
+            rsp.raise_on_errors()
+
+        assert e.value.errors == [b"(535, b\\'5.7.8 Username and Password not accepted. Learn more at\\n5.7.8 "
+                                  b" https://support.google.com/mail/?p=BadCredentials h194sm13693945wma.8 - gsmtp\\')"]
