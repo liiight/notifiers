@@ -1,6 +1,6 @@
 import pytest
 
-from notifiers.exceptions import BadArguments, NotificationError
+from notifiers.exceptions import BadArguments, NotificationError, ResourceError
 
 provider = 'hipchat'
 
@@ -89,6 +89,13 @@ class TestHipChatRooms:
     def test_hipchat_rooms_negative(self, resource):
         with pytest.raises(BadArguments):
             resource(env_prefix='foo')
+
+    def test_hipchat_rooms_negative_2(self, resource):
+        with pytest.raises(ResourceError) as e:
+            resource(token='foo', group='bat')
+
+        assert e.value.errors == ['Invalid OAuth session']
+        assert e.value.response.status_code == 401
 
 
 class TestHipChatUsers:

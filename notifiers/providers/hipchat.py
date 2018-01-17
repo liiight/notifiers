@@ -70,7 +70,7 @@ class HipChatResourceProxy(HipChatProxy):
     }
 
     def _get_resources(self, endpoint: str, data: dict) -> tuple:
-        url = self.base_url.format(data['group']) if data.get('group') else data['team_server']
+        url = self.base_url.format(group=data['group']) if data.get('group') else data['team_server']
         url += endpoint
         headers = self._get_headers(data['token'])
         params = {}
