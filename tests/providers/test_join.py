@@ -58,12 +58,11 @@ class TestJoinDevices:
         assert e.value.response.status_code == 404
 
 
-@pytest.mark.skip('Provider resources CLI command are not ready yet')
 class TestJoinCLI:
     """Test Join specific CLI"""
 
     def test_join_devices_negative(self, cli_runner):
-        cmd = 'join devices --token bad_token'.split()
+        cmd = 'join devices --apikey bad_token'.split()
         result = cli_runner(cmd)
         assert result.exit_code == -1
         assert not result.output
