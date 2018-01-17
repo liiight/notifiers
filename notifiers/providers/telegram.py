@@ -10,6 +10,7 @@ class TelegramProxy:
 
 
 class TelegramUpdates(TelegramProxy, ProviderResource):
+    """Return Telegram bot updates, correlating to the `getUpdates` method. Returns chat IDs needed to notifications"""
     resource_name = 'updates'
     updates_endpoint = '/getUpdates'
 

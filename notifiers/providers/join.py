@@ -1,8 +1,8 @@
 import requests
 
 from ..core import Provider, Response, ProviderResource
-from ..utils import requests
 from ..utils.json_schema import one_or_more, list_to_commas
+from ..exceptions import ResourceError
 
 
 class JoinProxy:
@@ -30,6 +30,7 @@ class JoinProxy:
 
 
 class JoinDevices(JoinProxy, ProviderResource):
+    """Return a list of Join devices IDs"""
     resource_name = 'devices'
     devices_url = '/listDevices'
     _required = {
@@ -52,7 +53,12 @@ class JoinDevices(JoinProxy, ProviderResource):
     def _get_resource(self, data: dict):
         url = self.base_url + self.devices_url
         response, errors = self._join_request(url, data)
-        self.create_response(data, response, errors).raise_on_errors()
+        if errors:
+            raise ResourceError(errors=errors,
+                                resource=self.resource_name,
+                                provider=self.name,
+                                data=data,
+                                response=response)
         return response.json()['records']
 
 

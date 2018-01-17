@@ -1,5 +1,6 @@
 from ..core import Provider, Response, ProviderResource
 from ..utils import requests
+from ..exceptions import ResourceError
 
 
 class PushbulletProxy:
@@ -35,7 +36,12 @@ class PushbulletDevices(PushbulletProxy, ProviderResource):
     def _get_resource(self, data: dict) -> list:
         headers = self._get_headers(data['token'])
         response, errors = requests.get(self.devices_url, headers=headers, path_to_errors=self.path_to_errors)
-        self.create_response(response=response, errors=errors).raise_on_errors()
+        if errors:
+            raise ResourceError(errors=errors,
+                                resource=self.resource_name,
+                                provider=self.name,
+                                data=data,
+                                response=response)
         return response.json()['devices']
 
 

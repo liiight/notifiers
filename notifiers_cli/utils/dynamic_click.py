@@ -148,7 +148,8 @@ def _resource(resource, pretty: bool = None, **data):
         data['env_prefix'] = ctx.obj['env_prefix']
 
     rsp = resource(**data)
-    click.echo(json.dumps(rsp))
+    dump = partial(json.dumps, indent=4) if pretty else partial(json.dumps)
+    click.echo(dump(rsp))
 
 
 def _resources(p):

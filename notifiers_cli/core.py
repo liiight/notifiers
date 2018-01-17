@@ -27,15 +27,18 @@ def provider_group_factory():
         resources_cmd = click.Command('resources', callback=resources_callback, help='Show provider resources list')
         group.add_command(resources_cmd)
 
+        pretty_opt = click.Option(['--pretty/--not-pretty'], help='Output a pretty version of the JSON')
+
         # Add any provider resources
         for resource in p.resources:
             rsc = getattr(p, resource)
             rsrc_callback = partial(_resource, rsc)
-            group.add_command(schema_to_command(rsc, resource, rsrc_callback, add_message=False))
+            rsrc_command = schema_to_command(rsc, resource, rsrc_callback, add_message=False)
+            rsrc_command.params.append(pretty_opt)
+            group.add_command(rsrc_command)
 
         for name, description in CORE_COMMANDS.items():
             callback = func_factory(p, name)
-            pretty_opt = click.Option(['--pretty/--not-pretty'], help='Output a pretty version of the JSON')
             params = [pretty_opt]
             command = click.Command(name, callback=callback, help=description.format(provider_name), params=params)
             group.add_command(command)

@@ -1,5 +1,6 @@
 from ..core import Provider, Response, ProviderResource
 from ..utils import requests
+from ..exceptions import ResourceError
 
 
 class HipChatProxy:
@@ -87,6 +88,7 @@ class HipChatResourceProxy(HipChatProxy):
 
 
 class HipChatUsers(HipChatResourceProxy, ProviderResource):
+    """Return a list of HipChat users"""
     resource_name = 'users'
 
     @property
@@ -107,11 +109,17 @@ class HipChatUsers(HipChatResourceProxy, ProviderResource):
 
     def _get_resource(self, data: dict):
         response, errors = self._get_resources(self.users_url, data)
-        self.create_response(response=response, errors=errors).raise_on_errors()
+        if errors:
+            raise ResourceError(errors=errors,
+                                resource=self.resource_name,
+                                provider=self.name,
+                                data=data,
+                                response=response)
         return response.json()
 
 
 class HipChatRooms(HipChatResourceProxy, ProviderResource):
+    """Return a list of HipChat rooms"""
     resource_name = 'rooms'
 
     @property
@@ -132,7 +140,12 @@ class HipChatRooms(HipChatResourceProxy, ProviderResource):
 
     def _get_resource(self, data: dict):
         response, errors = self._get_resources(self.rooms_url, data)
-        self.create_response(response=response, errors=errors).raise_on_errors()
+        if errors:
+            raise ResourceError(errors=errors,
+                                resource=self.resource_name,
+                                provider=self.name,
+                                data=data,
+                                response=response)
         return response.json()
 
 

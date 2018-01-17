@@ -1,5 +1,6 @@
 from ..core import Provider, Response, ProviderResource
 from ..utils import requests
+from ..exceptions import ResourceError
 
 
 class GitterProxy:
@@ -52,7 +53,12 @@ class GitterRooms(GitterProxy, ProviderResource):
                                         headers=headers,
                                         params=params,
                                         path_to_errors=self.path_to_errors)
-        self.create_response(response=response, errors=errors).raise_on_errors()
+        if errors:
+            raise ResourceError(errors=errors,
+                                resource=self.resource_name,
+                                provider=self.name,
+                                data=data,
+                                response=response)
         rsp = response.json()
         return rsp['results'] if filter_ else rsp
 
