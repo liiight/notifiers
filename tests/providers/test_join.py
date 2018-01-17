@@ -1,6 +1,6 @@
 import pytest
 
-from notifiers.exceptions import BadArguments
+from notifiers.exceptions import BadArguments, ResourceError
 
 provider = 'join'
 
@@ -33,6 +33,29 @@ class TestJoin:
         data = {'message': 'foo'}
         rsp = provider.notify(**data)
         rsp.raise_on_errors()
+
+
+class TestJoinDevices:
+    resource = 'devices'
+
+    def test_join_devices_attribs(self, resource):
+        assert resource.schema == {
+            'type': 'object',
+            'properties': {
+                'apikey': {'type': 'string', 'title': 'user API key'}},
+            'additionalProperties': False,
+            'required': ['apikey']
+        }
+
+    def test_join_devices_negative(self, resource):
+        with pytest.raises(BadArguments):
+            resource(env_prefix='foo')
+
+    def test_join_negative(self, resource):
+        with pytest.raises(ResourceError) as e:
+            resource(apikey='foo')
+        assert e.value.errors == ['Not Found']
+        assert e.value.response.status_code == 404
 
 
 @pytest.mark.skip('Provider resources CLI command are not ready yet')

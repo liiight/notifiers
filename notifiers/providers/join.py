@@ -1,4 +1,5 @@
 import requests
+import json
 
 from ..core import Provider, Response, ProviderResource
 from ..utils.json_schema import one_or_more, list_to_commas
@@ -21,7 +22,10 @@ class JoinProxy:
         except requests.RequestException as e:
             if e.response is not None:
                 response = e.response
-                errors = [e.response.json()['errorMessage']]
+                try:
+                    errors = [response.json()['errorMessage']]
+                except json.decoder.JSONDecodeError:
+                    errors = [response.text]
             else:
                 response = None
                 errors = [(str(e))]
