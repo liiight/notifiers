@@ -7,13 +7,12 @@ from notifiers.exceptions import BadArguments, NotificationError
 
 
 class TestTelegram:
-    """
-    Telegram related tests
-    """
+    """Telegram related tests"""
 
-    def test_metadata(self):
-        t = get_notifier('telegram')
-        assert t.metadata == {
+    provider = 'telegram'
+
+    def test_metadata(self, provider):
+        assert provider.metadata == {
             'base_url': 'https://api.telegram.org/bot{token}',
             'name': 'telegram',
             'site_url': 'https://core.telegram.org/'
@@ -24,54 +23,73 @@ class TestTelegram:
         ({'message': 'foo'}, 'chat_id'),
         ({'message': 'foo', 'chat_id': 1}, 'token'),
     ])
-    def test_missing_required(self, data, message):
-        p = get_notifier('telegram')
+    def test_missing_required(self, data, message, provider):
         data['env_prefix'] = 'test'
         with pytest.raises(BadArguments) as e:
-            p.notify(**data)
+            provider.notify(**data)
         assert f"'{message}' is a required property" in e.value.message
 
-    def test_bad_token(self):
-        p = get_notifier('telegram')
+    def test_bad_token(self, provider):
         data = {
             'token': 'foo',
             'chat_id': 1,
             'message': 'foo'
         }
         with pytest.raises(NotificationError) as e:
-            rsp = p.notify(**data)
+            rsp = provider.notify(**data)
             rsp.raise_on_errors()
         assert 'Not Found' in e.value.message
 
     @pytest.mark.online
-    def test_missing_chat_id(self):
-        p = get_notifier('telegram')
+    def test_missing_chat_id(self, provider):
         data = {
             'chat_id': 1,
             'message': 'foo'
         }
         with pytest.raises(NotificationError) as e:
-            rsp = p.notify(**data)
+            rsp = provider.notify(**data)
             rsp.raise_on_errors()
         assert 'chat not found' in e.value.message
 
     @pytest.mark.online
-    def test_sanity(self):
-        p = get_notifier('telegram')
-        rsp = p.notify(message='foo')
+    def test_sanity(self, provider):
+        rsp = provider.notify(message='foo')
         rsp.raise_on_errors()
 
     @pytest.mark.online
-    def test_all_options(self):
-        p = get_notifier('telegram')
+    def test_all_options(self, provider):
         data = {
             'parse_mode': 'markdown',
             'disable_web_page_preview': True,
             'disable_notification': True,
             'message': '_foo_'
         }
-        rsp = p.notify(**data)
+        rsp = provider.notify(**data)
         rsp.raise_on_errors()
+
+
+class TestTelegramResources:
+    provider = 'telegram'
+    resource = 'updates'
+
+    def test_telegram_updates_attribs(self, resource):
+        assert resource.schema == {
+            'additionalProperties': False,
+            'properties': {'token': {'title': 'Bot token', 'type': 'string'}},
+            'required': ['token'],
+            'type': 'object'
+        }
+        assert resource.name == self.provider
+        assert resource.required == {'required': ['token']}
+
+    def test_telegram_updates_negative(self, resource):
+        with pytest.raises(BadArguments):
+            resource(env_prefix='foo')
+
+    @pytest.mark.online
+    def test_telegram_updates_positive(self, resource):
+        rsp = resource()
+        assert isinstance(rsp, list)
 
 
 @pytest.mark.skip('Provider resources CLI command are not ready yet')

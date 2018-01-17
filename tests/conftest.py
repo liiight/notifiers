@@ -103,13 +103,24 @@ def bad_provider() -> Provider:
 
 @pytest.fixture(scope='class')
 def provider(request):
-    if not getattr(request.cls, 'provider', None):
+    name = getattr(request.cls, 'provider', None)
+    if not name:
         pytest.fail(f"Test class '{request.cls}' has not 'provider' attribute set")
-    name = request.cls.provider
     p = get_notifier(name)
     if not p:
         pytest.fail(f"No notifier with name '{name}'")
     return p
+
+
+@pytest.fixture(scope='class')
+def resource(request, provider):
+    name = getattr(request.cls, 'resource', None)
+    if not name:
+        pytest.fail(f"Test class '{request.cls}' has not 'resource' attribute set")
+    resource = getattr(provider, name, None)
+    if not resource:
+        pytest.fail(f'Provider {provider.name} does not have a resource named {name}')
+    return resource
 
 
 @pytest.fixture(scope='session')

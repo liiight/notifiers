@@ -1,6 +1,6 @@
 from ..core import Provider, Response, ProviderResource
-from ..utils import requests
 from ..exceptions import ResourceError
+from ..utils import requests
 
 
 class TelegramProxy:
