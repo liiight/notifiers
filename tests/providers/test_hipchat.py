@@ -91,7 +91,7 @@ class TestHipChatRooms:
             resource(env_prefix='foo')
 
 
-class TestHipChatUserss:
+class TestHipChatUsers:
     provider = 'hipchat'
     resource = 'users'
 
@@ -113,9 +113,11 @@ class TestHipChatUserss:
                     'title': 'Include active guest users in response. Otherwise, no guest users will be included'},
                 'deleted': {'type': 'boolean',
                             'title': 'Include deleted users'}},
-            'additionalProperties': False, 'allOf': [{'required': ['token']}, {
+            'additionalProperties': False,
+            'allOf': [{'required': ['token']}, {
                 'oneOf': [{'required': ['group']}, {'required': ['team_server']}],
-                'error_oneOf': "Only one 'group' or 'team_server' is allowed"}]}
+                'error_oneOf': "Only one 'group' or 'team_server' is allowed"}]
+        }
 
         assert resource.required == {'allOf': [
             {'required': ['token']}

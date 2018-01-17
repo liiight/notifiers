@@ -1,3 +1,5 @@
+import copy
+
 from ..core import Provider, Response, ProviderResource
 from ..utils import requests
 from ..exceptions import ResourceError
@@ -103,7 +105,7 @@ class HipChatUsers(HipChatResourceProxy, ProviderResource):
                 'title': 'Include deleted users'
             }
         }
-        schema = super()._schema
+        schema = copy.deepcopy(super()._schema)
         schema['properties'].update(user_schema)
         return schema
 
@@ -134,7 +136,7 @@ class HipChatRooms(HipChatResourceProxy, ProviderResource):
                 'title': 'Include archive rooms'
             }
         }
-        schema = super()._schema
+        schema = copy.deepcopy(super()._schema)
         schema['properties'].update(user_schema)
         return schema
 

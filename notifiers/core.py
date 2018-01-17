@@ -60,8 +60,10 @@ class SchemaResource(ABC):
     @property
     @abstractmethod
     def _schema(self) -> dict:
-        """Resource JSON schema"""
+        """Resource JSON schema without the required part"""
         pass
+
+    _merged_schema = None
 
     @property
     @abstractmethod
@@ -77,9 +79,11 @@ class SchemaResource(ABC):
 
         :return: JSON schema of the provider
         """
-        log.debug('merging required dict into schema for %s', self.name)
-        self._schema.update(self._required)
-        return self._schema
+        if not self._merged_schema:
+            log.debug('merging required dict into schema for %s', self.name)
+            self._merged_schema = self._schema.copy()
+            self._merged_schema.update(self._required)
+        return self._merged_schema
 
     @property
     def arguments(self) -> dict:
