@@ -1,3 +1,4 @@
+import json
 import logging
 
 import requests
@@ -34,10 +35,13 @@ class RequestsHelper:
                 if e.response is not None:
                     rsp = e.response
                     if path_to_errors:
-                        errors = rsp.json()
-                        for arg in path_to_errors:
-                            if errors.get(arg):
-                                errors = errors[arg]
+                        try:
+                            errors = rsp.json()
+                            for arg in path_to_errors:
+                                if errors.get(arg):
+                                    errors = errors[arg]
+                        except json.decoder.JSONDecodeError:
+                            errors = [rsp.text]
                     else:
                         errors = [rsp.text]
                     if not isinstance(errors, list):
