@@ -1,6 +1,6 @@
 import pytest
 
-from notifiers.exceptions import BadArguments, NotificationError
+from notifiers.exceptions import BadArguments, NotificationError, ResourceError
 
 provider = 'gitter'
 
@@ -64,7 +64,6 @@ class TestGitter:
 
 
 class TestGitterResources:
-    provider = 'gitter'
     resource = 'rooms'
 
     def test_gitter_rooms_attribs(self, resource):
@@ -89,6 +88,12 @@ class TestGitterResources:
     def test_gitter_rooms_negative(self, resource):
         with pytest.raises(BadArguments):
             resource(env_prefix='foo')
+
+    def test_gitter_rooms_negative_2(self, resource):
+        with pytest.raises(ResourceError) as e:
+            resource(token='foo')
+        assert e.value.errors == ['Unauthorized']
+        assert e.value.response.status_code == 401
 
     @pytest.mark.online
     def test_gitter_rooms_positive(self, resource):
