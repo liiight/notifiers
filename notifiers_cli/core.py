@@ -6,8 +6,9 @@ from notifiers import __version__, get_notifier
 from notifiers.core import all_providers
 from notifiers.exceptions import NotifierException
 from notifiers_cli.utils.dynamic_click import (
-    schema_to_command, CORE_COMMANDS, func_factory, _notify, _resource, _resources
+    schema_to_command, CORE_COMMANDS
 )
+from notifiers_cli.utils.callbacks import func_factory, _notify, _resource, _resources
 
 
 def provider_group_factory():
