@@ -1,3 +1,7 @@
+"""
+Callbacks and callback factories to enable dynamically associating :class:`~notifiers.core.Provider` methods to
+:class:`click.Group` and :class:`click.Command`
+"""
 import json
 import sys
 from functools import partial
