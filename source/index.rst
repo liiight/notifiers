@@ -31,7 +31,6 @@ API documentation
    api/core
    api/exceptions
    api/providers
-   api/cli
 
 Development documentation
 -------------------------
