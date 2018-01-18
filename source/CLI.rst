@@ -153,6 +153,58 @@ You can change the default env var prefix (which is ``NOTIFIERS_``) by sending t
 
         $ notify "this is even easier!"
 
+Provider resources
+==================
+
+Some providers have resource helper commands:
+
+.. code-block:: console
+
+    $ notifiers telegram resources
+    updates
+
+You can also see them in the provider ``--help`` view:
+
+.. code-block:: console
+
+    $ notifiers telegram --help
+    Usage: notifiers telegram [OPTIONS] COMMAND [ARGS]...
+
+      Options for 'telegram'
+
+    Options:
+      --help  Show this message and exit.
+
+    Commands:
+      defaults   'telegram' default values
+      metadata   'telegram' metadata
+      notify     Send Telegram notifications
+      required   'telegram' required schema
+      resources  Show provider resources list
+      schema     'telegram' full schema
+      updates    Return Telegram bot updates, correlating to...
+
+These resources have their own option they can use:
+
+.. code-block:: console
+
+    $ notifiers telegram updates --help
+    Usage: notifiers telegram updates [OPTIONS]
+
+      Return Telegram bot updates, correlating to the `getUpdates` method.
+      Returns chat IDs needed to notifications
+
+    Options:
+      --token TEXT             Bot token
+      --pretty / --not-pretty  Output a pretty version of the JSON
+      --help                   Show this message and exit.
+
+Invoking them returns a JSON reply (usually), where each reply correlates to the API data.
+
+.. note::
+   Like always, these resources play very nicely with environment variables, so if you set your token in an environment variable, the resource can pick that up by default
+
+
 Version
 =======
 Get installed ``notifiers`` version via the ``--version`` flag:

@@ -79,7 +79,7 @@ Or Dockerhub::
 Basic Usage
 -----------
 
-.. code-block:::: python
+.. code-block:: python
 
     >>> from notifiers import get_notifier
     >>> p = get_notifier('pushover')
@@ -87,6 +87,13 @@ Basic Usage
     {'required': ['user', 'message', 'token']}
     >>> p.notify(user='foo', token='bar', message='test')
     <NotificationResponse,provider=Pushover,status=Success>
+
+From CLI
+--------
+
+.. code-block:: console
+
+    $ notifiers pushover notify --user foo --token baz "This is so easy!"
 
 In the near future
 ------------------

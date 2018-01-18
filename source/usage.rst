@@ -93,4 +93,41 @@ You can also change the default prefix of ``NOTIFIERS_`` by pass the ``env_prefi
     >>> p.notify(message='test', env_prefix='MY_OWN_PREFIX_')
 
 
+Provider resources
+------------------
+
+Some provider have helper method to enable fetching relevant resources (like rooms, users etc.)
+To get a list of provider resources use the :meth:`notifiers.core.Provider.resources` property:
+
+    >>> telegram.resources
+    ['updates']
+
+Resource share almost all of their functionality with the :class:`~notifiers.core.Provider` class, as they have a schema as well:
+
+    >>> telegram.updates
+    <ProviderResource,provider=telegram,resource=updates>
+    >>> telegram.updates.schema
+    {'type': 'object', 'properties': {'token': {'type': 'string', 'title': 'Bot token'}}, 'additionalProperties': False, 'required': ['token']}
+
+To invoke the resource, just call it:
+
+    >>> telegram.updates()
+    Traceback (most recent call last):
+      File "<input>", line 1, in <module>
+      File "/Users/orcarmi/PycharmProjects/notifiers/notifiers/core.py", line 278, in __call__
+        data = self._process_data(**kwargs)
+      File "/Users/orcarmi/PycharmProjects/notifiers/notifiers/core.py", line 204, in _process_data
+        self._validate_data(data, validator)
+      File "/Users/orcarmi/PycharmProjects/notifiers/notifiers/core.py", line 175, in _validate_data
+        raise BadArguments(validation_error=msg, provider=self.name, data=data)
+    notifiers.exceptions.BadArguments: Error with sent data: 'token' is a required property
+
+Oops, forgot to send ``token``. Let's try again:
+
+    >>> telegram.updates(token='foo')
+    [{'update_id': REDACTED, 'message': {'message_id': REDACTED, 'from': {'id': REDACTED, 'is_bot': False, 'first_name': 'REDACTED', 'last_name': 'REDACTED', 'username': 'REDACTED', 'language_code': 'en-US'}, 'chat': {'id': REDACTED, 'first_name': 'REDACTED', 'last_name': 'REDACTED', 'username': 'REDACTED', 'type': 'private'}, 'date': 1516178366, 'text': 'Ccc'}}]
+
+As can be expected, each provider resource returns a completely different response that correlates to the underlying API command it wraps. In this example, by invoking the :meth:`notifiers.providers.telegram.Telegram.updates` method, you get a response that shows you which active chat IDs your telegram bot token can send to.
+
+
 

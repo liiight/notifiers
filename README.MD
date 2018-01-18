@@ -55,6 +55,13 @@ Basic Usage
 <NotificationResponse,provider=Pushover,status=Success>
 ```
 
+From CLI
+--------
+
+```text
+$ notifiers pushover notify --user foo --token baz "This is so easy!"
+```
+
 In the near future 
 ------------------
 
