@@ -7,6 +7,10 @@ Core API reference
    :members:
    :private-members:
 
+.. autoclass:: notifiers.core.ProviderResource
+   :members:
+   :private-members:
+
 .. autoclass:: notifiers.core.Response
    :members:
 
