@@ -3,7 +3,7 @@ import pytest
 import notifiers
 from notifiers.core import Provider, Response
 from notifiers.exceptions import BadArguments, SchemaError, NotificationError
-from notifiers.utils.helpers import text_to_bool
+from notifiers.utils.helpers import text_to_bool, merge_dicts
 
 
 class TestCore:
@@ -180,3 +180,10 @@ class TestUtils:
     ])
     def test_text_to_bool(self, text, result):
         assert text_to_bool(text) is result
+
+    @pytest.mark.parametrize('target_dict, merge_dict, result', [
+        ({'a': 'foo'}, {'b': 'bar'}, {'a': 'foo', 'b': 'bar'}),
+        ({'a': 'foo'}, {'a': 'bar'}, {'a': 'foo'})
+    ])
+    def test_merge_dict(self, target_dict, merge_dict, result):
+        assert merge_dicts(target_dict, merge_dict) == result
