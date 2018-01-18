@@ -107,7 +107,7 @@ class SMTP(Provider):
             data['to'] = list_to_commas(data['to'])
         # A workaround since `from` is a reserved word
         if data.get('from_'):
-            data['from'] = data['from_']
+            data['from'] = data.pop('from_')
         return data
 
     def _build_email(self, data: dict) -> MIMEMultipart:
