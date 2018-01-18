@@ -2,7 +2,8 @@ import pytest
 
 import notifiers
 from notifiers.core import Provider, Response
-from notifiers.exceptions import BadArguments, SchemaError, NotificationError, ResourceError
+from notifiers.exceptions import BadArguments, SchemaError, NotificationError
+from notifiers.utils.helpers import text_to_bool
 
 
 class TestCore:
@@ -161,3 +162,21 @@ class TestCore:
 
         rsp = resource(key='fpp')
         assert rsp == {'status': 'success'}
+
+
+class TestUtils:
+
+    @pytest.mark.parametrize('text, result', [
+        ('y', True),
+        ('yes', True),
+        ('true', True),
+        ('on', True),
+        ('no', False),
+        ('off', False),
+        ('false', False),
+        ('0', False),
+        ('foo', True),
+        ('bla', True),
+    ])
+    def test_text_to_bool(self, text, result):
+        assert text_to_bool(text) is result
