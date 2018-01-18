@@ -3,7 +3,7 @@ import pytest
 import notifiers
 from notifiers.core import Provider, Response
 from notifiers.exceptions import BadArguments, SchemaError, NotificationError
-from notifiers.utils.helpers import text_to_bool, merge_dicts
+from notifiers.utils.helpers import text_to_bool, merge_dicts, dict_from_environs
 
 
 class TestCore:
@@ -187,3 +187,12 @@ class TestUtils:
     ])
     def test_merge_dict(self, target_dict, merge_dict, result):
         assert merge_dicts(target_dict, merge_dict) == result
+
+    @pytest.mark.parametrize('prefix, name, args, result', [
+        ('foo', 'bar', ['key1', 'key2'], {'key1': 'baz', 'key2': 'baz'})
+    ])
+    def test_dict_from_environs(self, prefix, name, args, result, monkeypatch):
+        for arg in args:
+            environ = f'{prefix}{name}_{arg}'.upper()
+            monkeypatch.setenv(environ, 'baz')
+        assert dict_from_environs(prefix, name, args) == result
