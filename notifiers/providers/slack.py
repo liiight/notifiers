@@ -1,14 +1,12 @@
-import requests
-
 from ..core import Provider, Response
-from ..utils.helpers import create_response
+from ..utils import requests
 
 
 class Slack(Provider):
     """Send Slack webhook notifications"""
     base_url = 'https://hooks.slack.com/services/'
     site_url = 'https://api.slack.com/incoming-webhooks'
-    provider_name = 'slack'
+    name = 'slack'
 
     __fields = {
         'type': 'array',
@@ -106,7 +104,13 @@ class Slack(Provider):
             'additionalProperties': False
         }
     }
-    _required = {'required': ['webhook_url', 'message']}
+    _required = {
+        'required':
+            [
+                'webhook_url',
+                'message'
+            ]
+    }
     _schema = {
         'type': 'object',
         'properties': {
@@ -157,18 +161,5 @@ class Slack(Provider):
 
     def _send_notification(self, data: dict) -> Response:
         url = data.pop('webhook_url')
-        response_data = {
-            'provider_name': self.provider_name,
-            'data': data
-        }
-        try:
-            response = requests.post(url, json=data)
-            response.raise_for_status()
-            response_data['response'] = response
-        except requests.RequestException as e:
-            if e.response is not None:
-                response_data['response'] = e.response
-                response_data['errors'] = [e.response.text]
-            else:
-                response_data['errors'] = [(str(e))]
-        return create_response(**response_data)
+        response, errors = requests.post(url, json=data)
+        return self.create_response(data, response, errors)

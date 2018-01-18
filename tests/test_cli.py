@@ -38,7 +38,7 @@ class TestCLI:
         assert result.exit_code == 0
         assert '"base_url": "https://api.mock.com"' in result.output
         assert '"site_url": "https://www.mock.com"' in result.output
-        assert '"provider_name": "mock_provider"' in result.output
+        assert '"name": "mock_provider"' in result.output
 
     def test_required(self, cli_runner):
         """Test required command"""
@@ -69,6 +69,12 @@ class TestCLI:
         result = cli_runner(cmd)
         assert result.exit_code == 0
         assert '"option_with_default": "foo"' in result.output
+
+    def test_resources(self, cli_runner):
+        cmd = f'{mock_name} resources'.split()
+        result = cli_runner(cmd)
+        assert result.exit_code == 0
+        assert 'mock_rsrc' in result.output
 
     def test_piping_input(self, cli_runner):
         """Test piping in message"""

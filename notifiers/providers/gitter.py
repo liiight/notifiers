@@ -1,16 +1,72 @@
-import requests
-
-from ..core import Provider, Response
-from ..utils.helpers import create_response
-from ..exceptions import NotifierException
+from ..core import Provider, Response, ProviderResource
+from ..utils import requests
+from ..exceptions import ResourceError
 
 
-class Gitter(Provider):
-    """Send Gitter notifications"""
+class GitterProxy:
+    """Shared attributes between :class:`~notifiers.providers.gitter.GitterRooms` and
+    :class:`~notifiers.providers.gitter.GitterGitter`"""
+    name = 'gitter'
+    path_to_errors = 'errors', 'error'
     base_url = 'https://api.gitter.im/v1/rooms'
-    message_url = base_url + '/{room_id}/chatMessages'
+
+    def _get_headers(self, token: str) -> dict:
+        """
+        Builds Gitter requests header bases on the token provided
+
+        :param token: App token
+        :return: Authentication header dict
+        """
+        return {'Authorization': f'Bearer {token}'}
+
+
+class GitterRooms(GitterProxy, ProviderResource):
+    """Returns a list of Gitter rooms via token"""
+    resource_name = 'room'
+
+    _required = {
+        'required': [
+            'token'
+        ]
+    }
+
+    _schema = {
+        'type': 'object',
+        'properties': {
+            'token': {
+                'type': 'string',
+                'title': 'access token'
+            },
+            'filter': {
+                'type': 'string',
+                'title': 'Filter results'
+            }
+        },
+        'additionalProperties': False
+    }
+
+    def _get_resource(self, data: dict) -> list:
+        headers = self._get_headers(data['token'])
+        filter_ = data.get('filter')
+        params = {'q': filter_} if filter_ else {}
+        response, errors = requests.get(self.base_url,
+                                        headers=headers,
+                                        params=params,
+                                        path_to_errors=self.path_to_errors)
+        if errors:
+            raise ResourceError(errors=errors,
+                                resource=self.resource_name,
+                                provider=self.name,
+                                data=data,
+                                response=response)
+        rsp = response.json()
+        return rsp['results'] if filter_ else rsp
+
+
+class Gitter(GitterProxy, Provider):
+    """Send Gitter notifications"""
+    message_url = '/{room_id}/chatMessages'
     site_url = 'https://gitter.im'
-    provider_name = 'gitter'
 
     _required = {'required': ['message', 'token', 'room_id']}
     _schema = {
@@ -43,50 +99,20 @@ class Gitter(Provider):
         metadata['message_url'] = self.message_url
         return metadata
 
-    def _get_headers(self, token: str) -> dict:
-        """
-        Builds Gitter requests header bases on the token provided
-
-        :param token: App token
-        :return: Authentication header dict
-        """
-        return {'Authorization': f'Bearer {token}'}
-
     def _send_notification(self, data: dict) -> Response:
         room_id = data.pop('room_id')
-        url = self.message_url.format(room_id=room_id)
+        url = self.base_url + self.message_url.format(room_id=room_id)
 
-        response_data = {
-            'provider_name': self.provider_name,
-            'data': data
-        }
         headers = self._get_headers(data.pop('token'))
-        try:
-            response = requests.post(url, json=data, headers=headers)
-            response.raise_for_status()
-            response_data['response'] = response
-        except requests.RequestException as e:
-            if e.response is not None:
-                response_data['response'] = e.response
-                response_data['errors'] = [e.response.json()['error']]
-            else:
-                response_data['errors'] = [(str(e))]
-        return create_response(**response_data)
+        response, errors = requests.post(url, json=data, headers=headers, path_to_errors=self.path_to_errors)
+        return self.create_response(data, response, errors)
 
-    def rooms(self, token: str, query: str = None) -> list:
-        """
-        Return a list of available Gitter rooms. If query param is sent, filters the list according to it
+    @property
+    def resources(self):
+        return [
+            'rooms'
+        ]
 
-        :param token: App token
-        :param query: Optional query string
-        :return: List of room IDs
-        """
-        try:
-            headers = self._get_headers(token)
-            params = {'q': query} if query else {}
-            rsp = requests.get(self.base_url, headers=headers, params=params)
-            rsp.raise_for_status()
-            return rsp.json()['results'] if query else rsp.json()
-        except requests.RequestException as e:
-            message = e.response.json()['error']
-            raise NotifierException(provider=self.provider_name, message=message)
+    @property
+    def rooms(self) -> GitterRooms:
+        return GitterRooms()

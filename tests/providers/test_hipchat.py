@@ -1,21 +1,18 @@
 import pytest
 
-from notifiers import get_notifier
-from notifiers.exceptions import BadArguments, NotificationError
+from notifiers.exceptions import BadArguments, NotificationError, ResourceError
+
+provider = 'hipchat'
 
 
 class TestHipchat:
-    # No online tess for hipchat since they're deprecated and denies new signups
-    notifier_name = 'hipchat'
+    # No online test for hipchat since they're deprecated and denies new signups
 
-    def test_metadata(self):
-        p = get_notifier(self.notifier_name)
-        assert p.metadata == {
+    def test_metadata(self, provider):
+        assert provider.metadata == {
             'base_url': 'https://{group}.hipchat.com',
-            'provider_name': 'hipchat',
-            'room_url': '/v2/room/{room}/notification',
+            'name': 'hipchat',
             'site_url': 'https://www.hipchat.com/docs/apiv2',
-            'user_url': '/v2/user/{user}/message'
         }
 
     @pytest.mark.parametrize('data, message', [
@@ -24,15 +21,13 @@ class TestHipchat:
         ({'id': 'foo', 'token': 'bar', 'message': 'boo', 'room': 'bla', 'team_server': 'gg', 'group': 'gg'},
          "Only one 'group' or 'team_server' is allowed"),
     ])
-    def test_missing_required(self, data, message):
-        p = get_notifier(self.notifier_name)
+    def test_missing_required(self, data, message, provider):
         data['env_prefix'] = 'test'
         with pytest.raises(BadArguments) as e:
-            p.notify(**data)
+            provider.notify(**data)
         assert message in e.value.message
 
-    def test_bad_request(self):
-        p = get_notifier(self.notifier_name)
+    def test_bad_request(self, provider):
         data = {
             'token': 'foo',
             'room': 'baz',
@@ -41,12 +36,107 @@ class TestHipchat:
             'group': 'nada'
         }
         with pytest.raises(NotificationError) as e:
-            rsp = p.notify(**data)
+            rsp = provider.notify(**data)
             rsp.raise_on_errors()
         assert 'Invalid OAuth session' in e.value.message
 
+    def test_hipchat_resources(self, provider):
+        assert provider.resources
+        assert len(provider.resources) == 2
+        for resource in provider.resources:
+            assert getattr(provider, resource)
 
-@pytest.mark.skip('Provider resources CLI command are not ready yet')
+
+class TestHipChatRooms:
+    resource = 'rooms'
+
+    def test_hipchat_rooms_attribs(self, resource):
+        assert resource.schema == {
+            'type': 'object',
+            'properties': {
+                'token': {
+                    'type': 'string',
+                    'title': 'User token'
+                },
+                'start': {'type': 'integer',
+                          'title': 'Start index'},
+                'max_results': {'type': 'integer',
+                                'title': 'Max results in reply'},
+                'group': {'type': 'string',
+                          'title': 'Hipchat group name'},
+                'team_server': {'type': 'string',
+                                'title': 'Hipchat team server'},
+                'private': {'type': 'boolean',
+                            'title': 'Include private rooms'},
+                'archived': {'type': 'boolean',
+                             'title': 'Include archive rooms'}},
+            'additionalProperties': False,
+            'allOf': [
+                {'required': ['token']}
+                , {'oneOf': [{'required': ['group']},
+                             {'required': ['team_server']}],
+                   'error_oneOf': "Only one 'group' or 'team_server' is allowed"}
+            ]
+        }
+
+        assert resource.required == {'allOf': [
+            {'required': ['token']}
+            , {'oneOf': [{'required': ['group']},
+                         {'required': ['team_server']}],
+               'error_oneOf': "Only one 'group' or 'team_server' is allowed"}]}
+        assert resource.name == provider
+
+    def test_hipchat_rooms_negative(self, resource):
+        with pytest.raises(BadArguments):
+            resource(env_prefix='foo')
+
+    def test_hipchat_rooms_negative_2(self, resource):
+        with pytest.raises(ResourceError) as e:
+            resource(token='foo', group='bat')
+
+        assert e.value.errors == ['Invalid OAuth session']
+        assert e.value.response.status_code == 401
+
+
+class TestHipChatUsers:
+    resource = 'users'
+
+    def test_hipchat_users_attribs(self, resource):
+        assert resource.schema == {
+            'type': 'object',
+            'properties': {
+                'token': {'type': 'string', 'title': 'User token'},
+                'start': {'type': 'integer',
+                          'title': 'Start index'},
+                'max_results': {'type': 'integer',
+                                'title': 'Max results in reply'},
+                'group': {'type': 'string',
+                          'title': 'Hipchat group name'},
+                'team_server': {'type': 'string',
+                                'title': 'Hipchat team server'},
+                'guests': {
+                    'type': 'boolean',
+                    'title': 'Include active guest users in response. Otherwise, no guest users will be included'},
+                'deleted': {'type': 'boolean',
+                            'title': 'Include deleted users'}},
+            'additionalProperties': False,
+            'allOf': [{'required': ['token']}, {
+                'oneOf': [{'required': ['group']}, {'required': ['team_server']}],
+                'error_oneOf': "Only one 'group' or 'team_server' is allowed"}]
+        }
+
+        assert resource.required == {'allOf': [
+            {'required': ['token']}
+            , {'oneOf': [{'required': ['group']},
+                         {'required': ['team_server']}],
+               'error_oneOf': "Only one 'group' or 'team_server' is allowed"}]}
+        assert resource.name == provider
+
+    def test_hipchat_users_negative(self, resource):
+        with pytest.raises(BadArguments):
+            resource(env_prefix='foo')
+
+
 class TestHipchatCLI:
     """Test hipchat specific CLI"""
 

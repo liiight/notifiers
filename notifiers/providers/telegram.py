@@ -1,15 +1,53 @@
-import requests
-
-from ..core import Provider, Response
-from ..utils.helpers import create_response
-from ..exceptions import NotifierException
+from ..core import Provider, Response, ProviderResource
+from ..exceptions import ResourceError
+from ..utils import requests
 
 
-class Telegram(Provider):
+class TelegramProxy:
+    base_url = 'https://api.telegram.org/bot{token}'
+    name = 'telegram'
+    path_to_errors = 'description',
+
+
+class TelegramUpdates(TelegramProxy, ProviderResource):
+    """Return Telegram bot updates, correlating to the `getUpdates` method. Returns chat IDs needed to notifications"""
+    resource_name = 'updates'
+    updates_endpoint = '/getUpdates'
+
+    _required = {
+        'required': [
+            'token'
+        ]
+    }
+
+    _schema = {
+        'type': 'object',
+        'properties': {
+            'token': {
+                'type': 'string',
+                'title': 'Bot token'
+            }
+        },
+        'additionalProperties': False
+    }
+
+    def _get_resource(self, data: dict) -> list:
+        url = self.base_url.format(token=data['token']) + self.updates_endpoint
+        response, errors = requests.get(url, path_to_errors=self.path_to_errors)
+        if errors:
+            raise ResourceError(errors=errors,
+                                resource=self.resource_name,
+                                provider=self.name,
+                                data=data,
+                                response=response)
+        return response.json()['result']
+
+
+class Telegram(TelegramProxy, Provider):
     """Send Telegram notifications"""
-    base_url = 'https://api.telegram.org/bot{token}/{method}'
-    provider_name = 'telegram'
+
     site_url = 'https://core.telegram.org/'
+    push_endpoint = '/sendMessage'
 
     _required = {'required': ['message', 'chat_id', 'token']}
     _schema = {
@@ -59,35 +97,16 @@ class Telegram(Provider):
 
     def _send_notification(self, data: dict) -> Response:
         token = data.pop('token')
-        url = self.base_url.format(token=token, method='sendMessage')
-        response_data = {
-            'provider_name': self.provider_name,
-            'data': data
-        }
-        try:
-            response = requests.post(url, json=data)
-            response.raise_for_status()
-            response_data['response'] = response
-        except requests.RequestException as e:
-            if e.response is not None:
-                response_data['response'] = e.response
-                response_data['errors'] = [e.response.json()['description']]
-            else:
-                response_data['errors'] = [(str(e))]
-        return create_response(**response_data)
+        url = self.base_url.format(token=token) + self.push_endpoint
+        response, errors = requests.post(url, json=data, path_to_errors=self.path_to_errors)
+        return self.create_response(data, response, errors)
 
-    def updates(self, token) -> list:
-        """
-        Get a list of updates for the bot token, lets you see the relevant chat IDs
+    @property
+    def resources(self):
+        return [
+            'updates'
+        ]
 
-        :param token: Bot token
-        :return: List of updates
-        """
-        url = self.base_url.format(token=token, method='getUpdates')
-        try:
-            response = requests.get(url)
-            response.raise_for_status()
-            return response.json()['result']
-        except requests.RequestException as e:
-            message = e.response.json()['description']
-            raise NotifierException(provider=self.provider_name, message=message)
+    @property
+    def updates(self) -> TelegramUpdates:
+        return TelegramUpdates()

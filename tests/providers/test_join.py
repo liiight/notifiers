@@ -1,18 +1,16 @@
-import os
-
 import pytest
 
-from notifiers import get_notifier
-from notifiers.exceptions import BadArguments
+from notifiers.exceptions import BadArguments, ResourceError, NotificationError
+
+provider = 'join'
 
 
 class TestJoin:
-    def test_metadata(self):
-        j = get_notifier('join')
-        assert j.metadata == {
-            'base_url': 'https://joinjoaomgcd.appspot.com/_ah/api/messaging/v1/sendPush',
-            'devices_url': 'https://joinjoaomgcd.appspot.com/_ah/api/registration/v1/listDevices',
-            'provider_name': 'join',
+
+    def test_metadata(self, provider):
+        assert provider.metadata == {
+            'base_url': 'https://joinjoaomgcd.appspot.com/_ah/api/messaging/v1',
+            'name': 'join',
             'site_url': 'https://joaoapps.com/join/api/'
         }
 
@@ -20,32 +18,62 @@ class TestJoin:
         ({}, 'apikey'),
         ({'apikey': 'foo'}, 'message'),
     ])
-    def test_missing_required(self, data, message):
-        p = get_notifier('join')
+    def test_missing_required(self, data, message, provider):
         data['env_prefix'] = 'test'
         with pytest.raises(BadArguments) as e:
-            p.notify(**data)
+            provider.notify(**data)
         assert f"'{message}' is a required property" in e.value.message
 
-    def test_defaults(self):
-        p = get_notifier('join')
-        assert p.defaults == {'deviceId': 'group.all'}
+    def test_defaults(self, provider):
+        assert provider.defaults == {'deviceId': 'group.all'}
 
     @pytest.mark.skip('tests fail due to no device connected')
     @pytest.mark.online
-    def test_sanity(self):
-        p = get_notifier('join')
+    def test_sanity(self, provider):
         data = {'message': 'foo'}
-        rsp = p.notify(**data)
+        rsp = provider.notify(**data)
         rsp.raise_on_errors()
 
+    def test_negative(self, provider):
+        data = {
+            'message': 'foo',
+            'apikey': 'bar'
+        }
+        rsp = provider.notify(**data)
+        with pytest.raises(NotificationError) as e:
+            rsp.raise_on_errors()
 
-@pytest.mark.skip('Provider resources CLI command are not ready yet')
+        assert e.value.errors == ['User Not Authenticated']
+
+
+class TestJoinDevices:
+    resource = 'devices'
+
+    def test_join_devices_attribs(self, resource):
+        assert resource.schema == {
+            'type': 'object',
+            'properties': {
+                'apikey': {'type': 'string', 'title': 'user API key'}},
+            'additionalProperties': False,
+            'required': ['apikey']
+        }
+
+    def test_join_devices_negative(self, resource):
+        with pytest.raises(BadArguments):
+            resource(env_prefix='foo')
+
+    def test_join_devices_negative_online(self, resource):
+        with pytest.raises(ResourceError) as e:
+            resource(apikey='foo')
+        assert e.value.errors == ['Not Found']
+        assert e.value.response.status_code == 404
+
+
 class TestJoinCLI:
     """Test Join specific CLI"""
 
     def test_join_devices_negative(self, cli_runner):
-        cmd = 'join devices --token bad_token'.split()
+        cmd = 'join devices --apikey bad_token'.split()
         result = cli_runner(cmd)
         assert result.exit_code == -1
         assert not result.output
@@ -53,10 +81,7 @@ class TestJoinCLI:
     @pytest.mark.skip('tests fail due to no device connected')
     @pytest.mark.online
     def test_join_updates_positive(self, cli_runner):
-        token = os.environ.get('NOTIFIERS_JOIN_APIKEY')
-        assert token
-
-        cmd = f'join devices --token {token}'.split()
+        cmd = f'join devices'.split()
         result = cli_runner(cmd)
         assert result.exit_code == 0
         replies = ['You have no devices associated with this apikey', 'Device name: ']

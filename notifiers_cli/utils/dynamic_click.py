@@ -1,20 +1,86 @@
-import json
-import sys
+"""
+Helper module with tools to dynamically convert :class:`~notifiers.core.Provider` and
+:class:`~notifiers.core.ProviderResource` classes to :mod:`click` data types
+"""
 from functools import partial
 
 import click
-
-from notifiers_cli.utils.json_schema import COMPLEX_TYPES, json_schema_to_click_type, handle_oneof
 
 CORE_COMMANDS = {
     'required': "'{}' required schema",
     'schema': "'{}' full schema",
     'metadata': "'{}' metadata",
-    'defaults': "'{}' default values"
+    'defaults': "'{}' default values",
 }
+SCHEMA_BASE_MAP = {
+    'string': click.STRING,
+    'integer': click.INT,
+    'number': click.FLOAT,
+    'boolean': click.BOOL
+}
+COMPLEX_TYPES = ['object', 'array']
 
 
-def params_factory(schema: dict) -> list:
+def handle_oneof(oneof_schema: list) -> tuple:
+    """
+    Custom handle of `oneOf` JSON schema validator. Tried to match primitive type and see if it should be allowed
+     to be passed multiple timns into a command
+
+    :param oneof_schema: `oneOf` JSON schema
+    :return: Tuple of :class:`click.ParamType`, ``multiple`` flag and ``description`` of option
+    """
+    oneof_dict = {schema['type']: schema for schema in oneof_schema}
+    click_type = None
+    multiple = False
+    description = None
+    for key, value in oneof_dict.items():
+        if key == 'array':
+            continue
+        elif key in SCHEMA_BASE_MAP:
+            if oneof_dict.get('array') and oneof_dict['array']['items']['type'] == key:
+                multiple = True
+            # Found a match to a primitive type
+            click_type = SCHEMA_BASE_MAP[key]
+            description = value.get('title')
+            break
+    return click_type, multiple, description
+
+
+def json_schema_to_click_type(schema: dict) -> tuple:
+    """
+    A generic handler of a single property JSON schema to :class:`click.ParamType` converter
+
+    :param schema: JSON schema property to operate on
+    :return: Tuple of :class:`click.ParamType`, `description`` of option and optionally a :class:`click.Choice`
+     if the allowed values are a closed list (JSON schema ``enum``)
+    """
+    choices = None
+    if isinstance(schema['type'], list):
+        if 'string' in schema['type']:
+            schema['type'] = 'string'
+    click_type = SCHEMA_BASE_MAP[schema['type']]
+    description = schema.get('title')
+    if schema.get('enum'):
+        choices = click.Choice(schema['enum'])
+    return click_type, description, choices
+
+
+def clean_data(data: dict) -> dict:
+    """Removes all empty values and converts tuples into lists"""
+    new_data = {}
+    for key, value in data.items():
+        # Verify that only explicitly passed args get passed on
+        if not isinstance(value, bool) and not value:
+            continue
+
+        # Multiple choice command are passed as tuples, convert to list to match schema
+        if isinstance(value, tuple):
+            value = list(value)
+        new_data[key] = value
+    return new_data
+
+
+def params_factory(schema: dict, add_message: bool) -> list:
     """
     Generates list of :class:`click.Option` based on a JSON schema
 
@@ -23,8 +89,9 @@ def params_factory(schema: dict) -> list:
     """
 
     # Immediately create message as an argument
-    message_arg = click.Argument(['message'], required=False)
-    params = [message_arg]
+    params = []
+    if add_message:
+        params.append(click.Argument(['message'], required=False))
 
     for property, prpty_schema in schema.items():
         multiple = False
@@ -74,63 +141,18 @@ def params_factory(schema: dict) -> list:
     return params
 
 
-def provider_notify_command_factory(p) -> click.Command:
+def schema_to_command(p, name: str, callback: callable, add_message: bool) -> click.Command:
     """
     Generates a ``notify`` :class:`click.Command` for :class:`~notifiers.core.Provider`
 
     :param p: Relevant Provider
+    :param name: Command name
     :return: A ``notify`` :class:`click.Command`
     """
-    params = params_factory(p.schema['properties'])
-    name = 'notify'
+    params = params_factory(p.schema['properties'], add_message=add_message)
     help = p.__doc__
-    notify = partial(_notify, p=p)
-    cmd = click.Command(name=name, callback=notify, params=params, help=help)
+    cmd = click.Command(name=name, callback=callback, params=params, help=help)
     return cmd
-
-
-def func_factory(p, method: str) -> callable:
-    """
-    Dynamically generates callback commands to correlate to provider public methods
-
-    :param p: A :class:`notifiers.core.Provider` object
-    :param method: A string correlating to a provider method
-    :return: A callback func
-    """
-
-    def callback(pretty: bool = False):
-        res = getattr(p, method)
-        dump = partial(json.dumps, indent=4) if pretty else partial(json.dumps)
-        click.echo(dump(res))
-
-    return callback
-
-
-def _notify(p, **data):
-    """The callback func that will be hooked to the ``notify`` command"""
-    message = data.get('message')
-    if not message and not sys.stdin.isatty():
-        message = click.get_text_stream('stdin').read()
-    data['message'] = message
-
-    new_data = {}
-    for key, value in data.items():
-        # Verify that only explicitly passed args get passed on
-        if not isinstance(value, bool) and not value:
-            continue
-
-        # Multiple choice command are passed as tuples, convert to list to match schema
-        if isinstance(value, tuple):
-            value = list(value)
-        new_data[key] = value
-
-    ctx = click.get_current_context()
-    if ctx.obj.get('env_prefix'):
-        new_data['env_prefix'] = ctx.obj['env_prefix']
-
-    rsp = p.notify(**new_data)
-    rsp.raise_on_errors()
-    click.secho(f'Succesfully sent a notification to {p.provider_name}!', fg='green')
 
 
 def get_param_decals_from_name(option_name: str) -> str:

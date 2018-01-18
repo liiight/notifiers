@@ -7,7 +7,6 @@ from email.utils import formatdate
 from smtplib import SMTPAuthenticationError, SMTPServerDisconnected, SMTPSenderRefused
 
 from ..core import Provider, Response
-from ..utils.helpers import create_response
 from ..utils.json_schema import one_or_more, list_to_commas
 
 DEFAULT_SUBJECT = "New email from 'notifiers'!"
@@ -19,7 +18,7 @@ class SMTP(Provider):
     """Send emails via SMTP"""
     base_url = None
     site_url = 'https://en.wikipedia.org/wiki/Email'
-    provider_name = 'email'
+    name = 'email'
 
     _required = {
         'required': ['message', 'to'],
@@ -108,7 +107,7 @@ class SMTP(Provider):
             data['to'] = list_to_commas(data['to'])
         # A workaround since `from` is a reserved word
         if data.get('from_'):
-            data['from'] = data['from_']
+            data['from'] = data.pop('from_')
         return data
 
     def _build_email(self, data: dict) -> MIMEMultipart:
@@ -137,10 +136,7 @@ class SMTP(Provider):
         return data['host'], data['port'], data.get('username')
 
     def _send_notification(self, data: dict) -> Response:
-        response_data = {
-            'provider_name': self.provider_name,
-            'data': data
-        }
+        errors = None
         try:
             configuration = self._get_configuration(data)
             if not self.configuration or not self.smtp_server or self.configuration != configuration:
@@ -150,5 +146,5 @@ class SMTP(Provider):
         except (
                 SMTPServerDisconnected, SMTPSenderRefused, socket.error, OSError, IOError, SMTPAuthenticationError
         ) as e:
-            response_data['errors'] = [str(e)]
-        return create_response(**response_data)
+            errors = [str(e)]
+        return self.create_response(data, errors=errors)

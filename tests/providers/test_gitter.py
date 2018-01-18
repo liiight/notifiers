@@ -1,18 +1,17 @@
-import os
-
 import pytest
 
-from notifiers import get_notifier
-from notifiers.exceptions import BadArguments, NotificationError
+from notifiers.exceptions import BadArguments, NotificationError, ResourceError
+
+provider = 'gitter'
 
 
 class TestGitter:
-    def test_metadata(self):
-        p = get_notifier('gitter')
-        assert p.metadata == {
+
+    def test_metadata(self, provider):
+        assert provider.metadata == {
             'base_url': 'https://api.gitter.im/v1/rooms',
-            'message_url': 'https://api.gitter.im/v1/rooms/{room_id}/chatMessages',
-            'provider_name': 'gitter',
+            'message_url': '/{room_id}/chatMessages',
+            'name': 'gitter',
             'site_url': 'https://gitter.im'
         }
 
@@ -21,48 +20,91 @@ class TestGitter:
         ({'message': 'foo'}, 'token'),
         ({'message': 'foo', 'token': 'bar'}, 'room_id'),
     ])
-    def test_missing_required(self, data, message):
-        p = get_notifier('gitter')
+    def test_missing_required(self, provider, data, message):
         data['env_prefix'] = 'test'
         with pytest.raises(BadArguments) as e:
-            p.notify(**data)
+            provider.notify(**data)
         assert f"'{message}' is a required property" in e.value.message
 
-    def test_bad_request(self):
-        p = get_notifier('gitter')
+    def test_bad_request(self, provider):
         data = {
             'token': 'foo',
             'room_id': 'baz',
             'message': 'bar'
         }
         with pytest.raises(NotificationError) as e:
-            rsp = p.notify(**data)
+            rsp = provider.notify(**data)
             rsp.raise_on_errors()
         assert 'Unauthorized' in e.value.message
 
     @pytest.mark.online
-    def test_bad_room_id(self):
-        p = get_notifier('gitter')
+    def test_bad_room_id(self, provider):
         data = {
             'room_id': 'baz',
             'message': 'bar'
         }
         with pytest.raises(NotificationError) as e:
-            rsp = p.notify(**data)
+            rsp = provider.notify(**data)
             rsp.raise_on_errors()
         assert 'Bad Request' in e.value.message
 
     @pytest.mark.online
-    def test_sanity(self):
-        p = get_notifier('gitter')
+    def test_sanity(self, provider):
         data = {
             'message': 'bar'
         }
-        rsp = p.notify(**data)
+        rsp = provider.notify(**data)
         rsp.raise_on_errors()
 
+    def test_gitter_resources(self, provider):
+        assert provider.resources
+        for resource in provider.resources:
+            assert getattr(provider, resource)
+        assert 'rooms' in provider.resources
 
-@pytest.mark.skip('Provider resources CLI command are not ready yet')
+
+class TestGitterResources:
+    resource = 'rooms'
+
+    def test_gitter_rooms_attribs(self, resource):
+        assert resource.schema == {
+            'type': 'object',
+            'properties': {
+                'token': {
+                    'type': 'string',
+                    'title': 'access token'
+                },
+                'filter': {
+                    'type': 'string',
+                    'title': 'Filter results'
+                }
+            },
+            'required': ['token'],
+            'additionalProperties': False
+        }
+        assert resource.name == provider
+        assert resource.required == {'required': ['token']}
+
+    def test_gitter_rooms_negative(self, resource):
+        with pytest.raises(BadArguments):
+            resource(env_prefix='foo')
+
+    def test_gitter_rooms_negative_2(self, resource):
+        with pytest.raises(ResourceError) as e:
+            resource(token='foo')
+        assert e.value.errors == ['Unauthorized']
+        assert e.value.response.status_code == 401
+
+    @pytest.mark.online
+    def test_gitter_rooms_positive(self, resource):
+        rsp = resource()
+        assert isinstance(rsp, list)
+
+    @pytest.mark.online
+    def test_gitter_rooms_positive_with_filter(self, resource):
+        assert resource(filter='notifiers/testing')
+
+
 class TestGitterCLI:
     """Test Gitter specific CLI commands"""
 
@@ -74,20 +116,14 @@ class TestGitterCLI:
 
     @pytest.mark.online
     def test_gitter_rooms_positive(self, cli_runner):
-        token = os.environ.get('NOTIFIERS_GITTER_TOKEN')
-        assert token
-
-        cmd = f'gitter rooms --token {token}'.split()
+        cmd = 'gitter rooms'.split()
         result = cli_runner(cmd)
         assert result.exit_code == 0
         assert 'notifiers/testing' in result.output
 
     @pytest.mark.online
     def test_gitter_rooms_with_query(self, cli_runner):
-        token = os.environ.get('NOTIFIERS_GITTER_TOKEN')
-        assert token
-
-        cmd = f'gitter rooms --token {token} --query notifiers/testing'.split()
+        cmd = f'gitter rooms --filter notifiers/testing'.split()
         result = cli_runner(cmd)
         assert result.exit_code == 0
         assert 'notifiers/testing' in result.output

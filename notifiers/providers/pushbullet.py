@@ -1,16 +1,54 @@
-import requests
-
-from ..core import Provider, Response
-from ..utils.helpers import create_response
-from ..exceptions import NotifierException
+from ..core import Provider, Response, ProviderResource
+from ..utils import requests
+from ..exceptions import ResourceError
 
 
-class Pushbullet(Provider):
+class PushbulletProxy:
+    """Shared attributes between PushbulletDevices and Pushbullet"""
+    name = 'pushbullet'
+    path_to_errors = 'error', 'message'
+
+    def _get_headers(self, token: str) -> dict:
+        return {'Access-Token': token}
+
+
+class PushbulletDevices(PushbulletProxy, ProviderResource):
+    """Return a list of Pushbullet devices associated to a token"""
+    resource_name = 'devices'
+    devices_url = 'https://api.pushbullet.com/v2/devices'
+
+    _required = {
+        'required': [
+            'token'
+        ]
+    }
+    _schema = {
+        'type': 'object',
+        'properties': {
+            'token': {
+                'type': 'string',
+                'title': 'API access token'
+            }
+        },
+        'additionalProperties': False
+    }
+
+    def _get_resource(self, data: dict) -> list:
+        headers = self._get_headers(data['token'])
+        response, errors = requests.get(self.devices_url, headers=headers, path_to_errors=self.path_to_errors)
+        if errors:
+            raise ResourceError(errors=errors,
+                                resource=self.resource_name,
+                                provider=self.name,
+                                data=data,
+                                response=response)
+        return response.json()['devices']
+
+
+class Pushbullet(PushbulletProxy, Provider):
     """Send Pushbullet notifications"""
     base_url = 'https://api.pushbullet.com/v2/pushes'
-    devices_url = 'https://api.pushbullet.com/v2/devices'
     site_url = 'https://www.pushbullet.com'
-    provider_name = 'pushbullet'
 
     __type = {
         'type': 'string',
@@ -74,14 +112,17 @@ class Pushbullet(Provider):
         'additionalProperties': False
     }
 
-    def _get_headers(self, token: str) -> dict:
-        return {'Access-Token': token}
-
     @property
     def defaults(self) -> dict:
         return {
             'type': 'note'
         }
+
+    @property
+    def resources(self) -> list:
+        return [
+            'devices'
+        ]
 
     def _prepare_data(self, data: dict) -> dict:
         data['body'] = data.pop('message')
@@ -92,35 +133,13 @@ class Pushbullet(Provider):
         return data
 
     def _send_notification(self, data: dict) -> Response:
-        response_data = {
-            'provider_name': self.provider_name,
-            'data': data
-        }
         headers = self._get_headers(data.pop('token'))
-        try:
-            response = requests.post(self.base_url, json=data, headers=headers)
-            response.raise_for_status()
-            response_data['response'] = response
-        except requests.RequestException as e:
-            if e.response is not None:
-                response_data['response'] = e.response
-                response_data['errors'] = [e.response.json()['error']['message']]
-            else:
-                response_data['errors'] = [(str(e))]
-        return create_response(**response_data)
+        response, errors = requests.post(self.base_url,
+                                         json=data,
+                                         headers=headers,
+                                         path_to_errors=self.path_to_errors)
+        return self.create_response(data, response, errors)
 
-    def devices(self, token: str) -> list:
-        """
-        Returns a list of devices associated with the token
-
-        :param token: Access token
-        :return: A list of associated devices
-        """
-        headers = self._get_headers(token)
-        try:
-            response = requests.get(self.devices_url, headers=headers)
-            response.raise_for_status()
-            return response.json()['devices']
-        except requests.RequestException as e:
-            message = e.response.json()['error']['message']
-            raise NotifierException(provider=self.provider_name, message=message)
+    @property
+    def devices(self) -> PushbulletDevices:
+        return PushbulletDevices()

@@ -1,6 +1,6 @@
 import pytest
 
-from notifiers import get_notifier
+provider = 'slack'
 
 
 class TestSlack(object):
@@ -10,24 +10,21 @@ class TestSlack(object):
     Online test rely on setting the env variable NOTIFIERS_SLACK_WEBHOOK_URL
     """
 
-    def test_slack_metadata(self):
-        p = get_notifier('slack')
-        assert p.metadata == {
+    def test_slack_metadata(self, provider):
+        assert provider.metadata == {
             'base_url': 'https://hooks.slack.com/services/',
-            'provider_name': 'slack',
+            'name': 'slack',
             'site_url': 'https://api.slack.com/incoming-webhooks'
         }
 
     @pytest.mark.online
-    def test_sanity(self):
-        p = get_notifier('slack')
+    def test_sanity(self, provider):
         data = {'message': 'foo'}
-        rsp = p.notify(**data)
+        rsp = provider.notify(**data)
         rsp.raise_on_errors()
 
     @pytest.mark.online
-    def test_all_options(self):
-        p = get_notifier('slack')
+    def test_all_options(self, provider):
         data = {
             'message': 'http://foo.com',
             'icon_emoji': 'poop',
@@ -87,5 +84,5 @@ class TestSlack(object):
             ]
 
         }
-        rsp = p.notify(**data)
+        rsp = provider.notify(**data)
         rsp.raise_on_errors()

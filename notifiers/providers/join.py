@@ -1,17 +1,75 @@
 import requests
+import json
 
-from ..core import Provider, Response
+from ..core import Provider, Response, ProviderResource
 from ..utils.json_schema import one_or_more, list_to_commas
-from ..utils.helpers import create_response
-from ..exceptions import NotifierException
+from ..exceptions import ResourceError
 
 
-class Join(Provider):
+class JoinProxy:
+    name = 'join'
+    base_url = 'https://joinjoaomgcd.appspot.com/_ah/api/messaging/v1'
+
+    def _join_request(self, url: str, data: dict) -> tuple:
+        # Can 't use generic requests util since API doesn't always return error status
+        errors = None
+        try:
+            response = requests.get(url, params=data)
+            response.raise_for_status()
+            rsp = response.json()
+            if not rsp['success']:
+                errors = [rsp['errorMessage']]
+        except requests.RequestException as e:
+            if e.response is not None:
+                response = e.response
+                try:
+                    errors = [response.json()['errorMessage']]
+                except json.decoder.JSONDecodeError:
+                    errors = [response.text]
+            else:
+                response = None
+                errors = [(str(e))]
+
+        return response, errors
+
+
+class JoinDevices(JoinProxy, ProviderResource):
+    """Return a list of Join devices IDs"""
+    resource_name = 'devices'
+    devices_url = '/listDevices'
+    _required = {
+        'required': [
+            'apikey'
+        ]
+    }
+
+    _schema = {
+        'type': 'object',
+        'properties': {
+            'apikey': {
+                'type': 'string',
+                'title': 'user API key'
+            }
+        },
+        'additionalProperties': False
+    }
+
+    def _get_resource(self, data: dict):
+        url = self.base_url + self.devices_url
+        response, errors = self._join_request(url, data)
+        if errors:
+            raise ResourceError(errors=errors,
+                                resource=self.resource_name,
+                                provider=self.name,
+                                data=data,
+                                response=response)
+        return response.json()['records']
+
+
+class Join(JoinProxy, Provider):
     """Send Join notifications"""
-    base_url = 'https://joinjoaomgcd.appspot.com/_ah/api/messaging/v1/sendPush'
-    devices_url = 'https://joinjoaomgcd.appspot.com/_ah/api/registration/v1/listDevices'
+    push_url = '/sendPush'
     site_url = 'https://joaoapps.com/join/api/'
-    provider_name = 'join'
 
     _required = {
         'dependencies': {
@@ -150,12 +208,6 @@ class Join(Provider):
             'deviceId': 'group.all'
         }
 
-    @property
-    def metadata(self) -> dict:
-        data = super().metadata
-        data['devices_url'] = self.devices_url
-        return data
-
     def _prepare_data(self, data: dict) -> dict:
         if data.get('deviceIds'):
             data['deviceIds'] = list_to_commas(data['deviceIds'])
@@ -165,44 +217,17 @@ class Join(Provider):
         return data
 
     def _send_notification(self, data: dict) -> Response:
-        response_data = {
-            'provider_name': self.provider_name,
-            'data': data
-        }
-        try:
-            response = requests.get(self.base_url, params=data)
-            response.raise_for_status()
-            response_data['response'] = response
-            rsp = response.json()
-            if not rsp['success']:
-                response_data['errors'] = [rsp['errorMessage']]
-        except requests.RequestException as e:
-            if e.response is not None:
-                response_data['response'] = e.response
-                response_data['errors'] = [e.response.json()['errorMessage']]
-            else:
-                response_data['errors'] = [(str(e))]
+        # Can 't use generic requests util since API doesn't always return error status
+        url = self.base_url + self.push_url
+        response, errors = self._join_request(url, data)
+        return self.create_response(data, response, errors)
 
-        return create_response(**response_data)
+    @property
+    def resources(self):
+        return [
+            'devices'
+        ]
 
-    def devices(self, apikey: str) -> list:
-        """
-        Returns a list of devices corresponding with the api key
-
-        :param apikey: user api key
-        :return: List of devices
-        """
-        params = {
-            'apikey': apikey
-        }
-        try:
-            response = requests.get(self.devices_url, params=params)
-            response.raise_for_status()
-            rsp = response.json()
-            if not rsp['success']:
-                message = rsp['errorMessage']
-                raise NotifierException(provider=self.provider_name, message=message)
-        except requests.RequestException as e:
-            message = e.response.json()['errorMessage']
-            raise NotifierException(provider=self.provider_name, message=message)
-        return response.json()['records']
+    @property
+    def devices(self) -> JoinDevices:
+        return JoinDevices()

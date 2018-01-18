@@ -1,14 +1,12 @@
-import requests
-
 from ..core import Provider, Response
-from ..utils.helpers import create_response
+from ..utils import requests
 
 
 class SimplePush(Provider):
     """Send SimplePush notifications"""
     base_url = 'https://api.simplepush.io/send'
     site_url = 'https://simplepush.io/'
-    provider_name = 'simplepush'
+    name = 'simplepush'
 
     _required = {'required': ['key', 'message']}
     _schema = {
@@ -39,18 +37,6 @@ class SimplePush(Provider):
         return data
 
     def _send_notification(self, data: dict) -> Response:
-        response_data = {
-            'provider_name': self.provider_name,
-            'data': data
-        }
-        try:
-            response = requests.post(self.base_url, data=data)
-            response.raise_for_status()
-            response_data['response'] = response
-        except requests.RequestException as e:
-            if e.response is not None:
-                response_data['response'] = e.response
-                response_data['errors'] = [e.response.json()['message']]
-            else:
-                response_data['errors'] = [(str(e))]
-        return create_response(**response_data)
+        path_to_errors = 'message',
+        response, errors = requests.post(self.base_url, data=data, path_to_errors=path_to_errors)
+        return self.create_response(data, response, errors)

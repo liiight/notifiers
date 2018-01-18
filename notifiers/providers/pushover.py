@@ -1,16 +1,15 @@
-import requests
-
 from ..core import Provider, Response
+from ..utils import requests
 from ..utils.json_schema import one_or_more, list_to_commas
-from ..utils.helpers import create_response
 
 
 class Pushover(Provider):
     """Send Pushover notifications"""
     base_url = 'https://api.pushover.net/1/messages.json'
     site_url = 'https://pushover.net/'
-    provider_name = 'pushover'
+    name = 'pushover'
 
+    # todo move to be resource
     __sounds = ['pushover', 'bike', 'bugle', 'cashregister', 'classical', 'cosmic', 'falling', 'gamelan', 'incoming',
                 'intermission', 'magic', 'mechanical', 'pianobar', 'siren', 'spacealarm', 'tugboat', 'alien', 'climb',
                 'persistent', 'echo', 'updown', 'none']
@@ -100,21 +99,9 @@ class Pushover(Provider):
         return data
 
     def _send_notification(self, data: dict) -> Response:
-        response_data = {
-            'provider_name': self.provider_name,
-            'data': data
-        }
-        try:
-            response = requests.post(self.base_url, data=data)
-            response.raise_for_status()
-            response_data['response'] = response
-        except requests.RequestException as e:
-            if e.response is not None:
-                response_data['response'] = e.response
-                response_data['errors'] = e.response.json()['errors']
-            else:
-                response_data['errors'] = [(str(e))]
-        return create_response(**response_data)
+        path_to_errors = 'errors',
+        response, errors = requests.post(self.base_url, data=data, path_to_errors=path_to_errors)
+        return self.create_response(data, response, errors)
 
     @property
     def metadata(self) -> dict:

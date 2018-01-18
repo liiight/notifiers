@@ -1,26 +1,8 @@
+import logging
+import os
 from distutils.util import strtobool
 
-import requests
-
-from ..core import Response
-
-FAILURE_STATUS = 'Failure'
-SUCCESS_STATUS = 'Success'
-
-
-def create_response(provider_name: str, data: dict, response: requests.Response = None, failed: bool = False,
-                    errors: list = None) -> Response:
-    """
-    Helper function to generate a :class:`Response` object
-
-    :param provider_name: Name of the provider creating the response
-    :param data: The data that was used to send the notification
-    :param response: :class:`requests.Response` if exist
-    :param failed: Flag to determine if response succeeded or not
-    :param errors: List of errors if relevant
-    """
-    status = FAILURE_STATUS if failed else SUCCESS_STATUS
-    return Response(status=status, provider=provider_name, data=data, response=response, errors=errors)
+log = logging.getLogger('notifiers')
 
 
 def text_to_bool(value: str) -> bool:
@@ -33,3 +15,38 @@ def text_to_bool(value: str) -> bool:
         return bool(strtobool(value))
     except (ValueError, AttributeError):
         return value is not None
+
+
+def merge_dicts(target_dict: dict, merge_dict: dict) -> dict:
+    """
+    Merges ``merge_dict`` into ``target_dict`` if the latter does not already contain a value for each of the key
+    names in ``merge_dict``. Used to cleanly merge default and environ data into notification payload.
+
+    :param target_dict: The target dict to merge into and return, the user provided data for example
+    :param merge_dict: The data that should be merged into the target data
+    :return: A dict of merged data
+    """
+    log.debug('merging dict %s into %s', merge_dict, target_dict)
+    for key, value in merge_dict.items():
+        if key not in target_dict:
+            target_dict[key] = value
+    return target_dict
+
+
+def dict_from_environs(prefix: str, name: str, args: list) -> dict:
+    """
+    Return a dict of environment variables correlating to the arguments list, main name and prefix like so:
+    [prefix]_[name]_[arg]
+
+    :param prefix: The environ prefix to use
+    :param name: Main part
+    :param args: List of args to iterate over
+    :return: A dict of found environ values
+    """
+    environs = {}
+    log.debug("starting to collect environs using prefix: '%s'", prefix)
+    for arg in args:
+        environ = f'{prefix}{name}_{arg}'.upper()
+        if os.environ.get(environ):
+            environs[arg] = os.environ[environ]
+    return environs

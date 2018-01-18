@@ -1,16 +1,15 @@
-import requests
-
 from ..core import Provider, Response
-from ..utils.helpers import create_response
 from ..exceptions import NotifierException
+from ..utils import requests
 
 
 class Zulip(Provider):
     """Send Zulip notifications"""
-    provider_name = 'zulip'
+    name = 'zulip'
     site_url = 'https://zulipchat.com/api/'
     api_endpoint = '/api/v1/messages'
     base_url = 'https://{domain}.zulipchat.com'
+    path_to_errors = 'msg',
 
     __type = {
         'type': 'string',
@@ -83,26 +82,13 @@ class Zulip(Provider):
 
     def _validate_data_dependencies(self, data: dict) -> dict:
         if data['type'] == 'stream' and not data.get('subject'):
-            raise NotifierException(provider=self.provider_name,
+            raise NotifierException(provider=self.name,
                                     message="'subject' is required when 'type' is 'stream'",
                                     data=data)
         return data
 
     def _send_notification(self, data: dict) -> Response:
         url = data.pop('url')
-        response_data = {
-            'provider_name': self.provider_name,
-            'data': data
-        }
         auth = (data.pop('email'), data.pop('api_key'))
-        try:
-            response = requests.post(url, data=data, auth=auth)
-            response.raise_for_status()
-            response_data['response'] = response
-        except requests.RequestException as e:
-            if e.response is not None:
-                response_data['response'] = e.response
-                response_data['errors'] = [e.response.json()['msg']]
-            else:
-                response_data['errors'] = [(str(e))]
-        return create_response(**response_data)
+        response, errors = requests.post(url, data=data, auth=auth, path_to_errors=self.path_to_errors)
+        return self.create_response(data, response, errors)
