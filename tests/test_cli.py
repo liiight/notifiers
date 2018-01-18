@@ -70,6 +70,12 @@ class TestCLI:
         assert result.exit_code == 0
         assert '"option_with_default": "foo"' in result.output
 
+    def test_resources(self, cli_runner):
+        cmd = f'{mock_name} resources'.split()
+        result = cli_runner(cmd)
+        assert result.exit_code == 0
+        assert 'mock_rsrc' in result.output
+
     def test_piping_input(self, cli_runner):
         """Test piping in message"""
         cmd = f'{mock_name} notify --required foo'.split()

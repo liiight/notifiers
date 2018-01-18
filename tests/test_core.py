@@ -164,7 +164,7 @@ class TestCore:
         assert rsp == {'status': 'success'}
 
 
-class TestUtils:
+class TestHelpers:
 
     @pytest.mark.parametrize('text, result', [
         ('y', True),
