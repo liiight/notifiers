@@ -87,6 +87,7 @@ class SMTP(Provider):
     }
 
     def __init__(self):
+        super().__init__()
         self.smtp_server = None
         self.configuration = None
 

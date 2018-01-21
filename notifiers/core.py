@@ -146,7 +146,7 @@ class SchemaResource(ABC):
         """
         return data
 
-    def _validate_schema(self, validator: jsonschema.Draft4Validator):
+    def _validate_schema(self):
         """
         Validates provider schema for syntax issues. Raises :class:`~notifiers.exceptions.SchemaError` if relevant
 
@@ -155,11 +155,11 @@ class SchemaResource(ABC):
         """
         try:
             log.debug('validating provider schema')
-            validator.check_schema(self.schema)
+            self.validator.check_schema(self.schema)
         except jsonschema.SchemaError as e:
             raise SchemaError(schema_error=e.message, provider=self.name, data=self.schema)
 
-    def _validate_data(self, data: dict, validator: jsonschema.Draft4Validator):
+    def _validate_data(self, data: dict):
         """
         Validates data against provider schema. Raises :class:`~notifiers.exceptions.BadArguments` if relevant
 
@@ -168,7 +168,7 @@ class SchemaResource(ABC):
         :raises: :class:`~notifiers.exceptions.BadArguments`
         """
         log.debug('validating provided data')
-        e = best_match(validator.iter_errors(data))
+        e = best_match(self.validator.iter_errors(data))
         if e:
             custom_error_key = f'error_{e.validator}'
             msg = e.schema[custom_error_key] if e.schema.get(custom_error_key) else e.message
@@ -193,19 +193,20 @@ class SchemaResource(ABC):
         :param data: The raw data passed by the notifiers client
         :return: Processed data
         """
-        validator = jsonschema.Draft4Validator(self.schema)
-        self._validate_schema(validator)
-
         env_prefix = data.pop('env_prefix', None)
         environs = self._get_environs(env_prefix)
         if environs:
             data = merge_dicts(data, environs)
 
-        self._validate_data(data, validator)
+        self._validate_data(data)
         data = self._prepare_data(data)
         data = self._merge_defaults(data)
         data = self._validate_data_dependencies(data)
         return data
+
+    def __init__(self):
+        self.validator = jsonschema.Draft4Validator(self.schema)
+        self._validate_schema()
 
 
 class Provider(SchemaResource, ABC):

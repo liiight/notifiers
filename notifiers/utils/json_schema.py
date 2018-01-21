@@ -12,8 +12,7 @@ def one_or_more(schema: dict, unique_items: bool = True) -> dict:
                 'type': 'array',
                 'items': schema,
                 'minItems': 1,
-                'uniqueItems': unique_items,
-                'title': schema.get('title')
+                'uniqueItems': unique_items
             },
             schema
         ]
