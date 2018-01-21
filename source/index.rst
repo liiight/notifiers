@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to notifiers's documentation!
+Welcome to Notifiers documentation!
 =====================================
 
 .. include:: ../README.rst
@@ -31,6 +31,7 @@ API documentation
    api/core
    api/exceptions
    api/providers
+   api/utils
 
 Development documentation
 -------------------------

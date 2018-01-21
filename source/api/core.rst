@@ -3,6 +3,10 @@ Core
 
 Core API reference
 
+.. autoclass:: notifiers.core.SchemaResource
+   :members:
+   :private-members:
+
 .. autoclass:: notifiers.core.Provider
    :members:
    :private-members:

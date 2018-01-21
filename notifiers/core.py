@@ -21,8 +21,7 @@ class Response:
     A wrapper for the Notification response.
 
     :param status: Response status string. ``SUCCESS`` or ``FAILED``
-    :param provider: Provider name that returned that response.
-     Correlates to :attrib:`Provider.name`
+    :param provider: Provider name that returned that response. Correlates to :attr:`~notifiers.core.Provider.name`
     :param data: The notification data that was used for the notification
     :param response: The response object that was returned. Usually :class:`requests.Response`
     :param errors: Holds a list of errors if relevant
@@ -40,9 +39,9 @@ class Response:
 
     def raise_on_errors(self):
         """
-        Raises a :class:`NotificationError` if response hold errors
+        Raises a :class:`~notifiers.exceptions.NotificationError` if response hold errors
 
-        :raise :class:`NotificationError`:
+        :raises: :class:`~notifiers.exceptions.NotificationError`: If response has errors
         """
         if self.errors:
             raise NotificationError(provider=self.provider, data=self.data, errors=self.errors, response=self.response)
@@ -102,7 +101,7 @@ class SchemaResource(ABC):
 
     def create_response(self, data: dict = None, response: requests.Response = None, errors: list = None) -> Response:
         """
-        Helper function to generate a :class:`Response` object
+        Helper function to generate a :class:`~notifiers.core.Response` object
 
         :param name: Name of the provider creating the response
         :param data: The data that was used to send the notification
@@ -114,7 +113,8 @@ class SchemaResource(ABC):
 
     def _merge_defaults(self, data: dict) -> dict:
         """
-        Convenience method that calls :func:`_merge_dict_into_dict` in order to merge default values
+        Convenience method that calls :func:`~notifiers.utils.helpers.merge_dicts` in order to merge
+        default values
 
         :param data: Notification data
         :return: A merged dict of provided data with added defaults
@@ -148,10 +148,10 @@ class SchemaResource(ABC):
 
     def _validate_schema(self, validator: jsonschema.Draft4Validator):
         """
-        Validates provider schema for syntax issues. Raises :class:`SchemaError` if relevant
+        Validates provider schema for syntax issues. Raises :class:`~notifiers.exceptions.SchemaError` if relevant
 
         :param validator: :class:`jsonschema.Draft4Validator`
-        :raises: :class:`SchemaError`
+        :raises: :class:`~notifiers.exceptions.SchemaError`
         """
         try:
             log.debug('validating provider schema')
@@ -161,11 +161,11 @@ class SchemaResource(ABC):
 
     def _validate_data(self, data: dict, validator: jsonschema.Draft4Validator):
         """
-        Validates data against provider schema. Raises :class:`BadArguments` if relevant
+        Validates data against provider schema. Raises :class:`~notifiers.exceptions.BadArguments` if relevant
 
         :param data: Data to validate
         :param validator: :class:`jsonschema.Draft4Validator`
-        :raises: :class:`BadArguments`
+        :raises: :class:`~notifiers.exceptions.BadArguments`
         """
         log.debug('validating provided data')
         e = best_match(validator.iter_errors(data))
@@ -181,7 +181,7 @@ class SchemaResource(ABC):
 
         :param data: Data to validate
         :return: Return data if its valid
-        :raises: :class:`NotifierException`
+        :raises: :class:`~notifiers.exceptions.NotifierException`
         """
         return data
 
@@ -253,7 +253,7 @@ class Provider(SchemaResource, ABC):
         """
         The main method to send notifications. Prepares the data via the
         :meth:`~notifiers.core.SchemaResource._prepare_data` method and then sends the notification
-          via the :meth:`~notifiers.core.Providers._send_notification` method
+          via the :meth:`~notifiers.core.Provider._send_notification` method
 
         :param kwargs: Notification data
         :return: A :class:`~notifiers.core.Response` object
@@ -288,9 +288,9 @@ from .providers import _all_providers
 
 def get_notifier(provider_name: str) -> Provider:
     """
-    Convenience method to return an instantiated :class:`Provider` object according to it ``provider_name``
+    Convenience method to return an instantiated :class:`~notifiers.core.Provider` object according to it ``name``
 
-    :param provider_name: The ``name`` of the requested :class:`Provider`
+    :param provider_name: The ``name`` of the requested :class:`~notifiers.core.Provider`
     :return: :class:`Provider` or None
     """
     if provider_name in _all_providers:
@@ -299,5 +299,5 @@ def get_notifier(provider_name: str) -> Provider:
 
 
 def all_providers() -> list:
-    """Returns a list of all :class:`Provider` names"""
+    """Returns a list of all :class:`~notifiers.core.Provider` names"""
     return list(_all_providers.keys())
