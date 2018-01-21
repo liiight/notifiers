@@ -5,7 +5,7 @@ from ..exceptions import ResourceError
 
 class GitterProxy:
     """Shared attributes between :class:`~notifiers.providers.gitter.GitterRooms` and
-    :class:`~notifiers.providers.gitter.GitterGitter`"""
+    :class:`~notifiers.providers.gitter.Gitter`"""
     name = 'gitter'
     path_to_errors = 'errors', 'error'
     base_url = 'https://api.gitter.im/v1/rooms'

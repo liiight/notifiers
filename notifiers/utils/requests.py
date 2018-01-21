@@ -20,7 +20,7 @@ class RequestsHelper:
         :param raise_for_status: Should an exception be raised for a failed response. Default is **True**
         :param args: Additional args to be sent to the request
         :param kwargs: Additional args to be sent to the request
-        :return: Dict of response body or original :class:`requests.Response <Response>`
+        :return: Dict of response body or original :class:`requests.Response`
         """
         session = kwargs.get('session', requests.Session())
         log.debug('sending a %s request to %s with args: %s kwargs: %s', method.upper(), url, args, kwargs)

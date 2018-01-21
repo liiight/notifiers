@@ -26,12 +26,8 @@ API documentation
 -----------------
 
 .. toctree::
-   :maxdepth: 2
 
-   api/core
-   api/exceptions
-   api/providers
-   api/utils
+   api/index
 
 Development documentation
 -------------------------

@@ -124,7 +124,7 @@ class SchemaResource(ABC):
 
     def _get_environs(self, prefix: str = None) -> dict:
         """
-        Fetches set environment variables if such exist.
+        Fetches set environment variables if such exist, via the :func:`~notifiers.utils.helpers.dict_from_environs`
         Searches for `[PREFIX_NAME]_[PROVIDER_NAME]_[ARGUMENT]` for each of the arguments defined in the schema
 
         :param prefix: The environ prefix to use. If not supplied, uses the default

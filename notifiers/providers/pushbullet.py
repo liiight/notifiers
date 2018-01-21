@@ -4,7 +4,7 @@ from ..exceptions import ResourceError
 
 
 class PushbulletProxy:
-    """Shared attributes between PushbulletDevices and Pushbullet"""
+    """Shared attributes between :class:`PushbulletDevices` and :class:`Pushbullet`"""
     name = 'pushbullet'
     path_to_errors = 'error', 'message'
 

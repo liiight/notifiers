@@ -12,21 +12,22 @@ def one_or_more(schema: dict, unique_items: bool = True) -> dict:
                 'type': 'array',
                 'items': schema,
                 'minItems': 1,
-                'uniqueItems': unique_items
+                'uniqueItems': unique_items,
+                'title': schema.get('title')
             },
             schema
         ]
     }
 
 
-def list_to_commas(list_: list) -> str:
+def list_to_commas(list_of_args) -> str:
     """
-    Converts a list of items to a comma separated list. If `list_` is
+    Converts a list of items to a comma separated list. If ``list_of_args`` is
     not a list, just return it back
 
-    :param list_: List of items
+    :param list_of_args: List of items
     :return: A string representing a comma separated list.
     """
-    if isinstance(list_, list):
-        return ",".join(list_)
-    return list_
+    if isinstance(list_of_args, list):
+        return ",".join(list_of_args)
+    return list_of_args

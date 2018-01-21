@@ -67,13 +67,17 @@ Advantages
 
 Installation
 ------------
-Via pip::
+Via pip:
 
-    pip install notifiers
+.. code-block:: console
 
-Or Dockerhub::
+    $ pip install notifiers
 
-    docker pull liiight/notifiers
+Or Dockerhub:
+
+.. code-block:: console
+
+    $ docker pull liiight/notifiers
 
 
 Basic Usage

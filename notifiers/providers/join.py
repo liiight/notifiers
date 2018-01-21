@@ -7,6 +7,7 @@ from ..exceptions import ResourceError
 
 
 class JoinProxy:
+    """Shared resources between :class:`Join` and :class:`JoinDevices`"""
     name = 'join'
     base_url = 'https://joinjoaomgcd.appspot.com/_ah/api/messaging/v1'
 

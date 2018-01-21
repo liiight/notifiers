@@ -4,6 +4,7 @@ from ..utils import requests
 
 
 class TelegramProxy:
+    """Shared resources between :class:`TelegramUpdates` and :class:`Telegram`"""
     base_url = 'https://api.telegram.org/bot{token}'
     name = 'telegram'
     path_to_errors = 'description',

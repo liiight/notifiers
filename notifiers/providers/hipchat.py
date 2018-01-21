@@ -6,7 +6,7 @@ from ..exceptions import ResourceError
 
 
 class HipChatProxy:
-    """Shared attributed between resources and HipChatResourceProxy"""
+    """Shared attributed between resources and :class:`HipChatResourceProxy`"""
     base_url = 'https://{group}.hipchat.com'
     name = 'hipchat'
     path_to_errors = 'error', 'message'
@@ -24,7 +24,7 @@ class HipChatProxy:
 
 
 class HipChatResourceProxy(HipChatProxy):
-    """Common resources attributes that should not override HipChat attributes"""
+    """Common resources attributes that should not override :class:`HipChat` attributes"""
     _required = {
         'allOf': [
             {
