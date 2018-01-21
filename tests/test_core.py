@@ -36,7 +36,8 @@ class TestCore:
                 ]
             },
             'required': {'type': 'string'}, 'option_with_default': {'type': 'string'},
-            'message': {'type': 'string'}}
+            'message': {'type': 'string'}
+        }
 
         assert mock_provider.required == {'required': ['required']}
         rsp = mock_provider.notify(**self.valid_data)
@@ -56,12 +57,10 @@ class TestCore:
         with pytest.raises(BadArguments):
             mock_provider.notify(**data)
 
-    def test_bad_schema(self, mock_provider):
+    def test_bad_schema(self, bad_schema):
         """Test illegal JSON schema"""
-        mock_provider._schema = {'type': 'bad_schema'}
-        data = {'foo': 'bar'}
         with pytest.raises(SchemaError):
-            mock_provider.notify(**data)
+            bad_schema()
 
     def test_prepare_data(self, mock_provider):
         """Test ``prepare_data()`` method"""

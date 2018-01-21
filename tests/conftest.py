@@ -9,7 +9,6 @@ from notifiers.core import Provider, Response, get_notifier, ProviderResource
 from notifiers.providers import _all_providers
 from notifiers.utils.helpers import text_to_bool
 from notifiers.utils.json_schema import one_or_more, list_to_commas
-from notifiers.exceptions import ResourceError
 
 log = logging.getLogger(__name__)
 
@@ -92,13 +91,33 @@ def mock_provider(monkeypatch):
 
 
 @pytest.fixture
-def bad_provider() -> Provider:
+def bad_provider():
     """Returns an unimplemented :class:`notifiers.core.Provider` class for testing"""
 
     class BadProvider(Provider):
         pass
 
     return BadProvider
+
+
+@pytest.fixture
+def bad_schema():
+    """Return a provider with an invalid JSON schema"""
+
+    class BadSchema(Provider):
+        _required = {'required': ['fpp']}
+        _schema = {
+            'type': 'banana'
+        }
+
+        name = 'bad_schmea'
+        base_url = ''
+        site_url = ''
+
+        def _send_notification(self, data: dict):
+            pass
+
+    return BadSchema
 
 
 @pytest.fixture(scope='class')
