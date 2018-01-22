@@ -99,6 +99,25 @@ From CLI
 
     $ notifiers pushover notify --user foo --token baz "This is so easy!"
 
+As a logger
+-----------
+
+Directly add to your existing stdlib logging:
+
+.. code-block:: python
+
+    >>> import logging
+    >>> from notifiers.logging import NotificationHandler
+    >>> log = logging.getLogger(__name__)
+    >>> defaults = {
+            'token': 'foo,
+            'user': 'bar
+        }
+    >>> hdlr = NotificationHandler('pushover', defaults=defaults)
+    >>> hdlr.setLevel(logging.ERROR)
+    >>> log.addHandler(hdlr)
+    >>> log.error('And just like that, you get notified about all your errors!')
+
 In the near future
 ------------------
 
