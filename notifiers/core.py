@@ -254,7 +254,7 @@ class Provider(SchemaResource, ABC):
         """
         The main method to send notifications. Prepares the data via the
         :meth:`~notifiers.core.SchemaResource._prepare_data` method and then sends the notification
-          via the :meth:`~notifiers.core.Provider._send_notification` method
+        via the :meth:`~notifiers.core.Provider._send_notification` method
 
         :param kwargs: Notification data
         :param raise_on_errors: Should the :meth:`~notifiers.core.Response.raise_on_errors` be invoked immediately

@@ -21,3 +21,10 @@ Core API reference
 .. autofunction:: notifiers.core.get_notifier
 
 .. autofunction:: notifiers.core.all_providers
+
+Logging
+=======
+
+.. autoclass:: notifiers.logging.NotificationHandler
+   :members:
+

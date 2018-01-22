@@ -124,7 +124,7 @@ Notifiers CLI enable using pipe to directly pass value to the ``message`` argume
 Environment variables
 =====================
 
-Environment variables are respected by all means of notification by :mod:`notifiers` and the CLI is no different to that aspect.
+:ref:`environs` are respected by all means of notification by notifiers and the CLI is no different to that aspect.
 If you defined for example ``NOTIFIERS_PUSHOVER_TOKEN`` and ``NOTIFIERS_PUSHOVER_USER`` you can simply run:
 
 .. code-block:: console

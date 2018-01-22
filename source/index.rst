@@ -21,6 +21,7 @@ Documentation
    installation
    usage
    CLI
+   Logger
 
 API documentation
 -----------------
