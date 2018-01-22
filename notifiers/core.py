@@ -287,16 +287,20 @@ class ProviderResource(SchemaResource, ABC):
 from .providers import _all_providers
 
 
-def get_notifier(provider_name: str) -> Provider:
+def get_notifier(provider_name: str, strict: bool = False) -> Provider:
     """
     Convenience method to return an instantiated :class:`~notifiers.core.Provider` object according to it ``name``
 
     :param provider_name: The ``name`` of the requested :class:`~notifiers.core.Provider`
+    :param strict: Raises a :class:`ValueError` if the given provider string was not found
     :return: :class:`Provider` or None
+    :raises ValueError: In case ``strict`` is True and provider not found
     """
     if provider_name in _all_providers:
         log.debug("found a match for '%s', returning", provider_name)
         return _all_providers[provider_name]()
+    elif strict:
+        raise ValueError(f"Provider '{provider_name}' was not found!")
 
 
 def all_providers() -> list:
