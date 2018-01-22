@@ -26,7 +26,7 @@ class NotificationHandler(logging.Handler):
         data = copy.deepcopy(self.defaults)
         data['message'] = self.format(record)
         try:
-            self.provider.notify(**data)
+            self.provider.notify(raise_on_errors=True, **data)
         except Exception:
             self.handleError(record)
 
@@ -38,8 +38,9 @@ class NotificationHandler(logging.Handler):
     def handleError(self, record):
         if logging.raiseExceptions:
             t, v, tb = sys.exc_info()
-            if issubclass(t, NotifierException):
-                if self.fallback:
-                    msg = f"Could not log msg to provider {self.provider.name}!\n{v}"
-                    self.fallback_defaults['message'] = msg
-                    self.fallback.notify(**self.fallback_defaults)
+            if issubclass(t, NotifierException) and self.fallback:
+                msg = f"Could not log msg to provider '{self.provider.name}'!\n{v}"
+                self.fallback_defaults['message'] = msg
+                self.fallback.notify(**self.fallback_defaults)
+            else:
+                super().handle(record)

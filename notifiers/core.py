@@ -250,17 +250,23 @@ class Provider(SchemaResource, ABC):
         """
         pass
 
-    def notify(self, **kwargs) -> Response:
+    def notify(self, raise_on_errors: bool = False, **kwargs) -> Response:
         """
         The main method to send notifications. Prepares the data via the
         :meth:`~notifiers.core.SchemaResource._prepare_data` method and then sends the notification
           via the :meth:`~notifiers.core.Provider._send_notification` method
 
         :param kwargs: Notification data
+        :param raise_on_errors: Should the :meth:`~notifiers.core.Response.raise_on_errors` be invoked immediately
         :return: A :class:`~notifiers.core.Response` object
+        :raises: :class:`~notifiers.exceptions.NotificationError` if ``raise_on_errors`` is set to True and response
+         contained errors
         """
         data = self._process_data(**kwargs)
-        return self._send_notification(data)
+        rsp = self._send_notification(data)
+        if raise_on_errors:
+            rsp.raise_on_errors()
+        return rsp
 
 
 class ProviderResource(SchemaResource, ABC):
