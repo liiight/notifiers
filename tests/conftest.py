@@ -13,78 +13,81 @@ from notifiers.utils.json_schema import one_or_more, list_to_commas
 log = logging.getLogger(__name__)
 
 
+class MockProxy:
+    name = 'mock_provider'
+
+
+class MockResource(MockProxy, ProviderResource):
+    resource_name = 'mock_resource'
+
+    _required = {'required': ['key']}
+    _schema = {
+        'type': 'object',
+        'properties': {
+            'key': {
+                'type': 'string',
+                'title': 'required key'
+            },
+            'another_key': {
+                'type': 'integer',
+                'title': 'non-required key'
+            }
+        },
+        'additionalProperties': False
+    }
+
+    def _get_resource(self, data: dict):
+        return {'status': 'success'}
+
+
+class MockProvider(MockProxy, Provider):
+    """Mock Provider"""
+    base_url = 'https://api.mock.com'
+    _required = {'required': ['required']}
+    _schema = {
+        'type': 'object',
+        'properties': {
+            'not_required': one_or_more({
+                'type': 'string',
+                'title': 'example for not required arg'
+            }),
+            'required': {'type': 'string'},
+            'option_with_default': {'type': 'string'},
+            'message': {'type': 'string'}
+        },
+        'additionalProperties': False
+    }
+    site_url = 'https://www.mock.com'
+
+    @property
+    def defaults(self):
+        return {
+            'option_with_default': 'foo'
+        }
+
+    def _send_notification(self, data: dict):
+        return Response(status='success', provider=self.name, data=data)
+
+    def _prepare_data(self, data: dict):
+        if data.get('not_required'):
+            data['not_required'] = list_to_commas(data['not_required'])
+        data['required'] = list_to_commas(data['required'])
+        return data
+
+    @property
+    def resources(self):
+        return [
+            'mock_rsrc'
+        ]
+
+    @property
+    def mock_rsrc(self):
+        return MockResource()
+
+
 @pytest.fixture
 def mock_provider(monkeypatch):
     """Return a generic :class:`notifiers.core.Provider` class"""
-
-    class MockProxy:
-        name = 'mock_provider'
-
-    class MockResource(MockProxy, ProviderResource):
-        resource_name = 'mock_resource'
-
-        _required = {'required': ['key']}
-        _schema = {
-            'type': 'object',
-            'properties': {
-                'key': {
-                    'type': 'string',
-                    'title': 'required key'
-                },
-                'another_key': {
-                    'type': 'integer',
-                    'title': 'non-required key'
-                }
-            },
-            'additionalProperties': False
-        }
-
-        def _get_resource(self, data: dict):
-            return {'status': 'success'}
-
-    class MockProvider(MockProxy, Provider):
-        """Mock Provider"""
-        base_url = 'https://api.mock.com'
-        _required = {'required': ['required']}
-        _schema = {
-            'type': 'object',
-            'properties': {
-                'not_required': one_or_more({
-                    'type': 'string',
-                    'title': 'example for not required arg'
-                }),
-                'required': {'type': 'string'},
-                'option_with_default': {'type': 'string'},
-                'message': {'type': 'string'}
-            },
-            'additionalProperties': False
-        }
-        site_url = 'https://www.mock.com'
-
-        @property
-        def defaults(self):
-            return {
-                'option_with_default': 'foo'
-            }
-
-        def _send_notification(self, data: dict):
-            return Response(status='success', provider=self.name, data=data)
-
-        def _prepare_data(self, data: dict):
-            if data.get('not_required'):
-                data['not_required'] = list_to_commas(data['not_required'])
-            data['required'] = list_to_commas(data['required'])
-            return data
-
-        @property
-        def resources(self):
-            return [
-                'mock_rsrc'
-            ]
-
-        @property
-        def mock_rsrc(self):
-            return MockResource()
 
     monkeypatch.setitem(_all_providers, MockProvider.name, MockProvider)
     return MockProvider()
