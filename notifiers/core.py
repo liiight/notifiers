@@ -250,17 +250,23 @@ class Provider(SchemaResource, ABC):
         """
         pass
 
-    def notify(self, **kwargs) -> Response:
+    def notify(self, raise_on_errors: bool = False, **kwargs) -> Response:
         """
         The main method to send notifications. Prepares the data via the
         :meth:`~notifiers.core.SchemaResource._prepare_data` method and then sends the notification
           via the :meth:`~notifiers.core.Provider._send_notification` method
 
         :param kwargs: Notification data
+        :param raise_on_errors: Should the :meth:`~notifiers.core.Response.raise_on_errors` be invoked immediately
         :return: A :class:`~notifiers.core.Response` object
+        :raises: :class:`~notifiers.exceptions.NotificationError` if ``raise_on_errors`` is set to True and response
+         contained errors
         """
         data = self._process_data(**kwargs)
-        return self._send_notification(data)
+        rsp = self._send_notification(data)
+        if raise_on_errors:
+            rsp.raise_on_errors()
+        return rsp
 
 
 class ProviderResource(SchemaResource, ABC):
@@ -287,16 +293,20 @@ class ProviderResource(SchemaResource, ABC):
 from .providers import _all_providers
 
 
-def get_notifier(provider_name: str) -> Provider:
+def get_notifier(provider_name: str, strict: bool = False) -> Provider:
     """
     Convenience method to return an instantiated :class:`~notifiers.core.Provider` object according to it ``name``
 
     :param provider_name: The ``name`` of the requested :class:`~notifiers.core.Provider`
+    :param strict: Raises a :class:`ValueError` if the given provider string was not found
     :return: :class:`Provider` or None
+    :raises ValueError: In case ``strict`` is True and provider not found
     """
     if provider_name in _all_providers:
         log.debug("found a match for '%s', returning", provider_name)
         return _all_providers[provider_name]()
+    elif strict:
+        raise ValueError(f"Provider '{provider_name}' was not found!")
 
 
 def all_providers() -> list:

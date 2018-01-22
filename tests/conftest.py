@@ -1,6 +1,7 @@
 import logging
 import os
 from functools import partial
+from unittest.mock import MagicMock
 
 import pytest
 from click.testing import CliRunner
@@ -9,83 +10,86 @@ from notifiers.core import Provider, Response, get_notifier, ProviderResource
 from notifiers.providers import _all_providers
 from notifiers.utils.helpers import text_to_bool
 from notifiers.utils.json_schema import one_or_more, list_to_commas
+from notifiers.logging import NotificationHandler
 
 log = logging.getLogger(__name__)
+
+
+class MockProxy:
+    name = 'mock_provider'
+
+
+class MockResource(MockProxy, ProviderResource):
+    resource_name = 'mock_resource'
+
+    _required = {'required': ['key']}
+    _schema = {
+        'type': 'object',
+        'properties': {
+            'key': {
+                'type': 'string',
+                'title': 'required key'
+            },
+            'another_key': {
+                'type': 'integer',
+                'title': 'non-required key'
+            }
+        },
+        'additionalProperties': False
+    }
+
+    def _get_resource(self, data: dict):
+        return {'status': 'success'}
+
+
+class MockProvider(MockProxy, Provider):
+    """Mock Provider"""
+    base_url = 'https://api.mock.com'
+    _required = {'required': ['required']}
+    _schema = {
+        'type': 'object',
+        'properties': {
+            'not_required': one_or_more({
+                'type': 'string',
+                'title': 'example for not required arg'
+            }),
+            'required': {'type': 'string'},
+            'option_with_default': {'type': 'string'},
+            'message': {'type': 'string'}
+        },
+        'additionalProperties': False
+    }
+    site_url = 'https://www.mock.com'
+
+    @property
+    def defaults(self):
+        return {
+            'option_with_default': 'foo'
+        }
+
+    def _send_notification(self, data: dict):
+        return Response(status='success', provider=self.name, data=data)
+
+    def _prepare_data(self, data: dict):
+        if data.get('not_required'):
+            data['not_required'] = list_to_commas(data['not_required'])
+        data['required'] = list_to_commas(data['required'])
+        return data
+
+    @property
+    def resources(self):
+        return [
+            'mock_rsrc'
+        ]
+
+    @property
+    def mock_rsrc(self):
+        return MockResource()
 
 
 @pytest.fixture
 def mock_provider(monkeypatch):
     """Return a generic :class:`notifiers.core.Provider` class"""
-
-    class MockProxy:
-        name = 'mock_provider'
-
-    class MockResource(MockProxy, ProviderResource):
-        resource_name = 'mock_resource'
-
-        _required = {'required': ['key']}
-        _schema = {
-            'type': 'object',
-            'properties': {
-                'key': {
-                    'type': 'string',
-                    'title': 'required key'
-                },
-                'another_key': {
-                    'type': 'integer',
-                    'title': 'non-required key'
-                }
-            },
-            'additionalProperties': False
-        }
-
-        def _get_resource(self, data: dict):
-            return {'status': 'success'}
-
-    class MockProvider(MockProxy, Provider):
-        """Mock Provider"""
-        base_url = 'https://api.mock.com'
-        _required = {'required': ['required']}
-        _schema = {
-            'type': 'object',
-            'properties': {
-                'not_required': one_or_more({
-                    'type': 'string',
-                    'title': 'example for not required arg'
-                }),
-                'required': {'type': 'string'},
-                'option_with_default': {'type': 'string'},
-                'message': {'type': 'string'}
-            },
-            'additionalProperties': False
-        }
-        site_url = 'https://www.mock.com'
-
-        @property
-        def defaults(self):
-            return {
-                'option_with_default': 'foo'
-            }
-
-        def _send_notification(self, data: dict):
-            return Response(status='success', provider=self.name, data=data)
-
-        def _prepare_data(self, data: dict):
-            if data.get('not_required'):
-                data['not_required'] = list_to_commas(data['not_required'])
-            data['required'] = list_to_commas(data['required'])
-            return data
-
-        @property
-        def resources(self):
-            return [
-                'mock_rsrc'
-            ]
-
-        @property
-        def mock_rsrc(self):
-            return MockResource()
-
     monkeypatch.setitem(_all_providers, MockProvider.name, MockProvider)
     return MockProvider()
 
@@ -148,6 +152,24 @@ def cli_runner():
     provider_group_factory()
     runner = CliRunner()
     return partial(runner.invoke, notifiers_cli, obj={})
+
+
+@pytest.fixture
+def magic_mock_provider(monkeypatch):
+    MockProvider.notify = MagicMock()
+    MockProxy.name = 'magic_mock'
+    monkeypatch.setitem(_all_providers, MockProvider.name, MockProvider)
+    return MockProvider()
+
+
+@pytest.fixture
+def handler():
+    def return_handler(provider_name, logging_level, data=None, **kwargs):
+        hdlr = NotificationHandler(provider_name, data, **kwargs)
+        hdlr.setLevel(logging_level)
+        return hdlr
+
+    return return_handler
 
 
 def pytest_runtest_setup(item):
