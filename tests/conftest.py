@@ -157,7 +157,8 @@ def cli_runner():
 @pytest.fixture
 def magic_mock_provider(monkeypatch):
     MockProvider.notify = MagicMock()
-    monkeypatch.setitem(_all_providers, 'magic_mock', MockProvider)
+    MockProxy.name = 'magic_mock'
+    monkeypatch.setitem(_all_providers, MockProvider.name, MockProvider)
     return MockProvider()
 
 
