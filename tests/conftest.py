@@ -1,6 +1,7 @@
 import logging
 import os
 from functools import partial
+from unittest.mock import MagicMock
 
 import pytest
 from click.testing import CliRunner
@@ -9,6 +10,7 @@ from notifiers.core import Provider, Response, get_notifier, ProviderResource
 from notifiers.providers import _all_providers
 from notifiers.utils.helpers import text_to_bool
 from notifiers.utils.json_schema import one_or_more, list_to_commas
+from notifiers.logging import NotificationHandler
 
 log = logging.getLogger(__name__)
 
@@ -88,7 +90,6 @@ class MockProvider(MockProxy, Provider):
 @pytest.fixture
 def mock_provider(monkeypatch):
     """Return a generic :class:`notifiers.core.Provider` class"""
-
     monkeypatch.setitem(_all_providers, MockProvider.name, MockProvider)
     return MockProvider()
 
@@ -151,6 +152,23 @@ def cli_runner():
     provider_group_factory()
     runner = CliRunner()
     return partial(runner.invoke, notifiers_cli, obj={})
+
+
+@pytest.fixture
+def magic_mock_provider(monkeypatch):
+    MockProvider.notify = MagicMock()
+    monkeypatch.setitem(_all_providers, 'magic_mock', MockProvider)
+    return MockProvider()
+
+
+@pytest.fixture
+def handler():
+    def return_handler(provider_name, logging_level, data=None, **kwargs):
+        hdlr = NotificationHandler(provider_name, data, **kwargs)
+        hdlr.setLevel(logging_level)
+        return hdlr
+
+    return return_handler
 
 
 def pytest_runtest_setup(item):

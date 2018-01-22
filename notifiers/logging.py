@@ -43,4 +43,4 @@ class NotificationHandler(logging.Handler):
                 self.fallback_defaults['message'] = msg
                 self.fallback.notify(**self.fallback_defaults)
             else:
-                super().handle(record)
+                super().handleError(record)
