@@ -41,3 +41,13 @@ class TestLogger:
         log.info('test')
 
         assert magic_mock_provider.notify.called
+
+    def test_with_fallback_with_defaults(self, mock_provider, magic_mock_provider, handler):
+        fallback_defaults = {
+            'foo': 'bar'
+        }
+        hdlr = handler(mock_provider.name, logging.INFO, fallback='magic_mock', fallback_defaults=fallback_defaults)
+        log.addHandler(hdlr)
+        log.info('test')
+
+        assert magic_mock_provider.notify.called_with(fallback_defaults)
