@@ -1,19 +1,22 @@
-Logging logger
---------------
+Notification logger
+-------------------
 
-Notifiers enable you to log directly to a notifier via a stdlib logging handler, :class:`notifiers.logging.NotificationHandler`:
+Notifiers enable you to log directly to a notifier via a stdlib logging handler, :class:`~notifiers.logging.NotificationHandler`:
 
 .. code-block:: python
 
     >>> import logging
     >>> from notifiers.logging import NotificationHandler
+
     >>> log = logging.getLogger(__name__)
     >>> defaults = {
             'token': 'foo,
             'user': 'bar
         }
+
     >>> hdlr = NotificationHandler('pushover', defaults=defaults)
     >>> hdlr.setLevel(logging.ERROR)
+
     >>> log.addHandler(hdlr)
     >>> log.error('And just like that, you get notified about all your errors!')
 
