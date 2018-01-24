@@ -10,10 +10,7 @@ class PushoverProxy:
     path_to_errors = 'errors',
 
 
-class PushoverSounds(PushoverProxy, ProviderResource):
-    resource_name = 'sounds'
-    sounds_url = 'sounds.json'
-
+class PushoverResourceProxy:
     _required = {
         'required': [
             'token'
@@ -30,6 +27,11 @@ class PushoverSounds(PushoverProxy, ProviderResource):
         }
     }
 
+
+class PushoverSounds(PushoverProxy, PushoverResourceProxy, ProviderResource):
+    resource_name = 'sounds'
+    sounds_url = 'sounds.json'
+
     def _get_resource(self, data: dict):
         url = self.base_url + self.sounds_url
         params = {
@@ -43,6 +45,25 @@ class PushoverSounds(PushoverProxy, ProviderResource):
                                 data=data,
                                 response=response)
         return list(response.json()['sounds'].keys())
+
+
+class PushoverLimits(PushoverProxy, PushoverResourceProxy, ProviderResource):
+    resource_name = 'limits'
+    limits_url = 'apps/limits.json'
+
+    def _get_resource(self, data: dict):
+        url = self.base_url + self.limits_url
+        params = {
+            'token': data['token']
+        }
+        response, errors = requests.get(url, params=params, path_to_errors=self.path_to_errors)
+        if errors:
+            raise ResourceError(errors=errors,
+                                resource=self.resource_name,
+                                provider=self.name,
+                                data=data,
+                                response=response)
+        return response.json()
 
 
 class Pushover(PushoverProxy, Provider):
@@ -149,11 +170,16 @@ class Pushover(PushoverProxy, Provider):
     @property
     def resources(self) -> list:
         return [
-            'sounds'
+            'sounds',
+            'limits'
         ]
 
     @property
     def sounds(self) -> PushoverSounds:
         return PushoverSounds()
+
+    @property
+    def limits(self) -> PushoverLimits:
+        return PushoverLimits()
 
     # todo create devices method
