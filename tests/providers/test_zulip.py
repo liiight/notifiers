@@ -2,7 +2,7 @@ import datetime
 
 import pytest
 
-from notifiers.exceptions import BadArguments
+from notifiers.exceptions import BadArguments, NotifierException
 
 provider = 'zulip'
 
@@ -53,3 +53,8 @@ class TestZulip:
         rsp_data = rsp.data
         assert not rsp_data.get('type_')
         assert rsp_data['type'] == 'private'
+
+    def test_zulip_missing_subject(self, provider):
+        with pytest.raises(NotifierException) as e:
+            provider.notify(email='foo', api_key='bar', to='baz', domain='bla', type_='stream', message='foo')
+        assert "'subject' is required when 'type' is 'stream'" in e.value.message
