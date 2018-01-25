@@ -13,13 +13,10 @@ class TestPushover:
 
     def test_pushover_metadata(self, provider):
         assert provider.metadata == {
-            'base_url': 'https://api.pushover.net/1/messages.json', 'site_url': 'https://pushover.net/',
+            'base_url': 'https://api.pushover.net/1/',
+            'site_url': 'https://pushover.net/',
             'name': 'pushover',
-            'sounds': [
-                'pushover', 'bike', 'bugle', 'cashregister', 'classical', 'cosmic', 'falling', 'gamelan',
-                'incoming', 'intermission', 'magic', 'mechanical', 'pianobar', 'siren', 'spacealarm',
-                'tugboat', 'alien', 'climb', 'persistent', 'echo', 'updown', 'none'
-            ]
+            'message_url': 'messages.json'
         }
 
     @pytest.mark.parametrize('data, message', [
