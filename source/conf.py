@@ -177,6 +177,7 @@ texinfo_documents = [
 intersphinx_mapping = {
     'jsonschema': ('http://python-jsonschema.readthedocs.org/en/latest/', None),
     'requests': ('http://docs.python-requests.org/en/latest/', None),
+    'requests-toolbelt': ('https://toolbelt.readthedocs.io/en/latest/index.html', None),
     'click': ('http://click.pocoo.org/5/', None),
     'python': ('https://docs.python.org/3.4', None)
 }
