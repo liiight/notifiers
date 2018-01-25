@@ -62,23 +62,3 @@ def get(url: str, *args, **kwargs) -> tuple:
 def post(url: str, *args, **kwargs) -> tuple:
     """Send a POST request. Returns a dict or :class:`requests.Response <Response>`"""
     return RequestsHelper.request(url, 'post', *args, **kwargs)
-
-
-def delete(url: str, *args, **kwargs) -> tuple:
-    """Send a DELETE request. Returns a dict or :class:`requests.Response <Response>`"""
-    return RequestsHelper.request(url, 'delete', *args, **kwargs)
-
-
-def put(url: str, *args, **kwargs) -> tuple:
-    """Send a PUT request. Returns a dict or :class:`requests.Response <Response>`"""
-    return RequestsHelper.request(url, 'put', *args, **kwargs)
-
-
-def head(url: str, *args, **kwargs) -> tuple:
-    """Send a HEAD request. Returns a dict or :class:`requests.Response <Response>`"""
-    return RequestsHelper.request(url, 'head', *args, **kwargs)
-
-
-def options(url: str, *args, **kwargs) -> tuple:
-    """Send a OPTIONS request. Returns a dict or :class:`requests.Response <Response>`"""
-    return RequestsHelper.request(url, 'options', *args, **kwargs)
