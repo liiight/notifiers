@@ -82,6 +82,7 @@ class TestPushover:
     @pytest.mark.online
     def test_attachment_positive(self, provider, tmpdir):
         p = tmpdir.mkdir("test").join("image.jpg")
+        p.write('im binary')
         data = {
             'attachment': p.strpath,
             'message': 'foo'
