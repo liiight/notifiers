@@ -69,6 +69,26 @@ class TestPushover:
         rsp = provider.notify(**data)
         rsp.raise_on_errors()
 
+    def test_attachment_negative(self, provider):
+        data = {
+            'token': 'foo',
+            'user': 'bar',
+            'message': 'baz',
+            'attachment': '/foo/bar.jpg'
+        }
+        with pytest.raises(BadArguments):
+            provider.notify(**data)
+
+    @pytest.mark.online
+    def test_attachment_positive(self, provider, tmpdir):
+        p = tmpdir.mkdir("test").join("image.jpg")
+        data = {
+            'attachment': p.path,
+            'message': 'foo'
+        }
+        rsp = provider.notify(**data)
+        rsp.raise_on_errors()
+
 
 class TestPushoverSoundsResource:
     resource = 'sounds'
