@@ -68,3 +68,85 @@ class TestPushover:
                 'html': True}
         rsp = provider.notify(**data)
         rsp.raise_on_errors()
+
+
+class TestPushoverSoundsResource:
+    resource = 'sounds'
+
+    def test_pushover_sounds_attribs(self, resource):
+        assert resource.schema == {
+            'type': 'object',
+            'properties': {
+                'token': {
+                    'type': 'string',
+                    'title': "your application's API token"
+                }
+            },
+            'required': ['token']
+        }
+
+        assert resource.name == provider
+
+    def test_pushover_sounds_negative(self, resource):
+        with pytest.raises(BadArguments):
+            resource(env_prefix='foo')
+
+    @pytest.mark.online
+    def test_pushover_sounds_positive(self, resource):
+        assert isinstance(resource(), list)
+
+
+class TestPushoverLimitsResource:
+    resource = 'limits'
+
+    def test_pushover_limits_attribs(self, resource):
+        assert resource.schema == {
+            'type': 'object',
+            'properties': {
+                'token': {
+                    'type': 'string',
+                    'title': "your application's API token"
+                }
+            },
+            'required': ['token']
+        }
+
+        assert resource.name == provider
+
+    def test_pushover_limits_negative(self, resource):
+        with pytest.raises(BadArguments):
+            resource(env_prefix='foo')
+
+    @pytest.mark.online
+    def test_pushover_limits_positive(self, resource):
+        assert isinstance(resource(), dict)
+        assert all(key in resource() for key in ['limit', 'remaining', 'reset'])
+
+
+class TestPushoverCLI:
+
+    def test_pushover_sounds_negative(self, cli_runner):
+        cmd = 'pushover sounds --token bad_token'.split()
+        result = cli_runner(cmd)
+        assert result.exit_code == -1
+        assert not result.output
+
+    @pytest.mark.online
+    def test_pushover_sounds_positive(self, cli_runner):
+        cmd = 'pushover sounds'.split()
+        result = cli_runner(cmd)
+        assert result.exit_code == 0
+        assert 'piano' in result.output
+
+    def test_pushover_limits(self, cli_runner):
+        cmd = 'pushover limits --token bad_token'.split()
+        result = cli_runner(cmd)
+        assert result.exit_code == -1
+        assert not result.output
+
+    @pytest.mark.online
+    def test_pushover_limits_positive(self, cli_runner):
+        cmd = 'pushover limits'.split()
+        result = cli_runner(cmd)
+        assert result.exit_code == 0
+        assert all(key in result.output for key in ['limit', 'remaining', 'reset'])
