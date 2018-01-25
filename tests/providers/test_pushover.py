@@ -83,7 +83,7 @@ class TestPushover:
     def test_attachment_positive(self, provider, tmpdir):
         p = tmpdir.mkdir("test").join("image.jpg")
         data = {
-            'attachment': p.path,
+            'attachment': p.strpath,
             'message': 'foo'
         }
         rsp = provider.notify(**data)
