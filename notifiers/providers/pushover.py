@@ -1,7 +1,11 @@
+from pathlib import Path
+
+from requests_toolbelt import MultipartEncoder
+
 from ..core import Provider, Response, ProviderResource
+from ..exceptions import ResourceError, BadArguments
 from ..utils import requests
 from ..utils.json_schema import one_or_more, list_to_commas
-from ..exceptions import ResourceError
 
 
 class PushoverProxy:
@@ -143,6 +147,10 @@ class Pushover(PushoverProxy, Provider):
             'html': {
                 'type': 'boolean',
                 'title': 'enable HTML formatting'
+            },
+            'attachment': {
+                'type': 'string',
+                'title': 'an image attachment to send with the message'
             }
         },
         'additionalProperties': False
@@ -156,9 +164,25 @@ class Pushover(PushoverProxy, Provider):
             data['html'] = int(data['html'])
         return data
 
+    def _validate_data_dependencies(self, data: dict):
+        if data.get('attachment'):
+            path = Path(data['attachment']).expanduser()
+            if not path.exists():
+                raise BadArguments(provider=self.name, validation_error=f"Path does not exist '{path}'")
+        return data
+
     def _send_notification(self, data: dict) -> Response:
         url = self.base_url + self.message_url
-        response, errors = requests.post(url, data=data, path_to_errors=self.path_to_errors)
+        headers = {}
+        if data.get('attachment'):
+            attachment = data['attachment']
+            data['attachment'] = (attachment, open(attachment, mode='rb'))
+            data = MultipartEncoder(fields=data)
+            headers['Content-Type'] = data.content_type
+        response, errors = requests.post(url,
+                                         data=data,
+                                         headers=headers,
+                                         path_to_errors=self.path_to_errors)
         return self.create_response(data, response, errors)
 
     @property

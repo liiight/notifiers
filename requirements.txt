@@ -9,5 +9,6 @@ chardet==3.0.4            # via requests
 click==6.7
 idna==2.6                 # via requests
 jsonschema==2.6.0
+requests-toolbelt==0.8.0
 requests==2.18.4
 urllib3==1.22             # via requests
