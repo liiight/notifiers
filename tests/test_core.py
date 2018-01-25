@@ -134,6 +134,7 @@ class TestCore:
         rsrc = resources[0]
         resource = getattr(mock_provider, rsrc)
         assert resource
+        assert repr(resource) == '<ProviderResource,provider=mock_provider,resource=mock_resource>'
         assert resource.resource_name == 'mock_resource'
         assert resource.name == mock_provider.name
         assert resource.schema == {
