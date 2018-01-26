@@ -43,7 +43,10 @@ class TestLogger:
         magic_mock_provider.notify.assert_called_with(foo='bar', message='test', raise_on_errors=True)
 
     def test_with_fallback(self, magic_mock_provider, handler):
-        hdlr = handler('pushover', logging.INFO, fallback=magic_mock_provider.name)
+        data = {
+            'env_prefix': 'foo'
+        }
+        hdlr = handler('pushover', logging.INFO, data, fallback=magic_mock_provider.name)
         log.addHandler(hdlr)
         log.info('test')
 
@@ -54,7 +57,10 @@ class TestLogger:
         fallback_defaults = {
             'foo': 'bar'
         }
-        hdlr = handler('pushover', logging.INFO, fallback=magic_mock_provider.name,
+        data = {
+            'env_prefix': 'foo'
+        }
+        hdlr = handler('pushover', logging.INFO, data, fallback=magic_mock_provider.name,
                        fallback_defaults=fallback_defaults)
         log.addHandler(hdlr)
         log.info('test')
