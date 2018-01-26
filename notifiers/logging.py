@@ -36,7 +36,7 @@ class NotificationHandler(logging.Handler):
         self.provider = notifiers.get_notifier(provider, strict=True)
         if kwargs.get('fallback'):
             self.fallback = notifiers.get_notifier(kwargs.pop('fallback'), strict=True)
-            self.fallback_defaults = kwargs.pop('fallback_defaults', None)
+            self.fallback_defaults = kwargs.pop('fallback_defaults', {})
 
     def emit(self, record):
         """

@@ -23,14 +23,14 @@ class TestLogger:
         assert repr(hdlr) == '<NotificationHandler magic_mock(INFO)>'
 
         log.info('test')
-        assert magic_mock_provider.notify.called
+        magic_mock_provider.notify.assert_called()
 
     def test_lower_level_log(self, magic_mock_provider, handler):
         hdlr = handler(magic_mock_provider.name, logging.INFO)
         log.addHandler(hdlr)
 
         log.debug('test')
-        assert not magic_mock_provider.notify.called
+        magic_mock_provider.notify.assert_not_called()
 
     def test_with_data(self, magic_mock_provider, handler):
         data = {
@@ -40,22 +40,24 @@ class TestLogger:
         log.addHandler(hdlr)
 
         log.info('test')
-        assert magic_mock_provider.notify.called_with(data)
+        magic_mock_provider.notify.assert_called_with(foo='bar', message='test', raise_on_errors=True)
 
-    def test_with_fallback(self, mock_provider, magic_mock_provider, handler):
-        hdlr = handler(mock_provider.name, logging.INFO, fallback=magic_mock_provider.name)
+    def test_with_fallback(self, magic_mock_provider, handler):
+        hdlr = handler('pushover', logging.INFO, fallback=magic_mock_provider.name)
         log.addHandler(hdlr)
         log.info('test')
 
-        assert magic_mock_provider.notify.called
+        magic_mock_provider.notify.assert_called_with(message="Could not log msg to provider 'pushover'!\n"
+                                                              "Error with sent data: 'user' is a required property")
 
-    def test_with_fallback_with_defaults(self, mock_provider, magic_mock_provider, handler):
+    def test_with_fallback_with_defaults(self, magic_mock_provider, handler):
         fallback_defaults = {
             'foo': 'bar'
         }
-        hdlr = handler(mock_provider.name, logging.INFO, fallback=magic_mock_provider.name,
+        hdlr = handler('pushover', logging.INFO, fallback=magic_mock_provider.name,
                        fallback_defaults=fallback_defaults)
         log.addHandler(hdlr)
         log.info('test')
 
-        assert magic_mock_provider.notify.called_with(fallback_defaults)
+        magic_mock_provider.notify.assert_called_with(foo='bar', message="Could not log msg to provider 'pushover'!\n"
+                                                                         "Error with sent data: 'user' is a required property")
