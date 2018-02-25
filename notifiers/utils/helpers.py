@@ -50,3 +50,14 @@ def dict_from_environs(prefix: str, name: str, args: list) -> dict:
         if os.environ.get(environ):
             environs[arg] = os.environ[environ]
     return environs
+
+
+def snake_to_camel_case(value: str) -> str:
+    """
+    Convert a snake case param to CamelCase
+
+    :param value: The value to convert
+    :return: A CamelCase value
+    """
+    log.debug('trying to convert %s to camel case', value)
+    return ''.join(word.capitalize() for word in value.split('_'))
