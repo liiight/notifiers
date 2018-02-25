@@ -5,6 +5,7 @@ from ..exceptions import ResourceError
 
 
 class Twilio(Provider):
+    """Send an SMS via a Twilio number"""
     name = 'twilio'
     base_url = 'https://api.twilio.com/2010-04-01/Accounts/{}/Messages.json'
     site_url = 'https://www.twilio.com/'
@@ -13,7 +14,7 @@ class Twilio(Provider):
     _required = {
         'allOf': [
             {
-                'oneOf': [
+                'anyOf': [
                     {
                         'anyOf': [
                             {
@@ -34,10 +35,10 @@ class Twilio(Provider):
                         ]
                     }
                 ],
-                'error_oneOf': "Either 'from' or 'messaging_service_id' are required"
+                'error_anyOf': "Either 'from' or 'messaging_service_id' are required"
             },
             {
-                'oneOf': [
+                'anyOf': [
                     {
                         'required': [
                             'message'
@@ -49,7 +50,7 @@ class Twilio(Provider):
                         ]
                     }
                 ],
-                'error_oneOf': "Either 'message' or 'media_url' are required"
+                'error_anyOf': "Either 'message' or 'media_url' are required"
             },
             {
                 'required': [
