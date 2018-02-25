@@ -23,6 +23,7 @@ Supported providers
 -   [Join](https://joaoapps.com/join/)
 -   [Hipchat](https://www.hipchat.com/docs/apiv2)
 -   [Zulip](https://zulipchat.com/)
+-   [Twilio](https://www.twilio.com/)
 
 Advantages
 ----------

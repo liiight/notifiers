@@ -3,7 +3,7 @@ import pytest
 import notifiers
 from notifiers.core import Provider, Response
 from notifiers.exceptions import BadArguments, SchemaError, NotificationError
-from notifiers.utils.helpers import text_to_bool, merge_dicts, dict_from_environs
+from notifiers.utils.helpers import text_to_bool, merge_dicts, dict_from_environs, snake_to_camel_case
 
 
 class TestCore:
@@ -196,3 +196,11 @@ class TestHelpers:
             environ = f'{prefix}{name}_{arg}'.upper()
             monkeypatch.setenv(environ, 'baz')
         assert dict_from_environs(prefix, name, args) == result
+
+    @pytest.mark.parametrize('snake_value, cc_value', [
+        ('foo_bar', 'FooBar'),
+        ('foo', 'Foo'),
+        ('long_ass_var_name', 'LongAssVarName')
+    ])
+    def test_snake_to_camel_case(self, snake_value, cc_value):
+        assert snake_to_camel_case(snake_value) == cc_value

@@ -3,7 +3,7 @@ import pytest
 provider = 'slack'
 
 
-class TestSlack(object):
+class TestSlack:
     """
     Slack web hook tests
 

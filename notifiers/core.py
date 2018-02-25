@@ -187,7 +187,7 @@ class SchemaResource(ABC):
 
     def _process_data(self, **data) -> dict:
         """
-        The main method that process all resources data. Validated schema, gets environs, validates data, prepares
+        The main method that process all resources data. Validates schema, gets environs, validates data, prepares
          it via provider requirements, merges defaults and check for data dependencies
 
         :param data: The raw data passed by the notifiers client
