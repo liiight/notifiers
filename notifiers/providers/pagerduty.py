@@ -9,52 +9,16 @@ class PagerDuty(Provider):
     site_url = 'https://v2.developer.pagerduty.com/'
     path_to_errors = 'errors',
 
-    __payload = {
-        'type': 'object',
-        'properties': {
-            'source': {
-                'type': 'string',
-                'title': 'The unique location of the affected system, preferably a hostname or FQDN'
-            },
-            'severity': {
-                'type': 'string',
-                'enum': [
-                    'critical',
-                    'error',
-                    'warning',
-                    'info'
-                ],
-                'title': 'The perceived severity of the status the event is describing with respect to the '
-                         'affected system'
-            },
-            'timestamp': {
-                # todo create a epoch format
-                'type': 'string',
-                'title': 'The time at which the emitting tool detected or generated the event',
-            },
-            'component': {
-                'type': 'string',
-                'title': 'Component of the source machine that is responsible for the event'
-            },
-            'group': {
-                'type': 'string',
-                'title': 'Logical grouping of components of a service'
-            },
-            'class': {
-                'type': 'string',
-                'title': 'The class/type of the event'
-            },
-            'custom_details': {
-                'type': 'object',
-                'title': 'Additional details about the event and affected system'
-            }
-        },
-        'required': [
-            'source',
-            'severity'
-        ],
-        'additionalProperties': False
-    }
+    __payload_attributes = [
+        'message',
+        'source',
+        'severity',
+        'timestamp',
+        'component',
+        'group',
+        'class',
+        'custom_details'
+    ]
 
     __images = {
         'type': 'array',
@@ -108,7 +72,8 @@ class PagerDuty(Provider):
         'required': [
             'routing_key',
             'event_action',
-            'payload',
+            'source',
+            'severity',
             'message'
         ]
     }
@@ -140,8 +105,54 @@ class PagerDuty(Provider):
                 'title': 'Deduplication key for correlating triggers and resolves',
                 'maxLength': 255
             },
-            'payload': __payload,
+            'source': {
+                'type': 'string',
+                'title': 'The unique location of the affected system, preferably a hostname or FQDN'
+            },
+            'severity': {
+                'type': 'string',
+                'enum': [
+                    'critical',
+                    'error',
+                    'warning',
+                    'info'
+                ],
+                'title': 'The perceived severity of the status the event is describing with respect to the '
+                         'affected system'
+            },
+            'timestamp': {
+                # todo create a epoch format
+                'type': 'string',
+                'title': 'The time at which the emitting tool detected or generated the event',
+            },
+            'component': {
+                'type': 'string',
+                'title': 'Component of the source machine that is responsible for the event'
+            },
+            'group': {
+                'type': 'string',
+                'title': 'Logical grouping of components of a service'
+            },
+            'class': {
+                'type': 'string',
+                'title': 'The class/type of the event'
+            },
+            'custom_details': {
+                'type': 'object',
+                'title': 'Additional details about the event and affected system'
+            },
             'images': __images,
             'links': __links
         }
     }
+
+    def _prepare_data(self, data: dict) -> dict:
+        payload = {attribute: data.pop(attribute) for attribute in self.__payload_attributes if data.get(attribute)}
+        payload['summary'] = payload.pop('message')
+        data['payload'] = payload
+        return data
+
+    def _send_notification(self, data: dict) -> Response:
+        url = self.base_url
+        response, errors = requests.post(url, json=data, path_to_errors=self.path_to_errors)
+        return self.create_response(data, response, errors)

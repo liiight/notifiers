@@ -1,4 +1,6 @@
-from . import pushover, simplepush, slack, email, gmail, telegram, gitter, pushbullet, join, hipchat, zulip, twilio
+from . import (
+    pushover, simplepush, slack, email, gmail, telegram, gitter, pushbullet, join, hipchat, zulip, twilio, pagerduty
+)
 
 _all_providers = {
     'pushover': pushover.Pushover,
@@ -12,5 +14,6 @@ _all_providers = {
     'join': join.Join,
     'hipchat': hipchat.HipChat,
     'zulip': zulip.Zulip,
-    'twilio': twilio.Twilio
+    'twilio': twilio.Twilio,
+    'pagerduty': pagerduty.PagerDuty
 }
