@@ -37,7 +37,7 @@ The easiest way to send notifications!
     :target: https://readthedocs.org/projects/notifiers/badge/?version=latest
     :alt: RTD
 
-See `Releases <https://github.com/liiight/notifiers/releases>`_ for recent changes
+See `Changelog <http://notifiers.readthedocs.io/en/latest/changelog.html>`_ for recent changes
 
 .. inclusion-start
 

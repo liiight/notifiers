@@ -45,3 +45,11 @@ API documentation for the different providers.
 .. automodule:: notifiers.providers.zulip
    :members:
    :undoc-members:
+
+.. automodule:: notifiers.providers.twilio
+   :members:
+   :undoc-members:
+
+.. automodule:: notifiers.providers.pagerduty
+   :members:
+   :undoc-members:

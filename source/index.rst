@@ -17,6 +17,7 @@ Documentation
    :maxdepth: 3
    :caption: Contents:
 
+   changelog
    about
    installation
    usage

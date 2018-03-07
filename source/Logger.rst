@@ -1,3 +1,5 @@
+.. _notification_logger:
+
 Notification logger
 -------------------
 
