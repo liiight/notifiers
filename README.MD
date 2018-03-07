@@ -24,6 +24,7 @@ Supported providers
 -   [Hipchat](https://www.hipchat.com/docs/apiv2)
 -   [Zulip](https://zulipchat.com/)
 -   [Twilio](https://www.twilio.com/)
+-   [PagerDuty](https://www.pagerduty.com)
 
 Advantages
 ----------
@@ -88,9 +89,8 @@ Directly add to your existing stdlib logging:
 In the near future 
 ------------------
 
--   SendGrid, Graphite, Stride, Prowl, Teams, Twilio and many more...
+-   Many more providers!
 -   Low level providers (Amazon SNS, Google FCM, OS Toast messages) via `extra` dependencies
--   Docs!
 
 ### Why python 3 only?
 
