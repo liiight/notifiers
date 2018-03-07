@@ -121,7 +121,7 @@ class PagerDuty(Provider):
                          'affected system'
             },
             'timestamp': {
-                # todo create a epoch format
+                # todo create a iso8601 format
                 'type': 'string',
                 'title': 'The time at which the emitting tool detected or generated the event in ISO 8601',
             },
