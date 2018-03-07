@@ -40,15 +40,15 @@ To view all providers use the ``providers`` command like so:
 
 .. code-block:: console
 
-        $ notifiers providers
-        pushover, simplepush, slack, email, gmail, telegram, gitter, pushbullet, join, hipchat, zulip
+     $ notifiers providers
+     pushover, simplepush, slack, email, gmail, telegram, gitter, pushbullet, join, hipchat, zulip
 
 This will return all available provider names
 
-Provider groups
-===============
+Provider actions
+================
 
-Each provider correlates to a group of actions it can perform. Due to the generic nature that providers are implemented in, these actions are usually shared among all providers. To access available commands, use the ``notifiers [PROVIDER_NAME] --help`` command:
+Each provider has a group of actions it can perform. Due to the generic nature that providers are implemented in, these actions are usually shared among all providers. To access available commands, use the ``notifiers [PROVIDER_NAME] --help`` command:
 
 .. code-block:: console
 
@@ -67,14 +67,14 @@ Each provider correlates to a group of actions it can perform. Due to the generi
       required  'email' required schema
       schema    'email' full schema
 
-The ``defaults``, ``metadata``, ``required`` and ``schema`` command all return a JSON dump of the relevant provider property:
+The ``defaults``, ``metadata``, ``required`` and ``schema`` command all return a JSON output of the relevant provider property:
 
 .. code-block:: console
 
     $ notifiers email metadata
     {"base_url": null, "site_url": "https://en.wikipedia.org/wiki/Email", "provider_name": "email"}
 
-These helper method can also accept a ``--pretty`` flag which will out a nicely indented JSON:
+These helper methods can also accept a ``--pretty`` flag which will out a nicely indented JSON:
 
 .. code-block:: console
 
@@ -92,7 +92,7 @@ To send a notification you use the ``notify`` command. Each notifier has its own
 .. code-block:: console
 
     $ notifiers email notify --help
-    Usage: core.py email notify [OPTIONS] [MESSAGE]
+    Usage: notifiers email notify [OPTIONS] [MESSAGE]
 
       Send emails via SMTP
 
@@ -110,8 +110,11 @@ To send a notification you use the ``notify`` command. Each notifier has its own
       --html / --no-html  Should the email be parse as an html file
       --help              Show this message and exit.
 
+.. note::
 
-Note that ``message`` is an expected argument that need to be either explicitly passed in.
+   Due to the nature of command line syntax, only primitive argument types can be used with it, meaning you can only pass string, int, float and booleans (using flags) when invoking the notify command via CLI. List and dict arguments cannot be passed with it.
+
+Note that ``message`` is an expected argument that need to be either explicitly set or piped into the command.
 
 Piping into a notification
 ==========================
