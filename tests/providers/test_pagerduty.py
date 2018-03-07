@@ -62,7 +62,7 @@ class TestPagerDuty:
             'event_action': 'trigger',
             'source': 'bar',
             'severity': 'info',
-            'timestamp': datetime.datetime.now(),
+            'timestamp': datetime.datetime.now().isoformat(),
             'component': 'baz',
             'group': 'bla',
             'class': 'buzu',

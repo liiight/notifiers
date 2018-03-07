@@ -123,7 +123,7 @@ class PagerDuty(Provider):
             'timestamp': {
                 # todo create a epoch format
                 'type': 'string',
-                'title': 'The time at which the emitting tool detected or generated the event',
+                'title': 'The time at which the emitting tool detected or generated the event in ISO 8601',
             },
             'component': {
                 'type': 'string',
