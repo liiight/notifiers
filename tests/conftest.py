@@ -163,8 +163,9 @@ def magic_mock_provider(monkeypatch):
 
 
 @pytest.fixture
-def handler():
+def handler(caplog):
     def return_handler(provider_name, logging_level, data=None, **kwargs):
+        caplog.set_level(logging.INFO)
         hdlr = NotificationHandler(provider_name, data, **kwargs)
         hdlr.setLevel(logging_level)
         return hdlr
