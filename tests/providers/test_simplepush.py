@@ -5,7 +5,7 @@ from notifiers.exceptions import BadArguments
 provider = 'simplepush'
 
 
-class TestSimplePush(object):
+class TestSimplePush:
     """SimplePush notifier tests
 
     Note: These tests assume correct environs set for NOTIFIERS_SIMPLEPUSH_KEY
