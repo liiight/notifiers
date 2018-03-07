@@ -4,4 +4,5 @@ codecov
 pytest-cov
 Sphinx
 sphinx-autodoc-annotation
+sphinx_rtd_theme
 bumpversion
