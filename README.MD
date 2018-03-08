@@ -3,7 +3,9 @@ Notifiers
 
 The easiest way to send notifications!
 
-[![Travis CI](https://img.shields.io/travis/liiight/notifiers/master.svg?style=flat-square) ](https://travis-ci.org/liiight/notifiers) [![Codecov](https://img.shields.io/codecov/c/github/liiight/notifiers/master.svg?style=flat-square) ](https://codecov.io/gh/liiight/notifiers) [![image](https://img.shields.io/gitter/room/nwjs/nw.js.svg?style=flat-square) ](https://gitter.im/notifiers/notifiers) [![PyPi version](https://img.shields.io/pypi/v/notifiers.svg?style=flat-square) ](https://pypi.python.org/pypi/notifiers) [![Supported Python versions](https://img.shields.io/pypi/pyversions/notifiers.svg?style=flat-square) ](https://pypi.org/project/notifiers) [![License](https://img.shields.io/pypi/l/notifiers.svg?style=flat-square) ](https://choosealicense.com/licenses) [![Status](https://img.shields.io/pypi/status/notifiers.svg?style=flat-square) ](https://pypi.python.org/pypi/notifiers) [![Docker build](https://img.shields.io/docker/build/liiight/notifiers.svg?style=flat-square) ](https://hub.docker.com/r/liiight/notifiers/) [![RTD](https://img.shields.io/readthedocs/notifiers.svg?style=flat-square) ](https://readthedocs.org/projects/notifiers/badge/?version=latest) 
+[![Travis CI](https://img.shields.io/travis/liiight/notifiers/master.svg?style=flat-square) ](https://travis-ci.org/liiight/notifiers) [![Codecov](https://img.shields.io/codecov/c/github/liiight/notifiers/master.svg?style=flat-square) ](https://codecov.io/gh/liiight/notifiers) [![image](https://img.shields.io/gitter/room/nwjs/nw.js.svg?style=flat-square) ](https://gitter.im/notifiers/notifiers) [![PyPi version](https://img.shields.io/pypi/v/notifiers.svg?style=flat-square) ](https://pypi.python.org/pypi/notifiers) [![Supported Python versions](https://img.shields.io/pypi/pyversions/notifiers.svg?style=flat-square) ](https://pypi.org/project/notifiers) [![License](https://img.shields.io/pypi/l/notifiers.svg?style=flat-square) ](https://choosealicense.com/licenses) [![Status](https://img.shields.io/pypi/status/notifiers.svg?style=flat-square) ](https://pypi.python.org/pypi/notifiers) [![Docker build](https://img.shields.io/docker/build/liiight/notifiers.svg?style=flat-square) ](https://hub.docker.com/r/liiight/notifiers/) [![RTD](https://img.shields.io/readthedocs/notifiers.svg?style=flat-square) ](https://readthedocs.org/projects/notifiers/badge/?version=latest) [![Paypal](https://img.shields.io/badge/Donate-PayPal-green.svg?style=flat-square) ](https://paypal.me/notifiers) 
+[![Twitter Follow](https://img.shields.io/twitter/follow/liiight.svg?style=flat-square&logo=twitter&label=Follow) ](https://twitter.com/liiight)
+ 
 
 See [Releases](http://notifiers.readthedocs.io/en/latest/changelog.html) for recent changes
 
@@ -98,3 +100,9 @@ I wanted to avoid the whole unicode issue fiasco if possible, but there isn't a 
 overwhelming desire for this, i'll do it. Probably.
 
 See [Docs](http://notifiers.readthedocs.io/) for more information
+
+
+Donations
+---------
+
+If you like this and want to buy me a cup of coffee, please click the donation button above or click this [link](https://paypal.me/notifiers) ☕

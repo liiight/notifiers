@@ -37,6 +37,15 @@ The easiest way to send notifications!
     :target: https://readthedocs.org/projects/notifiers/badge/?version=latest
     :alt: RTD
 
+.. image:: https://img.shields.io/badge/Donate-PayPal-green.svg?style=flat-square
+    :target: https://paypal.me/notifiers
+    :alt: Paypal
+
+
+.. image:: https://img.shields.io/twitter/follow/liiight.svg?style=flat-square&logo=twitter&label=Follow
+    :target: https://twitter.com/liiight
+    :alt: Twitter Follow
+
 See `Changelog <http://notifiers.readthedocs.io/en/latest/changelog.html>`_ for recent changes
 
 .. inclusion-start
@@ -136,3 +145,8 @@ overwhelming desire for this, i’ll do it. Probably.
 .. inclusion-end
 
 See `Docs <http://notifiers.readthedocs.io/>`_ for more information
+
+Donations
+---------
+
+If you like this and want to buy me a cup of coffee, please click the donation button above or click this `link <https://paypal.me/notifiers>`_. ☕
