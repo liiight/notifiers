@@ -1,6 +1,11 @@
 Changelog
 =========
 
+0.7.1
+-----
+
+Maintenance release (added logo and donation link)
+
 0.7.0
 -----
 
