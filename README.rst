@@ -1,6 +1,8 @@
 Notifiers
 =========
-The easiest way to send notifications!
+
+.. image:: https://raw.githubusercontent.com/liiight/notifiers/develop/assets/images/circle_full_logo.png
+    :alt: Full logo
 
 .. image:: https://img.shields.io/travis/liiight/notifiers/master.svg?style=flat-square
     :target: https://travis-ci.org/liiight/notifiers
