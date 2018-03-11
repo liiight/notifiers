@@ -11,11 +11,12 @@ class PopcornNotify(Provider):
     path_to_errors = 'error',
 
     _required = {
-        [
-            'message',
-            'api_key',
-            'recipients'
-        ]
+        'required':
+            [
+                'message',
+                'api_key',
+                'recipients'
+            ]
     }
 
     _schema = {
