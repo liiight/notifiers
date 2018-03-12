@@ -75,3 +75,4 @@ def valid_file(path: str) -> bool:
     log.debug('checking if %s is a valid file', path)
     return path.exists() and path.is_file()
     # todo add tests
+    # todo use in a json schema formatter

@@ -111,6 +111,12 @@ class MailGun(Provider):
             'attachment': one_or_more({
                 'type': 'string',
                 'title': 'File attachment'
+                # todo add custom formatter
+            }),
+            'inline': one_or_more({
+                'type': 'string',
+                'title': 'Attachment with inline disposition. Can be used to send inline images'
+                # todo add custom formatter
             }),
             'tag': one_or_more(schema={
                 # todo create ascii formatter
@@ -181,7 +187,8 @@ class MailGun(Provider):
                 },
                 'title': 'attach a custom JSON data to the message'
             }
-        }
+        },
+        'additionalProperties': False
     }
 
     def _prepare_data(self, data: dict) -> dict:
@@ -203,6 +210,11 @@ class MailGun(Provider):
             if isinstance(attachment, str):
                 attachment = [attachment]
             new_data['attachment'] = attachment
+        if data.get('inline'):
+            inline = data.pop('inline')
+            if isinstance(inline, str):
+                inline = [inline]
+            new_data['inline'] = inline
 
         for property_ in self.__properties_to_change:
             if data.get(property_):
@@ -222,19 +234,22 @@ class MailGun(Provider):
         return new_data
 
     def _validate_data_dependencies(self, data: dict):
-        if data.get('attachment'):
-            for attachment in data['attachment']:
-                if not valid_file(attachment):
-                    raise BadArguments(provider=self.name,
-                                       validation_error=f"Path '{attachment}' does not exist or is not a file!")
+        files = data.get('attachment', []) + data.get('inline', [])
+        for file in files:
+            if not valid_file(file):
+                raise BadArguments(provider=self.name,
+                                   validation_error=f"Path '{file}' does not exist or is not a file!")
         return data
 
     def _send_notification(self, data: dict) -> Response:
         url = self.base_url.format(domain=data.pop('domain'))
         auth = 'api', data.pop('api_key')
-        files = {}
+        files = []
         if data.get('attachment'):
-            files = [('attachment', (attach, open(attach, mode='rb'))) for attach in data['attachment']]
+            files += [('attachment', (attach, open(attach, mode='rb'))) for attach in data['attachment']]
+        if data.get('inline'):
+            files += [('inline', (attach, open(attach, mode='rb'))) for attach in data['inline']]
+
         response, errors = requests.post(url=url,
                                          data=data,
                                          auth=auth,
