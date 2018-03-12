@@ -72,7 +72,9 @@ class TestMailgun:
                 'foo': 'bar'
             },
             'data': {
-                'foo': '{"bar": true}'
+                'foo': {
+                    'bar': 'bla'
+                }
             }
         }
         provider.notify(**data, raise_on_errors=True)
