@@ -35,10 +35,11 @@ class TestMailgun:
 
     @pytest.mark.online
     def test_mailgun_all_options(self, provider, tmpdir):
-        file_1 = tmpdir.mkdir("sub").join("hello.txt")
+        dir_ = tmpdir.mkdir("sub")
+        file_1 = dir_.join("hello.txt")
         file_1.write("content")
 
-        file_2 = tmpdir.mkdir("sub").join("world.txt")
+        file_2 = dir_.join("world.txt")
         file_2.write("content")
 
         now = datetime.datetime.now() + datetime.timedelta(minutes=3)
