@@ -34,7 +34,6 @@ class MailGun(Provider):
             {
                 'required': [
                     'to',
-                    'message',
                     'domain',
                     'api_key'
                 ]
@@ -57,7 +56,7 @@ class MailGun(Provider):
                 'anyOf': [
                     {
                         'required': [
-                            'text'
+                            'message'
                         ]
                     },
                     {
@@ -184,10 +183,14 @@ class MailGun(Provider):
 
         new_data = {
             'to': data.pop('to'),
-            'text': data.pop('message'),
             'from': data.pop('from'),
-            'domain': data.pop('domain')
+            'domain': data.pop('domain'),
+            'api_key': data.pop('api_key')
         }
+        if data.get('message'):
+            new_data['text'] = data.pop('message')
+        if data.get('html'):
+            new_data['html'] = data.pop('html')
 
         for property_ in self.__properties_to_change:
             if data.get(property_):
@@ -205,7 +208,7 @@ class MailGun(Provider):
         return new_data
 
     def _send_notification(self, data: dict) -> Response:
-        url = self.base_url.format(data.pop('domain'))
+        url = self.base_url.format(domain=data.pop('domain'))
         auth = 'api', data.pop('api_key')
         response, errors = requests.post(url=url,
                                          data=data,
