@@ -1,11 +1,10 @@
 import json
-from pathlib import Path
 
 from ..core import Provider, Response
 from ..exceptions import BadArguments
 from ..utils import requests
-from ..utils.json_schema import one_or_more
 from ..utils.helpers import valid_file
+from ..utils.json_schema import one_or_more
 
 
 class MailGun(Provider):
@@ -246,9 +245,9 @@ class MailGun(Provider):
         auth = 'api', data.pop('api_key')
         files = []
         if data.get('attachment'):
-            files += [('attachment', (attach, open(attach, mode='rb'))) for attach in data['attachment']]
+            files += requests.file_list_for_request(data['attachment'], 'attachment')
         if data.get('inline'):
-            files += [('inline', (attach, open(attach, mode='rb'))) for attach in data['inline']]
+            files += requests.file_list_for_request(data['inline'], 'inline')
 
         response, errors = requests.post(url=url,
                                          data=data,
