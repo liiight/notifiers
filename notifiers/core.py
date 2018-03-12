@@ -171,7 +171,8 @@ class SchemaResource(ABC):
         e = best_match(self.validator.iter_errors(data))
         if e:
             custom_error_key = f'error_{e.validator}'
-            msg = e.schema[custom_error_key] if e.schema.get(custom_error_key) else e.message
+            error = e.schema[custom_error_key] if e.schema.get(custom_error_key) else e.message
+            msg = f'Error: {error}, instance: {e.instance}'
             raise BadArguments(validation_error=msg, provider=self.name, data=data)
 
     def _validate_data_dependencies(self, data: dict) -> dict:
