@@ -5,6 +5,7 @@ from ..core import Provider, Response
 from ..exceptions import BadArguments
 from ..utils import requests
 from ..utils.json_schema import one_or_more
+from ..utils.helpers import valid_file
 
 
 class MailGun(Provider):
@@ -223,9 +224,9 @@ class MailGun(Provider):
     def _validate_data_dependencies(self, data: dict):
         if data.get('attachment'):
             for attachment in data['attachment']:
-                path = Path(attachment).expanduser()
-                if not path.exists():
-                    raise BadArguments(provider=self.name, validation_error=f"Path does not exist '{path}'")
+                if not valid_file(attachment):
+                    raise BadArguments(provider=self.name,
+                                       validation_error=f"Path '{attachment}' does not exist or is not a file!")
         return data
 
     def _send_notification(self, data: dict) -> Response:
