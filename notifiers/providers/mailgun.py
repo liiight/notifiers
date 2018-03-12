@@ -1,6 +1,8 @@
 import json
+from pathlib import Path
 
 from ..core import Provider, Response
+from ..exceptions import BadArguments
 from ..utils import requests
 from ..utils.json_schema import one_or_more
 
@@ -105,6 +107,10 @@ class MailGun(Provider):
                 'type': 'string',
                 'title': 'Message subject'
             },
+            'attachment': one_or_more({
+                'type': 'string',
+                'title': 'File attachment'
+            }),
             'tag': one_or_more(schema={
                 # todo create ascii formatter
                 'type': 'string',
@@ -191,6 +197,11 @@ class MailGun(Provider):
             new_data['text'] = data.pop('message')
         if data.get('html'):
             new_data['html'] = data.pop('html')
+        if data.get('attachment'):
+            attachment = data.pop('attachment')
+            if isinstance(attachment, str):
+                attachment = [attachment]
+            new_data['attachment'] = attachment
 
         for property_ in self.__properties_to_change:
             if data.get(property_):
@@ -200,18 +211,32 @@ class MailGun(Provider):
         if data.get('headers'):
             for key, value in data['headers'].items():
                 new_data[f'h:{key}'] = value
+            del data['headers']
 
         if data.get('data'):
             for key, value in data['data'].items():
                 new_data[f'v:{key}'] = json.dumps(value)
+            del data['data']
 
         return new_data
+
+    def _validate_data_dependencies(self, data: dict):
+        if data.get('attachment'):
+            for attachment in data['attachment']:
+                path = Path(attachment).expanduser()
+                if not path.exists():
+                    raise BadArguments(provider=self.name, validation_error=f"Path does not exist '{path}'")
+        return data
 
     def _send_notification(self, data: dict) -> Response:
         url = self.base_url.format(domain=data.pop('domain'))
         auth = 'api', data.pop('api_key')
+        files = {}
+        if data.get('attachment'):
+            files = [('attachment', (attach, open(attach, mode='rb'))) for attach in data['attachment']]
         response, errors = requests.post(url=url,
                                          data=data,
                                          auth=auth,
+                                         files=files,
                                          path_to_errors=self.path_to_errors)
         return self.create_response(data, response, errors)
