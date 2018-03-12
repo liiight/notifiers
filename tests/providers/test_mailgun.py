@@ -64,7 +64,7 @@ class TestMailgun:
             'deliverytime': rfc_2822,
             'testmode': False,
             'tracking': True,
-            'tracking_click': True,
+            'tracking_clicks': True,
             'tracking_opens': True,
             'require_tls': False,
             'skip_verification': True,
