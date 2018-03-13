@@ -70,6 +70,7 @@ Supported providers
 - `Zulip <https://zulipchat.com/>`_
 - `Twilio <https://www.twilio.com/>`_
 - `Pagerduty <https://www.pagerduty.com>`_
+- `Mailgun <https://www.mailgun.com/>`_
 
 Advantages
 ----------

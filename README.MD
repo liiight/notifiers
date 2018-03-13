@@ -25,7 +25,8 @@ Supported providers
 -   [Hipchat](https://www.hipchat.com/docs/apiv2)
 -   [Zulip](https://zulipchat.com/)
 -   [Twilio](https://www.twilio.com/)
--   [PagerDuty](https://www.pagerduty.com)
+-   [Pagerduty](https://www.pagerduty.com)
+-   [Mailgun](https://www.mailgun.com/)
 
 Advantages
 ----------
