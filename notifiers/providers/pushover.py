@@ -177,6 +177,7 @@ class Pushover(PushoverProxy, Provider):
         if data.get('attachment'):
             attachment = data['attachment']
             data['attachment'] = (attachment, open(attachment, mode='rb'))
+            # todo refactor this to use the new files tool
             data = MultipartEncoder(fields=data)
             headers['Content-Type'] = data.content_type
         response, errors = requests.post(url,
