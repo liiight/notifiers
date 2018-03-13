@@ -62,3 +62,18 @@ def get(url: str, *args, **kwargs) -> tuple:
 def post(url: str, *args, **kwargs) -> tuple:
     """Send a POST request. Returns a dict or :class:`requests.Response <Response>`"""
     return RequestsHelper.request(url, 'post', *args, **kwargs)
+
+
+def file_list_for_request(list_of_paths: list, key_name: str, mimetype: str = None) -> list:
+    """
+    Convenience function to construct a list of files for multiple files upload by :mod:`requests`
+
+    :param list_of_paths: Lists of strings to include in files. Should be pre validated for correctness
+    :param key_name: The key name to use for the file list in the request
+    :param mimetype: If specified, will be included in the requests
+    :return: List of open files ready to be used in a request
+    """
+    if mimetype:
+        return [(key_name, (file, open(file, mode='rb'), mimetype)) for file in list_of_paths]
+    return [(key_name, (file, open(file, mode='rb'))) for file in list_of_paths]
+    # todo add tests

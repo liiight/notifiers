@@ -60,7 +60,7 @@ class TestPushbulletCLI:
         assert not result.output
 
     @pytest.mark.online
-    def test_telegram_updates_positive(self, cli_runner):
+    def test_pushbullet_devices_positive(self, cli_runner):
         token = os.environ.get('NOTIFIERS_PUSHBULLET_TOKEN')
         assert token
 
