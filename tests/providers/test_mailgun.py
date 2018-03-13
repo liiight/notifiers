@@ -87,3 +87,14 @@ class TestMailgun:
         rsp = provider.notify(**data)
         assert rsp.status == FAILURE_STATUS
         assert 'Forbidden' in rsp.errors
+
+
+class TestMailGunCLI:
+
+    @pytest.mark.online
+    def test_mailgun_notify(self, cli_runner):
+        cmd = f'pushbullet devices --token {token}'.split()
+        result = cli_runner(cmd)
+        assert result.exit_code == 0
+        replies = ['You have no devices associated with this token', 'Nickname: ']
+        assert any(reply in result.output for reply in replies)

@@ -200,15 +200,16 @@ class MailGun(Provider):
             'domain': data.pop('domain'),
             'api_key': data.pop('api_key')
         }
+
         if data.get('message'):
             new_data['text'] = data.pop('message')
-        if data.get('html'):
-            new_data['html'] = data.pop('html')
+
         if data.get('attachment'):
             attachment = data.pop('attachment')
             if isinstance(attachment, str):
                 attachment = [attachment]
             new_data['attachment'] = attachment
+
         if data.get('inline'):
             inline = data.pop('inline')
             if isinstance(inline, str):
@@ -229,6 +230,9 @@ class MailGun(Provider):
             for key, value in data['data'].items():
                 new_data[f'v:{key}'] = json.dumps(value)
             del data['data']
+
+        for key, value in data.items():
+            new_data[key] = value
 
         return new_data
 
