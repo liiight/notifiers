@@ -44,4 +44,4 @@ class TestPopcornNotify:
         error = 'Please provide a valid API key'
         assert error in rsp.errors
         with pytest.raises(BadArguments, match=error):
-            rsp.raise_one_errors()
+            rsp.raise_on_errors()

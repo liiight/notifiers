@@ -71,6 +71,7 @@ Supported providers
 - `Twilio <https://www.twilio.com/>`_
 - `Pagerduty <https://www.pagerduty.com>`_
 - `Mailgun <https://www.mailgun.com/>`_
+- `PopcornNotify <https://popcornnotify.com/>`_
 
 Advantages
 ----------
