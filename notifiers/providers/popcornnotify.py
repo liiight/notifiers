@@ -42,6 +42,8 @@ class PopcornNotify(Provider):
     }
 
     def _prepare_data(self, data: dict) -> dict:
+        if isinstance(data['recipients'], str):
+            data['recipients'] = [data['recipients']]
         data['recipients'] = list_to_commas(data['recipients'])
         return data
 

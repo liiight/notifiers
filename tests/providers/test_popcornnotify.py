@@ -1,4 +1,6 @@
 import pytest
+from notifiers.exceptions import BadArguments
+from notifiers.core import FAILURE_STATUS
 
 from notifiers.exceptions import BadArguments
 
@@ -30,6 +32,16 @@ class TestPopcornNotify:
         data = {
             'message': 'foo'
         }
-        rsp = provider.notify(**data, raise_on_errors=True)
-        raw_rsp = rsp.response.json()
+        provider.notify(**data, raise_on_errors=True)
 
+    def test_popcornnotify_error(self, provider):
+        data = {
+            'message': 'foo',
+            'api_key': 'foo'
+        }
+        rsp = provider.notify(**data)
+        assert rsp.status == FAILURE_STATUS
+        error = 'Please provide a valid API key'
+        assert error in rsp.errors
+        with pytest.raises(BadArguments, match=error):
+            rsp.raise_one_errors()
