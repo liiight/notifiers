@@ -53,3 +53,8 @@ API documentation for the different providers.
 .. automodule:: notifiers.providers.pagerduty
    :members:
    :undoc-members:
+
+.. automodule:: notifiers.providers.mailgun
+   :members:
+   :undoc-members:
+

@@ -1,19 +1,24 @@
-def one_or_more(schema: dict, unique_items: bool = True) -> dict:
+def one_or_more(schema: dict, unique_items: bool = True, min: int = 1, max: int = None) -> dict:
     """
     Helper function to construct a schema that validates items matching
     `schema` or an array containing items matching `schema`.
 
     :param schema: The schema to use
     :param unique_items: Flag if array items should be unique
+    :param min: Correlates to ``minLength`` attribute of JSON Schema array
+    :param max: Correlates to ``maxLength`` attribute of JSON Schema array
     """
+    multi_schema = {
+        'type': 'array',
+        'items': schema,
+        'minItems': min,
+        'uniqueItems': unique_items
+    }
+    if max:
+        multi_schema['maxItems'] = max
     return {
         'oneOf': [
-            {
-                'type': 'array',
-                'items': schema,
-                'minItems': 1,
-                'uniqueItems': unique_items
-            },
+            multi_schema,
             schema
         ]
     }

@@ -61,7 +61,9 @@ def json_schema_to_click_type(schema: dict) -> tuple:
     click_type = SCHEMA_BASE_MAP[schema['type']]
     description = schema.get('title')
     if schema.get('enum'):
-        choices = click.Choice(schema['enum'])
+        # todo handle multi type enums better (or at all)
+        enum = [value for value in schema['enum'] if isinstance(value, str)]
+        choices = click.Choice(enum)
     return click_type, description, choices
 
 
