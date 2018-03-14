@@ -8,7 +8,7 @@ class Statuspage(Provider):
     base_url = 'https://api.statuspage.io/v1//pages/{page_id}/incidents.json'
     site_url = 'https://statuspage.io'
     name = 'statuspage'
-    path_to_errors = 'errors',
+    path_to_errors = 'error',
 
     realtime_statuses = [
         'investigating',
@@ -168,6 +168,8 @@ class Statuspage(Provider):
             'page_id': data.pop('page_id')
         }
         for key, value in data.items():
+            if isinstance(value, bool):
+                value = 't' if value else 'f'
             new_data[f'incident[{key}]'] = value
         return new_data
 
