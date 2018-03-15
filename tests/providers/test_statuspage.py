@@ -95,7 +95,7 @@ class TestStatusPage:
             'body': 'Incident body',
             'impact_override': 'minor',
             'backfilled': True,
-            'backfill_date': (datetime.datetime.utcnow() - datetime.timedelta(days=1)).isoformat()
+            'backfill_date': (datetime.date.today() - datetime.timedelta(days=1)).isoformat()
         })
     ])
     def test_success(self, data, provider):
