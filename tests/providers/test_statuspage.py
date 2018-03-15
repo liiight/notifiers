@@ -84,8 +84,8 @@ class TestStatusPage:
             'wants_twitter_update': False,
             'impact_override': 'minor',
             'deliver_notifications': False,
-            'scheduled_for': (datetime.datetime.now() + datetime.timedelta(minutes=1)).isoformat(),
-            'scheduled_until': (datetime.datetime.now() + datetime.timedelta(minutes=2)).isoformat(),
+            'scheduled_for': (datetime.datetime.utcnow() + datetime.timedelta(minutes=1)).isoformat(),
+            'scheduled_until': (datetime.datetime.utcnow() + datetime.timedelta(minutes=2)).isoformat(),
             'scheduled_remind_prior': False,
             'scheduled_auto_in_progress': True,
             'scheduled_auto_completed': True
@@ -95,7 +95,7 @@ class TestStatusPage:
             'body': 'Incident body',
             'impact_override': 'minor',
             'backfilled': True,
-            'backfill_date': (datetime.datetime.now() - datetime.timedelta(hours=1)).isoformat()
+            'backfill_date': (datetime.datetime.utcnow() - datetime.timedelta(hours=1)).isoformat()
         })
     ])
     def test_success(self, data, provider):
