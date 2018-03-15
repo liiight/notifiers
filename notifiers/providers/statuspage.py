@@ -161,7 +161,7 @@ class Statuspage(Provider):
                                                 f"Please choose one of {self.scheduled_statuses}")
         elif backfill and status:
             raise BadArguments(provider=self.name,
-                               validation_error=f"Cannot set 'status' when setting 'backfill'!")
+                               validation_error="Cannot set 'status' when setting 'backfill'!")
 
         return data
 
