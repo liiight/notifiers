@@ -198,10 +198,10 @@ class SchemaResource(ABC):
         if environs:
             data = merge_dicts(data, environs)
 
-        self._validate_data(data)
-        data = self._prepare_data(data)
         data = self._merge_defaults(data)
+        self._validate_data(data)
         data = self._validate_data_dependencies(data)
+        data = self._prepare_data(data)
         return data
 
     def __init__(self):

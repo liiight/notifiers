@@ -143,10 +143,10 @@ class Statuspage(Provider):
     }
 
     def _validate_data_dependencies(self, data: dict) -> dict:
-        scheduled_properties = [prop for prop in self.arguments if prop.startswith('scheduled')]
+        scheduled_properties = [prop for prop in data if prop.startswith('scheduled')]
         scheduled = any(data.get(prop) is not None for prop in scheduled_properties)
 
-        backfill_properties = [prop for prop in self.arguments if prop.startswith('backfill')]
+        backfill_properties = [prop for prop in data if prop.startswith('backfill')]
         backfill = any(data.get(prop) is not None for prop in backfill_properties)
 
         if scheduled and backfill:
@@ -159,6 +159,10 @@ class Statuspage(Provider):
             raise BadArguments(provider=self.name,
                                validation_error=f"Status '{status}' is a realtime incident status! "
                                                 f"Please choose one of {self.scheduled_statuses}")
+        elif backfill and status:
+            raise BadArguments(provider=self.name,
+                               validation_error=f"Cannot set 'status' when setting 'backfill'!")
+
         return data
 
     def _prepare_data(self, data: dict) -> dict:
