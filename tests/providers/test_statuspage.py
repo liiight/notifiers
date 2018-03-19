@@ -1,8 +1,9 @@
+import datetime
+
 import pytest
 
-import datetime
-from notifiers.exceptions import BadArguments, NotificationError
 from notifiers.core import FAILURE_STATUS
+from notifiers.exceptions import BadArguments
 
 provider = 'statuspage'
 
