@@ -51,6 +51,11 @@ class TestSMTP(object):
         rsp = provider.notify(to=to, message='foo')
         assert rsp.data['to'] == ','.join(to)
 
+    def test_attachmet(self, provider):
+        attachments = ['foo.txt', 'bar.txt', 'baz.txt']
+        rsp = provider.notify(to='foo', message='bar', attachments=attachments)
+        assert rsp.data['attachments'] == ','.join(attachments)
+
     @pytest.mark.online
     def test_smtp_sanity(self, provider):
         """using Gmail SMTP"""
