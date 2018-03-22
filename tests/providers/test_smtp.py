@@ -54,7 +54,7 @@ class TestSMTP(object):
     def test_attachment(self, provider):
         attachments = ['foo.txt', 'bar.txt', 'baz.txt']
         rsp = provider.notify(to='foo', message='bar', attachments=attachments)
-        assert rsp.data['attachments'] == ','.join(attachments)
+        assert rsp.data['attachments'] == attachments
 
     @pytest.mark.online
     def test_smtp_sanity(self, provider):
