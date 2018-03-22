@@ -2,10 +2,9 @@ import getpass
 import smtplib
 import socket
 from email.mime.multipart import MIMEMultipart
+from email.mime.application import MIMEApplication
 from email.mime.text import MIMEText
 from email.utils import formatdate
-from email.mime.base import MIMEBase
-from email import encoders
 from smtplib import SMTPAuthenticationError, SMTPServerDisconnected, SMTPSenderRefused
 
 from ..core import Provider, Response
@@ -127,6 +126,11 @@ class SMTP(Provider):
         email.attach(MIMEText(data['message'].encode('utf-8'), content_type, _charset='utf-8'))
         return email
 
+    def _add_attachments(self, data: dict, email) -> MIMEMultipart:
+        for attachment in data['attachments']:
+            email.attach(MIMEApplication(open(attachment).read()))
+        return email
+
     def _connect_to_server(self, data: dict):
         self.smtp_server = smtplib.SMTP_SSL if data['ssl'] else smtplib.SMTP
         self.smtp_server = self.smtp_server(data['host'], data['port'])
@@ -149,6 +153,7 @@ class SMTP(Provider):
             if not self.configuration or not self.smtp_server or self.configuration != configuration:
                 self._connect_to_server(data)
             email = self._build_email(data)
+            email = self._add_attachments(data, email)
             self.smtp_server.sendmail(data['from'], data['to'], email.as_string())
         except (
                 SMTPServerDisconnected, SMTPSenderRefused, socket.error, OSError, IOError, SMTPAuthenticationError
