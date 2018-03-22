@@ -4,6 +4,8 @@ import socket
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formatdate
+from email.mime.base import MIMEBase
+from email import encoders
 from smtplib import SMTPAuthenticationError, SMTPServerDisconnected, SMTPSenderRefused
 
 from ..core import Provider, Response
@@ -54,6 +56,10 @@ class SMTP(Provider):
                 'title': 'the FROM address to use in the email',
                 'duplicate': True
             },
+            'attachments': one_or_more({
+                'type':  "string",
+                'title': 'one or more attachments to use in the email'
+            }),
             'host': {
                 'type': 'string',
                 'title': 'the host of the SMTP server'
