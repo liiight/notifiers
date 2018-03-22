@@ -101,6 +101,7 @@ class SMTP(Provider):
         return {
             'subject': DEFAULT_SUBJECT,
             'from': DEFAULT_FROM,
+            'attachments': False,
             'host': DEFAULT_SMTP_HOST,
             'port': 25,
             'tls': False,
@@ -128,7 +129,11 @@ class SMTP(Provider):
 
     def _add_attachments(self, data: dict, email) -> MIMEMultipart:
         for attachment in data['attachments']:
-            email.attach(MIMEApplication(open(attachment).read()))
+            file = open(attachment, 'rb')
+            part = MIMEApplication(file.read())
+            part.add_header('Content-Disposition', 'attachment', filename=attachment)
+            email.attach(part)
+            file.close()
         return email
 
     def _connect_to_server(self, data: dict):
@@ -153,8 +158,9 @@ class SMTP(Provider):
             if not self.configuration or not self.smtp_server or self.configuration != configuration:
                 self._connect_to_server(data)
             email = self._build_email(data)
-            email = self._add_attachments(data, email)
-            self.smtp_server.sendmail(data['from'], data['to'], email.as_string())
+            if data['attachments']:
+              email = self._add_attachments(data, email)
+            self.smtp_server.sendmail(from_addr=data['from'], to_addrs=data['to'], msg=email.as_string())
         except (
                 SMTPServerDisconnected, SMTPSenderRefused, socket.error, OSError, IOError, SMTPAuthenticationError
         ) as e:
