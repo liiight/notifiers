@@ -6,8 +6,11 @@ from email.mime.application import MIMEApplication
 from email.mime.text import MIMEText
 from email.utils import formatdate
 from smtplib import SMTPAuthenticationError, SMTPServerDisconnected, SMTPSenderRefused
+from pathlib import Path
 
+from ..exceptions import BadArguments
 from ..core import Provider, Response
+from ..utils.helpers import valid_file
 from ..utils.json_schema import one_or_more, list_to_commas
 
 DEFAULT_SUBJECT = "New email from 'notifiers'!"
@@ -101,7 +104,6 @@ class SMTP(Provider):
         return {
             'subject': DEFAULT_SUBJECT,
             'from': DEFAULT_FROM,
-            'attachments': False,
             'host': DEFAULT_SMTP_HOST,
             'port': 25,
             'tls': False,
@@ -129,11 +131,10 @@ class SMTP(Provider):
 
     def _add_attachments(self, data: dict, email) -> MIMEMultipart:
         for attachment in data['attachments']:
-            file = open(attachment, 'rb')
-            part = MIMEApplication(file.read())
+            file = Path(attachment).read_bytes()
+            part = MIMEApplication(file)
             part.add_header('Content-Disposition', 'attachment', filename=attachment)
             email.attach(part)
-            file.close()
         return email
 
     def _connect_to_server(self, data: dict):
@@ -151,6 +152,14 @@ class SMTP(Provider):
     def _get_configuration(self, data: dict) -> tuple:
         return data['host'], data['port'], data.get('username')
 
+    def _validate_data_dependencies(self, data: dict):
+        files = data.get('attachment', [])
+        for file in files:
+            if not valid_file(file):
+                raise BadArguments(provider=self.name,
+                                   validation_error=f"Path '{file}' does not exist or is not a file!")
+        return data
+
     def _send_notification(self, data: dict) -> Response:
         errors = None
         try:
@@ -158,8 +167,8 @@ class SMTP(Provider):
             if not self.configuration or not self.smtp_server or self.configuration != configuration:
                 self._connect_to_server(data)
             email = self._build_email(data)
-            if data['attachments']:
-              email = self._add_attachments(data, email)
+            if data.get('attachments'):
+                email = self._add_attachments(data, email)
             self.smtp_server.sendmail(from_addr=data['from'], to_addrs=data['to'], msg=email.as_string())
         except (
                 SMTPServerDisconnected, SMTPSenderRefused, socket.error, OSError, IOError, SMTPAuthenticationError
