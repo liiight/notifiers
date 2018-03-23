@@ -82,11 +82,7 @@ class TestMailgun:
     def test_mailgun_error_response(self, provider):
         data = {
             'api_key': 'FOO',
-            'message': 'bla',
-            'to': 'BAR',
-            'from': 'BAZ',
-            'domain': 'FOO-BAR-BAZ'
-
+            'message': 'bla'
         }
         rsp = provider.notify(**data)
         assert rsp.status == FAILURE_STATUS
