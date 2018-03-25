@@ -3,7 +3,7 @@ import datetime
 import pytest
 
 from notifiers.core import FAILURE_STATUS
-from notifiers.exceptions import BadArguments
+from notifiers.exceptions import BadArguments, ResourceError
 
 provider = 'statuspage'
 
@@ -101,3 +101,26 @@ class TestStatusPage:
     ])
     def test_success(self, data, provider):
         provider.notify(**data, raise_on_errors=True)
+
+
+class TestStatuspageComponents:
+    resource = 'components'
+
+    def test_statuspage_components_attribs(self, resource):
+        assert resource.schema == {
+            'additionalProperties': False,
+            'properties': {'api_key': {'title': 'OAuth2 token', 'type': 'string'},
+                           'page_id': {'title': 'Page ID', 'type': 'string'}},
+            'required': ['api_key', 'page_id'],
+            'type': 'object'
+        }
+
+        assert resource.name == provider
+        assert resource.required == {'required': ['api_key', 'page_id']}
+
+    def test_statuspage_components_negative(self, resource):
+        with pytest.raises(BadArguments):
+            resource(env_prefix='foo')
+
+        with pytest.raises(ResourceError, match='Could not authenticate'):
+            resource(api_key='foo', page_id='bar')
