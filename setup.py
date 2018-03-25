@@ -3,7 +3,7 @@ from distutils.core import setup
 
 from setuptools import find_packages
 
-with io.open('README.rst', encoding='utf-8') as readme:
+with io.open('README.MD', encoding='utf-8') as readme:
     long_description = readme.read()
 
 
@@ -30,6 +30,7 @@ setup(
     author_email='or.carmi82@gmail.com',
     description='Easily send notifications everywhere',
     long_description=long_description,
+    long_description_content_type="text/markdown",
     include_package_data=True,
     install_requires=load_requirements('requirements.txt'),
     tests_require=['pytest'],
