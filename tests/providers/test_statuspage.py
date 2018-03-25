@@ -12,7 +12,7 @@ class TestStatusPage:
 
     def test_metadata(self, provider):
         assert provider.metadata == {
-            'base_url': 'https://api.statuspage.io/v1//pages/{page_id}/incidents.json',
+            'base_url': 'https://api.statuspage.io/v1//pages/{page_id}/',
             'name': 'statuspage',
             'site_url': 'https://statuspage.io'
         }
