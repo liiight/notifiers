@@ -49,7 +49,13 @@ class TestZulip:
         rsp.raise_on_errors()
 
     def test_zulip_type_key(self, provider):
-        rsp = provider.notify(email='foo', api_key='bar', to='baz', domain='bla', type_='private', message='foo')
+        rsp = provider.notify(email='foo',
+                              api_key='bar',
+                              to='baz',
+                              domain='bla',
+                              type_='private',
+                              message='foo',
+                              subject='foo')
         rsp_data = rsp.data
         assert not rsp_data.get('type_')
         assert rsp_data['type'] == 'private'

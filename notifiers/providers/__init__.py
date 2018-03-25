@@ -1,6 +1,6 @@
 from . import (
     pushover, simplepush, slack, email, gmail, telegram, gitter, pushbullet, join, hipchat, zulip, twilio, pagerduty,
-    mailgun, popcornnotify
+    mailgun, popcornnotify, statuspage
 )
 
 _all_providers = {
@@ -18,5 +18,6 @@ _all_providers = {
     'twilio': twilio.Twilio,
     'pagerduty': pagerduty.PagerDuty,
     'mailgun': mailgun.MailGun,
-    'popcornnotify': popcornnotify.PopcornNotify
+    'popcornnotify': popcornnotify.PopcornNotify,
+    'statuspage': statuspage.Statuspage
 }

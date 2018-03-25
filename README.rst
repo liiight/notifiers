@@ -72,7 +72,7 @@ Supported providers
 - `Pagerduty <https://www.pagerduty.com>`_
 - `Mailgun <https://www.mailgun.com/>`_
 - `PopcornNotify <https://popcornnotify.com/>`_
-
+- `StatusPage.io <https://statuspage.io>`_
 Advantages
 ----------
 - Spend your precious time on your own code base, instead of chasing down 3rd party provider APIs. That's what we're here for!

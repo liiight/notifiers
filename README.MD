@@ -28,6 +28,7 @@ Supported providers
 -   [Pagerduty](https://www.pagerduty.com)
 -   [Mailgun](https://www.mailgun.com/)
 -   [PopcornNotify](https://popcornnotify.com)
+-   [StatusPage.io](https://statuspage.io)
 
 Advantages
 ----------
