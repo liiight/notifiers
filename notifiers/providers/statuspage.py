@@ -1,14 +1,63 @@
-from ..core import Provider, Response
+from ..core import Provider, Response, ProviderResource
+from ..exceptions import BadArguments, ResourceError
 from ..utils import requests
-from ..exceptions import BadArguments
 
 
-class Statuspage(Provider):
-    """Create Statuspage incidents"""
-    base_url = 'https://api.statuspage.io/v1//pages/{page_id}/incidents.json'
-    site_url = 'https://statuspage.io'
+class StatuspageProxy:
+    """Shared resources between :class:`Statuspage` and :class:`StatuspageComponents`"""
+    base_url = 'https://api.statuspage.io/v1//pages/{page_id}/'
     name = 'statuspage'
     path_to_errors = 'error',
+    site_url = 'https://statuspage.io'
+
+
+class StatuspageComponents(StatuspageProxy, ProviderResource):
+    """Return a list of Statuspage components for the page ID"""
+    resource_name = 'components'
+    components_url = 'components.json'
+
+    _required = {
+        'required': [
+            'api_key',
+            'page_id'
+        ]
+    }
+
+    _schema = {
+        'type': 'object',
+        'properties': {
+            'api_key': {
+                'type': 'string',
+                'title': 'OAuth2 token'
+            },
+            'page_id': {
+                'type': 'string',
+                'title': 'Page ID'
+            }
+        },
+        'additionalProperties': False
+    }
+
+    def _get_resource(self, data: dict) -> dict:
+        url = self.base_url.format(page_id=data['page_id']) + self.components_url
+        params = {
+            'api_key': data.pop('api_key')
+        }
+        response, errors = requests.get(url,
+                                        params=params,
+                                        path_to_errors=self.path_to_errors)
+        if errors:
+            raise ResourceError(errors=errors,
+                                resource=self.resource_name,
+                                provider=self.name,
+                                data=data,
+                                response=response)
+        return response.json()
+
+
+class Statuspage(StatuspageProxy, Provider):
+    """Create Statuspage incidents"""
+    incidents_url = 'incidents.json'
 
     realtime_statuses = [
         'investigating',
@@ -178,7 +227,7 @@ class Statuspage(Provider):
         return new_data
 
     def _send_notification(self, data: dict) -> Response:
-        url = self.base_url.format(page_id=data.pop('page_id'))
+        url = self.base_url.format(page_id=data.pop('page_id')) + self.incidents_url
         params = {
             'api_key': data.pop('api_key')
         }
@@ -187,3 +236,13 @@ class Statuspage(Provider):
                                          params=params,
                                          path_to_errors=self.path_to_errors)
         return self.create_response(data, response, errors)
+
+    @property
+    def resources(self):
+        return [
+            'components'
+        ]
+
+    @property
+    def components(self) -> StatuspageComponents:
+        return StatuspageComponents()
