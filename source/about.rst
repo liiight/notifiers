@@ -11,7 +11,7 @@ There has to be a better way, right?
 
 The solution
 ------------
-Enter :mod:`notifiers`. A common interface to many, many notification providers, with a minimal set of dependencies (just :mod:`jsonschema`, :mod:`requests`, :mod:`requests-toolbelt` for some file uploads and :mod:`click` for CLI operations)
+Enter :mod:`notifiers`. A common interface to many, many notification providers, with a minimal set of dependencies (just :mod:`jsonschema`, :mod:`requests`, and :mod:`click` for CLI operations)
 
 The interface
 -------------

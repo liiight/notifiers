@@ -1,7 +1,5 @@
 from pathlib import Path
 
-from requests_toolbelt import MultipartEncoder
-
 from ..core import Provider, Response, ProviderResource
 from ..exceptions import ResourceError, BadArguments
 from ..utils import requests
@@ -162,6 +160,8 @@ class Pushover(PushoverProxy, Provider):
             data['device'] = list_to_commas(data['device'])
         if data.get('html') is not None:
             data['html'] = int(data['html'])
+        if data.get('attachment') and not isinstance(data['attachment'], list):
+            data['attachment'] = [data['attachment']]
         return data
 
     def _validate_data_dependencies(self, data: dict):
@@ -174,15 +174,13 @@ class Pushover(PushoverProxy, Provider):
     def _send_notification(self, data: dict) -> Response:
         url = self.base_url + self.message_url
         headers = {}
+        files = []
         if data.get('attachment'):
-            attachment = data['attachment']
-            data['attachment'] = (attachment, open(attachment, mode='rb'))
-            # todo refactor this to use the new files tool
-            data = MultipartEncoder(fields=data)
-            headers['Content-Type'] = data.content_type
+            files = requests.file_list_for_request(data['attachment'], 'attachment')
         response, errors = requests.post(url,
                                          data=data,
                                          headers=headers,
+                                         files=files,
                                          path_to_errors=self.path_to_errors)
         return self.create_response(data, response, errors)
 
