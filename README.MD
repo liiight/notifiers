@@ -13,22 +13,7 @@ Got an app or service and you want to enable your users to use notifications wit
 Supported providers
 -------------------
 
--   [Pushover](https://pushover.net/)
--   [SimplePush](https://simplepush.io/)
--   [Slack](https://api.slack.com/)
--   [Gmail](https://www.google.com/gmail/about/)
--   Email (SMTP)
--   [Telegram](https://telegram.org/)
--   [Gitter](https://gitter.im)
--   [Pushbullet](https://www.pushbullet.com)
--   [Join](https://joaoapps.com/join/)
--   [Hipchat](https://www.hipchat.com/docs/apiv2)
--   [Zulip](https://zulipchat.com/)
--   [Twilio](https://www.twilio.com/)
--   [Pagerduty](https://www.pagerduty.com)
--   [Mailgun](https://www.mailgun.com/)
--   [PopcornNotify](https://popcornnotify.com)
--   [StatusPage.io](https://statuspage.io)
+[Pushover](https://pushover.net/), [SimplePush](https://simplepush.io/), [Slack](https://api.slack.com/), [Gmail](https://www.google.com/gmail/about/), Email (SMTP), [Telegram](https://telegram.org/), [Gitter](https://gitter.im), [Pushbullet](https://www.pushbullet.com), [Join](https://joaoapps.com/join/), [Hipchat](https://www.hipchat.com/docs/apiv2), [Zulip](https://zulipchat.com/), [Twilio](https://www.twilio.com/), [Pagerduty](https://www.pagerduty.com), [Mailgun](https://www.mailgun.com/), [PopcornNotify](https://popcornnotify.com), [StatusPage.io](https://statuspage.io)
 
 Advantages
 ----------
@@ -96,13 +81,7 @@ In the near future
 -   Many more providers!
 -   Low level providers (Amazon SNS, Google FCM, OS Toast messages) via `extra` dependencies
 
-### Why python 3 only?
-
-I wanted to avoid the whole unicode issue fiasco if possible, but there isn't a real constraint in adding python 2 support. If there's an
-overwhelming desire for this, i'll do it. Probably.
-
 See [Docs](http://notifiers.readthedocs.io/) for more information
-
 
 Donations
 ---------
