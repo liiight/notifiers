@@ -55,6 +55,10 @@ class Pushbullet(PushbulletProxy, Provider):
         'title': 'Type of the push, one of "note" or "link"',
         'enum': ['note', 'link']
     }
+
+    _resources = {
+        'devices': PushbulletDevices()
+    }
     _required = {'required': ['message', 'token']}
     _schema = {
         'type': 'object',
@@ -118,12 +122,6 @@ class Pushbullet(PushbulletProxy, Provider):
             'type': 'note'
         }
 
-    @property
-    def resources(self) -> list:
-        return [
-            'devices'
-        ]
-
     def _prepare_data(self, data: dict) -> dict:
         data['body'] = data.pop('message')
 
@@ -139,7 +137,3 @@ class Pushbullet(PushbulletProxy, Provider):
                                          headers=headers,
                                          path_to_errors=self.path_to_errors)
         return self.create_response(data, response, errors)
-
-    @property
-    def devices(self) -> PushbulletDevices:
-        return PushbulletDevices()

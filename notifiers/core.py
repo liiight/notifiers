@@ -212,6 +212,16 @@ class SchemaResource(ABC):
 class Provider(SchemaResource, ABC):
     """The Base class all notification providers inherit from."""
 
+    _resources = {}
+
+    def __repr__(self):
+        return f'<Provider:[{self.name.capitalize()}]>'
+
+    def __getattr__(self, item):
+        if item in self._resources:
+            return self._resources[item]
+        raise AttributeError(f'{self} does not have a property {item}')
+
     @property
     @abstractmethod
     def base_url(self):
@@ -221,9 +231,6 @@ class Provider(SchemaResource, ABC):
     @abstractmethod
     def site_url(self):
         pass
-
-    def __repr__(self):
-        return f'<Provider:[{self.name.capitalize()}]>'
 
     @property
     def metadata(self) -> dict:
@@ -239,7 +246,7 @@ class Provider(SchemaResource, ABC):
     @property
     def resources(self) -> list:
         """Return a list of names of relevant :class:`~notifiers.core.ProviderResource` objects"""
-        return []
+        return list(self._resources.keys())
 
     @abstractmethod
     def _send_notification(self, data: dict) -> Response:

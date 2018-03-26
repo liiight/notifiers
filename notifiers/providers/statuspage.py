@@ -59,6 +59,10 @@ class Statuspage(StatuspageProxy, Provider):
     """Create Statuspage incidents"""
     incidents_url = 'incidents.json'
 
+    _resources = {
+        'components': StatuspageComponents()
+    }
+
     realtime_statuses = [
         'investigating',
         'identified',
@@ -236,13 +240,3 @@ class Statuspage(StatuspageProxy, Provider):
                                          params=params,
                                          path_to_errors=self.path_to_errors)
         return self.create_response(data, response, errors)
-
-    @property
-    def resources(self):
-        return [
-            'components'
-        ]
-
-    @property
-    def components(self) -> StatuspageComponents:
-        return StatuspageComponents()

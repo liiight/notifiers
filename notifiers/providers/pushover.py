@@ -74,6 +74,11 @@ class Pushover(PushoverProxy, Provider):
     site_url = 'https://pushover.net/'
     name = 'pushover'
 
+    _resources = {
+        'sounds': PushoverSounds(),
+        'limits': PushoverLimits()
+    }
+
     _required = {'required': ['user', 'message', 'token']}
     _schema = {
         'type': 'object',
@@ -189,20 +194,3 @@ class Pushover(PushoverProxy, Provider):
         m = super().metadata
         m['message_url'] = self.message_url
         return m
-
-    @property
-    def resources(self) -> list:
-        return [
-            'sounds',
-            'limits'
-        ]
-
-    @property
-    def sounds(self) -> PushoverSounds:
-        return PushoverSounds()
-
-    @property
-    def limits(self) -> PushoverLimits:
-        return PushoverLimits()
-
-    # todo create devices method
