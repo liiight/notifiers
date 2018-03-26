@@ -15,10 +15,40 @@ Enter :mod:`notifiers`. A common interface to many, many notification providers,
 
 The interface
 -------------
+
+Consistent naming
+~~~~~~~~~~~~~~~~~
+
 Right out of the gate there was an issue of consistent naming. Different API providers have different names for similar properties.
 For example, one provider can name its API key as ``api_key``, another as ``token``, the third as ``apikey`` and etc.
 The solution I chose was to be as fateful to the original API properties as possible, with the only exception being the ``message`` property,
 which is shared among all notifiers and replaced internally as needed.
+
+Snake Case
+~~~~~~~~~~
+
+While the majority of providers already expect lower case and speicfically snake cased properties in their request, some do not.
+Notifiers normalizes this by making all request properties snake case and converting to relevant usage behind the scenes.
+
+Reserved words issue
+~~~~~~~~~~~~~~~~~~~~
+
+Some provider properties clash with python's reserved words, ``from`` being the most prominent example of that. There are two solutions to that issues.
+The first is to construct data via a dict and unpack it into the :meth:`~notifiers.core.Provider.notify` command like so:
+
+.. code:: python
+
+   >>> data = {
+        'to': 'foo@bar.com',
+        'from': 'bar@foo.com'
+   }
+   >>> provider.notify(**data)
+
+The other is to use an alternate key word, which would always be the reservred key word followed by an underscore:
+
+.. code:: python
+
+   >>> provider.notify(to='foo@bar.com', from_='bar@foo.com')
 
 What this is
 ------------
