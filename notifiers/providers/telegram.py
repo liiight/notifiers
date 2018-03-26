@@ -50,6 +50,10 @@ class Telegram(TelegramProxy, Provider):
     site_url = 'https://core.telegram.org/'
     push_endpoint = '/sendMessage'
 
+    _resources = {
+        'updates': TelegramUpdates()
+    }
+
     _required = {'required': ['message', 'chat_id', 'token']}
     _schema = {
         'type': 'object',
@@ -101,13 +105,3 @@ class Telegram(TelegramProxy, Provider):
         url = self.base_url.format(token=token) + self.push_endpoint
         response, errors = requests.post(url, json=data, path_to_errors=self.path_to_errors)
         return self.create_response(data, response, errors)
-
-    @property
-    def resources(self):
-        return [
-            'updates'
-        ]
-
-    @property
-    def updates(self) -> TelegramUpdates:
-        return TelegramUpdates()

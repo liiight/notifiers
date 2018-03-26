@@ -22,7 +22,7 @@ class GitterProxy:
 
 class GitterRooms(GitterProxy, ProviderResource):
     """Returns a list of Gitter rooms via token"""
-    resource_name = 'room'
+    resource_name = 'rooms'
 
     _required = {
         'required': [
@@ -68,6 +68,10 @@ class Gitter(GitterProxy, Provider):
     message_url = '/{room_id}/chatMessages'
     site_url = 'https://gitter.im'
 
+    _resources = {
+        'rooms': GitterRooms()
+    }
+
     _required = {'required': ['message', 'token', 'room_id']}
     _schema = {
         'type': 'object',
@@ -106,13 +110,3 @@ class Gitter(GitterProxy, Provider):
         headers = self._get_headers(data.pop('token'))
         response, errors = requests.post(url, json=data, headers=headers, path_to_errors=self.path_to_errors)
         return self.create_response(data, response, errors)
-
-    @property
-    def resources(self):
-        return [
-            'rooms'
-        ]
-
-    @property
-    def rooms(self) -> GitterRooms:
-        return GitterRooms()
