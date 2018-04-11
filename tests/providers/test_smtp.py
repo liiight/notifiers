@@ -56,7 +56,7 @@ class TestSMTP(object):
         file_1 = dir_.join('foo.txt')
         file_2 = dir_.join('bar.txt')
         file_3 = dir_.join('baz.txt')
-        attachments = [file_1, file_2, file_3]
+        attachments = [str(file_1), str(file_2), str(file_3)]
         rsp = provider.notify(to='foo', message='bar', attachments=attachments)
         assert rsp.data['attachments'] == attachments
 
