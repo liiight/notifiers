@@ -35,7 +35,7 @@ class Response:
         self.errors = errors
 
     def __repr__(self):
-        return f'<Response,provider={self.provider.capitalize()},status={self.status}>'
+        return f'<Response,provider={self.provider.capitalize()},status={self.status}, errors={self.errors}>'
 
     def raise_on_errors(self):
         """

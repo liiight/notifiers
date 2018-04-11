@@ -2,11 +2,15 @@ import getpass
 import smtplib
 import socket
 from email.mime.multipart import MIMEMultipart
+from email.mime.application import MIMEApplication
 from email.mime.text import MIMEText
 from email.utils import formatdate
 from smtplib import SMTPAuthenticationError, SMTPServerDisconnected, SMTPSenderRefused
+from pathlib import Path
 
+from ..exceptions import BadArguments
 from ..core import Provider, Response
+from ..utils.helpers import valid_file
 from ..utils.json_schema import one_or_more, list_to_commas
 
 DEFAULT_SUBJECT = "New email from 'notifiers'!"
@@ -54,6 +58,10 @@ class SMTP(Provider):
                 'title': 'the FROM address to use in the email',
                 'duplicate': True
             },
+            'attachments': one_or_more({
+                'type':  "string",
+                'title': 'one or more attachments to use in the email'
+            }),
             'host': {
                 'type': 'string',
                 'title': 'the host of the SMTP server'
@@ -121,6 +129,14 @@ class SMTP(Provider):
         email.attach(MIMEText(data['message'].encode('utf-8'), content_type, _charset='utf-8'))
         return email
 
+    def _add_attachments(self, data: dict, email) -> MIMEMultipart:
+        for attachment in data['attachments']:
+            file = Path(attachment).read_bytes()
+            part = MIMEApplication(file)
+            part.add_header('Content-Disposition', 'attachment', filename=attachment)
+            email.attach(part)
+        return email
+
     def _connect_to_server(self, data: dict):
         self.smtp_server = smtplib.SMTP_SSL if data['ssl'] else smtplib.SMTP
         self.smtp_server = self.smtp_server(data['host'], data['port'])
@@ -136,6 +152,14 @@ class SMTP(Provider):
     def _get_configuration(self, data: dict) -> tuple:
         return data['host'], data['port'], data.get('username')
 
+    def _validate_data_dependencies(self, data: dict):
+        files = data.get('attachment', [])
+        for file in files:
+            if not valid_file(file):
+                raise BadArguments(provider=self.name,
+                                   validation_error=f"Path '{file}' does not exist or is not a file!")
+        return data
+
     def _send_notification(self, data: dict) -> Response:
         errors = None
         try:
@@ -143,7 +167,9 @@ class SMTP(Provider):
             if not self.configuration or not self.smtp_server or self.configuration != configuration:
                 self._connect_to_server(data)
             email = self._build_email(data)
-            self.smtp_server.sendmail(data['from'], data['to'], email.as_string())
+            if data.get('attachments'):
+                email = self._add_attachments(data, email)
+            self.smtp_server.sendmail(from_addr=data['from'], to_addrs=data['to'], msg=email.as_string())
         except (
                 SMTPServerDisconnected, SMTPSenderRefused, socket.error, OSError, IOError, SMTPAuthenticationError
         ) as e:
