@@ -36,7 +36,8 @@ class TestPopcornNotify:
     def test_popcornnotify_error(self, provider):
         data = {
             'message': 'foo',
-            'api_key': 'foo'
+            'api_key': 'foo',
+            'recipients': 'foo'
         }
         rsp = provider.notify(**data)
         assert rsp.status == FAILURE_STATUS

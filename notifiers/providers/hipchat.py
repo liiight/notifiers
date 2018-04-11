@@ -158,6 +158,11 @@ class HipChat(HipChatProxy, Provider):
     user_message = '/{user}/message'
     site_url = 'https://www.hipchat.com/docs/apiv2'
 
+    _resources = {
+        'rooms': HipChatRooms(),
+        'users': HipChatUsers()
+    }
+
     __icon = {
         'oneOf': [
             {
@@ -434,18 +439,3 @@ class HipChat(HipChatProxy, Provider):
         headers = self._get_headers(data.pop('token'))
         response, errors = requests.post(url, json=data, headers=headers, path_to_errors=self.path_to_errors)
         return self.create_response(data, response, errors)
-
-    @property
-    def resources(self) -> list:
-        return [
-            'rooms',
-            'users'
-        ]
-
-    @property
-    def users(self) -> HipChatUsers:
-        return HipChatUsers()
-
-    @property
-    def rooms(self) -> HipChatRooms:
-        return HipChatRooms()

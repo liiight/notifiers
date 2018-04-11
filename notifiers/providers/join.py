@@ -72,6 +72,10 @@ class Join(JoinProxy, Provider):
     push_url = '/sendPush'
     site_url = 'https://joaoapps.com/join/api/'
 
+    _resources = {
+        'devices': JoinDevices()
+    }
+
     _required = {
         'dependencies': {
             'smstext': ['smsnumber'],
@@ -222,13 +226,3 @@ class Join(JoinProxy, Provider):
         url = self.base_url + self.push_url
         response, errors = self._join_request(url, data)
         return self.create_response(data, response, errors)
-
-    @property
-    def resources(self):
-        return [
-            'devices'
-        ]
-
-    @property
-    def devices(self) -> JoinDevices:
-        return JoinDevices()

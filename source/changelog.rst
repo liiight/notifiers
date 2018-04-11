@@ -4,11 +4,20 @@ Changelog
 Unreleased (develop)
 --------------------
 
+0.7.2
+-----
+
 Added
 ~~~~~
 
 - `Mailgun <https://www.mailgun.com/>`_ support (`#96 <https://github.com/liiight/notifiers/pull/96>`_)
 - `PopcornNotify <https://popcornnotify.com/>`_ support (`#97 <https://github.com/liiight/notifiers/pull/97>`_)
+- `StatusPage.io <https://statuspage.io>`_ support (`#98 <https://github.com/liiight/notifiers/pull/98>`_)
+
+Dependency changes
+~~~~~~~~~~~~~~~~~~
+
+- Removed :mod:`requests-toolbelt` (it wasn't actually needed, :mod:`requests` was sufficient)
 
 0.7.1
 -----

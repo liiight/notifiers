@@ -1,7 +1,6 @@
-from ..core import Provider, Response, ProviderResource
-from ..utils.helpers import snake_to_camel_case
+from ..core import Provider, Response
 from ..utils import requests
-from ..exceptions import ResourceError
+from ..utils.helpers import snake_to_camel_case
 
 
 class Twilio(Provider):
@@ -18,7 +17,7 @@ class Twilio(Provider):
                     {
                         'anyOf': [
                             {
-                                'required':[
+                                'required': [
                                     'from'
                                 ]
                             },

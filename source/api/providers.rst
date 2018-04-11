@@ -58,3 +58,11 @@ API documentation for the different providers.
    :members:
    :undoc-members:
 
+.. automodule:: notifiers.providers.popcornnotify
+   :members:
+   :undoc-members:
+
+.. automodule:: notifiers.providers.statuspage
+   :members:
+   :undoc-members:
+
