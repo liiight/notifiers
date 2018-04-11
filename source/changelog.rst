@@ -4,6 +4,11 @@ Changelog
 Unreleased (develop)
 --------------------
 
+Added
+~~~~~
+
+- Added ability to add email attachment via SMTP (`#91 <https://github.com/liiight/notifiers/pull/91>`_) via (`#99 <https://github.com/liiight/notifiers/pull/99>`_). Thanks `@grabear <https://github.com/grabear>`_
+
 0.7.2
 -----
 
