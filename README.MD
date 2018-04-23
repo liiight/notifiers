@@ -75,6 +75,11 @@ Directly add to your existing stdlib logging:
 >>> log.error('And just like that, you get notified about all your errors!')
 ```
 
+Mentions
+--------
+
+- Mentioned in [Python Bytes](https://pythonbytes.fm/episodes/show/67/result-of-moving-python-to-github) podcast
+
 In the near future 
 ------------------
 
