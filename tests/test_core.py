@@ -1,8 +1,9 @@
 import pytest
 
 import notifiers
-from notifiers.core import Provider, Response
-from notifiers.exceptions import BadArguments, SchemaError, NotificationError
+from notifiers import notify
+from notifiers.core import Provider, Response, SUCCESS_STATUS
+from notifiers.exceptions import BadArguments, SchemaError, NotificationError, NoSuchNotifierError
 from notifiers.utils.helpers import text_to_bool, merge_dicts, dict_from_environs, snake_to_camel_case
 
 
@@ -162,6 +163,20 @@ class TestCore:
 
         rsp = resource(key='fpp')
         assert rsp == {'status': 'success'}
+
+    def test_direct_notify_positive(self, mock_provider):
+        rsp = notify(mock_provider.name, required='foo', message='foo')
+        assert not rsp.errors
+        assert rsp.status == SUCCESS_STATUS
+        assert rsp.data == {
+            'required': 'foo',
+            'message': 'foo',
+            'option_with_default': 'foo'
+        }
+
+    def test_direct_notify_negative(self):
+        with pytest.raises(NoSuchNotifierError, match='No such notifier with name'):
+            notify('foo', message='whateverz')
 
 
 class TestHelpers:

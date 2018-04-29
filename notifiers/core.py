@@ -5,7 +5,7 @@ import jsonschema
 import requests
 from jsonschema.exceptions import best_match
 
-from .exceptions import SchemaError, BadArguments, NotificationError
+from .exceptions import SchemaError, BadArguments, NotificationError, NoSuchNotifierError
 from .utils.helpers import merge_dicts, dict_from_environs
 
 DEFAULT_ENVIRON_PREFIX = 'NOTIFIERS_'
@@ -313,9 +313,21 @@ def get_notifier(provider_name: str, strict: bool = False) -> Provider:
         log.debug("found a match for '%s', returning", provider_name)
         return _all_providers[provider_name]()
     elif strict:
-        raise ValueError(f"Provider '{provider_name}' was not found!")
+        raise NoSuchNotifierError(name=provider_name)
 
 
 def all_providers() -> list:
     """Returns a list of all :class:`~notifiers.core.Provider` names"""
     return list(_all_providers.keys())
+
+
+def notify(provider_name: str, **kwargs) -> Response:
+    """
+    Quickly sends a notification without needing to get a notifier via the :func:`get_notifier` method.
+
+    :param provider_name: Name of the notifier to use. Note that if this notifier name does not exist it will raise a
+    :param kwargs: Notification data, dependant on provider
+    :return: :class:`Response~
+    :raises NoSuchNotifierError: If ``provider_name`` is unknown, will raise notification error
+    """
+    return get_notifier(provider_name=provider_name, strict=True).notify(**kwargs)
