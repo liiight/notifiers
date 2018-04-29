@@ -327,7 +327,8 @@ def notify(provider_name: str, **kwargs) -> Response:
 
     :param provider_name: Name of the notifier to use. Note that if this notifier name does not exist it will raise a
     :param kwargs: Notification data, dependant on provider
-    :return: :class:`Response~
-    :raises NoSuchNotifierError: If ``provider_name`` is unknown, will raise notification error
+    :return: :class:`Response`
+    :raises: :class:`~notifiers.exceptions.NoSuchNotifierError` If ``provider_name`` is unknown,
+     will raise notification error
     """
     return get_notifier(provider_name=provider_name, strict=True).notify(**kwargs)

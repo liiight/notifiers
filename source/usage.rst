@@ -23,9 +23,20 @@ To send a notification invoke the :meth:`~notifiers.core.Provider.notify` method
 
     >>> pushover.notify(apikey='FOO', user='BAR', message='BAZ')
 
-The :meth:`~notifiers.core.Provider.notify` takes key word arguments based on the provider's schema. The ``message`` key word is used in all notifiers.
+The :meth:`notifiers.core.Provider.notify` method takes key word arguments based on the provider's schema. The ``message`` key word is used in all notifiers.
 
-If there's a problem with sent key words, a :class:`~notifiers.exceptions.NotifierException` will be thrown:
+.. note::
+
+    You can also send a notification without getting a provider object via the :meth:`notifiers.core.notify` method:
+
+    .. code-block:: python
+
+        >>> from notifiers import notify
+        >>> notify('pushover', apikey='FOO', user='BAR', message='BAZ').
+
+    The first argument of the :meth:`~notifiers.core.notify` method is the requested provider name. If such does not exist a :class:`~notifiers.exception.NoSuchNotifierError` exception will be raised.
+
+    If there's a problem with sent key words, a :class:`~notifiers.exceptions.NotifierException` will be thrown:
 
 .. code-block:: python
 
