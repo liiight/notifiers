@@ -8,6 +8,7 @@ Added
 ~~~~~
 
 - Added ability to add email attachment via SMTP (`#91 <https://github.com/liiight/notifiers/pull/91>`_) via (`#99 <https://github.com/liiight/notifiers/pull/99>`_). Thanks `@grabear <https://github.com/grabear>`_
+- Added direct notify ability via :meth:`notifiers.notify` via (`#101 <https://github.com/liiight/notifiers/pull/101>`_).
 
 0.7.2
 -----
