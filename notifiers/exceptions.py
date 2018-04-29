@@ -7,10 +7,10 @@ class NotifierException(Exception):
         :param args: Exception arguments
         :param kwargs: Exception kwargs
         """
-        self.provider = kwargs['provider']
-        self.message = kwargs.pop('message', None)
-        self.data = kwargs.pop('data', None)
-        self.response = kwargs.pop('response', None)
+        self.provider = kwargs.get('provider')
+        self.message = kwargs.get('message')
+        self.data = kwargs.get('data')
+        self.response = kwargs.get('response')
         super().__init__(self.message)
 
     def __repr__(self):
@@ -83,3 +83,17 @@ class ResourceError(NotifierException):
 
     def __repr__(self):
         return f'<ResourceError: {self.message}>'
+
+
+class NoSuchNotifierError(NotifierException):
+    """
+    An unknown notifier was requests, one that was not registered
+    """
+
+    def __init__(self, name: str, *args, **kwargs):
+        self.name = name
+        kwargs['message'] = f'No such notifier with name {name}'
+        super().__init__(*args, **kwargs)
+
+    def __repr__(self):
+        return f'<NoSuchNotifierError: {self.name}>'

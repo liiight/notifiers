@@ -6,7 +6,7 @@ from unittest.mock import MagicMock
 import pytest
 from click.testing import CliRunner
 
-from notifiers.core import Provider, Response, get_notifier, ProviderResource
+from notifiers.core import Provider, Response, get_notifier, ProviderResource, SUCCESS_STATUS
 from notifiers.providers import _all_providers
 from notifiers.utils.helpers import text_to_bool
 from notifiers.utils.json_schema import one_or_more, list_to_commas
@@ -39,7 +39,7 @@ class MockResource(MockProxy, ProviderResource):
     }
 
     def _get_resource(self, data: dict):
-        return {'status': 'success'}
+        return {'status': SUCCESS_STATUS}
 
 
 class MockProvider(MockProxy, Provider):
@@ -68,7 +68,7 @@ class MockProvider(MockProxy, Provider):
         }
 
     def _send_notification(self, data: dict):
-        return Response(status='success', provider=self.name, data=data)
+        return Response(status=SUCCESS_STATUS, provider=self.name, data=data)
 
     def _prepare_data(self, data: dict):
         if data.get('not_required'):

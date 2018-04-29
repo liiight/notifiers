@@ -22,6 +22,8 @@ Core API reference
 
 .. autofunction:: notifiers.core.all_providers
 
+.. autofunction:: notifiers.core.notify
+
 Logging
 =======
 

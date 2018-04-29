@@ -1,8 +1,9 @@
 import pytest
 
 import notifiers
-from notifiers.core import Provider, Response
-from notifiers.exceptions import BadArguments, SchemaError, NotificationError
+from notifiers import notify
+from notifiers.core import Provider, Response, SUCCESS_STATUS
+from notifiers.exceptions import BadArguments, SchemaError, NotificationError, NoSuchNotifierError
 from notifiers.utils.helpers import text_to_bool, merge_dicts, dict_from_environs, snake_to_camel_case
 
 
@@ -44,7 +45,7 @@ class TestCore:
         assert isinstance(rsp, Response)
         assert not rsp.errors
         assert rsp.raise_on_errors() is None
-        assert repr(rsp) == '<Response,provider=Mock_provider,status=success, errors=None>'
+        assert repr(rsp) == f'<Response,provider=Mock_provider,status={SUCCESS_STATUS}, errors=None>'
         assert repr(mock_provider) == '<Provider:[Mock_provider]>'
 
     @pytest.mark.parametrize('data', [
@@ -114,7 +115,7 @@ class TestCore:
         prefix = f'mock_'
         monkeypatch.setenv(f'{prefix}{mock_provider.name}_required'.upper(), 'foo')
         rsp = mock_provider.notify(env_prefix=prefix)
-        assert rsp.status == 'success'
+        assert rsp.status == SUCCESS_STATUS
         assert rsp.data['required'] == 'foo'
 
     def test_provided_data_takes_precedence_over_environ(self, mock_provider, monkeypatch):
@@ -122,7 +123,7 @@ class TestCore:
         prefix = f'mock_'
         monkeypatch.setenv(f'{prefix}{mock_provider.name}_required'.upper(), 'foo')
         rsp = mock_provider.notify(required='bar', env_prefix=prefix)
-        assert rsp.status == 'success'
+        assert rsp.status == SUCCESS_STATUS
         assert rsp.data['required'] == 'bar'
 
     def test_resources(self, mock_provider):
@@ -161,7 +162,21 @@ class TestCore:
             resource()
 
         rsp = resource(key='fpp')
-        assert rsp == {'status': 'success'}
+        assert rsp == {'status': SUCCESS_STATUS}
+
+    def test_direct_notify_positive(self, mock_provider):
+        rsp = notify(mock_provider.name, required='foo', message='foo')
+        assert not rsp.errors
+        assert rsp.status == SUCCESS_STATUS
+        assert rsp.data == {
+            'required': 'foo',
+            'message': 'foo',
+            'option_with_default': 'foo'
+        }
+
+    def test_direct_notify_negative(self):
+        with pytest.raises(NoSuchNotifierError, match='No such notifier with name'):
+            notify('foo', message='whateverz')
 
 
 class TestHelpers:

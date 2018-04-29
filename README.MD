@@ -6,7 +6,7 @@ Notifiers
 [![Twitter Follow](https://img.shields.io/twitter/follow/liiight.svg?style=flat-square&logo=twitter&label=Follow) ](https://twitter.com/liiight)
  
 
-See [Releases](http://notifiers.readthedocs.io/en/latest/changelog.html) for recent changes
+See [changelog](http://notifiers.readthedocs.io/en/latest/changelog.html) for recent changes
 
 Got an app or service and you want to enable your users to use notifications with their provider of choice? Working on a script and you want to receive notification based on its output? You don't need to implement a solution yourself, or use individual provider libs. A one stop shop for all notification providers with a unified and simple interface.
 
@@ -43,6 +43,13 @@ Basic Usage
 >>> p.required
 {'required': ['user', 'message', 'token']}
 >>> p.notify(user='foo', token='bar', message='test')
+<NotificationResponse,provider=Pushover,status=Success>
+```
+
+Or:
+```python
+>>> from notifiers import notify
+>>> notify('pushover', user='foo', token='bar', message='test')
 <NotificationResponse,provider=Pushover,status=Success>
 ```
 
