@@ -1,7 +1,6 @@
 import io
-from distutils.core import setup
 
-from setuptools import find_packages
+from setuptools import find_packages, setup
 
 with io.open('README.MD', encoding='utf-8') as readme:
     long_description = readme.read()
