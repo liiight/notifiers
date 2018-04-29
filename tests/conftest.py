@@ -39,7 +39,7 @@ class MockResource(MockProxy, ProviderResource):
     }
 
     def _get_resource(self, data: dict):
-        return {'status': 'success'}
+        return {'status': SUCCESS_STATUS}
 
 
 class MockProvider(MockProxy, Provider):

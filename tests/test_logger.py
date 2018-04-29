@@ -1,5 +1,7 @@
 import logging
 
+from notifiers.exceptions import NoSuchNotifierError
+
 import pytest
 
 log = logging.getLogger('test_logger')
@@ -14,7 +16,7 @@ class TestLogger:
         assert '--- Logging error ---' in capsys.readouterr().err
 
     def test_missing_provider(self, handler):
-        with pytest.raises(ValueError):
+        with pytest.raises(NoSuchNotifierError):
             handler('foo', logging.INFO)
 
     def test_valid_logging(self, magic_mock_provider, handler):
