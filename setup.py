@@ -1,20 +1,20 @@
-import io
+from pathlib import Path
 
 from setuptools import find_packages, setup
 
-with io.open('README.MD', encoding='utf-8') as readme:
-    long_description = readme.read()
+long_description = Path('README.MD').read_text()
 
 
 def load_requirements(filename):
-    with io.open(filename, encoding='utf-8') as reqfile:
+    with Path(filename).open() as reqfile:
         return [line.strip() for line in reqfile if not line.startswith('#')]
 
 
 # Populates __version__ without importing the package
 __version__ = None
-with io.open('notifiers/_version.py', encoding='utf-8') as ver_file:
+with open('notifiers/_version.py', encoding='utf-8') as ver_file:
     exec(ver_file.read())  # pylint: disable=W0122
+
 if not __version__:
     print('Could not find __version__ from notifiers/_version.py')
     exit(1)
@@ -23,11 +23,11 @@ setup(
     name='notifiers',
     version=__version__,
     packages=find_packages(exclude=['notifiers.tests']),
-    url='https://github.com/liiight/notifiers',
+    url='https://github.com/notifiers/notifiers',
     license='MIT',
     author='Or Carmi',
     author_email='or.carmi82@gmail.com',
-    description='Easily send notifications everywhere',
+    description='The easy way to send notifications',
     long_description=long_description,
     long_description_content_type="text/markdown",
     include_package_data=True,
@@ -42,6 +42,7 @@ setup(
         "Operating System :: OS Independent",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
         "Intended Audience :: Developers",
         "Intended Audience :: End Users/Desktop"
     ],
