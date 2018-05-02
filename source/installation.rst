@@ -13,13 +13,13 @@ Or install from source:
 
 .. code-block:: console
 
-    $ pip install https://github.com/liiight/notifiers/master.zip
+    $ pip install https://github.com/notifiers/notifiers/master.zip
 
 Use ``develop`` branch for cutting edge (not recommended):
 
 .. code-block:: console
 
-    $ pip install https://github.com/liiight/notifiers/develop.zip
+    $ pip install https://github.com/notifiers/notifiers/develop.zip
 
 .. note:: Python 3.6 and higher is required when installing via pip
 
