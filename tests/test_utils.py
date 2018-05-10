@@ -1,0 +1,58 @@
+import pytest
+
+from notifiers.utils.helpers import text_to_bool, merge_dicts, dict_from_environs, snake_to_camel_case, valid_file
+
+
+class TestHelpers:
+
+    @pytest.mark.parametrize('text, result', [
+        ('y', True),
+        ('yes', True),
+        ('true', True),
+        ('on', True),
+        ('no', False),
+        ('off', False),
+        ('false', False),
+        ('0', False),
+        ('foo', True),
+        ('bla', True),
+    ])
+    def test_text_to_bool(self, text, result):
+        assert text_to_bool(text) is result
+
+    @pytest.mark.parametrize('target_dict, merge_dict, result', [
+        ({'a': 'foo'}, {'b': 'bar'}, {'a': 'foo', 'b': 'bar'}),
+        ({'a': 'foo'}, {'a': 'bar'}, {'a': 'foo'})
+    ])
+    def test_merge_dict(self, target_dict, merge_dict, result):
+        assert merge_dicts(target_dict, merge_dict) == result
+
+    @pytest.mark.parametrize('prefix, name, args, result', [
+        ('foo', 'bar', ['key1', 'key2'], {'key1': 'baz', 'key2': 'baz'})
+    ])
+    def test_dict_from_environs(self, prefix, name, args, result, monkeypatch):
+        for arg in args:
+            environ = f'{prefix}{name}_{arg}'.upper()
+            monkeypatch.setenv(environ, 'baz')
+        assert dict_from_environs(prefix, name, args) == result
+
+    @pytest.mark.parametrize('snake_value, cc_value', [
+        ('foo_bar', 'FooBar'),
+        ('foo', 'Foo'),
+        ('long_ass_var_name', 'LongAssVarName')
+    ])
+    def test_snake_to_camel_case(self, snake_value, cc_value):
+        assert snake_to_camel_case(snake_value) == cc_value
+
+    def test_valid_file(self, tmpdir):
+        dir_ = str(tmpdir)
+
+        file = tmpdir.join('foo.txt')
+        file.write('foo')
+        file = str(file)
+
+        no_file = 'foo'
+
+        assert valid_file(file)
+        assert not valid_file(dir_)
+        assert not valid_file(no_file)
