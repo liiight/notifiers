@@ -76,4 +76,3 @@ def file_list_for_request(list_of_paths: list, key_name: str, mimetype: str = No
     if mimetype:
         return [(key_name, (file, open(file, mode='rb'), mimetype)) for file in list_of_paths]
     return [(key_name, (file, open(file, mode='rb'))) for file in list_of_paths]
-    # todo add tests

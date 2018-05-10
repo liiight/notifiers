@@ -1,6 +1,7 @@
 import pytest
 
 from notifiers.utils.helpers import text_to_bool, merge_dicts, dict_from_environs, snake_to_camel_case, valid_file
+from notifiers.utils.requests import file_list_for_request
 
 
 class TestHelpers:
@@ -56,3 +57,18 @@ class TestHelpers:
         assert valid_file(file)
         assert not valid_file(dir_)
         assert not valid_file(no_file)
+
+    def test_file_list_for_request(self, tmpdir):
+        file_1 = tmpdir.join('file_1')
+        file_2 = tmpdir.join('file_2')
+
+        file_1.write('foo')
+        file_2.write('foo')
+
+        file_list = file_list_for_request([file_1, file_2], 'foo')
+        assert len(file_list) == 2
+        assert all(len(member[1]) == 2 for member in file_list)
+
+        file_list_2 = file_list_for_request([file_1, file_2], 'foo', 'foo_mimetype')
+        assert len(file_list_2) == 2
+        assert all(len(member[1]) == 3 for member in file_list_2)
