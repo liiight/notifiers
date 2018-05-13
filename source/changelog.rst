@@ -4,6 +4,11 @@ Changelog
 Unreleased (develop)
 --------------------
 
+0.7.4
+-----
+
+Maintenance release, broke markdown on pypi
+
 0.7.3
 -----
 
