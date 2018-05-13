@@ -4,6 +4,9 @@ Changelog
 Unreleased (develop)
 --------------------
 
+0.7.3
+-----
+
 Added
 ~~~~~
 
