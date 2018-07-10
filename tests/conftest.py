@@ -177,6 +177,6 @@ def pytest_runtest_setup(item):
     """Skips PRs if secure env vars are set and test is marked as online"""
     pull_request = text_to_bool(os.environ.get('TRAVIS_PULL_REQUEST'))
     secure_env_vars = text_to_bool(os.environ.get('TRAVIS_SECURE_ENV_VARS'))
-    online = item.get_marker('online') is not None
+    online = item.get_closest_marker('online')
     if online and pull_request and not secure_env_vars:
         pytest.skip('skipping online tests via PRs')
