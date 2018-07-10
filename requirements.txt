@@ -9,5 +9,9 @@ chardet==3.0.4            # via requests
 click==6.7
 idna==2.7                 # via requests
 jsonschema==2.6.0
+pendulum==2.0.2
+python-dateutil==2.7.3    # via pendulum
+pytzdata==2018.5          # via pendulum
 requests==2.19.1
+six==1.11.0               # via python-dateutil
 urllib3==1.23             # via requests

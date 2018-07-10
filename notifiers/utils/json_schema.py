@@ -1,3 +1,9 @@
+import jsonschema
+import datetime
+import pendulum
+from pendulum.exceptions import ParserError
+
+
 def one_or_more(schema: dict, unique_items: bool = True, min: int = 1, max: int = None) -> dict:
     """
     Helper function to construct a schema that validates items matching
@@ -35,3 +41,19 @@ def list_to_commas(list_of_args) -> str:
     if isinstance(list_of_args, list):
         return ",".join(list_of_args)
     return list_of_args
+
+
+format_checker = jsonschema.FormatChecker()
+
+
+@format_checker.checks('iso8601', raises=ValueError)
+def is_iso8601(instance):
+    if not isinstance(instance, str):
+        return True
+    try:
+        dt = pendulum.parse(instance)
+        return dt.to_iso8601_string() == instance
+    except ParserError:
+        raise ValueError
+    # format_string = '%Y-%m-%dT%H:%M:%S.%f%z'
+    # return datetime.datetime.strptime(instance, format_string) is not None
