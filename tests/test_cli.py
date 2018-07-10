@@ -22,7 +22,7 @@ class TestCLI:
         """Test valid notification usage"""
         cmd = f'{mock_name} notify --required bar foo'.split()
         result = cli_runner(cmd)
-        assert result.exit_code == 0
+        assert result.exit_code == 0, f'Exit code is {result.exit_code}. Output: {result.output}'
         assert 'Succesfully sent a notification' in result.output
 
     def test_providers(self, cli_runner):

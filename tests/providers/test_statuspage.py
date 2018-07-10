@@ -1,6 +1,8 @@
 import datetime
+import os
 
 import pytest
+import requests
 
 from notifiers.core import FAILURE_STATUS
 from notifiers.exceptions import BadArguments, ResourceError
@@ -8,8 +10,34 @@ from notifiers.exceptions import BadArguments, ResourceError
 provider = 'statuspage'
 
 
+@pytest.fixture(autouse=True, scope='session')
+def close_all_open_incidents(request):
+    if request.node.get_closest_marker('online'):
+        api_key = os.getenv('NOTIFIERS_STATUSPAGE_API_KEY')
+        page_id = os.getenv('NOTIFIERS_STATUSPAGE_PAGE_ID')
+
+        url = f'https://api.statuspage.io/v1/pages/{page_id}/incidents/unresolved.json'
+        s = requests.Session()
+        s.headers = {
+            'Authorization': f'OAuth {api_key}'
+        }
+        incidents = s.get(url).json()
+        for incident in incidents:
+            incident_status = incident['status']
+            if incident_status in ['resolve', 'completed']:
+                continue
+            incident_id = incident['id']
+            url = f'https://api.statuspage.io/v1/pages/{page_id}/incidents/{incident_id}.json'
+            status = 'resolved' if incident_status == 'investigating' else 'completed'
+            body = {
+                'incident[status]': status
+            }
+            s.patch(url, data=body)
+
+
 class TestStatusPage:
 
+    @pytest.mark.foo
     def test_metadata(self, provider):
         assert provider.metadata == {
             'base_url': 'https://api.statuspage.io/v1//pages/{page_id}/',
