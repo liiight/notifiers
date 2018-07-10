@@ -38,6 +38,7 @@ class TestGitter:
         assert 'Unauthorized' in e.value.message
 
     @pytest.mark.online
+    @pytest.mark.skip('Need to fix gitter credentials')
     def test_bad_room_id(self, provider):
         data = {
             'room_id': 'baz',
@@ -49,6 +50,7 @@ class TestGitter:
         assert 'Bad Request' in e.value.message
 
     @pytest.mark.online
+    @pytest.mark.skip('Need to fix gitter credentials')
     def test_sanity(self, provider):
         data = {
             'message': 'bar'
@@ -96,11 +98,13 @@ class TestGitterResources:
         assert e.value.response.status_code == 401
 
     @pytest.mark.online
+    @pytest.mark.skip('Need to fix gitter credentials')
     def test_gitter_rooms_positive(self, resource):
         rsp = resource()
         assert isinstance(rsp, list)
 
     @pytest.mark.online
+    @pytest.mark.skip('Need to fix gitter credentials')
     def test_gitter_rooms_positive_with_filter(self, resource):
         assert resource(filter='notifiers/testing')
 
@@ -115,6 +119,7 @@ class TestGitterCLI:
         assert not result.output
 
     @pytest.mark.online
+    @pytest.mark.skip('Need to fix gitter credentials')
     def test_gitter_rooms_positive(self, cli_runner):
         cmd = 'gitter rooms'.split()
         result = cli_runner(cmd)
@@ -122,6 +127,7 @@ class TestGitterCLI:
         assert 'notifiers/testing' in result.output
 
     @pytest.mark.online
+    @pytest.mark.skip('Need to fix gitter credentials')
     def test_gitter_rooms_with_query(self, cli_runner):
         cmd = f'gitter rooms --filter notifiers/testing'.split()
         result = cli_runner(cmd)
