@@ -87,10 +87,10 @@ class MockProvider(MockProxy, Provider):
         return MockResource()
 
 
-@pytest.fixture
-def mock_provider(monkeypatch):
+@pytest.fixture(scope='session')
+def mock_provider():
     """Return a generic :class:`notifiers.core.Provider` class"""
-    monkeypatch.setitem(_all_providers, MockProvider.name, MockProvider)
+    _all_providers.update({MockProvider.name: MockProvider})
     return MockProvider()
 
 
