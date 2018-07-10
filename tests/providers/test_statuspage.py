@@ -12,16 +12,16 @@ provider = 'statuspage'
 
 @pytest.fixture(autouse=True, scope='session')
 def close_all_open_incidents(request):
-    if request.node.get_marker('online'):
+    if request.node.get_closest_marker('online'):
         api_key = os.getenv('NOTIFIERS_STATUSPAGE_API_KEY')
         page_id = os.getenv('NOTIFIERS_STATUSPAGE_PAGE_ID')
 
         url = f'https://api.statuspage.io/v1/pages/{page_id}/incidents/unresolved.json'
-        headers = {
+        s = requests.Session()
+        s.headers = {
             'Authorization': f'OAuth {api_key}'
         }
-        s = requests.Session()
-        incidents = s.get(url, headers=headers).json()
+        incidents = s.get(url).json()
         for incident in incidents:
             incident_status = incident['status']
             if incident_status in ['resolve', 'completed']:
@@ -32,7 +32,7 @@ def close_all_open_incidents(request):
             body = {
                 'incident[status]': status
             }
-            s.patch(url, data=body, headers=headers)
+            s.patch(url, data=body)
 
 
 class TestStatusPage:
