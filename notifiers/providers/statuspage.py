@@ -138,13 +138,13 @@ class Statuspage(StatuspageProxy, Provider):
                 'title': 'Control whether notifications should be delivered for the initial incident update'
             },
             'scheduled_for': {
-                # todo ISO8601 FORMAT
                 'type': 'string',
+                'format': 'iso8601',
                 'title': 'Time the scheduled maintenance should begin'
             },
             'scheduled_until': {
-                # todo ISO8601 FORMAT
                 'type': 'string',
+                'format': 'iso8601',
                 'title': 'Time the scheduled maintenance should end'
             },
             'scheduled_remind_prior': {
