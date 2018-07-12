@@ -1,7 +1,9 @@
+import email
 import re
 
 import jsonschema
-import pendulum
+
+from .helpers import valid_file
 
 # Taken from https://gist.github.com/codehack/6350492822e52b7fa7fe
 ISO8601 = re.compile(
@@ -69,7 +71,7 @@ def is_iso8601(instance: str):
 def is_iso8601(instance: str):
     if not isinstance(instance, str):
         return True
-    return pendulum.parse(instance).to_rfc2822_string() == instance
+    return email.utils.parsedate(instance) is not None
 
 
 @format_checker.checks('ascii', raises=ValueError)
@@ -77,3 +79,10 @@ def is_ascii(instance: str):
     if not isinstance(instance, str):
         return True
     return instance.encode('ascii')
+
+
+@format_checker.checks('valid_file', raises=ValueError)
+def path(instance: str):
+    if not isinstance(instance, str):
+        return True
+    return valid_file(instance)

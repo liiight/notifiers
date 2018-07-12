@@ -1,9 +1,7 @@
 import json
 
 from ..core import Provider, Response
-from ..exceptions import BadArguments
 from ..utils import requests
-from ..utils.helpers import valid_file
 from ..utils.json_schema import one_or_more
 
 
@@ -90,6 +88,7 @@ class MailGun(Provider):
             'to': __email_list,
             'from': {
                 'type': 'string',
+                'format': 'email',
                 'title': 'Email address for From header'
             },
             'from_': {
@@ -109,13 +108,13 @@ class MailGun(Provider):
             },
             'attachment': one_or_more({
                 'type': 'string',
+                'format': 'valid_file',
                 'title': 'File attachment'
-                # todo add custom formatter
             }),
             'inline': one_or_more({
                 'type': 'string',
+                'format': 'valid_file',
                 'title': 'Attachment with inline disposition. Can be used to send inline images'
-                # todo add custom formatter
             }),
             # todo one_or_more is broken?
             'tag': one_or_more(schema={
@@ -236,14 +235,6 @@ class MailGun(Provider):
             new_data[key] = value
 
         return new_data
-
-    def _validate_data_dependencies(self, data: dict):
-        files = data.get('attachment', []) + data.get('inline', [])
-        for file in files:
-            if not valid_file(file):
-                raise BadArguments(provider=self.name,
-                                   validation_error=f"Path '{file}' does not exist or is not a file!")
-        return data
 
     def _send_notification(self, data: dict) -> Response:
         url = self.base_url.format(domain=data.pop('domain'))
