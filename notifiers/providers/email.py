@@ -51,23 +51,28 @@ class SMTP(Provider):
             }),
             'from': {
                 'type': 'string',
+                'format': 'email',
                 'title': 'the FROM address to use in the email'
             },
             'from_': {
                 'type': 'string',
+                'format': 'email',
                 'title': 'the FROM address to use in the email',
                 'duplicate': True
             },
             'attachments': one_or_more({
-                'type':  "string",
+                'type': "string",
+                'format': 'valid_file',
                 'title': 'one or more attachments to use in the email'
             }),
             'host': {
                 'type': 'string',
+                'format': 'hostname',
                 'title': 'the host of the SMTP server'
             },
             'port': {
                 'type': 'integer',
+                'format': 'port',
                 'title': 'the port number to use'
             },
             'username': {
@@ -151,14 +156,6 @@ class SMTP(Provider):
 
     def _get_configuration(self, data: dict) -> tuple:
         return data['host'], data['port'], data.get('username')
-
-    def _validate_data_dependencies(self, data: dict):
-        files = data.get('attachment', [])
-        for file in files:
-            if not valid_file(file):
-                raise BadArguments(provider=self.name,
-                                   validation_error=f"Path '{file}' does not exist or is not a file!")
-        return data
 
     def _send_notification(self, data: dict) -> Response:
         errors = None

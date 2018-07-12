@@ -82,7 +82,14 @@ def is_ascii(instance: str):
 
 
 @format_checker.checks('valid_file', raises=ValueError)
-def path(instance: str):
+def is_valid_file(instance: str):
     if not isinstance(instance, str):
         return True
     return valid_file(instance)
+
+
+@format_checker.checks('port', raises=ValueError)
+def is_valid_port(instance: int):
+    if not isinstance(instance, int):
+        return True
+    return instance in range(65535)
