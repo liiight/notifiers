@@ -164,7 +164,7 @@ class Statuspage(StatuspageProxy, Provider):
                 'title': 'Create an historical incident'
             },
             'backfill_date': {
-                # todo create custom formatter for this date format
+                'format': 'date',
                 'type': 'string',
                 'title': 'Date of incident in YYYY-MM-DD format'
             }

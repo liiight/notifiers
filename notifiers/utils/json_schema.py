@@ -1,7 +1,19 @@
+import re
+
 import jsonschema
-import datetime
 import pendulum
-from pendulum.exceptions import ParserError
+
+# Taken from https://gist.github.com/codehack/6350492822e52b7fa7fe
+ISO8601 = re.compile(
+    r'^(?P<full>('
+    r'(?P<year>\d{4})([/-]?'
+    r'(?P<mon>(0[1-9])|(1[012]))([/-]?'
+    r'(?P<mday>(0[1-9])|([12]\d)|(3[01])))?)?(?:T'
+    r'(?P<hour>([01][0-9])|(?:2[0123]))(:?'
+    r'(?P<min>[0-5][0-9])(:?'
+    r'(?P<sec>[0-5][0-9]([,.]\d{1,10})?))?)?'
+    r'(?:Z|([\-+](?:([01][0-9])|(?:2[0123]))(:?(?:[0-5][0-9]))?))?)?))$'
+)
 
 
 def one_or_more(schema: dict, unique_items: bool = True, min: int = 1, max: int = None) -> dict:
@@ -47,13 +59,21 @@ format_checker = jsonschema.FormatChecker()
 
 
 @format_checker.checks('iso8601', raises=ValueError)
-def is_iso8601(instance):
+def is_iso8601(instance: str):
     if not isinstance(instance, str):
         return True
-    try:
-        dt = pendulum.parse(instance)
-        return dt.to_iso8601_string() == instance
-    except ParserError:
-        raise ValueError
-    # format_string = '%Y-%m-%dT%H:%M:%S.%f%z'
-    # return datetime.datetime.strptime(instance, format_string) is not None
+    return ISO8601.match(instance) is not None
+
+
+@format_checker.checks('rfc2822', raises=ValueError)
+def is_iso8601(instance: str):
+    if not isinstance(instance, str):
+        return True
+    return pendulum.parse(instance).to_rfc2822_string() == instance
+
+
+@format_checker.checks('ascii', raises=ValueError)
+def is_ascii(instance: str):
+    if not isinstance(instance, str):
+        return True
+    return instance.encode('ascii')

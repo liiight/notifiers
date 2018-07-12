@@ -117,9 +117,10 @@ class MailGun(Provider):
                 'title': 'Attachment with inline disposition. Can be used to send inline images'
                 # todo add custom formatter
             }),
+            # todo one_or_more is broken?
             'tag': one_or_more(schema={
-                # todo create ascii formatter
                 'type': 'string',
+                'format': 'ascii',
                 'title': 'Tag string',
                 'maxLength': 128
             }, max=3),
@@ -128,8 +129,8 @@ class MailGun(Provider):
                 'title': 'Enables/disables DKIM signatures on per-message basis'
             },
             'deliverytime': {
-                # todo create rfc2822 formatter
                 'type': 'string',
+                'format': 'rfc2822',
                 'title': 'Desired time of delivery. Note: Messages can be scheduled for a maximum of 3 days in '
                          'the future.'
             },
