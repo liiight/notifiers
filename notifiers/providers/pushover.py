@@ -1,7 +1,5 @@
-from pathlib import Path
-
 from ..core import Provider, Response, ProviderResource
-from ..exceptions import ResourceError, BadArguments
+from ..exceptions import ResourceError
 from ..utils import requests
 from ..utils.json_schema import one_or_more, list_to_commas
 
@@ -154,6 +152,7 @@ class Pushover(PushoverProxy, Provider):
             },
             'attachment': {
                 'type': 'string',
+                'format': 'valid_file',
                 'title': 'an image attachment to send with the message'
             }
         },
@@ -168,13 +167,6 @@ class Pushover(PushoverProxy, Provider):
             data['html'] = int(data['html'])
         if data.get('attachment') and not isinstance(data['attachment'], list):
             data['attachment'] = [data['attachment']]
-        return data
-
-    def _validate_data_dependencies(self, data: dict):
-        if data.get('attachment'):
-            path = Path(data['attachment']).expanduser()
-            if not path.exists():
-                raise BadArguments(provider=self.name, validation_error=f"Path does not exist '{path}'")
         return data
 
     def _send_notification(self, data: dict) -> Response:

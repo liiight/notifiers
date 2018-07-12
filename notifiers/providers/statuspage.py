@@ -203,18 +203,24 @@ class Statuspage(StatuspageProxy, Provider):
         backfill = any(data.get(prop) is not None for prop in backfill_properties)
 
         if scheduled and backfill:
-            raise BadArguments(provider=self.name,
-                               validation_error="Cannot set both 'backfill' and 'scheduled' incident properties "
-                                                "in the same notification!")
+            raise BadArguments(
+                provider=self.name,
+                validation_error="Cannot set both 'backfill' and 'scheduled' incident properties "
+                                 "in the same notification!"
+            )
 
         status = data.get('status')
         if scheduled and status and status not in self.scheduled_statuses:
-            raise BadArguments(provider=self.name,
-                               validation_error=f"Status '{status}' is a realtime incident status! "
-                                                f"Please choose one of {self.scheduled_statuses}")
+            raise BadArguments(
+                provider=self.name,
+                validation_error=f"Status '{status}' is a realtime incident status! "
+                                 f"Please choose one of {self.scheduled_statuses}"
+            )
         elif backfill and status:
-            raise BadArguments(provider=self.name,
-                               validation_error="Cannot set 'status' when setting 'backfill'!")
+            raise BadArguments(
+                provider=self.name,
+                validation_error="Cannot set 'status' when setting 'backfill'!"
+            )
 
         return data
 

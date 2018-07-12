@@ -1,4 +1,4 @@
 requests
 jsonschema
 click
-pendulum
+rfc3987
