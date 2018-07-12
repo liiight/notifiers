@@ -1,6 +1,6 @@
 import email
 import re
-
+from datetime import datetime
 import jsonschema
 
 from .helpers import valid_file
@@ -93,3 +93,10 @@ def is_valid_port(instance: int):
     if not isinstance(instance, int):
         return True
     return instance in range(65535)
+
+
+@format_checker.checks('timestamp', raises=ValueError)
+def is_timestamp(instance):
+    if not isinstance(instance, (int, str)):
+        return True
+    return datetime.fromtimestamp(int(instance))

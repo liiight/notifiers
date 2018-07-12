@@ -32,6 +32,7 @@ class PopcornNotify(Provider):
             },
             'recipients': one_or_more({
                 'type': 'string',
+                'format': 'email',
                 'title': 'The recipient email address or phone number. Or an array of email addresses and phone numbers'
             }),
             'subject': {

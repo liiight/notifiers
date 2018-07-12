@@ -93,6 +93,7 @@ class MailGun(Provider):
             },
             'from_': {
                 'type': 'string',
+                'format': 'email',
                 'title': 'Email address for From header',
                 'duplicate': True
             },
