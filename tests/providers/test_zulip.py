@@ -49,7 +49,7 @@ class TestZulip:
         rsp.raise_on_errors()
 
     def test_zulip_type_key(self, provider):
-        rsp = provider.notify(email='foo',
+        rsp = provider.notify(email='foo@foo.com',
                               api_key='bar',
                               to='baz',
                               domain='bla',

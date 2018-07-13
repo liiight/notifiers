@@ -57,8 +57,11 @@ class TestSMTP(object):
     def test_attachment(self, provider, tmpdir):
         dir_ = tmpdir.mkdir('sub')
         file_1 = dir_.join('foo.txt')
+        file_1.write('foo')
         file_2 = dir_.join('bar.txt')
+        file_2.write('foo')
         file_3 = dir_.join('baz.txt')
+        file_3.write('foo')
         attachments = [str(file_1), str(file_2), str(file_3)]
         rsp = provider.notify(to=['foo@foo.com'], message='bar', attachments=attachments)
         assert rsp.data['attachments'] == attachments
