@@ -36,13 +36,16 @@ class TestGmail:
         rsp.raise_on_errors()
 
     def test_email_from_key(self, provider):
-        rsp = provider.notify(to='foo', from_='bla', message='foo')
+        rsp = provider.notify(to='foo@foo.com', from_='bla@foo.com', message='foo')
         rsp_data = rsp.data
         assert not rsp_data.get('from_')
-        assert rsp_data['from'] == 'bla'
+        assert rsp_data['from'] == 'bla@foo.com'
 
     def test_multiple_to(self, provider):
-        to = ['foo', 'bar']
+        to = [
+            'foo@foo.com',
+            'bar@foo.com'
+        ]
         rsp = provider.notify(to=to, message='foo')
         assert rsp.data['to'] == ','.join(to)
 
@@ -50,7 +53,7 @@ class TestGmail:
         data = {
             'username': 'foo',
             'password': 'foo',
-            'to': 'foo',
+            'to': 'foo@foo.com',
             'message': 'bar'
         }
         rsp = provider.notify(**data)

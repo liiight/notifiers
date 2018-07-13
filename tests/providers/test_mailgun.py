@@ -83,9 +83,9 @@ class TestMailgun:
         data = {
             'api_key': 'FOO',
             'message': 'bla',
-            'to': 'foo',
+            'to': 'foo@foo.com',
             'domain': 'foo',
-            'from': 'foo'
+            'from': 'foo@foo.com'
         }
         rsp = provider.notify(**data)
         assert rsp.status == FAILURE_STATUS

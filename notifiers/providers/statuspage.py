@@ -241,8 +241,10 @@ class Statuspage(StatuspageProxy, Provider):
         params = {
             'api_key': data.pop('api_key')
         }
-        response, errors = requests.post(url,
-                                         data=data,
-                                         params=params,
-                                         path_to_errors=self.path_to_errors)
+        response, errors = requests.post(
+            url,
+            data=data,
+            params=params,
+            path_to_errors=self.path_to_errors
+        )
         return self.create_response(data, response, errors)
