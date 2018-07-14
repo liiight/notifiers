@@ -1,9 +1,12 @@
 import email
 import re
 from datetime import datetime
+
 import jsonschema
 
 from .helpers import valid_file
+
+# todo reformat this module into a package and add test
 
 # Taken from https://gist.github.com/codehack/6350492822e52b7fa7fe
 ISO8601 = re.compile(
@@ -16,6 +19,8 @@ ISO8601 = re.compile(
     r'(?P<sec>[0-5][0-9]([,.]\d{1,10})?))?)?'
     r'(?:Z|([\-+](?:([01][0-9])|(?:2[0123]))(:?(?:[0-5][0-9]))?))?)?))$'
 )
+
+E164 = re.compile(r'^\+?[1-9]\d{1,14}$')
 
 
 def one_or_more(schema: dict, unique_items: bool = True, min: int = 1, max: int = None) -> dict:
@@ -100,3 +105,10 @@ def is_timestamp(instance):
     if not isinstance(instance, (int, str)):
         return True
     return datetime.fromtimestamp(int(instance))
+
+
+@format_checker.checks('e164', raises=ValueError)
+def is_e164(instance):
+    if not isinstance(instance, str):
+        return True
+    return E164.match(instance) is not None

@@ -122,7 +122,10 @@ class Pushover(PushoverProxy, Provider):
                          "user's default sound choice. See `sounds` resource",
             },
             'timestamp': {
-                'type': ['integer', 'string'],
+                'type': [
+                    'integer',
+                    'string'
+                ],
                 'format': 'timestamp',
                 'minimum': 0,
                 'title': "a Unix timestamp of your message's date and time to display to the user, "
