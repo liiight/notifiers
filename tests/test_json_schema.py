@@ -1,7 +1,9 @@
+import hypothesis.strategies as st
 import pytest
+from hypothesis import given
 from jsonschema import validate, ValidationError
 
-from notifiers.utils.json_schema import format_checker
+from notifiers.utils.json_schema import format_checker, one_or_more, list_to_commas
 
 
 class TestFormats:
@@ -45,3 +47,31 @@ class TestFormats:
     def test_format_negative(self, formatter, value):
         with pytest.raises(ValidationError):
             validate(value, {'format': formatter}, format_checker=format_checker)
+
+
+class TestSchemaUtils:
+
+    @pytest.mark.parametrize('input_schema, unique_items, min, max, data', [
+        ({'type': 'string'}, True, 1, 1, 'foo'),
+        ({'type': 'string'}, True, 1, 2, ['foo', 'bar']),
+        ({'type': 'integer'}, True, 1, 2, 1),
+        ({'type': 'integer'}, True, 1, 2, [1, 2]),
+    ])
+    def test_one_or_more_positive(self, input_schema, unique_items, min, max, data):
+        expected_schema = one_or_more(input_schema, unique_items, min, max)
+        validate(data, expected_schema)
+
+    @pytest.mark.parametrize('input_schema, unique_items, min, max, data', [
+        ({'type': 'string'}, True, 1, 1, 1),
+        ({'type': 'string'}, True, 1, 1, ['foo', 'bar']),
+        ({'type': 'integer'}, False, 3, None, [1, 1]),
+        ({'type': 'integer'}, True, 1, 1, [1, 2]),
+    ])
+    def test_one_or_more_negative(self, input_schema, unique_items, min, max, data):
+        expected_schema = one_or_more(input_schema, unique_items, min, max)
+        with pytest.raises(ValidationError):
+            validate(data, expected_schema)
+
+    @given(st.lists(st.text()))
+    def test_list_to_commas(self, input_data):
+        assert list_to_commas(input_data) == ','.join(input_data)

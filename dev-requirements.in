@@ -6,3 +6,4 @@ Sphinx
 sphinx-autodoc-annotation
 sphinx_rtd_theme
 bumpversion
+hypothesis
