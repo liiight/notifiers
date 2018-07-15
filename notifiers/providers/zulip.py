@@ -56,6 +56,7 @@ class Zulip(Provider):
             },
             'domain': {
                 'type': 'string',
+                'minLength': 1,
                 'title': 'Zulip cloud domain'
             },
             'server': {
