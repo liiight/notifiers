@@ -3,7 +3,8 @@ import pytest
 from hypothesis import given
 from jsonschema import validate, ValidationError
 
-from notifiers.utils.json_schema import format_checker, one_or_more, list_to_commas
+from notifiers.utils.schema.formats import format_checker
+from notifiers.utils.schema.helpers import one_or_more, list_to_commas
 
 
 class TestFormats:

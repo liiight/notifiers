@@ -1,7 +1,7 @@
 from ..core import Provider, Response, ProviderResource
 from ..exceptions import ResourceError
 from ..utils import requests
-from ..utils.json_schema import one_or_more, list_to_commas
+from ..utils.schema.helpers import one_or_more, list_to_commas
 
 
 class PushoverProxy:

@@ -1,17 +1,15 @@
 import getpass
 import smtplib
 import socket
-from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
+from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formatdate
-from smtplib import SMTPAuthenticationError, SMTPServerDisconnected, SMTPSenderRefused
 from pathlib import Path
+from smtplib import SMTPAuthenticationError, SMTPServerDisconnected, SMTPSenderRefused
 
-from ..exceptions import BadArguments
+from ..utils.schema.helpers import one_or_more, list_to_commas
 from ..core import Provider, Response
-from ..utils.helpers import valid_file
-from ..utils.json_schema import one_or_more, list_to_commas
 
 DEFAULT_SUBJECT = "New email from 'notifiers'!"
 DEFAULT_FROM = f'{getpass.getuser()}@{socket.getfqdn()}'

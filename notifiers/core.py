@@ -7,7 +7,7 @@ from jsonschema.exceptions import best_match
 
 from .exceptions import SchemaError, BadArguments, NotificationError, NoSuchNotifierError
 from .utils.helpers import merge_dicts, dict_from_environs
-from .utils.json_schema import format_checker
+from .utils.schema.formats import format_checker
 
 DEFAULT_ENVIRON_PREFIX = 'NOTIFIERS_'
 

@@ -2,7 +2,7 @@ import json
 
 from ..core import Provider, Response
 from ..utils import requests
-from ..utils.json_schema import one_or_more
+from ..utils.schema.helpers import one_or_more
 
 
 class MailGun(Provider):
@@ -117,7 +117,6 @@ class MailGun(Provider):
                 'format': 'valid_file',
                 'title': 'Attachment with inline disposition. Can be used to send inline images'
             }),
-            # todo one_or_more is broken?
             'tag': one_or_more(schema={
                 'type': 'string',
                 'format': 'ascii',
