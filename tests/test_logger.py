@@ -52,8 +52,9 @@ class TestLogger:
         log.addHandler(hdlr)
         log.info('test')
 
-        magic_mock_provider.notify.assert_called_with(message="Could not log msg to provider 'pushover'!\n"
-                                                              "Error with sent data: 'user' is a required property")
+        magic_mock_provider.notify.assert_called_with(
+            message="Could not log msg to provider 'pushover'!\nError with sent data: 'user' is a required property"
+        )
 
     def test_with_fallback_with_defaults(self, magic_mock_provider, handler):
         fallback_defaults = {
@@ -62,10 +63,17 @@ class TestLogger:
         data = {
             'env_prefix': 'foo'
         }
-        hdlr = handler('pushover', logging.INFO, data, fallback=magic_mock_provider.name,
-                       fallback_defaults=fallback_defaults)
+        hdlr = handler(
+            'pushover',
+            logging.INFO,
+            data,
+            fallback=magic_mock_provider.name,
+            fallback_defaults=fallback_defaults
+        )
         log.addHandler(hdlr)
         log.info('test')
 
-        magic_mock_provider.notify.assert_called_with(foo='bar', message="Could not log msg to provider 'pushover'!\n"
-                                                                         "Error with sent data: 'user' is a required property")
+        magic_mock_provider.notify.assert_called_with(
+            foo='bar',
+            message="Could not log msg to provider 'pushover'!\nError with sent data: 'user' is a required property"
+        )
