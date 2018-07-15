@@ -1,10 +1,8 @@
 import json
 
 from ..core import Provider, Response
-from ..exceptions import BadArguments
 from ..utils import requests
-from ..utils.helpers import valid_file
-from ..utils.json_schema import one_or_more
+from ..utils.schema.helpers import one_or_more
 
 
 class MailGun(Provider):
@@ -90,10 +88,12 @@ class MailGun(Provider):
             'to': __email_list,
             'from': {
                 'type': 'string',
+                'format': 'email',
                 'title': 'Email address for From header'
             },
             'from_': {
                 'type': 'string',
+                'format': 'email',
                 'title': 'Email address for From header',
                 'duplicate': True
             },
@@ -109,17 +109,17 @@ class MailGun(Provider):
             },
             'attachment': one_or_more({
                 'type': 'string',
+                'format': 'valid_file',
                 'title': 'File attachment'
-                # todo add custom formatter
             }),
             'inline': one_or_more({
                 'type': 'string',
+                'format': 'valid_file',
                 'title': 'Attachment with inline disposition. Can be used to send inline images'
-                # todo add custom formatter
             }),
             'tag': one_or_more(schema={
-                # todo create ascii formatter
                 'type': 'string',
+                'format': 'ascii',
                 'title': 'Tag string',
                 'maxLength': 128
             }, max=3),
@@ -128,8 +128,8 @@ class MailGun(Provider):
                 'title': 'Enables/disables DKIM signatures on per-message basis'
             },
             'deliverytime': {
-                # todo create rfc2822 formatter
                 'type': 'string',
+                'format': 'rfc2822',
                 'title': 'Desired time of delivery. Note: Messages can be scheduled for a maximum of 3 days in '
                          'the future.'
             },
@@ -235,14 +235,6 @@ class MailGun(Provider):
             new_data[key] = value
 
         return new_data
-
-    def _validate_data_dependencies(self, data: dict):
-        files = data.get('attachment', []) + data.get('inline', [])
-        for file in files:
-            if not valid_file(file):
-                raise BadArguments(provider=self.name,
-                                   validation_error=f"Path '{file}' does not exist or is not a file!")
-        return data
 
     def _send_notification(self, data: dict) -> Response:
         url = self.base_url.format(domain=data.pop('domain'))

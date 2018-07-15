@@ -6,16 +6,17 @@
 #
 alabaster==0.7.11         # via sphinx
 atomicwrites==1.1.5       # via pytest
-attrs==18.1.0             # via pytest
+attrs==18.1.0             # via hypothesis, pytest
 babel==2.6.0              # via sphinx
 bumpversion==0.5.3
 certifi==2018.4.16        # via requests
 chardet==3.0.4            # via requests
 click==6.7                # via pip-tools
 codecov==2.0.15
-coverage==4.5.1           # via codecov, pytest-cov
+coverage==4.5.1           # via codecov, hypothesis, pytest-cov
 docutils==0.14            # via sphinx
 first==2.0.1              # via pip-tools
+hypothesis==3.66.1
 idna==2.7                 # via requests
 imagesize==1.0.0          # via sphinx
 jinja2==2.10              # via sphinx

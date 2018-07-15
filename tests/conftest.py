@@ -7,10 +7,10 @@ import pytest
 from click.testing import CliRunner
 
 from notifiers.core import Provider, Response, get_notifier, ProviderResource, SUCCESS_STATUS
+from notifiers.logging import NotificationHandler
 from notifiers.providers import _all_providers
 from notifiers.utils.helpers import text_to_bool
-from notifiers.utils.json_schema import one_or_more, list_to_commas
-from notifiers.logging import NotificationHandler
+from notifiers.utils.schema.helpers import one_or_more, list_to_commas
 
 log = logging.getLogger(__name__)
 

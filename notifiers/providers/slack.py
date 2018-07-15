@@ -63,10 +63,12 @@ class Slack(Provider):
                 },
                 'image_url': {
                     'type': 'string',
+                    'format': 'uri',
                     'title': 'Image URL'
                 },
                 'thumb_url': {
                     'type': 'string',
+                    'format': 'uri',
                     'title': 'Thumbnail URL'
                 },
                 'footer': {
@@ -75,10 +77,12 @@ class Slack(Provider):
                 },
                 'footer_icon': {
                     'type': 'string',
+                    'format': 'uri',
                     'title': 'Footer icon URL'
                 },
                 'ts': {
-                    'type': 'integer',
+                    'type': ['integer', 'string'],
+                    'format': 'timestamp',
                     'title': 'Provided timestamp (epoch)'
                 },
                 'fallback': {
@@ -116,10 +120,12 @@ class Slack(Provider):
         'properties': {
             'webhook_url': {
                 'type': 'string',
+                'format': 'uri',
                 'title': 'the webhook URL to use. Register one at https://my.slack.com/services/new/incoming-webhook/'
             },
             'icon_url': {
                 'type': 'string',
+                'format': 'uri',
                 'title': 'override bot icon with image URL'
             },
             'icon_emoji': {

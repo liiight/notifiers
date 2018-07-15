@@ -37,7 +37,7 @@ class TestPopcornNotify:
         data = {
             'message': 'foo',
             'api_key': 'foo',
-            'recipients': 'foo'
+            'recipients': 'foo@foo.com'
         }
         rsp = provider.notify(**data)
         assert rsp.status == FAILURE_STATUS

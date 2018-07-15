@@ -138,13 +138,13 @@ class Statuspage(StatuspageProxy, Provider):
                 'title': 'Control whether notifications should be delivered for the initial incident update'
             },
             'scheduled_for': {
-                # todo ISO8601 FORMAT
                 'type': 'string',
+                'format': 'iso8601',
                 'title': 'Time the scheduled maintenance should begin'
             },
             'scheduled_until': {
-                # todo ISO8601 FORMAT
                 'type': 'string',
+                'format': 'iso8601',
                 'title': 'Time the scheduled maintenance should end'
             },
             'scheduled_remind_prior': {
@@ -164,7 +164,7 @@ class Statuspage(StatuspageProxy, Provider):
                 'title': 'Create an historical incident'
             },
             'backfill_date': {
-                # todo create custom formatter for this date format
+                'format': 'date',
                 'type': 'string',
                 'title': 'Date of incident in YYYY-MM-DD format'
             }
@@ -203,18 +203,24 @@ class Statuspage(StatuspageProxy, Provider):
         backfill = any(data.get(prop) is not None for prop in backfill_properties)
 
         if scheduled and backfill:
-            raise BadArguments(provider=self.name,
-                               validation_error="Cannot set both 'backfill' and 'scheduled' incident properties "
-                                                "in the same notification!")
+            raise BadArguments(
+                provider=self.name,
+                validation_error="Cannot set both 'backfill' and 'scheduled' incident properties "
+                                 "in the same notification!"
+            )
 
         status = data.get('status')
         if scheduled and status and status not in self.scheduled_statuses:
-            raise BadArguments(provider=self.name,
-                               validation_error=f"Status '{status}' is a realtime incident status! "
-                                                f"Please choose one of {self.scheduled_statuses}")
+            raise BadArguments(
+                provider=self.name,
+                validation_error=f"Status '{status}' is a realtime incident status! "
+                                 f"Please choose one of {self.scheduled_statuses}"
+            )
         elif backfill and status:
-            raise BadArguments(provider=self.name,
-                               validation_error="Cannot set 'status' when setting 'backfill'!")
+            raise BadArguments(
+                provider=self.name,
+                validation_error="Cannot set 'status' when setting 'backfill'!"
+            )
 
         return data
 
@@ -235,8 +241,10 @@ class Statuspage(StatuspageProxy, Provider):
         params = {
             'api_key': data.pop('api_key')
         }
-        response, errors = requests.post(url,
-                                         data=data,
-                                         params=params,
-                                         path_to_errors=self.path_to_errors)
+        response, errors = requests.post(
+            url,
+            data=data,
+            params=params,
+            path_to_errors=self.path_to_errors
+        )
         return self.create_response(data, response, errors)

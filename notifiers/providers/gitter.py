@@ -72,7 +72,13 @@ class Gitter(GitterProxy, Provider):
         'rooms': GitterRooms()
     }
 
-    _required = {'required': ['message', 'token', 'room_id']}
+    _required = {
+        'required': [
+            'message',
+            'token',
+            'room_id'
+        ]
+    }
     _schema = {
         'type': 'object',
         'properties': {
@@ -89,7 +95,6 @@ class Gitter(GitterProxy, Provider):
                 'title': 'ID of the room to send the notification to'
             }
         },
-        'required': ['message', 'token', 'room_id'],
         'additionalProperties': False
     }
 

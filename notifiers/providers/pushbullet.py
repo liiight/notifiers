@@ -101,6 +101,7 @@ class Pushbullet(PushbulletProxy, Provider):
             },
             'email': {
                 'type': 'string',
+                'format': 'email',
                 'title': 'Email address to send the push to. If there is a pushbullet user with this address,'
                          ' they get a push, otherwise they get an email'
             },

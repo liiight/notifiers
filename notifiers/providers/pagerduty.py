@@ -121,8 +121,8 @@ class PagerDuty(Provider):
                          'affected system'
             },
             'timestamp': {
-                # todo create a iso8601 format
                 'type': 'string',
+                'format': 'iso8601',
                 'title': 'The time at which the emitting tool detected or generated the event in ISO 8601',
             },
             'component': {

@@ -7,6 +7,7 @@ from jsonschema.exceptions import best_match
 
 from .exceptions import SchemaError, BadArguments, NotificationError, NoSuchNotifierError
 from .utils.helpers import merge_dicts, dict_from_environs
+from .utils.schema.formats import format_checker
 
 DEFAULT_ENVIRON_PREFIX = 'NOTIFIERS_'
 
@@ -205,7 +206,7 @@ class SchemaResource(ABC):
         return data
 
     def __init__(self):
-        self.validator = jsonschema.Draft4Validator(self.schema)
+        self.validator = jsonschema.Draft4Validator(self.schema, format_checker=format_checker)
         self._validate_schema()
 
 

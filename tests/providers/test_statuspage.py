@@ -57,18 +57,18 @@ class TestStatusPage:
 
     @pytest.mark.parametrize('added_data, message', [
         ({
-             'scheduled_for': 'foo',
-             'scheduled_until': 'foo',
-             'backfill_date': 'foo',
+             'scheduled_for': datetime.datetime.now().isoformat(),
+             'scheduled_until': datetime.datetime.now().isoformat(),
+             'backfill_date': str(datetime.datetime.now().date()),
              'backfilled': True
          }, "Cannot set both 'backfill' and 'scheduled' incident properties in the same notification!"),
         ({
-             'scheduled_for': 'foo',
-             'scheduled_until': 'foo',
+             'scheduled_for': datetime.datetime.now().isoformat(),
+             'scheduled_until': datetime.datetime.now().isoformat(),
              'status': 'investigating'
          }, "is a realtime incident status! Please choose one of"),
         ({
-             'backfill_date': 'foo',
+             'backfill_date': str(datetime.datetime.now().date()),
              'backfilled': True,
              'status': 'investigating'
          }, "Cannot set 'status' when setting 'backfill'!")

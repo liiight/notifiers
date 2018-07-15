@@ -49,7 +49,7 @@ class TestZulip:
         rsp.raise_on_errors()
 
     def test_zulip_type_key(self, provider):
-        rsp = provider.notify(email='foo',
+        rsp = provider.notify(email='foo@foo.com',
                               api_key='bar',
                               to='baz',
                               domain='bla',
@@ -62,5 +62,12 @@ class TestZulip:
 
     def test_zulip_missing_subject(self, provider):
         with pytest.raises(NotifierException) as e:
-            provider.notify(email='foo', api_key='bar', to='baz', domain='bla', type_='stream', message='foo')
+            provider.notify(
+                email='foo@foo.com',
+                api_key='bar',
+                to='baz@foo.com',
+                domain='bla',
+                type_='stream',
+                message='foo'
+            )
         assert "'subject' is required when 'type' is 'stream'" in e.value.message

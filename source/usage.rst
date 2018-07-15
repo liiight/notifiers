@@ -9,7 +9,6 @@ The easiest way to initialize a notifier is via the :func:`~notifiers.core.get_n
 .. code-block:: python
 
     >>> import notifiers
-
     >>> pushover = notifiers.get_notifier('pushover')
 
 Or import it directly:

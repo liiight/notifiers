@@ -1,9 +1,10 @@
-import requests
 import json
 
+import requests
+
 from ..core import Provider, Response, ProviderResource
-from ..utils.json_schema import one_or_more, list_to_commas
 from ..exceptions import ResourceError
+from ..utils.schema.helpers import one_or_more, list_to_commas
 
 
 class JoinProxy:
