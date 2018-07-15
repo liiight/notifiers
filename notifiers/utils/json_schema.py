@@ -95,9 +95,9 @@ def is_valid_file(instance: str):
 
 @format_checker.checks('port', raises=ValueError)
 def is_valid_port(instance: int):
-    if not isinstance(instance, int):
+    if not isinstance(instance, (int, str)):
         return True
-    return instance in range(65535)
+    return int(instance) in range(65535)
 
 
 @format_checker.checks('timestamp', raises=ValueError)
