@@ -47,6 +47,10 @@ class Response:
         if self.errors:
             raise NotificationError(provider=self.provider, data=self.data, errors=self.errors, response=self.response)
 
+    @property
+    def ok(self):
+        return self.errors is None
+
 
 class SchemaResource(ABC):
     """Base class that represent an object schema and its utility methods"""
