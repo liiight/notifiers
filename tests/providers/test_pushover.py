@@ -55,17 +55,19 @@ class TestPushover:
     @pytest.mark.online
     def test_all_options(self, provider):
         """Use all available pushover options"""
-        data = {'message': 'foo',
-                'title': 'title',
-                'priority': 2,
-                'url': 'http://foo.com',
-                'url_title': 'url title',
-                'sound': 'bike',
-                'timestamp': 0,
-                'retry': 30,
-                'expire': 30,
-                'callback': 'http://callback.com',
-                'html': True}
+        data = {
+            'message': 'foo',
+            'title': 'title',
+            'priority': 2,
+            'url': 'http://foo.com',
+            'url_title': 'url title',
+            'sound': 'bike',
+            'timestamp': '0',
+            'retry': 30,
+            'expire': 30,
+            'callback': 'http://callback.com',
+            'html': True
+        }
         rsp = provider.notify(**data)
         rsp.raise_on_errors()
 
