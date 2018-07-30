@@ -35,7 +35,7 @@ requests==2.19.1          # via codecov, sphinx
 six==1.11.0               # via more-itertools, packaging, pip-tools, pytest, sphinx
 snowballstemmer==1.2.1    # via sphinx
 sphinx-autodoc-annotation==1.0.post1
-sphinx-rtd-theme==0.4.0
 sphinx==1.7.6
+sphinx_rtd_theme==0.4.1
 sphinxcontrib-websupport==1.1.0  # via sphinx
 urllib3==1.23             # via requests
