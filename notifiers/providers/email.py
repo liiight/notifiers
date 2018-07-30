@@ -1,3 +1,24 @@
+"""
+Enables sending email messages to SMTP servers.
+Example:
+
+.. code-block:: python
+
+    >> from notifiers import get_notifier
+    >> email = get_notifiers('email')
+    >> email.notify(to='email@addrees.foo', message='hi!')
+
+It uses several defaults:
+
+.. code-block:: python
+
+    >> email.defaults
+    {'subject': "New email from 'notifiers'!", 'from': '[USER@HOSTNAME]', 'host': 'localhost', 'port': 25, 'tls': False, 'ssl': False, 'html': False}
+
+Any of these can be overridden by sending them to the :func:`notify` command.
+
+API documentation:
+"""
 import getpass
 import smtplib
 import socket

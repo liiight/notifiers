@@ -2,10 +2,6 @@ Providers
 =========
 API documentation for the different providers.
 
-.. automodule:: notifiers.providers.email
-   :members:
-   :undoc-members:
-
 .. automodule:: notifiers.providers.gitter
    :members:
    :undoc-members:

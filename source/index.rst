@@ -84,6 +84,13 @@ Documentation
    CLI
    Logger
 
+Providers documentation
+-----------------------
+
+.. toctree::
+
+  providers/index
+
 API documentation
 -----------------
 
