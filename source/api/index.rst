@@ -8,5 +8,4 @@ Internal API documentation
 
    core
    exceptions
-   providers
    utils

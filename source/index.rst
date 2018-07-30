@@ -38,10 +38,10 @@ Basic Usage
 .. code-block:: python
 
     >>> from notifiers import get_notifier
-    >>> p = get_notifier('pushover')
-    >>> p.required
+    >>> pushover = get_notifier('pushover')
+    >>> pushover.required
     {'required': ['user', 'message', 'token']}
-    >>> p.notify(user='foo', token='bar', message='test')
+    >>> pushover.notify(user='foo', token='bar', message='test')
     <NotificationResponse,provider=Pushover,status=Success>
 
 From CLI

@@ -5,3 +5,4 @@ Providers Documentation
    :maxdepth: 2
 
    email
+   gitter
