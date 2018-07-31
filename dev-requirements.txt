@@ -24,12 +24,12 @@ markupsafe==1.0           # via jinja2
 more-itertools==4.2.0     # via pytest
 packaging==17.1           # via sphinx
 pip-tools==2.0.2
-pluggy==0.6.0             # via pytest
+pluggy==0.7.1             # via pytest
 py==1.5.4                 # via pytest
 pygments==2.2.0           # via sphinx
 pyparsing==2.2.0          # via packaging
 pytest-cov==2.5.1
-pytest==3.6.4
+pytest==3.7.0
 pytz==2018.5              # via babel
 requests==2.19.1          # via codecov, sphinx
 six==1.11.0               # via more-itertools, packaging, pip-tools, pytest, sphinx
