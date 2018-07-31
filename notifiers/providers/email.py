@@ -16,7 +16,6 @@ It uses several defaults:
     {'subject': "New email from 'notifiers'!", 'from': '[USER@HOSTNAME]', 'host': 'localhost', 'port': 25, 'tls': False, 'ssl': False, 'html': False}
 
 Any of these can be overridden by sending them to the :func:`notify` command.
-
 """
 import getpass
 import smtplib

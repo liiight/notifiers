@@ -6,3 +6,17 @@ Providers Documentation
 
    email
    gitter
+   gmail
+   hipchat
+   join
+   mailgun
+   pagerduty
+   popcornnotify
+   pushbullet
+   pushover
+   simplepush
+   slack
+   statuspage
+   telegram
+   twilio
+   zulip
