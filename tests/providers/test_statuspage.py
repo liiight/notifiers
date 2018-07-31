@@ -1,5 +1,7 @@
 import datetime
+import logging
 import os
+from time import sleep
 
 import pytest
 import requests
@@ -9,30 +11,27 @@ from notifiers.exceptions import BadArguments, ResourceError
 
 provider = 'statuspage'
 
+log = logging.getLogger('statuspage')
 
-@pytest.fixture(autouse=True, scope='session')
+
+@pytest.fixture(autouse=True)
 def close_all_open_incidents(request):
     if request.node.get_closest_marker('online'):
         api_key = os.getenv('NOTIFIERS_STATUSPAGE_API_KEY')
         page_id = os.getenv('NOTIFIERS_STATUSPAGE_PAGE_ID')
 
-        url = f'https://api.statuspage.io/v1/pages/{page_id}/incidents/unresolved.json'
         s = requests.Session()
         s.headers = {
             'Authorization': f'OAuth {api_key}'
         }
+        url = f'https://api.statuspage.io/v1/pages/{page_id}/incidents.json'
         incidents = s.get(url).json()
         for incident in incidents:
-            incident_status = incident['status']
-            if incident_status in ['resolve', 'completed']:
-                continue
             incident_id = incident['id']
             url = f'https://api.statuspage.io/v1/pages/{page_id}/incidents/{incident_id}.json'
-            status = 'resolved' if incident_status == 'investigating' else 'completed'
-            body = {
-                'incident[status]': status
-            }
-            s.patch(url, data=body)
+            log.debug('deleting status page incident %s', incident_id)
+            s.delete(url)
+            sleep(2)
 
 
 class TestStatusPage:
@@ -113,8 +112,8 @@ class TestStatusPage:
             'wants_twitter_update': False,
             'impact_override': 'minor',
             'deliver_notifications': False,
-            'scheduled_for': (datetime.datetime.utcnow() + datetime.timedelta(minutes=1)).isoformat(),
-            'scheduled_until': (datetime.datetime.utcnow() + datetime.timedelta(minutes=2)).isoformat(),
+            'scheduled_for': (datetime.datetime.utcnow() + datetime.timedelta(minutes=10)).isoformat(),
+            'scheduled_until': (datetime.datetime.utcnow() + datetime.timedelta(minutes=12)).isoformat(),
             'scheduled_remind_prior': False,
             'scheduled_auto_in_progress': True,
             'scheduled_auto_completed': True
