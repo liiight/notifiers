@@ -41,7 +41,7 @@ class TestSMTP(object):
             f'Error not in expected errors; {rsp.errors}'
 
     def test_email_from_key(self, provider):
-        rsp = provider.notify(to='foo@foo.co ', from_='bla@foo.com', message='foo')
+        rsp = provider.notify(to='foo@foo.co ', from_='bla@foo.com', message='foo', host='nohost')
         rsp_data = rsp.data
         assert not rsp_data.get('from_')
         assert rsp_data['from'] == 'bla@foo.com'
@@ -51,7 +51,7 @@ class TestSMTP(object):
             'foo@foo.com',
             'bar@foo.com'
         ]
-        rsp = provider.notify(to=to, message='foo')
+        rsp = provider.notify(to=to, message='foo', host='nohost')
         assert rsp.data['to'] == ','.join(to)
 
     def test_attachment(self, provider, tmpdir):
@@ -63,7 +63,7 @@ class TestSMTP(object):
         file_3 = dir_.join('baz.txt')
         file_3.write('foo')
         attachments = [str(file_1), str(file_2), str(file_3)]
-        rsp = provider.notify(to=['foo@foo.com'], message='bar', attachments=attachments)
+        rsp = provider.notify(to=['foo@foo.com'], message='bar', attachments=attachments, host='nohost')
         assert rsp.data['attachments'] == attachments
 
     @pytest.mark.online
