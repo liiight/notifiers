@@ -17,7 +17,6 @@ It uses several defaults:
 
 Any of these can be overridden by sending them to the :func:`notify` command.
 
-API documentation:
 """
 import getpass
 import smtplib
