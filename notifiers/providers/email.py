@@ -6,7 +6,11 @@ Example:
 
     >>> from notifiers import get_notifier
     >>> email = get_notifier('email')
+    >>> email.required
+    {'required': ['message', 'to']}
+
     >>> email.notify(to='email@addrees.foo', message='hi!')
+
 
 It uses several defaults:
 
@@ -68,12 +72,10 @@ class SMTP(Provider):
     name = 'email'
 
     _required = {
-        'required': ['message', 'to'],
-        'dependencies': {
-            'username': ['password'],
-            'password': ['username'],
-            'ssl': ['tls']
-        }
+        'required': [
+            'message',
+            'to'
+        ]
     }
 
     _schema = {
@@ -138,6 +140,11 @@ class SMTP(Provider):
                 'type': 'boolean',
                 'title': 'should the email be parse as an HTML file'
             }
+        },
+        'dependencies': {
+            'username': ['password'],
+            'password': ['username'],
+            'ssl': ['tls']
         },
         'additionalProperties': False,
     }
