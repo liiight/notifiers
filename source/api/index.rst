@@ -7,5 +7,6 @@ Internal API documentation
    :maxdepth: 2
 
    core
+   providers
    exceptions
    utils
