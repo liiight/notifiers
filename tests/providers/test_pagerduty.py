@@ -53,7 +53,7 @@ class TestPagerDuty:
         ]
         links = [
             {
-                'href': 'https://github.com/liiight/notifiers',
+                'href': 'https://github.com/notifiers/notifiers',
                 'text': 'Python Notifiers'
             }
         ]

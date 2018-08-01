@@ -1,3 +1,12 @@
+"""
+Send notification via `Join <https://joaoapps.com/join/>`_
+
+.. code-block:: python
+
+    >> from notifiers import get_notifier
+    >> join = get_notifiers('join')
+    >> join.notify(apikey='SECRET', message='Hi!')
+"""
 import json
 
 import requests
