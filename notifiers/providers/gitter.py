@@ -14,7 +14,7 @@ You can view the available rooms you can access via the ``rooms`` resource
 
 .. code-block:: python
 
-    >> gitter.rooms(token="SECRET_TOKEN")
+    >>> gitter.rooms(token="SECRET_TOKEN")
     {'id': '...', 'name': 'Foo/bar', ... }
 
 """

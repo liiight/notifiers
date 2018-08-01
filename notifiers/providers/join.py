@@ -3,9 +3,15 @@ Send notification via `Join <https://joaoapps.com/join/>`_
 
 .. code-block:: python
 
-    >> from notifiers import get_notifier
-    >> join = get_notifiers('join')
-    >> join.notify(apikey='SECRET', message='Hi!')
+    >>> from notifiers import get_notifier
+    >>> join = get_notifier('join')
+    >>> join.notify(apikey='SECRET', message='Hi!')
+
+All options:
+
+.. code-block:: python
+
+
 """
 import json
 
@@ -133,6 +139,7 @@ class Join(JoinProxy, Provider):
             }),
             'url': {
                 'type': 'string',
+                'format': 'uri',
                 'title': ' A URL you want to open on the device. If a notification is created with this push, '
                          'this will make clicking the notification open this URL'
             },
@@ -142,6 +149,7 @@ class Join(JoinProxy, Provider):
             },
             'file': {
                 'type': 'string',
+                'format': 'uri',
                 'title': 'a publicly accessible URL of a file'
             },
             'smsnumber': {
@@ -164,6 +172,7 @@ class Join(JoinProxy, Provider):
             },
             'mmsfile': {
                 'type': 'string',
+                'format': 'uri',
                 'title': 'publicly accessible mms file url'
             },
             'mediaVolume': {
@@ -180,6 +189,7 @@ class Join(JoinProxy, Provider):
             },
             'wallpaper': {
                 'type': 'string',
+                'fromat': 'uri',
                 'title': 'a publicly accessible URL of an image file'
             },
             'find': {
@@ -193,11 +203,13 @@ class Join(JoinProxy, Provider):
             },
             'icon': {
                 'type': 'string',
-                'title': "notification's icon"
+                'format': 'uri',
+                'title': "notification's icon URL"
             },
             'smallicon': {
                 'type': 'string',
-                'title': 'Status Bar Icon'
+                'format': 'uri',
+                'title': 'Status Bar Icon URL'
             },
             'priority': {
                 'type': 'integer',
@@ -211,7 +223,8 @@ class Join(JoinProxy, Provider):
             },
             'image': {
                 'type': 'string',
-                'title': 'Notification image'
+                'format': 'uri',
+                'title': 'Notification image URL'
             }
         },
         'additionalProperties': False

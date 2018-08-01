@@ -5,26 +5,26 @@ Simple example:
 
 .. code-block:: python
 
-    >> from notifiers import get_notifier
-    >> hipchat = get_notifiers('hipchat')
-    >> hipchat.notify(token='SECRET', group='foo', message='hi!', room=1234)
+    >>> from notifiers import get_notifier
+    >>> hipchat = get_notifier('hipchat')
+    >>> hipchat.notify(token='SECRET', group='foo', message='hi!', room=1234)
 
-Complex example:
+All options:
 
 .. code-block:: python
 
-    >> hipchat.notify(
-        token='SECRET',
-        group='foo',
-        message='hi!',
-        card=dict(
-            style='image',
-            title='foo image
-        ),
-        id='card ID',
-        icon='https://path.to/icon.png',
-        room=2131
-      )
+    >>> hipchat.notify(
+    ...    token='SECRET',
+    ...    group='foo',
+    ...    message='hi!',
+    ...    card=dict(
+    ...        style='image',
+    ...        title='foo image'
+    ...    ),
+    ...    id='card ID',
+    ...    icon='https://path.to/icon.png',
+    ...    room=2131
+    ... )
 """
 import copy
 
