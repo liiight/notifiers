@@ -16,7 +16,7 @@ codecov==2.0.15
 coverage==4.5.1           # via codecov, hypothesis, pytest-cov
 docutils==0.14            # via sphinx
 first==2.0.1              # via pip-tools
-hypothesis==3.66.15
+hypothesis==3.66.19
 idna==2.7                 # via requests
 imagesize==1.0.0          # via sphinx
 jinja2==2.10              # via sphinx
