@@ -35,3 +35,4 @@ def list_to_commas(list_of_args) -> str:
     if isinstance(list_of_args, list):
         return ",".join(list_of_args)
     return list_of_args
+    # todo change or create a new util that handle conversion to list as well
