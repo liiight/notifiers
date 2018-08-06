@@ -36,14 +36,16 @@ Full schema:
     properties:
       attachments:
         oneOf:
-        - items: &id001
+        - items:
             format: valid_file
             title: one or more attachments to use in the email
             type: string
           minItems: 1
           type: array
           uniqueItems: true
-        - *id001
+        - format: valid_file
+          title: one or more attachments to use in the email
+          type: string
       from:
         format: email
         title: the FROM address to use in the email
@@ -81,18 +83,20 @@ Full schema:
         type: boolean
       to:
         oneOf:
-        - items: &id002
+        - items:
             format: email
             title: one or more email addresses to use
             type: string
           minItems: 1
           type: array
           uniqueItems: true
-        - *id002
+        - format: email
+          title: one or more email addresses to use
+          type: string
       username:
         title: username if relevant
         type: string
     required:
     - message
     - to
-    type: object
+type: object

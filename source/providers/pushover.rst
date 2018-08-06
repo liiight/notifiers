@@ -15,6 +15,7 @@ Full schema:
 
 .. code-block:: yaml
 
+    additionalProperties: false
     properties:
       attachment:
         format: valid_file
@@ -27,13 +28,14 @@ Full schema:
         type: string
       device:
         oneOf:
-        - items: &id001
+        - items:
             title: your user's device name to send the message directly to that device
             type: string
           minItems: 1
           type: array
           uniqueItems: true
-        - *id001
+        - title: your user's device name to send the message directly to that device
+          type: string
       expire:
         maximum: 86400
         title: how many seconds your notification will continue to be retried for. priority
@@ -82,13 +84,14 @@ Full schema:
         type: string
       user:
         oneOf:
-        - items: &id002
+        - items:
             title: the user/group key (not e-mail address) of your user (or you)
             type: string
           minItems: 1
           type: array
           uniqueItems: true
-        - *id002
+        - title: the user/group key (not e-mail address) of your user (or you)
+          type: string
     required:
     - user
     - message

@@ -174,7 +174,7 @@ class Join(JoinProxy, Provider):
             },
             'wallpaper': {
                 'type': 'string',
-                'fromat': 'uri',
+                'format': 'uri',
                 'title': 'a publicly accessible URL of an image file'
             },
             'find': {
