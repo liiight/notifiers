@@ -21,29 +21,78 @@ It uses several defaults:
 
 Any of these can be overridden by sending them to the :func:`notify` command.
 
-All options:
+Full schema:
 
-.. code-block:: python
+.. code-block:: yaml
 
-    >>> data = {
-    ...    'message': 'Hi!',
-    ...    'subject': 'Hello!',
-    ...    'to': [
-    ...        'foo@.bar.com',
-    ...        'bla@boo.baz'
-    ...    ],
-    ...    'from': 'baz@baz.baz',
-    ...    'attachments': [
-    ...        '/path/to/file1', # String or pathlib.Path
-    ...        Path('path/to/file2')
-    ...    ],
-    ...    'host': 'localhost',
-    ...    'port': 25,
-    ...    'username': 'foo',
-    ...    'password': 'bar',
-    ...    'tls': True,
-    ...    'ssl': True,
-    ...    'html': True
-    ... }
-    >>> email.notify(**data)
-
+    additionalProperties: false
+    dependencies:
+      password:
+      - username
+      ssl:
+      - tls
+      username:
+      - password
+    properties:
+      attachments:
+        oneOf:
+        - items: &id001
+            format: valid_file
+            title: one or more attachments to use in the email
+            type: string
+          minItems: 1
+          type: array
+          uniqueItems: true
+        - *id001
+      from:
+        format: email
+        title: the FROM address to use in the email
+        type: string
+      from_:
+        duplicate: true
+        format: email
+        title: the FROM address to use in the email
+        type: string
+      host:
+        format: hostname
+        title: the host of the SMTP server
+        type: string
+      html:
+        title: should the email be parse as an HTML file
+        type: boolean
+      message:
+        title: the content of the email message
+        type: string
+      password:
+        title: password if relevant
+        type: string
+      port:
+        format: port
+        title: the port number to use
+        type: integer
+      ssl:
+        title: should SSL be used
+        type: boolean
+      subject:
+        title: the subject of the email message
+        type: string
+      tls:
+        title: should TLS be used
+        type: boolean
+      to:
+        oneOf:
+        - items: &id002
+            format: email
+            title: one or more email addresses to use
+            type: string
+          minItems: 1
+          type: array
+          uniqueItems: true
+        - *id002
+      username:
+        title: username if relevant
+        type: string
+    required:
+    - message
+    - to
+    type: object
