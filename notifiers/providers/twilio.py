@@ -79,8 +79,8 @@ class Twilio(Provider):
             },
             'to': {
                 'type': 'string',
+                'format': 'e164',
                 'title': 'The recipient of the message, in E.164 format'
-                # todo add a custom formatter for this
             },
             'from': {
                 'type': 'string',
