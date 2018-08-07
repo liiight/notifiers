@@ -8,7 +8,8 @@ Welcome to Notifiers documentation!
 
 Got an app or service and you want to enable your users to use notifications with their provider of choice? Working on a script and you want to receive notification based on its output? You don't need to implement a solution yourself, or use individual provider libs. A one stop shop for all notification providers with a unified and simple interface.
 
-Click for a list of currently supported :ref:`providers`
+Click for a list of currently supported :ref:`providers`.
+See latest changes in :ref:`changelog`.
 
 Advantages
 ----------
@@ -25,7 +26,7 @@ Via pip:
 
     $ pip install notifiers
 
-Or Dockerhub:
+Via Dockerhub:
 
 .. code-block:: console
 
@@ -38,10 +39,10 @@ Basic Usage
 .. code-block:: python
 
     >>> from notifiers import get_notifier
-    >>> p = get_notifier('pushover')
-    >>> p.required
+    >>> pushover = get_notifier('pushover')
+    >>> pushover.required
     {'required': ['user', 'message', 'token']}
-    >>> p.notify(user='foo', token='bar', message='test')
+    >>> pushover.notify(user='foo', token='bar', message='test')
     <NotificationResponse,provider=Pushover,status=Success>
 
 From CLI
@@ -62,9 +63,9 @@ Directly add to your existing stdlib logging:
     >>> from notifiers.logging import NotificationHandler
     >>> log = logging.getLogger(__name__)
     >>> defaults = {
-            'token': 'foo,
-            'user': 'bar
-        }
+    ...     'token': 'foo,
+    ...     'user': 'bar
+    ... }
     >>> hdlr = NotificationHandler('pushover', defaults=defaults)
     >>> hdlr.setLevel(logging.ERROR)
     >>> log.addHandler(hdlr)
@@ -83,6 +84,13 @@ Documentation
    usage
    CLI
    Logger
+
+Providers documentation
+-----------------------
+
+.. toctree::
+
+  providers/index
 
 API documentation
 -----------------

@@ -7,10 +7,10 @@ import pytest
 from click.testing import CliRunner
 
 from notifiers.core import Provider, Response, get_notifier, ProviderResource, SUCCESS_STATUS
+from notifiers.logging import NotificationHandler
 from notifiers.providers import _all_providers
 from notifiers.utils.helpers import text_to_bool
-from notifiers.utils.json_schema import one_or_more, list_to_commas
-from notifiers.logging import NotificationHandler
+from notifiers.utils.schema.helpers import one_or_more, list_to_commas
 
 log = logging.getLogger(__name__)
 
@@ -87,10 +87,10 @@ class MockProvider(MockProxy, Provider):
         return MockResource()
 
 
-@pytest.fixture
-def mock_provider(monkeypatch):
+@pytest.fixture(scope='session')
+def mock_provider():
     """Return a generic :class:`notifiers.core.Provider` class"""
-    monkeypatch.setitem(_all_providers, MockProvider.name, MockProvider)
+    _all_providers.update({MockProvider.name: MockProvider})
     return MockProvider()
 
 
@@ -177,6 +177,6 @@ def pytest_runtest_setup(item):
     """Skips PRs if secure env vars are set and test is marked as online"""
     pull_request = text_to_bool(os.environ.get('TRAVIS_PULL_REQUEST'))
     secure_env_vars = text_to_bool(os.environ.get('TRAVIS_SECURE_ENV_VARS'))
-    online = item.get_marker('online') is not None
+    online = item.get_closest_marker('online')
     if online and pull_request and not secure_env_vars:
         pytest.skip('skipping online tests via PRs')

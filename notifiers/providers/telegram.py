@@ -3,14 +3,14 @@ from ..exceptions import ResourceError
 from ..utils import requests
 
 
-class TelegramProxy:
+class TelegramMixin:
     """Shared resources between :class:`TelegramUpdates` and :class:`Telegram`"""
     base_url = 'https://api.telegram.org/bot{token}'
     name = 'telegram'
     path_to_errors = 'description',
 
 
-class TelegramUpdates(TelegramProxy, ProviderResource):
+class TelegramUpdates(TelegramMixin, ProviderResource):
     """Return Telegram bot updates, correlating to the `getUpdates` method. Returns chat IDs needed to notifications"""
     resource_name = 'updates'
     updates_endpoint = '/getUpdates'
@@ -44,7 +44,7 @@ class TelegramUpdates(TelegramProxy, ProviderResource):
         return response.json()['result']
 
 
-class Telegram(TelegramProxy, Provider):
+class Telegram(TelegramMixin, Provider):
     """Send Telegram notifications"""
 
     site_url = 'https://core.telegram.org/'

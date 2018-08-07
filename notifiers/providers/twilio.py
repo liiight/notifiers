@@ -79,8 +79,8 @@ class Twilio(Provider):
             },
             'to': {
                 'type': 'string',
+                'format': 'e164',
                 'title': 'The recipient of the message, in E.164 format'
-                # todo add a custom formatter for this
             },
             'from': {
                 'type': 'string',
@@ -97,10 +97,12 @@ class Twilio(Provider):
             },
             'media_url': {
                 'type': 'string',
+                'format': 'uri',
                 'title': 'The URL of the media you wish to send out with the message'
             },
             'status_callback': {
                 'type': 'string',
+                'format': 'uri',
                 'title': 'A URL where Twilio will POST each time your message status changes'
             },
             'application_sid': {

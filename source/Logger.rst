@@ -12,9 +12,9 @@ Notifiers enable you to log directly to a notifier via a stdlib logging handler,
 
     >>> log = logging.getLogger(__name__)
     >>> defaults = {
-            'token': 'foo,
-            'user': 'bar
-        }
+    ...    'token': 'foo,
+    ...    'user': 'bar
+    ... }
 
     >>> hdlr = NotificationHandler('pushover', defaults=defaults)
     >>> hdlr.setLevel(logging.ERROR)
@@ -37,11 +37,11 @@ If you rely on 3rd party notifiers to send you notification about errors, you ma
 .. code-block:: python
 
     >>> fallback_defaults = {
-        'host': 'http://localhost,
-        'port': 80,
-        'username': 'foo',
-        'password': 'bar
-    }
+    ...     'host': 'http://localhost,
+    ...     'port': 80,
+    ...     'username': 'foo',
+    ...     'password': 'bar
+    ... }
 
     >>> hdlr = NotificationHandler('pushover', fallback='email', fallback_defaults=fallback_defaults)
 

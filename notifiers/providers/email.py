@@ -1,17 +1,15 @@
 import getpass
 import smtplib
 import socket
-from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
+from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formatdate
-from smtplib import SMTPAuthenticationError, SMTPServerDisconnected, SMTPSenderRefused
 from pathlib import Path
+from smtplib import SMTPAuthenticationError, SMTPServerDisconnected, SMTPSenderRefused
 
-from ..exceptions import BadArguments
 from ..core import Provider, Response
-from ..utils.helpers import valid_file
-from ..utils.json_schema import one_or_more, list_to_commas
+from ..utils.schema.helpers import one_or_more, list_to_commas
 
 DEFAULT_SUBJECT = "New email from 'notifiers'!"
 DEFAULT_FROM = f'{getpass.getuser()}@{socket.getfqdn()}'
@@ -25,12 +23,10 @@ class SMTP(Provider):
     name = 'email'
 
     _required = {
-        'required': ['message', 'to'],
-        'dependencies': {
-            'username': ['password'],
-            'password': ['username'],
-            'ssl': ['tls']
-        }
+        'required': [
+            'message',
+            'to'
+        ]
     }
 
     _schema = {
@@ -51,23 +47,28 @@ class SMTP(Provider):
             }),
             'from': {
                 'type': 'string',
+                'format': 'email',
                 'title': 'the FROM address to use in the email'
             },
             'from_': {
                 'type': 'string',
+                'format': 'email',
                 'title': 'the FROM address to use in the email',
                 'duplicate': True
             },
             'attachments': one_or_more({
-                'type':  "string",
+                'type': "string",
+                'format': 'valid_file',
                 'title': 'one or more attachments to use in the email'
             }),
             'host': {
                 'type': 'string',
+                'format': 'hostname',
                 'title': 'the host of the SMTP server'
             },
             'port': {
                 'type': 'integer',
+                'format': 'port',
                 'title': 'the port number to use'
             },
             'username': {
@@ -90,6 +91,11 @@ class SMTP(Provider):
                 'type': 'boolean',
                 'title': 'should the email be parse as an HTML file'
             }
+        },
+        'dependencies': {
+            'username': ['password'],
+            'password': ['username'],
+            'ssl': ['tls']
         },
         'additionalProperties': False,
     }
@@ -151,14 +157,6 @@ class SMTP(Provider):
 
     def _get_configuration(self, data: dict) -> tuple:
         return data['host'], data['port'], data.get('username')
-
-    def _validate_data_dependencies(self, data: dict):
-        files = data.get('attachment', [])
-        for file in files:
-            if not valid_file(file):
-                raise BadArguments(provider=self.name,
-                                   validation_error=f"Path '{file}' does not exist or is not a file!")
-        return data
 
     def _send_notification(self, data: dict) -> Response:
         errors = None

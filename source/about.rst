@@ -11,7 +11,7 @@ There has to be a better way, right?
 
 The solution
 ------------
-Enter :mod:`notifiers`. A common interface to many, many notification providers, with a minimal set of dependencies (just :mod:`jsonschema`, :mod:`requests`, and :mod:`click` for CLI operations)
+Enter :mod:`notifiers`. A common interface to many, many notification providers, with a minimal set of dependencies.
 
 The interface
 -------------
@@ -39,9 +39,9 @@ The first is to construct data via a dict and unpack it into the :meth:`~notifie
 .. code:: python
 
    >>> data = {
-        'to': 'foo@bar.com',
-        'from': 'bar@foo.com'
-   }
+   ...  'to': 'foo@bar.com',
+   ...  'from': 'bar@foo.com'
+   ... }
    >>> provider.notify(**data)
 
 The other is to use an alternate key word, which would always be the reservred key word followed by an underscore:

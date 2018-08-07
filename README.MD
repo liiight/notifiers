@@ -99,3 +99,7 @@ Donations
 ---------
 
 If you like this and want to buy me a cup of coffee, please click the donation button above or click this [link](https://paypal.me/notifiers) ☕
+
+Code of Conduct
+---------------
+Everyone interacting in the Notifiers project's codebases, issue trackers and chat rooms is expected to follow the [PyPA Code of Conduct.](https://www.pypa.io/en/latest/code-of-conduct/)

@@ -3,7 +3,7 @@ from ..utils import requests
 from ..exceptions import ResourceError
 
 
-class PushbulletProxy:
+class PushbulletMixin:
     """Shared attributes between :class:`PushbulletDevices` and :class:`Pushbullet`"""
     name = 'pushbullet'
     path_to_errors = 'error', 'message'
@@ -12,7 +12,7 @@ class PushbulletProxy:
         return {'Access-Token': token}
 
 
-class PushbulletDevices(PushbulletProxy, ProviderResource):
+class PushbulletDevices(PushbulletMixin, ProviderResource):
     """Return a list of Pushbullet devices associated to a token"""
     resource_name = 'devices'
     devices_url = 'https://api.pushbullet.com/v2/devices'
@@ -45,7 +45,7 @@ class PushbulletDevices(PushbulletProxy, ProviderResource):
         return response.json()['devices']
 
 
-class Pushbullet(PushbulletProxy, Provider):
+class Pushbullet(PushbulletMixin, Provider):
     """Send Pushbullet notifications"""
     base_url = 'https://api.pushbullet.com/v2/pushes'
     site_url = 'https://www.pushbullet.com'
@@ -101,6 +101,7 @@ class Pushbullet(PushbulletProxy, Provider):
             },
             'email': {
                 'type': 'string',
+                'format': 'email',
                 'title': 'Email address to send the push to. If there is a pushbullet user with this address,'
                          ' they get a push, otherwise they get an email'
             },

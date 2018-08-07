@@ -37,6 +37,7 @@ class Zulip(Provider):
             },
             'email': {
                 'type': 'string',
+                'format': 'email',
                 'title': 'User email'
             },
             'api_key': {
@@ -55,10 +56,12 @@ class Zulip(Provider):
             },
             'domain': {
                 'type': 'string',
+                'minLength': 1,
                 'title': 'Zulip cloud domain'
             },
             'server': {
                 'type': 'string',
+                'format': 'uri',
                 'title': 'Zulip server URL. Example: https://myzulip.server.com'
             }
         },
@@ -82,9 +85,11 @@ class Zulip(Provider):
 
     def _validate_data_dependencies(self, data: dict) -> dict:
         if data['type'] == 'stream' and not data.get('subject'):
-            raise NotifierException(provider=self.name,
-                                    message="'subject' is required when 'type' is 'stream'",
-                                    data=data)
+            raise NotifierException(
+                provider=self.name,
+                message="'subject' is required when 'type' is 'stream'",
+                data=data
+            )
         return data
 
     def _send_notification(self, data: dict) -> Response:

@@ -1,15 +1,42 @@
 import datetime
+import logging
+import os
+from time import sleep
 
 import pytest
+import requests
 
 from notifiers.core import FAILURE_STATUS
 from notifiers.exceptions import BadArguments, ResourceError
 
 provider = 'statuspage'
 
+log = logging.getLogger('statuspage')
+
+
+@pytest.fixture(autouse=True)
+def close_all_open_incidents(request):
+    if request.node.get_closest_marker('online'):
+        api_key = os.getenv('NOTIFIERS_STATUSPAGE_API_KEY')
+        page_id = os.getenv('NOTIFIERS_STATUSPAGE_PAGE_ID')
+
+        s = requests.Session()
+        s.headers = {
+            'Authorization': f'OAuth {api_key}'
+        }
+        url = f'https://api.statuspage.io/v1/pages/{page_id}/incidents.json'
+        incidents = s.get(url).json()
+        for incident in incidents:
+            incident_id = incident['id']
+            url = f'https://api.statuspage.io/v1/pages/{page_id}/incidents/{incident_id}.json'
+            log.debug('deleting status page incident %s', incident_id)
+            s.delete(url)
+            sleep(2)
+
 
 class TestStatusPage:
 
+    @pytest.mark.foo
     def test_metadata(self, provider):
         assert provider.metadata == {
             'base_url': 'https://api.statuspage.io/v1//pages/{page_id}/',
@@ -29,18 +56,18 @@ class TestStatusPage:
 
     @pytest.mark.parametrize('added_data, message', [
         ({
-             'scheduled_for': 'foo',
-             'scheduled_until': 'foo',
-             'backfill_date': 'foo',
+             'scheduled_for': datetime.datetime.now().isoformat(),
+             'scheduled_until': datetime.datetime.now().isoformat(),
+             'backfill_date': str(datetime.datetime.now().date()),
              'backfilled': True
          }, "Cannot set both 'backfill' and 'scheduled' incident properties in the same notification!"),
         ({
-             'scheduled_for': 'foo',
-             'scheduled_until': 'foo',
+             'scheduled_for': datetime.datetime.now().isoformat(),
+             'scheduled_until': datetime.datetime.now().isoformat(),
              'status': 'investigating'
          }, "is a realtime incident status! Please choose one of"),
         ({
-             'backfill_date': 'foo',
+             'backfill_date': str(datetime.datetime.now().date()),
              'backfilled': True,
              'status': 'investigating'
          }, "Cannot set 'status' when setting 'backfill'!")
@@ -85,8 +112,8 @@ class TestStatusPage:
             'wants_twitter_update': False,
             'impact_override': 'minor',
             'deliver_notifications': False,
-            'scheduled_for': (datetime.datetime.utcnow() + datetime.timedelta(minutes=1)).isoformat(),
-            'scheduled_until': (datetime.datetime.utcnow() + datetime.timedelta(minutes=2)).isoformat(),
+            'scheduled_for': (datetime.datetime.utcnow() + datetime.timedelta(minutes=10)).isoformat(),
+            'scheduled_until': (datetime.datetime.utcnow() + datetime.timedelta(minutes=12)).isoformat(),
             'scheduled_remind_prior': False,
             'scheduled_auto_in_progress': True,
             'scheduled_auto_completed': True

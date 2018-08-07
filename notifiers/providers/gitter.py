@@ -1,9 +1,9 @@
 from ..core import Provider, Response, ProviderResource
-from ..utils import requests
 from ..exceptions import ResourceError
+from ..utils import requests
 
 
-class GitterProxy:
+class GitterMixin:
     """Shared attributes between :class:`~notifiers.providers.gitter.GitterRooms` and
     :class:`~notifiers.providers.gitter.Gitter`"""
     name = 'gitter'
@@ -20,7 +20,7 @@ class GitterProxy:
         return {'Authorization': f'Bearer {token}'}
 
 
-class GitterRooms(GitterProxy, ProviderResource):
+class GitterRooms(GitterMixin, ProviderResource):
     """Returns a list of Gitter rooms via token"""
     resource_name = 'rooms'
 
@@ -63,7 +63,7 @@ class GitterRooms(GitterProxy, ProviderResource):
         return rsp['results'] if filter_ else rsp
 
 
-class Gitter(GitterProxy, Provider):
+class Gitter(GitterMixin, Provider):
     """Send Gitter notifications"""
     message_url = '/{room_id}/chatMessages'
     site_url = 'https://gitter.im'
@@ -72,7 +72,13 @@ class Gitter(GitterProxy, Provider):
         'rooms': GitterRooms()
     }
 
-    _required = {'required': ['message', 'token', 'room_id']}
+    _required = {
+        'required': [
+            'message',
+            'token',
+            'room_id'
+        ]
+    }
     _schema = {
         'type': 'object',
         'properties': {
@@ -89,7 +95,6 @@ class Gitter(GitterProxy, Provider):
                 'title': 'ID of the room to send the notification to'
             }
         },
-        'required': ['message', 'token', 'room_id'],
         'additionalProperties': False
     }
 

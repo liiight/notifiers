@@ -9,7 +9,6 @@ The easiest way to initialize a notifier is via the :func:`~notifiers.core.get_n
 .. code-block:: python
 
     >>> import notifiers
-
     >>> pushover = notifiers.get_notifier('pushover')
 
 Or import it directly:
@@ -141,5 +140,70 @@ Oops, forgot to send ``token``. Let's try again:
 
 As can be expected, each provider resource returns a completely different response that correlates to the underlying API command it wraps. In this example, by invoking the :meth:`notifiers.providers.telegram.Telegram.updates` method, you get a response that shows you which active chat IDs your telegram bot token can send to.
 
+
+Handling errors
+---------------
+There are two base types of errors in Notifiers, data (or schema) related errors and notification related errors.
+The former can present as so:
+
+    >>> import notifiers
+    >>> pushover = notifiers.get_notifier('pushover')
+    >>> pushover.notify(message='FOO')
+    Traceback (most recent call last):
+      File "<input>", line 1, in <module>
+      File "/Users/liiight/PycharmProjects/notifiers/notifiers/core.py", line 215, in notify
+        self._validate_data(kwargs, validator)
+      File "/Users/liiight/PycharmProjects/notifiers/notifiers/core.py", line 193, in _validate_data
+        raise BadArguments(validation_error=msg, provider=self.name, data=data)
+    notifiers.exceptions.BadArguments: <NotificationError: Error with sent data: 'user' is a required property>
+
+Here we see that an :class:`BadArguments` exception was raised instantly, since not all required values were sent.
+Another example:
+
+    >>> pushover.notify(message='FOO', token='TOKEN', user='USER', attachment='/foo')
+    Traceback (most recent call last):
+      File "/Users/orcarmi/PycharmProjects/notifiers/poc.py", line 50, in <module>
+        raise_on_errors=True)
+      File "/Users/orcarmi/PycharmProjects/notifiers/notifiers/core.py", line 273, in notify
+        data = self._process_data(**kwargs)
+      File "/Users/orcarmi/PycharmProjects/notifiers/notifiers/core.py", line 203, in _process_data
+        self._validate_data(data)
+      File "/Users/orcarmi/PycharmProjects/notifiers/notifiers/core.py", line 176, in _validate_data
+        raise BadArguments(validation_error=msg, provider=self.name, data=data)
+    notifiers.exceptions.BadArguments: Error with sent data: 'foo' is not a 'valid_file'
+
+Some values have both ``type`` and ``format`` set in their schema, which enforces a specific logic. Here we can see that the schema for pushover's ``attachment`` attribute has ``format`` set to ``valid_file`` which check that the file is present.
+
+There are also notification based errors:
+    >>> rsp = pushover.notify(message='FOO', token='BAD TOKEN', user='USER')
+    >>> rsp.raise_on_errors()
+    Traceback (most recent call last):
+      File "/Users/orcarmi/PycharmProjects/notifiers/poc.py", line 49, in <module>
+        raise_on_errors=True)
+      File "/Users/orcarmi/PycharmProjects/notifiers/notifiers/core.py", line 276, in notify
+        rsp.raise_on_errors()
+      File "/Users/orcarmi/PycharmProjects/notifiers/notifiers/core.py", line 48, in raise_on_errors
+        raise NotificationError(provider=self.provider, data=self.data, errors=self.errors, response=self.response)
+    notifiers.exceptions.NotificationError: Notification errors: application token is invalid
+
+Note the default behaviour for :class:`~notifiers.core.Response` is not to raise exception on error. You can either use the :func:`~notifiers.core.Response.raise_on_errors()` method, or pass ``raise_on_errors=True`` to the notification command:
+
+    >>> pushover.notify(message='FOO', token='BAD TOKEN', user='USER', raise_on_errors=True)
+    Traceback (most recent call last):
+      File "/Users/orcarmi/PycharmProjects/notifiers/poc.py", line 49, in <module>
+        raise_on_errors=True)
+      File "/Users/orcarmi/PycharmProjects/notifiers/notifiers/core.py", line 276, in notify
+        rsp.raise_on_errors()
+      File "/Users/orcarmi/PycharmProjects/notifiers/notifiers/core.py", line 48, in raise_on_errors
+        raise NotificationError(provider=self.provider, data=self.data, errors=self.errors, response=self.response)
+    notifiers.exceptions.NotificationError: Notification errors: application token is invalid
+
+You can also use the ``ok`` property:
+
+    >>> rsp = pushover.notify(message='FOO', token='BAD TOKEN', user='USER')
+    >>> rsp.ok
+    False
+    >>> rsp.errors
+    ['application token is invalid']
 
 
