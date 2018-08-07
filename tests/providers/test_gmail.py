@@ -36,7 +36,7 @@ class TestGmail:
         rsp.raise_on_errors()
 
     def test_email_from_key(self, provider):
-        rsp = provider.notify(to='foo@foo.com', from_='bla@foo.com', message='foo')
+        rsp = provider.notify(to='foo@foo.com', from_='bla@foo.com', message='foo', host='goo')
         rsp_data = rsp.data
         assert not rsp_data.get('from_')
         assert rsp_data['from'] == 'bla@foo.com'
@@ -46,7 +46,7 @@ class TestGmail:
             'foo@foo.com',
             'bar@foo.com'
         ]
-        rsp = provider.notify(to=to, message='foo')
+        rsp = provider.notify(to=to, message='foo', host='goo')
         assert rsp.data['to'] == ','.join(to)
 
     def test_gmail_negative(self, provider):
