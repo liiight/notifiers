@@ -4,13 +4,13 @@ from ..utils import requests
 from ..utils.schema.helpers import one_or_more, list_to_commas
 
 
-class PushoverProxy:
+class PushoverMixin:
     name = 'pushover'
     base_url = 'https://api.pushover.net/1/'
     path_to_errors = 'errors',
 
 
-class PushoverResourceProxy:
+class PushoverResourceMixin(PushoverMixin):
     _required = {
         'required': [
             'token'
@@ -28,7 +28,7 @@ class PushoverResourceProxy:
     }
 
 
-class PushoverSounds(PushoverProxy, PushoverResourceProxy, ProviderResource):
+class PushoverSounds(PushoverResourceMixin, ProviderResource):
     resource_name = 'sounds'
     sounds_url = 'sounds.json'
 
@@ -47,7 +47,7 @@ class PushoverSounds(PushoverProxy, PushoverResourceProxy, ProviderResource):
         return list(response.json()['sounds'].keys())
 
 
-class PushoverLimits(PushoverProxy, PushoverResourceProxy, ProviderResource):
+class PushoverLimits(PushoverResourceMixin, ProviderResource):
     resource_name = 'limits'
     limits_url = 'apps/limits.json'
 
@@ -66,7 +66,7 @@ class PushoverLimits(PushoverProxy, PushoverResourceProxy, ProviderResource):
         return response.json()
 
 
-class Pushover(PushoverProxy, Provider):
+class Pushover(PushoverMixin, Provider):
     """Send Pushover notifications"""
     message_url = 'messages.json'
     site_url = 'https://pushover.net/'

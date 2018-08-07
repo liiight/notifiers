@@ -1,10 +1,11 @@
 Changelog
 =========
 
-Unreleased (develop)
+1.0.0 (develop)
 --------------------
 
 - Added JSON Schema formatter support (`#107 <https://github.com/liiight/notifiers/pull/107>`_)
+- Improved documentation across the board
 
 0.7.4
 -----

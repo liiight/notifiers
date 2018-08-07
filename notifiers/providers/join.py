@@ -7,12 +7,13 @@ from ..exceptions import ResourceError
 from ..utils.schema.helpers import one_or_more, list_to_commas
 
 
-class JoinProxy:
+class JoinMixin:
     """Shared resources between :class:`Join` and :class:`JoinDevices`"""
     name = 'join'
     base_url = 'https://joinjoaomgcd.appspot.com/_ah/api/messaging/v1'
 
-    def _join_request(self, url: str, data: dict) -> tuple:
+    @staticmethod
+    def _join_request(url: str, data: dict) -> tuple:
         # Can 't use generic requests util since API doesn't always return error status
         errors = None
         try:
@@ -35,7 +36,7 @@ class JoinProxy:
         return response, errors
 
 
-class JoinDevices(JoinProxy, ProviderResource):
+class JoinDevices(JoinMixin, ProviderResource):
     """Return a list of Join devices IDs"""
     resource_name = 'devices'
     devices_url = '/listDevices'
@@ -68,7 +69,7 @@ class JoinDevices(JoinProxy, ProviderResource):
         return response.json()['records']
 
 
-class Join(JoinProxy, Provider):
+class Join(JoinMixin, Provider):
     """Send Join notifications"""
     push_url = '/sendPush'
     site_url = 'https://joaoapps.com/join/api/'

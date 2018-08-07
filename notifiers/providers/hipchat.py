@@ -5,7 +5,7 @@ from ..exceptions import ResourceError
 from ..utils import requests
 
 
-class HipChatProxy:
+class HipChatMixin:
     """Shared attributed between resources and :class:`HipChatResourceProxy`"""
     base_url = 'https://{group}.hipchat.com'
     name = 'hipchat'
@@ -23,7 +23,7 @@ class HipChatProxy:
         return {'Authorization': f'Bearer {token}'}
 
 
-class HipChatResourceProxy(HipChatProxy):
+class HipChatResourceMixin(HipChatMixin):
     """Common resources attributes that should not override :class:`HipChat` attributes"""
     _required = {
         'allOf': [
@@ -89,7 +89,7 @@ class HipChatResourceProxy(HipChatProxy):
         return requests.get(url, headers=headers, params=params, path_to_errors=self.path_to_errors)
 
 
-class HipChatUsers(HipChatResourceProxy, ProviderResource):
+class HipChatUsers(HipChatResourceMixin, ProviderResource):
     """Return a list of HipChat users"""
     resource_name = 'users'
 
@@ -120,7 +120,7 @@ class HipChatUsers(HipChatResourceProxy, ProviderResource):
         return response.json()
 
 
-class HipChatRooms(HipChatResourceProxy, ProviderResource):
+class HipChatRooms(HipChatResourceMixin, ProviderResource):
     """Return a list of HipChat rooms"""
     resource_name = 'rooms'
 
@@ -151,7 +151,7 @@ class HipChatRooms(HipChatResourceProxy, ProviderResource):
         return response.json()
 
 
-class HipChat(HipChatProxy, Provider):
+class HipChat(HipChatMixin, Provider):
     """Send HipChat notifications"""
 
     room_notification = '/{room}/notification'
