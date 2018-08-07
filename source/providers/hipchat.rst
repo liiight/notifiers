@@ -10,9 +10,24 @@ Simple example:
     >>> hipchat = get_notifier('hipchat')
     >>> hipchat.notify(token='SECRET', group='foo', message='hi!', room=1234)
 
-Hipchat requires using either a ``group`` or a ``team_server`` key word (for private instances
+Hipchat requires using either a ``group`` or a ``team_server`` key word (for private instances)
 
-All options:
+You can view the users you can send to via the ``users`` resource:
+
+.. code-block:: python
+
+    >>> hipchat.users(token='SECRET', group='foo')
+    {'items': [{'id': 1, 'links': {'self': '...'}, 'mention_name': '...', 'name': '...', 'version': 'E4GX9340'}, ...]}
+
+You can view the rooms you can send to via the ``rooms`` resource:
+
+.. code-block:: python
+
+    >>> hipchat.rooms(token='SECRET', group='foo')
+    {'items': [{'id': 9, 'is_archived': False, ... }]
+
+
+Full schema:
 
 .. code-block:: yaml
 
@@ -252,17 +267,3 @@ All options:
           to send a message to.
         type: string
     type: object
-
-You can view the users you can send to via the ``users`` resource:
-
-.. code-block:: python
-
-    >>> hipchat.users(token='SECRET', group='foo')
-    {'items': [{'id': 1, 'links': {'self': '...'}, 'mention_name': '...', 'name': '...', 'version': 'E4GX9340'}, ...]}
-
-You can view the users you can send to via the ``rooms`` resource:
-
-.. code-block:: python
-
-    >>> hipchat.rooms(token='SECRET', group='foo')
-    {'items': [{'id': 9, 'is_archived': False, ... }]

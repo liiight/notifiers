@@ -20,6 +20,13 @@ Send `Pushbullet <https://www.pushbullet.com>`_ notifications.
     ...     guid='1234abcd',
     ... )
 
+You can view the devices you can send to via the ``devices`` resource:
+
+.. code-block:: python
+
+    >>> pushbullet.devices(token='SECRET')
+    [{'active': True, 'iden': ... }]
+
 Full schema:
 
 .. code-block:: yaml
