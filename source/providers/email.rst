@@ -1,5 +1,6 @@
 Email (SMTP)
 ------------
+
 Enables sending email messages to SMTP servers.
 
 .. code-block:: python

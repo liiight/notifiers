@@ -1,5 +1,6 @@
 Gitter
 ------
+
 Send notifications via `Gitter <https://gitter.im>`_
 
 .. code-block:: python

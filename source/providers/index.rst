@@ -1,5 +1,7 @@
-Providers Documentation
-=======================
+.. _providers:
+
+Providers
+=========
 
 .. toctree::
    :maxdepth: 2
