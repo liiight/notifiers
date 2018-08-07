@@ -3,7 +3,7 @@ from ..exceptions import BadArguments, ResourceError
 from ..utils import requests
 
 
-class StatuspageProxy:
+class StatuspageMixin:
     """Shared resources between :class:`Statuspage` and :class:`StatuspageComponents`"""
     base_url = 'https://api.statuspage.io/v1//pages/{page_id}/'
     name = 'statuspage'
@@ -11,7 +11,7 @@ class StatuspageProxy:
     site_url = 'https://statuspage.io'
 
 
-class StatuspageComponents(StatuspageProxy, ProviderResource):
+class StatuspageComponents(StatuspageMixin, ProviderResource):
     """Return a list of Statuspage components for the page ID"""
     resource_name = 'components'
     components_url = 'components.json'
@@ -55,7 +55,7 @@ class StatuspageComponents(StatuspageProxy, ProviderResource):
         return response.json()
 
 
-class Statuspage(StatuspageProxy, Provider):
+class Statuspage(StatuspageMixin, Provider):
     """Create Statuspage incidents"""
     incidents_url = 'incidents.json'
 

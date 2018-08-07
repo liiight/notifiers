@@ -65,7 +65,7 @@ class MailGun(Provider):
                         ]
                     }
                 ],
-                'error_anyOf': 'Need either "text" or "html"'
+                'error_anyOf': 'Need either "message" or "html"'
             }
         ]
     }

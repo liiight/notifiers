@@ -8,8 +8,8 @@ from email.utils import formatdate
 from pathlib import Path
 from smtplib import SMTPAuthenticationError, SMTPServerDisconnected, SMTPSenderRefused
 
-from ..utils.schema.helpers import one_or_more, list_to_commas
 from ..core import Provider, Response
+from ..utils.schema.helpers import one_or_more, list_to_commas
 
 DEFAULT_SUBJECT = "New email from 'notifiers'!"
 DEFAULT_FROM = f'{getpass.getuser()}@{socket.getfqdn()}'
@@ -23,12 +23,10 @@ class SMTP(Provider):
     name = 'email'
 
     _required = {
-        'required': ['message', 'to'],
-        'dependencies': {
-            'username': ['password'],
-            'password': ['username'],
-            'ssl': ['tls']
-        }
+        'required': [
+            'message',
+            'to'
+        ]
     }
 
     _schema = {
@@ -93,6 +91,11 @@ class SMTP(Provider):
                 'type': 'boolean',
                 'title': 'should the email be parse as an HTML file'
             }
+        },
+        'dependencies': {
+            'username': ['password'],
+            'password': ['username'],
+            'ssl': ['tls']
         },
         'additionalProperties': False,
     }

@@ -7,12 +7,13 @@ from ..exceptions import ResourceError
 from ..utils.schema.helpers import one_or_more, list_to_commas
 
 
-class JoinProxy:
+class JoinMixin:
     """Shared resources between :class:`Join` and :class:`JoinDevices`"""
     name = 'join'
     base_url = 'https://joinjoaomgcd.appspot.com/_ah/api/messaging/v1'
 
-    def _join_request(self, url: str, data: dict) -> tuple:
+    @staticmethod
+    def _join_request(url: str, data: dict) -> tuple:
         # Can 't use generic requests util since API doesn't always return error status
         errors = None
         try:
@@ -35,7 +36,7 @@ class JoinProxy:
         return response, errors
 
 
-class JoinDevices(JoinProxy, ProviderResource):
+class JoinDevices(JoinMixin, ProviderResource):
     """Return a list of Join devices IDs"""
     resource_name = 'devices'
     devices_url = '/listDevices'
@@ -68,7 +69,7 @@ class JoinDevices(JoinProxy, ProviderResource):
         return response.json()['records']
 
 
-class Join(JoinProxy, Provider):
+class Join(JoinMixin, Provider):
     """Send Join notifications"""
     push_url = '/sendPush'
     site_url = 'https://joaoapps.com/join/api/'
@@ -124,6 +125,7 @@ class Join(JoinProxy, Provider):
             }),
             'url': {
                 'type': 'string',
+                'format': 'uri',
                 'title': ' A URL you want to open on the device. If a notification is created with this push, '
                          'this will make clicking the notification open this URL'
             },
@@ -133,6 +135,7 @@ class Join(JoinProxy, Provider):
             },
             'file': {
                 'type': 'string',
+                'format': 'uri',
                 'title': 'a publicly accessible URL of a file'
             },
             'smsnumber': {
@@ -155,6 +158,7 @@ class Join(JoinProxy, Provider):
             },
             'mmsfile': {
                 'type': 'string',
+                'format': 'uri',
                 'title': 'publicly accessible mms file url'
             },
             'mediaVolume': {
@@ -171,6 +175,7 @@ class Join(JoinProxy, Provider):
             },
             'wallpaper': {
                 'type': 'string',
+                'format': 'uri',
                 'title': 'a publicly accessible URL of an image file'
             },
             'find': {
@@ -184,11 +189,13 @@ class Join(JoinProxy, Provider):
             },
             'icon': {
                 'type': 'string',
-                'title': "notification's icon"
+                'format': 'uri',
+                'title': "notification's icon URL"
             },
             'smallicon': {
                 'type': 'string',
-                'title': 'Status Bar Icon'
+                'format': 'uri',
+                'title': 'Status Bar Icon URL'
             },
             'priority': {
                 'type': 'integer',
@@ -202,7 +209,8 @@ class Join(JoinProxy, Provider):
             },
             'image': {
                 'type': 'string',
-                'title': 'Notification image'
+                'format': 'uri',
+                'title': 'Notification image URL'
             }
         },
         'additionalProperties': False
