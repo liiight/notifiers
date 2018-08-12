@@ -1,12 +1,13 @@
 from . import (
     pushover, simplepush, slack, email, gmail, telegram, gitter, pushbullet, join, hipchat, zulip, twilio, pagerduty,
-    mailgun, popcornnotify, statuspage
+    mailgun, popcornnotify, statuspage, sendgrid
 )
 
 _all_providers = {
     'pushover': pushover.Pushover,
     'simplepush': simplepush.SimplePush,
     'slack': slack.Slack,
+    'sendgrid': sendgrid.SendGrid,
     'email': email.SMTP,
     'gmail': gmail.Gmail,
     'telegram': telegram.Telegram,
