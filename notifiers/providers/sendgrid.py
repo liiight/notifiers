@@ -10,10 +10,7 @@ class SendGrid(Provider):
     base_url = 'https://api.sendgrid.com/v3/mail/send'
     site_url = 'https://sendgrid.com/docs'
     name = 'sendgrid'
-    # TODO what is this?
-    path_to_errors = 'message',
 
-    # TODO what is this? why do we specify the top level required seperately?
     _required = {
         'allOf': [
             {
@@ -111,8 +108,8 @@ class SendGrid(Provider):
         'properties': {
             'to': {
                 'type': 'string',
-                'title': 'The destination address of the email, will override' +
-                         ' and replace any provided personalizations',
+                'title': 'The destination address of the email, will' +
+                         ' be appended to the personalizations',
                 'format': 'email'
             },
             'api_key': {
@@ -178,7 +175,8 @@ class SendGrid(Provider):
                 'properties': {
                     'email': {
                         'type': 'string',
-                        'title': 'The email address'
+                        'title': 'The email address',
+                        'format': 'email'
                     },
                     'name': {
                         'type': 'string',
@@ -582,15 +580,18 @@ class SendGrid(Provider):
         # inserting support for a 'to' argument, since sendgrid is a little
         # complicated about setting that
         if data.get('to'):
-            data['personalizations'] = [
+            if not data.get('personalizations'):
+                data['personalizations'] = []
+
+            data['personalizations'].append(
                 {
                     'to': [
-                            {
-                                'email': data.pop('to')
-                            }
-                        ]
+                        {
+                            'email': data.pop('to')
+                        }
+                    ]
                 }
-            ]
+            )
 
 
         return data

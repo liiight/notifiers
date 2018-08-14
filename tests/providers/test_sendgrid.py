@@ -1,6 +1,7 @@
-import pytest
 import os
 import re
+import base64
+import pytest
 from notifiers.exceptions import BadArguments
 provider = 'sendgrid'
 """
@@ -49,16 +50,26 @@ def get_attachment_payload():
     ]
     return payload
 
-# deleting all the NOTIFIERS variables before the schema tests
-# so we can interact purely with the test data in this class
-@pytest.fixture()
-def clean_environment():
-    for each in os.environ:
-        if re.match('^NOTIFIERS.*', each):
-            del(os.environ[each])
-
-@pytest.mark.usefixtures('clean_environment')
 class TestSendgridSchema:
+
+    old_environ = {}
+
+    @classmethod
+    def setup_class(cls):
+        """
+        deleting all the NOTIFIERS variables before the schema tests
+        so we can interact purely with the test data in this class
+        """
+        for each in os.environ:
+            if re.match('^NOTIFIERS.*', each):
+                cls.old_environ[each] = os.environ.pop(each)
+
+    @classmethod
+    def teardown_class(cls):
+        """put the NOTIFIERS variables back for other tests"""
+        print (cls.old_environ)
+        for each in cls.old_environ:
+            os.environ[each] = cls.old_environ[each]
 
     def test_sendgrid_metadata(self, provider):
         assert(provider.metadata == {
@@ -366,7 +377,7 @@ class TestSendgridSchema:
         payload = get_basic_payload()
         payload['headers'] = {'key': 'value', 'key2': 'value'}
         assert(provider._process_data(**payload) == payload)
-    
+
     def test_categories(self, provider):
         payload = get_basic_payload()
         payload['categories'] = ['a', 'b', 'c']
@@ -471,7 +482,6 @@ class TestSendgridSchema:
         }
         assert(provider._process_data(**payload) == payload)
 
-class TestSendgridProviderOverrides:
     def test_from_(self, provider):
         payload = get_basic_payload()
         payload['from_'] = payload.pop('from')
@@ -489,6 +499,22 @@ class TestSendgridProviderOverrides:
         del(payload['personalizations'])
         assert(provider._process_data(**payload) == get_basic_payload())
 
+    def test_to_and_personalizations(self, provider):
+        payload = get_basic_payload()
+        payload['to'] = 'test@example.com'
+        expected_payload = payload
+        del(expected_payload['to'])
+        expected_payload['personalizations'].append(
+            {
+                'to': [
+                    {
+                        'email': 'test@example.com'
+                    }
+                ]
+            }
+        )
+        assert(provider._process_data(**payload) == expected_payload)
+
 def get_online_basic_payload():
     """
     Gets a basic payload with the live variables deleted, so that
@@ -504,4 +530,87 @@ class TestSendgridOnline:
     @pytest.mark.online
     def test_basic(self, provider):
         payload = get_online_basic_payload()
+        provider.notify(**payload, raise_on_errors=True)
+
+    @pytest.mark.online
+    def test_full_payload(self, provider):
+        # this tests all the payload options that can be used realistically
+        # on the free tier
+        payload = get_basic_payload()
+        # make sure the personalized email gets inboxed
+        payload['personalizations'][0]['to'][0]['email'] = os.environ.get('NOTIFIERS_SENDGRID_TO')
+        payload['personalizations'][0]['substitutions'] = {
+            '{{name}}': 'Kenobi',
+            '{{person}}': '{{person_section}}'
+        }
+
+        payload['sections'] = {
+            '{{person_section}}': 'General {{name}}!'
+        }
+
+        payload['content'].append(
+            {
+                'type': 'text/html',
+                'value': '<p> hello there, {{person}} {{tracking_pixel}} </p>'
+            }
+        )
+        payload['reply_to'] = {
+            'email': 'e@m.ail',
+            'name': 'a reply to person'
+        }
+        payload['attachments'] = [
+            {
+                'content': base64.b64encode(b'a test attachment').decode('utf-8'),
+                'type': 'text/plain',
+                'filename': 'file.txt',
+                'disposition': 'attachment',
+            },
+            {
+                'content': base64.b64encode(b'an inline test attachment').decode('utf-8'),
+                'type': 'text/plain',
+                'filename': 'file2.txt',
+                'disposition': 'inline',
+                'content_id': 'test'
+            }
+        ]
+
+        payload['headers'] = {
+            'X-NOTIFIERS-TEST': 'notifiers test'
+        }
+
+        payload['categories'] = [
+            'notifiers test'
+        ]
+
+        payload['custom_args'] = {
+            'notifiers': 'test'
+        }
+
+        payload['mail_settings'] = {
+            'bcc': {
+                'enable': True,
+                'email': os.environ.get('NOTIFIERS_SENDGRID_TO')
+            },
+            'footer': {
+                'enable': True,
+                'text': 'text footer',
+                'html': '<h1> html footer </h1>'
+            }
+        }
+
+        payload['tracking_settings'] = {
+            'click_tracking': {
+                'enable': True,
+                'enable_text': True
+            },
+            'open_tracking': {
+                'enable': True,
+                'substitution_tag': '{{tracking_pixel}}'
+            },
+            'subscription_tracking': {
+                'enable': True,
+                'html': '<a href=https://www.google.com> Test Link </a>'
+            }
+        }
+
         provider.notify(**payload, raise_on_errors=True)
