@@ -84,20 +84,29 @@ class SendGrid(Provider):
     }
 
     __from = {
-        'type': 'object',
-        'title': 'The from address of the email',
-        'additionalProperties': False,
-        'required': ['email'],
-        'properties': {
-            'email': {
-                'type': 'string',
-                'title': 'The email address'
+        'oneOf': [
+            {
+                'type': 'object',
+                'title': 'The from address of the email',
+                'additionalProperties': False,
+                'required': ['email'],
+                'properties': {
+                    'email': {
+                        'type': 'string',
+                        'title': 'The email address'
+                    },
+                    'name': {
+                        'type': 'string',
+                        'title': 'The name associated with the email address'
+                    }
+                }
             },
-            'name': {
+            {
                 'type': 'string',
-                'title': 'The name associated with the email address'
+                'title': 'the email address to set in the "from" headers',
+                'format': 'email'
             }
-        }
+        ]
     }
 
     _schema = {
@@ -564,6 +573,10 @@ class SendGrid(Provider):
     def _prepare_data(self, data: dict) -> dict:
         if data.get('from_'):
             data['from'] = data.pop('from_')
+        if isinstance(data['from'], str):
+            data['from'] = {
+                'email': data.pop('from')
+            }
 
         if data.get('message'):
             content = [

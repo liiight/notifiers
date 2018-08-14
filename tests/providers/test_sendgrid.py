@@ -518,6 +518,11 @@ class TestSendgridSchema:
         )
         assert provider._process_data(**payload) == expected_payload
 
+    def test_bare_from(self, provider):
+        payload = get_basic_payload()
+        payload['from'] = 'test@example.com'
+        assert provider._process_data(**payload) == get_basic_payload()
+
 def get_online_basic_payload():
     """
     Gets a basic payload with the live variables deleted, so that
