@@ -573,6 +573,9 @@ class SendGrid(Provider):
     def _prepare_data(self, data: dict) -> dict:
         if data.get('from_'):
             data['from'] = data.pop('from_')
+
+        # supporting a bare string 'from', this simplifies
+        # the API and allows us to use the CLI
         if isinstance(data['from'], str):
             data['from'] = {
                 'email': data.pop('from')
@@ -590,6 +593,7 @@ class SendGrid(Provider):
         # inserting support for a 'to' argument, since sendgrid is a little
         # complicated about setting that
         if data.get('to'):
+
             if not data.get('personalizations'):
                 data['personalizations'] = []
 
