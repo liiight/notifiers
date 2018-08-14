@@ -2,6 +2,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
+.pytest_cache/
 
 # C extensions
 *.so
@@ -87,6 +88,9 @@ celerybeat-schedule
 venv/
 ENV/
 
+# pipenv
+Pipfile*
+
 # Spyder project settings
 .spyderproject
 .spyproject
@@ -101,3 +105,6 @@ ENV/
 .mypy_cache/
 poc*
 /docs/
+
+# vim swap files
+.*.sw*
