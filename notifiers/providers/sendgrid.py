@@ -1,8 +1,5 @@
-import json
-
 from ..core import Provider, Response
 from ..utils import requests
-from ..utils.schema.helpers import one_or_more
 
 
 class SendGrid(Provider):
@@ -154,7 +151,7 @@ class SendGrid(Provider):
                         'send_at': {
                             'type': 'integer',
                             'title': 'A unix timestamp allowing you to ' +
-                                     'specify when you want your email ' + 
+                                     'specify when you want your email ' +
                                      'to be delivered',
                         }
 
@@ -185,81 +182,81 @@ class SendGrid(Provider):
                 }
             },
             'subject': {
-                    'type': 'string',
-                    'title': 'The global subject of the message',
-                    'minLength': 1
+                'type': 'string',
+                'title': 'The global subject of the message',
+                'minLength': 1
             },
             'content': {
-                    'type': 'array',
-                    'title': 'An array in which you may specify the content' +
-                             ' of your email by mime type',
-                    'items': {
-                        'additionalProperties': False,
-                        'required': ['type', 'value'],
-                        'properties': {
-                            'type': {
-                                'type': 'string',
-                                'minLength': 1,
-                                'title': 'The mime type of this message part' +
-                                         ' e.g "text/html"'
-                            },
-                            'value': {
-                                'type': 'string',
-                                'minLength': 1,
-                                'title': 'The actual content of the specified' +
-                                         ' mime type'
-                            }
+                'type': 'array',
+                'title': 'An array in which you may specify the content' +
+                         ' of your email by mime type',
+                'items': {
+                    'additionalProperties': False,
+                    'required': ['type', 'value'],
+                    'properties': {
+                        'type': {
+                            'type': 'string',
+                            'minLength': 1,
+                            'title': 'The mime type of this message part' +
+                                     ' e.g "text/html"'
+                        },
+                        'value': {
+                            'type': 'string',
+                            'minLength': 1,
+                            'title': 'The actual content of the specified' +
+                                     ' mime type'
                         }
                     }
-                },
+                }
+            },
             'attachments': {
-                    'type': 'array',
-                    'title': 'An array of attachments for your email',
-                    'items': {
-                        'additionalProperties': False,
-                        'required': ['content', 'filename'],
-                        'properties': {
-                            'content': {
-                                'type': 'string',
-                                'title': 'The base64 encoded content of the' +
-                                         ' attachment',
-                                'minLength': 1,
-                            },
-                            'type': {
-                                'type': 'string',
-                                'title': 'The mime type of the attachment',
-                                'minLength': 1
-                            },
-                            'filename': {
-                                'type': 'string',
-                                'title': 'The filename of the attachment',
-                                'minLength': 1
-                            },
-                            'disposition': {
-                                'type': 'string',
-                                'default': 'attachment',
-                                'enum': [
-                                    'inline',
-                                    'attachment'
-                                ]
-                            },
-                            'content_id': {
-                                'type': 'string',
-                                'title': 'the content ID for the attachment' +
-                                         ', used when disposition is ' +
-                                          '"inline"',
-                            }
+                'type': 'array',
+                'title': 'An array of attachments for your email',
+                'items': {
+                    'additionalProperties': False,
+                    'required': ['content', 'filename'],
+                    'properties': {
+                        'content': {
+                            'type': 'string',
+                            'title': 'The base64 encoded content of the' +
+                                     ' attachment',
+                            'minLength': 1,
+                        },
+                        'type': {
+                            'type': 'string',
+                            'title': 'The mime type of the attachment',
+                            'minLength': 1
+                        },
+                        'filename': {
+                            'type': 'string',
+                            'title': 'The filename of the attachment',
+                            'minLength': 1
+                        },
+                        'disposition': {
+                            'type': 'string',
+                            'default': 'attachment',
+                            'enum': [
+                                'inline',
+                                'attachment'
+                            ]
+                        },
+                        'content_id': {
+                            'type': 'string',
+                            'title': 'the content ID for the attachment' +
+                                     ', used when disposition is ' +
+                                     '"inline"',
                         }
                     }
+                }
             },
             'template_id': {
-                    'type': 'string',
-                    'title': 'The ID of the template you would like to use'
+                'type': 'string',
+                'title': 'The ID of the template you would like to use'
             },
             'sections': {
-                    'type': 'object',
-                    'title': 'An object of key/value pairs that define ' +
-                            'block sections to be used for substitutions'
+                'type': 'object',
+                'title': 'An object of key/value pairs that define ' +
+                         'block sections to be used for substitutions'
             },
             'headers': {
                 'type': 'object',
@@ -307,9 +304,9 @@ class SendGrid(Provider):
                     'groups_to_display': {
                         'type': 'array',
                         'title': 'An array containing the unsubscribe ' +
-                                 'groups that you would like to be' + 
-                                ' displayed on the unsubscribe preferences' + 
-                                ' page.',
+                                 'groups that you would like to be' +
+                                 ' displayed on the unsubscribe preferences' +
+                                 ' page.',
                         'maxItems': 25,
                         'items': {
                             'type': 'integer'
@@ -354,7 +351,7 @@ class SendGrid(Provider):
                     'bypass_list_management': {
                         'type': 'object',
                         'additionalProperties': False,
-                        'title': 'Allows you to bypass all unsubscribe ' + 
+                        'title': 'Allows you to bypass all unsubscribe ' +
                                  'groups and suppressions to ensure that ' +
                                  'the email is delivered to every single ' +
                                  'recipient.',
@@ -550,7 +547,7 @@ class SendGrid(Provider):
                             'utm_content': {
                                 'type': 'string',
                                 'title': 'Used to differentiate your ' +
-                                         'campaign from advertisements.'  
+                                         'campaign from advertisements.'
                             },
                             'utm_campaign': {
                                 'type': 'string',
@@ -601,7 +598,7 @@ class SendGrid(Provider):
             'Authorization': f'Bearer {data["api_key"]}',
             'Content-Type': 'application/json'
         }
-        del(data['api_key'])
+        del data['api_key']
         response, errors = requests.post(url=self.base_url,
                                          json=data,
                                          headers=headers
