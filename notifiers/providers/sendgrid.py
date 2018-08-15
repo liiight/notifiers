@@ -159,6 +159,7 @@ class SendGrid(Provider):
                         },
                         'send_at': {
                             'type': 'integer',
+                            'format': 'timestamp',
                             'title': 'A unix timestamp allowing you to ' +
                                      'specify when you want your email ' +
                                      'to be delivered',
@@ -291,6 +292,7 @@ class SendGrid(Provider):
             },
             'send_at': {
                 'type': 'integer',
+                'format': 'timestamp',
                 'title': 'A unix timestamp allowing you to specify when ' +
                          'you want your email to be delivered'
             },

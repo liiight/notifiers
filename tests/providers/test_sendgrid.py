@@ -397,9 +397,15 @@ class TestSendgridSchema:
         payload['custom_args'] = {'key': 'value'}
         assert provider._process_data(**payload) == payload
 
-    def test_send_at(self, provider):
+    def test_send_at_invalid_timestamp(self, provider):
         payload = get_basic_payload()
-        payload['send_at'] = 1234
+        payload['send_at'] = 9999999999999999
+        with pytest.raises(BadArguments, match=" 9999999999999999 is not a 'timestamp'"):
+            provider._process_data(**payload)
+
+    def test_send_at_valid(self, provider):
+        payload = get_basic_payload()
+        payload['send_at'] = 1534297539
         assert provider._process_data(**payload) == payload
 
     def test_batch_id(self, provider):
