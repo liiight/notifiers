@@ -1,6 +1,43 @@
 from ..core import Provider, Response
 from ..utils import requests
 
+"""A couple of helper functions to help build the schema"""
+def get_email_object(title: str) -> dict:
+    """returns a pre-canned email object with a custom title"""
+    return {
+        'type': 'object',
+        'title': title,
+        'additionalProperties': False,
+        'required': ['email'],
+        'properties': {
+            'email': {
+                'type': 'string',
+                'title': 'The email address of the recipient',
+                'format': 'email'
+            },
+            'name': {
+                'type': 'string',
+                'title': 'The name associated with the email address'
+            }
+        }
+    }
+
+
+def get_from_object(duplicate: bool) -> dict:
+    """returns a pre-canned 'from' schema, optionally labeled a dupe"""
+    return {
+        'duplicate': duplicate,
+        'oneOf': [
+            get_email_object('The from address of the email'),
+            {
+                'type': 'string',
+                'title': 'The from address of the email',
+                'format': 'email'
+            }
+        ]
+    }
+
+
 
 class SendGrid(Provider):
     """Send emails via SendGrid"""
@@ -66,47 +103,7 @@ class SendGrid(Provider):
         'minItems': 1,
         'maxItems': 1000,
         'uniqueItems': False,
-        'items': {
-            'type': 'object',
-            'required': ['email'],
-            'properties': {
-                'email': {
-                    'type': 'string',
-                    'title': 'Email address of recipient',
-                    'format': 'email'
-                },
-                'name': {
-                    'type': 'string',
-                    'title': 'Name of recipient'
-                }
-            }
-        }
-    }
-
-    __from = {
-        'oneOf': [
-            {
-                'type': 'object',
-                'title': 'The from address of the email',
-                'additionalProperties': False,
-                'required': ['email'],
-                'properties': {
-                    'email': {
-                        'type': 'string',
-                        'title': 'The email address'
-                    },
-                    'name': {
-                        'type': 'string',
-                        'title': 'The name associated with the email address'
-                    }
-                }
-            },
-            {
-                'type': 'string',
-                'title': 'the email address to set in the "from" headers',
-                'format': 'email'
-            }
-        ]
+        'items': get_email_object('A recipient address')
     }
 
     _schema = {
@@ -172,25 +169,9 @@ class SendGrid(Provider):
                 'type': 'string',
                 'title': 'Plain text message content'
             },
-            'from': __from,
-            'from_': __from,
-            'reply_to': {
-                'type': 'object',
-                'title': 'The "reply to" address of the email',
-                'additionalProperties': False,
-                'required': ['email'],
-                'properties': {
-                    'email': {
-                        'type': 'string',
-                        'title': 'The email address',
-                        'format': 'email'
-                    },
-                    'name': {
-                        'type': 'string',
-                        'title': 'The name associated with the email address'
-                    }
-                }
-            },
+            'from': get_from_object(False),
+            'from_': get_from_object(True),
+            'reply_to': get_email_object('The "reply to" address of the email'),
             'subject': {
                 'type': 'string',
                 'title': 'The global subject of the message',
