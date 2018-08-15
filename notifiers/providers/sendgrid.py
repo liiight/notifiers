@@ -2,6 +2,8 @@ from ..core import Provider, Response
 from ..utils import requests
 
 """A couple of helper functions to help build the schema"""
+
+
 def get_email_object(title: str) -> dict:
     """returns a pre-canned email object with a custom title"""
     return {
@@ -36,7 +38,6 @@ def get_from_object(duplicate: bool) -> dict:
             }
         ]
     }
-
 
 
 class SendGrid(Provider):
@@ -143,15 +144,17 @@ class SendGrid(Provider):
                         },
                         'substitutions': {
                             'type': 'object',
-                            'title': 'A collection of key/value pairs that will ' +
-                                     'be applied to the text and html parts of the email',
+                            'title': 'A collection of key/value pairs that ' +
+                                     'will be applied to the text and html' +
+                                     'parts of the email',
                             'maxProperties': 10000
                         },
                         'custom_args': {
                             'type': 'object',
                             'title': 'Values that are specific to this ' +
                                      'personalization that will be carried' +
-                                     ' along with the email and its activity data',
+                                     ' along with the email and its ' +
+                                     'activity data',
                             'maxProperties': 10000
                         },
                         'send_at': {
@@ -171,7 +174,9 @@ class SendGrid(Provider):
             },
             'from': get_from_object(False),
             'from_': get_from_object(True),
-            'reply_to': get_email_object('The "reply to" address of the email'),
+            'reply_to': get_email_object(
+                'The "reply to" address of the email'
+            ),
             'subject': {
                 'type': 'string',
                 'title': 'The global subject of the message',
@@ -279,7 +284,8 @@ class SendGrid(Provider):
             },
             'batch_id': {
                 'type': 'string',
-                'title': 'This ID represents a batch of emails to be sent at the same time.'
+                'title': 'This ID represents a batch of emails to be sent ' +
+                         'at the same time.'
             },
             'asm': {
                 'type': 'object',
@@ -350,7 +356,8 @@ class SendGrid(Provider):
                         'properties': {
                             'enable': {
                                 'type': 'boolean',
-                                'title': 'Indicates if this setting is enabled.'
+                                'title': 'Indicates if this setting is ' +
+                                         'enabled.'
                             }
                         }
                     },
@@ -362,7 +369,8 @@ class SendGrid(Provider):
                         'properties': {
                             'enable': {
                                 'type': 'boolean',
-                                'title': 'Indicates if this setting is enabled.'
+                                'title': 'Indicates if this setting is ' +
+                                         'enabled.'
                             },
                             'text': {
                                 'type': 'string',
@@ -376,17 +384,10 @@ class SendGrid(Provider):
                         }
                     },
                     'sandbox_mode': {
-                        'type': 'object',
-                        'additionalProperties': False,
+                        'type': 'boolean',
                         'title': 'This allows you to send a test email to ' +
                                  'ensure that your request body is valid ' +
                                  'and formatted correctly.',
-                        'properties': {
-                            'enable': {
-                                'type': 'boolean',
-                                'title': 'Indicates if this setting is enabled'
-                            }
-                        }
                     },
                     'spam_check': {
                         'type': 'object',
@@ -423,8 +424,8 @@ class SendGrid(Provider):
                 'type': 'object',
                 'additionalProperties': False,
                 'title': 'Settings to determine how you would like to ' +
-                         'track the metrics of how your recipients interact '+
-                         'with your email.',
+                         'track the metrics of how your recipients interact' +
+                         ' with your email.',
                 'properties': {
                     'click_tracking': {
                         'type': 'object',
@@ -461,7 +462,7 @@ class SendGrid(Provider):
                                          'insert in the body of your ' +
                                          'email at a location that you ' +
                                          'desire. This tag will be ' +
-                                         'replaced by the open tracking '+
+                                         'replaced by the open tracking ' +
                                          'pixel.'
                             }
                         }
@@ -496,13 +497,14 @@ class SendGrid(Provider):
                             },
                             'substitution_tag': {
                                 'type': 'string',
-                                'title': 'A tag that will be replaced with the ' +
-                                         'unsubscribe URL. for example: ' +
+                                'title': 'A tag that will be replaced with ' +
+                                         'the unsubscribe URL. for example: ' +
                                          '[unsubscribe_url]. If this ' +
-                                         'parameter is used, it will override' +
-                                         ' both the text and html parameters.' +
-                                         ' The URL of the link will be placed' +
-                                         ' at the substitution tag’s location' +
+                                         'parameter is used, it will ' +
+                                         'override both the text and' +
+                                         ' html parameters. The URL of ' +
+                                         'the link will be placed at ' +
+                                         'the substitution tag’s location' +
                                          ', with no additional formatting.'
                             }
                         }
@@ -516,7 +518,7 @@ class SendGrid(Provider):
                                  'would like to specify the location of the' +
                                  ' link within your email, you may use the ' +
                                  'substitution_tag.',
-                        'properties' : {
+                        'properties': {
                             'enable': {
                                 'type': 'boolean',
                                 'title': 'Indicates if this setting is enabled'
@@ -577,8 +579,7 @@ class SendGrid(Provider):
         # complicated about setting that
         if data.get('to'):
 
-            if not data.get('personalizations'):
-                data['personalizations'] = []
+            data.setdefault('personalizations', [])
 
             data['personalizations'].append(
                 {
@@ -590,17 +591,20 @@ class SendGrid(Provider):
                 }
             )
 
+        if 'mail_settings' in data and 'sandbox_mode' in data['mail_settings']:
+            data['mail_settings']['sandbox_mode'] = {
+                'enable': data['mail_settings'].pop('sandbox_mode')
+            }
 
         return data
 
     def _send_notification(self, data: dict) -> Response:
         headers = {
             'Authorization': f'Bearer {data["api_key"]}',
-            'Content-Type': 'application/json'
         }
         del data['api_key']
         response, errors = requests.post(url=self.base_url,
                                          json=data,
                                          headers=headers
-                                        )
+                                         )
         return self.create_response(data, response, errors)

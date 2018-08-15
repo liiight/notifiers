@@ -5,14 +5,16 @@ Online functional tests require the following env variables:
     NOTIFIERS_SENDGRID_TO
 The 'from' email in the online tests will be 'test@example.com'
 """
-# pylint: disable=too-many-public-methods,no-self-use,redefined-outer-name,missing-docstring
-# pylint: disable=protected-access
+# pylint: disable=too-many-public-methods,no-self-use,redefined-outer-name
+# pylint: disable=protected-access,missing-docstring,invalid-name
 import os
 import re
+import copy
 import base64
 import pytest
 from notifiers.exceptions import BadArguments
 provider = 'sendgrid'
+
 
 def get_basic_payload():
     """
@@ -42,6 +44,7 @@ def get_basic_payload():
         ],
     }
 
+
 def get_attachment_payload():
     """Gets a payload section for attachments"""
     payload = get_basic_payload()
@@ -52,6 +55,7 @@ def get_attachment_payload():
         }
     ]
     return payload
+
 
 class TestSendgridSchema:
     """Tests just the schema validation for SG"""
@@ -80,7 +84,6 @@ class TestSendgridSchema:
             'site_url': 'https://sendgrid.com/docs',
             'name': 'sendgrid',
         })
-
 
     def test_basic_payload(self, provider):
         provider._process_data(**get_basic_payload())
@@ -143,6 +146,7 @@ class TestSendgridSchema:
             "'someone' is not a 'email'"
         )
     ]
+
     @pytest.mark.parametrize('payload,error', to_payloads)
     def test_bad_personalization_to_values(self, payload, error, provider):
         full_payload = get_basic_payload()
@@ -232,13 +236,15 @@ class TestSendgridSchema:
     def test_from_missing(self, provider):
         payload = get_basic_payload()
         del payload['from']
-        with pytest.raises(BadArguments, match="'from' is a required property"):
+        with pytest.raises(BadArguments,
+                           match="'from' is a required property"):
             provider._process_data(**payload)
 
     def test_from_email_missing(self, provider):
         payload = get_basic_payload()
         del payload['from']['email']
-        with pytest.raises(BadArguments, match="'email' is a required property"):
+        with pytest.raises(BadArguments,
+                           match="'email' is a required property"):
             provider._process_data(**payload)
 
     def test_from_name(self, provider):
@@ -255,7 +261,8 @@ class TestSendgridSchema:
     def test_reply_to_email_missing(self, provider):
         payload = get_basic_payload()
         payload['reply_to'] = {}
-        with pytest.raises(BadArguments, match="'email' is a required property"):
+        with pytest.raises(BadArguments,
+                           match="'email' is a required property"):
             provider._process_data(**payload)
 
     def test_email_name(self, provider):
@@ -272,7 +279,8 @@ class TestSendgridSchema:
     def test_subject_missing(self, provider):
         payload = get_basic_payload()
         del payload['subject']
-        with pytest.raises(BadArguments, match="'subject' is a required property"):
+        with pytest.raises(BadArguments,
+                           match="'subject' is a required property"):
             provider._process_data(**payload)
 
     def test_empty_subject(self, provider):
@@ -284,19 +292,22 @@ class TestSendgridSchema:
     def test_no_content(self, provider):
         payload = get_basic_payload()
         del payload['content']
-        with pytest.raises(BadArguments, match="'content' is a required property"):
+        with pytest.raises(BadArguments,
+                           match="'content' is a required property"):
             provider._process_data(**payload)
 
     def test_missing_mime_type(self, provider):
         payload = get_basic_payload()
         del payload['content'][0]['type']
-        with pytest.raises(BadArguments, match="'type' is a required property"):
+        with pytest.raises(BadArguments,
+                           match="'type' is a required property"):
             provider._process_data(**payload)
 
     def test_missing_content_value(self, provider):
         payload = get_basic_payload()
         del payload['content'][0]['value']
-        with pytest.raises(BadArguments, match="'value' is a required property"):
+        with pytest.raises(BadArguments,
+                           match="'value' is a required property"):
             provider._process_data(**payload)
 
     def test_empty_mime_type(self, provider):
@@ -318,13 +329,15 @@ class TestSendgridSchema:
     def test_attachment_content_missing(self, provider):
         payload = get_attachment_payload()
         del payload['attachments'][0]['content']
-        with pytest.raises(BadArguments, match="'content' is a required property"):
+        with pytest.raises(BadArguments,
+                           match="'content' is a required property"):
             provider._process_data(**payload)
 
     def test_attachment_filename_missing(self, provider):
         payload = get_attachment_payload()
         del payload['attachments'][0]['filename']
-        with pytest.raises(BadArguments, match="'filename' is a required property"):
+        with pytest.raises(BadArguments,
+                           match="'filename' is a required property"):
             provider._process_data(**payload)
 
     def test_empty_attachment_content(self, provider):
@@ -400,7 +413,8 @@ class TestSendgridSchema:
     def test_send_at_invalid_timestamp(self, provider):
         payload = get_basic_payload()
         payload['send_at'] = 9999999999999999
-        with pytest.raises(BadArguments, match=" 9999999999999999 is not a 'timestamp'"):
+        with pytest.raises(BadArguments,
+                           match=" 9999999999999999 is not a 'timestamp'"):
             provider._process_data(**payload)
 
     def test_send_at_valid(self, provider):
@@ -424,7 +438,8 @@ class TestSendgridSchema:
     def test_asm_no_group_id(self, provider):
         payload = get_basic_payload()
         payload['asm'] = {}
-        with pytest.raises(BadArguments, match="'group_id' is a required property"):
+        with pytest.raises(BadArguments,
+                           match="'group_id' is a required property"):
             provider._process_data(**payload)
 
     def test_asm_additional_properties(self, provider):
@@ -456,16 +471,19 @@ class TestSendgridSchema:
                 'text': 'some text',
                 'html': '<h1>some html</h1>'
             },
-            'sandbox_mode': {
-                'enable': True,
-            },
+            'sandbox_mode': True,
             'spam_check': {
                 'enable': True,
                 'threshold': 10,
                 'post_to_url': 'http://foo.com'
             }
         }
-        assert provider._process_data(**payload) == payload
+
+        expected_payload = copy.deepcopy(payload)
+        expected_payload['mail_settings']['sandbox_mode'] = {
+            'enable': True
+        }
+        assert provider._process_data(**payload) == expected_payload
 
     def test_tracking_settings(self, provider):
         payload = get_basic_payload()
@@ -529,6 +547,7 @@ class TestSendgridSchema:
         payload['from'] = 'test@example.com'
         assert provider._process_data(**payload) == get_basic_payload()
 
+
 def get_online_basic_payload():
     """
     Gets a basic payload with the live variables deleted, so that
@@ -538,6 +557,7 @@ def get_online_basic_payload():
     # delete this so that the 'to' from the environment gets read in instead
     del payload['personalizations']
     return payload
+
 
 class TestSendgridOnline:
 
@@ -552,7 +572,8 @@ class TestSendgridOnline:
         # on the free tier
         payload = get_basic_payload()
         # make sure the personalized email gets inboxed
-        payload['personalizations'][0]['to'][0]['email'] = os.environ.get('NOTIFIERS_SENDGRID_TO')
+        payload['personalizations'][0]['to'][0]['email'] =\
+            os.environ.get('NOTIFIERS_SENDGRID_TO')
         payload['personalizations'][0]['substitutions'] = {
             '{{name}}': 'Kenobi',
             '{{person}}': '{{person_section}}'
