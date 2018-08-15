@@ -56,7 +56,7 @@ def is_valid_port(instance: int):
     return int(instance) in range(65535)
 
 
-@format_checker.checks('timestamp', raises=ValueError)
+@format_checker.checks('timestamp', raises=(ValueError, OverflowError, OSError))
 def is_timestamp(instance):
     if not isinstance(instance, (int, str)):
         return True
