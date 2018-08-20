@@ -1,8 +1,4 @@
 repos:
-- repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v1.2.3
-  hooks:
-  - id: requirements-txt-fixer
 - repo: https://github.com/ambv/black
   rev: 18.6b4
   hooks:
