@@ -16,7 +16,7 @@ codecov==2.0.15
 coverage==4.5.1           # via codecov, hypothesis, pytest-cov
 docutils==0.14            # via sphinx
 first==2.0.1              # via pip-tools
-hypothesis==3.66.23
+hypothesis==3.68.2
 idna==2.7                 # via requests
 imagesize==1.0.0          # via sphinx
 jinja2==2.10              # via sphinx
@@ -28,13 +28,13 @@ pluggy==0.7.1             # via pytest
 py==1.5.4                 # via pytest
 pygments==2.2.0           # via sphinx
 pyparsing==2.2.0          # via packaging
-pytest==3.7.1
+pytest==3.7.2
 pytest-cov==2.5.1
 pytz==2018.5              # via babel
 requests==2.19.1          # via codecov, sphinx
 six==1.11.0               # via more-itertools, packaging, pip-tools, pytest, sphinx
 snowballstemmer==1.2.1    # via sphinx
-sphinx==1.7.6
+sphinx==1.7.7
 sphinx-autodoc-annotation==1.0.post1
 sphinx-rtd-theme==0.4.1
 sphinxcontrib-websupport==1.1.0  # via sphinx
