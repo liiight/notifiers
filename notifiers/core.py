@@ -5,16 +5,21 @@ import jsonschema
 import requests
 from jsonschema.exceptions import best_match
 
-from .exceptions import SchemaError, BadArguments, NotificationError, NoSuchNotifierError
+from .exceptions import (
+    SchemaError,
+    BadArguments,
+    NotificationError,
+    NoSuchNotifierError,
+)
 from .utils.helpers import merge_dicts, dict_from_environs
 from .utils.schema.formats import format_checker
 
-DEFAULT_ENVIRON_PREFIX = 'NOTIFIERS_'
+DEFAULT_ENVIRON_PREFIX = "NOTIFIERS_"
 
-log = logging.getLogger('notifiers')
+log = logging.getLogger("notifiers")
 
-FAILURE_STATUS = 'Failure'
-SUCCESS_STATUS = 'Success'
+FAILURE_STATUS = "Failure"
+SUCCESS_STATUS = "Success"
 
 
 class Response:
@@ -28,7 +33,14 @@ class Response:
     :param errors: Holds a list of errors if relevant
     """
 
-    def __init__(self, status: str, provider: str, data: dict, response: requests.Response = None, errors: list = None):
+    def __init__(
+        self,
+        status: str,
+        provider: str,
+        data: dict,
+        response: requests.Response = None,
+        errors: list = None,
+    ):
         self.status = status
         self.provider = provider
         self.data = data
@@ -36,7 +48,7 @@ class Response:
         self.errors = errors
 
     def __repr__(self):
-        return f'<Response,provider={self.provider.capitalize()},status={self.status}, errors={self.errors}>'
+        return f"<Response,provider={self.provider.capitalize()},status={self.status}, errors={self.errors}>"
 
     def raise_on_errors(self):
         """
@@ -45,7 +57,12 @@ class Response:
         :raises: :class:`~notifiers.exceptions.NotificationError`: If response has errors
         """
         if self.errors:
-            raise NotificationError(provider=self.provider, data=self.data, errors=self.errors, response=self.response)
+            raise NotificationError(
+                provider=self.provider,
+                data=self.data,
+                errors=self.errors,
+                response=self.response,
+            )
 
     @property
     def ok(self):
@@ -84,7 +101,7 @@ class SchemaResource(ABC):
         :return: JSON schema of the provider
         """
         if not self._merged_schema:
-            log.debug('merging required dict into schema for %s', self.name)
+            log.debug("merging required dict into schema for %s", self.name)
             self._merged_schema = self._schema.copy()
             self._merged_schema.update(self._required)
         return self._merged_schema
@@ -92,7 +109,7 @@ class SchemaResource(ABC):
     @property
     def arguments(self) -> dict:
         """Returns all of the provider argument as declared in the JSON schema"""
-        return dict(self.schema['properties'].items())
+        return dict(self.schema["properties"].items())
 
     @property
     def required(self) -> dict:
@@ -104,17 +121,24 @@ class SchemaResource(ABC):
         """A dict of default provider values if such is needed"""
         return {}
 
-    def create_response(self, data: dict = None, response: requests.Response = None, errors: list = None) -> Response:
+    def create_response(
+        self, data: dict = None, response: requests.Response = None, errors: list = None
+    ) -> Response:
         """
         Helper function to generate a :class:`~notifiers.core.Response` object
 
-        :param name: Name of the provider creating the response
         :param data: The data that was used to send the notification
         :param response: :class:`requests.Response` if exist
         :param errors: List of errors if relevant
         """
         status = FAILURE_STATUS if errors else SUCCESS_STATUS
-        return Response(status=status, provider=self.name, data=data, response=response, errors=errors)
+        return Response(
+            status=status,
+            provider=self.name,
+            data=data,
+            response=response,
+            errors=errors,
+        )
 
     def _merge_defaults(self, data: dict) -> dict:
         """
@@ -124,7 +148,7 @@ class SchemaResource(ABC):
         :param data: Notification data
         :return: A merged dict of provided data with added defaults
         """
-        log.debug('merging defaults %s into data %s', self.defaults, data)
+        log.debug("merging defaults %s into data %s", self.defaults, data)
         return merge_dicts(data, self.defaults)
 
     def _get_environs(self, prefix: str = None) -> dict:
@@ -136,7 +160,7 @@ class SchemaResource(ABC):
         :return: A dict of arguments and value retrieved from environs
         """
         if not prefix:
-            log.debug('using default environ prefix')
+            log.debug("using default environ prefix")
             prefix = DEFAULT_ENVIRON_PREFIX
         return dict_from_environs(prefix, self.name, list(self.arguments.keys()))
 
@@ -155,28 +179,32 @@ class SchemaResource(ABC):
         """
         Validates provider schema for syntax issues. Raises :class:`~notifiers.exceptions.SchemaError` if relevant
 
-        :param validator: :class:`jsonschema.Draft4Validator`
         :raises: :class:`~notifiers.exceptions.SchemaError`
         """
         try:
-            log.debug('validating provider schema')
+            log.debug("validating provider schema")
             self.validator.check_schema(self.schema)
         except jsonschema.SchemaError as e:
-            raise SchemaError(schema_error=e.message, provider=self.name, data=self.schema)
+            raise SchemaError(
+                schema_error=e.message, provider=self.name, data=self.schema
+            )
 
     def _validate_data(self, data: dict):
         """
         Validates data against provider schema. Raises :class:`~notifiers.exceptions.BadArguments` if relevant
 
         :param data: Data to validate
-        :param validator: :class:`jsonschema.Draft4Validator`
         :raises: :class:`~notifiers.exceptions.BadArguments`
         """
-        log.debug('validating provided data')
+        log.debug("validating provided data")
         e = best_match(self.validator.iter_errors(data))
         if e:
-            custom_error_key = f'error_{e.validator}'
-            msg = e.schema[custom_error_key] if e.schema.get(custom_error_key) else e.message
+            custom_error_key = f"error_{e.validator}"
+            msg = (
+                e.schema[custom_error_key]
+                if e.schema.get(custom_error_key)
+                else e.message
+            )
             raise BadArguments(validation_error=msg, provider=self.name, data=data)
 
     def _validate_data_dependencies(self, data: dict) -> dict:
@@ -198,7 +226,7 @@ class SchemaResource(ABC):
         :param data: The raw data passed by the notifiers client
         :return: Processed data
         """
-        env_prefix = data.pop('env_prefix', None)
+        env_prefix = data.pop("env_prefix", None)
         environs = self._get_environs(env_prefix)
         if environs:
             data = merge_dicts(data, environs)
@@ -210,7 +238,9 @@ class SchemaResource(ABC):
         return data
 
     def __init__(self):
-        self.validator = jsonschema.Draft4Validator(self.schema, format_checker=format_checker)
+        self.validator = jsonschema.Draft4Validator(
+            self.schema, format_checker=format_checker
+        )
         self._validate_schema()
 
 
@@ -220,12 +250,12 @@ class Provider(SchemaResource, ABC):
     _resources = {}
 
     def __repr__(self):
-        return f'<Provider:[{self.name.capitalize()}]>'
+        return f"<Provider:[{self.name.capitalize()}]>"
 
     def __getattr__(self, item):
         if item in self._resources:
             return self._resources[item]
-        raise AttributeError(f'{self} does not have a property {item}')
+        raise AttributeError(f"{self} does not have a property {item}")
 
     @property
     @abstractmethod
@@ -242,11 +272,7 @@ class Provider(SchemaResource, ABC):
         """
         Returns a dict of the provider metadata as declared. Override if needed.
         """
-        return {
-            'base_url': self.base_url,
-            'site_url': self.site_url,
-            'name': self.name
-        }
+        return {"base_url": self.base_url, "site_url": self.site_url, "name": self.name}
 
     @property
     def resources(self) -> list:
@@ -298,7 +324,7 @@ class ProviderResource(SchemaResource, ABC):
         return self._get_resource(data)
 
     def __repr__(self):
-        return f'<ProviderResource,provider={self.name},resource={self.resource_name}>'
+        return f"<ProviderResource,provider={self.name},resource={self.resource_name}>"
 
 
 # Avoid premature import

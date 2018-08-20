@@ -28,14 +28,14 @@ pluggy==0.7.1             # via pytest
 py==1.5.4                 # via pytest
 pygments==2.2.0           # via sphinx
 pyparsing==2.2.0          # via packaging
-pytest-cov==2.5.1
 pytest==3.7.1
+pytest-cov==2.5.1
 pytz==2018.5              # via babel
 requests==2.19.1          # via codecov, sphinx
 six==1.11.0               # via more-itertools, packaging, pip-tools, pytest, sphinx
 snowballstemmer==1.2.1    # via sphinx
+sphinx==1.7.6
 sphinx-autodoc-annotation==1.0.post1
 sphinx-rtd-theme==0.4.1
-sphinx==1.7.6
 sphinxcontrib-websupport==1.1.0  # via sphinx
 urllib3==1.23             # via requests

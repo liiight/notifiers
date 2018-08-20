@@ -2,7 +2,7 @@ import pytest
 
 from notifiers.exceptions import BadArguments
 
-provider = 'simplepush'
+provider = "simplepush"
 
 
 class TestSimplePush:
@@ -13,17 +13,16 @@ class TestSimplePush:
 
     def test_simplepush_metadata(self, provider):
         assert provider.metadata == {
-            'base_url': 'https://api.simplepush.io/send',
-            'site_url': 'https://simplepush.io/',
-            'name': 'simplepush'
+            "base_url": "https://api.simplepush.io/send",
+            "site_url": "https://simplepush.io/",
+            "name": "simplepush",
         }
 
-    @pytest.mark.parametrize('data, message', [
-        ({}, 'key'),
-        ({'key': 'foo'}, 'message'),
-    ])
+    @pytest.mark.parametrize(
+        "data, message", [({}, "key"), ({"key": "foo"}, "message")]
+    )
     def test_simplepush_missing_required(self, data, message, provider):
-        data['env_prefix'] = 'test'
+        data["env_prefix"] = "test"
         with pytest.raises(BadArguments) as e:
             provider.notify(**data)
         assert f"'{message}' is a required property" in e.value.message
@@ -31,6 +30,6 @@ class TestSimplePush:
     @pytest.mark.online
     def test_simplepush_sanity(self, provider):
         """Successful simplepush notification"""
-        data = {'message': 'foo'}
+        data = {"message": "foo"}
         rsp = provider.notify(**data)
         rsp.raise_on_errors()
