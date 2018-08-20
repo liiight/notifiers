@@ -5,103 +5,89 @@ from ..utils import requests
 
 class TelegramMixin:
     """Shared resources between :class:`TelegramUpdates` and :class:`Telegram`"""
-    base_url = 'https://api.telegram.org/bot{token}'
-    name = 'telegram'
-    path_to_errors = 'description',
+
+    base_url = "https://api.telegram.org/bot{token}"
+    name = "telegram"
+    path_to_errors = ("description",)
 
 
 class TelegramUpdates(TelegramMixin, ProviderResource):
     """Return Telegram bot updates, correlating to the `getUpdates` method. Returns chat IDs needed to notifications"""
-    resource_name = 'updates'
-    updates_endpoint = '/getUpdates'
 
-    _required = {
-        'required': [
-            'token'
-        ]
-    }
+    resource_name = "updates"
+    updates_endpoint = "/getUpdates"
+
+    _required = {"required": ["token"]}
 
     _schema = {
-        'type': 'object',
-        'properties': {
-            'token': {
-                'type': 'string',
-                'title': 'Bot token'
-            }
-        },
-        'additionalProperties': False
+        "type": "object",
+        "properties": {"token": {"type": "string", "title": "Bot token"}},
+        "additionalProperties": False,
     }
 
     def _get_resource(self, data: dict) -> list:
-        url = self.base_url.format(token=data['token']) + self.updates_endpoint
+        url = self.base_url.format(token=data["token"]) + self.updates_endpoint
         response, errors = requests.get(url, path_to_errors=self.path_to_errors)
         if errors:
-            raise ResourceError(errors=errors,
-                                resource=self.resource_name,
-                                provider=self.name,
-                                data=data,
-                                response=response)
-        return response.json()['result']
+            raise ResourceError(
+                errors=errors,
+                resource=self.resource_name,
+                provider=self.name,
+                data=data,
+                response=response,
+            )
+        return response.json()["result"]
 
 
 class Telegram(TelegramMixin, Provider):
     """Send Telegram notifications"""
 
-    site_url = 'https://core.telegram.org/'
-    push_endpoint = '/sendMessage'
+    site_url = "https://core.telegram.org/"
+    push_endpoint = "/sendMessage"
 
-    _resources = {
-        'updates': TelegramUpdates()
-    }
+    _resources = {"updates": TelegramUpdates()}
 
-    _required = {'required': ['message', 'chat_id', 'token']}
+    _required = {"required": ["message", "chat_id", "token"]}
     _schema = {
-        'type': 'object',
-        'properties': {
-            'message': {
-                'type': 'string',
-                'title': 'Text of the message to be sent'
+        "type": "object",
+        "properties": {
+            "message": {"type": "string", "title": "Text of the message to be sent"},
+            "token": {"type": "string", "title": "Bot token"},
+            "chat_id": {
+                "oneOf": [{"type": "string"}, {"type": "integer"}],
+                "title": "Unique identifier for the target chat or username of the target channel "
+                "(in the format @channelusername)",
             },
-            'token': {
-                'type': 'string',
-                'title': 'Bot token'
+            "parse_mode": {
+                "type": "string",
+                "title": "Send Markdown or HTML, if you want Telegram apps to show bold, italic,"
+                " fixed-width text or inline URLs in your bot's message.",
+                "enum": ["markdown", "html"],
             },
-            'chat_id': {
-                'oneOf': [
-                    {'type': 'string'},
-                    {'type': 'integer'}
-                ],
-                'title': 'Unique identifier for the target chat or username of the target channel '
-                         '(in the format @channelusername)'
+            "disable_web_page_preview": {
+                "type": "boolean",
+                "title": "Disables link previews for links in this message",
             },
-            'parse_mode': {
-                'type': 'string',
-                'title': "Send Markdown or HTML, if you want Telegram apps to show bold, italic,"
-                         " fixed-width text or inline URLs in your bot's message.",
-                'enum': ['markdown', 'html']
+            "disable_notification": {
+                "type": "boolean",
+                "title": "Sends the message silently. Users will receive a notification with no sound.",
             },
-            'disable_web_page_preview': {
-                'type': 'boolean',
-                'title': 'Disables link previews for links in this message'
+            "reply_to_message_id": {
+                "type": "integer",
+                "title": "If the message is a reply, ID of the original message",
             },
-            'disable_notification': {
-                'type': 'boolean',
-                'title': 'Sends the message silently. Users will receive a notification with no sound.'
-            },
-            'reply_to_message_id': {
-                'type': 'integer',
-                'title': 'If the message is a reply, ID of the original message'
-            }
         },
-        'additionalProperties': False
+        "additionalProperties": False,
     }
 
     def _prepare_data(self, data: dict) -> dict:
-        data['text'] = data.pop('message')
+        data["text"] = data.pop("message")
         return data
 
     def _send_notification(self, data: dict) -> Response:
-        token = data.pop('token')
+        token = data.pop("token")
         url = self.base_url.format(token=token) + self.push_endpoint
-        response, errors = requests.post(url, json=data, path_to_errors=self.path_to_errors)
+        response, errors = requests.post(
+            url, json=data, path_to_errors=self.path_to_errors
+        )
         return self.create_response(data, response, errors)
