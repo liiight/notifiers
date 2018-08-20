@@ -7,14 +7,14 @@ class NotifierException(Exception):
         :param args: Exception arguments
         :param kwargs: Exception kwargs
         """
-        self.provider = kwargs.get('provider')
-        self.message = kwargs.get('message')
-        self.data = kwargs.get('data')
-        self.response = kwargs.get('response')
+        self.provider = kwargs.get("provider")
+        self.message = kwargs.get("message")
+        self.data = kwargs.get("data")
+        self.response = kwargs.get("response")
         super().__init__(self.message)
 
     def __repr__(self):
-        return f'<NotificationError: {self.message}>'
+        return f"<NotificationError: {self.message}>"
 
 
 class BadArguments(NotifierException):
@@ -27,11 +27,11 @@ class BadArguments(NotifierException):
     """
 
     def __init__(self, validation_error: str, *args, **kwargs):
-        kwargs['message'] = f'Error with sent data: {validation_error}'
+        kwargs["message"] = f"Error with sent data: {validation_error}"
         super().__init__(*args, **kwargs)
 
     def __repr__(self):
-        return f'<BadArguments: {self.message}>'
+        return f"<BadArguments: {self.message}>"
 
 
 class SchemaError(NotifierException):
@@ -44,11 +44,11 @@ class SchemaError(NotifierException):
     """
 
     def __init__(self, schema_error: str, *args, **kwargs):
-        kwargs['message'] = f'Schema error: {schema_error}'
+        kwargs["message"] = f"Schema error: {schema_error}"
         super().__init__(*args, **kwargs)
 
     def __repr__(self):
-        return f'<SchemaError: {self.message}>'
+        return f"<SchemaError: {self.message}>"
 
 
 class NotificationError(NotifierException):
@@ -61,12 +61,12 @@ class NotificationError(NotifierException):
     """
 
     def __init__(self, *args, **kwargs):
-        self.errors = kwargs.pop('errors', None)
-        kwargs['message'] = f'Notification errors: {",".join(self.errors)}'
+        self.errors = kwargs.pop("errors", None)
+        kwargs["message"] = f'Notification errors: {",".join(self.errors)}'
         super().__init__(*args, **kwargs)
 
     def __repr__(self):
-        return f'<NotificationError: {self.message}>'
+        return f"<NotificationError: {self.message}>"
 
 
 class ResourceError(NotifierException):
@@ -76,13 +76,13 @@ class ResourceError(NotifierException):
     """
 
     def __init__(self, *args, **kwargs):
-        self.errors = kwargs.pop('errors', None)
-        self.resource = kwargs.pop('resource', None)
-        kwargs['message'] = f'Notifier resource errors: {",".join(self.errors)}'
+        self.errors = kwargs.pop("errors", None)
+        self.resource = kwargs.pop("resource", None)
+        kwargs["message"] = f'Notifier resource errors: {",".join(self.errors)}'
         super().__init__(*args, **kwargs)
 
     def __repr__(self):
-        return f'<ResourceError: {self.message}>'
+        return f"<ResourceError: {self.message}>"
 
 
 class NoSuchNotifierError(NotifierException):
@@ -92,8 +92,8 @@ class NoSuchNotifierError(NotifierException):
 
     def __init__(self, name: str, *args, **kwargs):
         self.name = name
-        kwargs['message'] = f'No such notifier with name {name}'
+        kwargs["message"] = f"No such notifier with name {name}"
         super().__init__(*args, **kwargs)
 
     def __repr__(self):
-        return f'<NoSuchNotifierError: {self.name}>'
+        return f"<NoSuchNotifierError: {self.name}>"

@@ -3,7 +3,7 @@ import os
 from distutils.util import strtobool
 from pathlib import Path
 
-log = logging.getLogger('notifiers')
+log = logging.getLogger("notifiers")
 
 
 def text_to_bool(value: str) -> bool:
@@ -27,7 +27,7 @@ def merge_dicts(target_dict: dict, merge_dict: dict) -> dict:
     :param merge_dict: The data that should be merged into the target data
     :return: A dict of merged data
     """
-    log.debug('merging dict %s into %s', merge_dict, target_dict)
+    log.debug("merging dict %s into %s", merge_dict, target_dict)
     for key, value in merge_dict.items():
         if key not in target_dict:
             target_dict[key] = value
@@ -47,7 +47,7 @@ def dict_from_environs(prefix: str, name: str, args: list) -> dict:
     environs = {}
     log.debug("starting to collect environs using prefix: '%s'", prefix)
     for arg in args:
-        environ = f'{prefix}{name}_{arg}'.upper()
+        environ = f"{prefix}{name}_{arg}".upper()
         if os.environ.get(environ):
             environs[arg] = os.environ[environ]
     return environs
@@ -60,8 +60,8 @@ def snake_to_camel_case(value: str) -> str:
     :param value: The value to convert
     :return: A CamelCase value
     """
-    log.debug('trying to convert %s to camel case', value)
-    return ''.join(word.capitalize() for word in value.split('_'))
+    log.debug("trying to convert %s to camel case", value)
+    return "".join(word.capitalize() for word in value.split("_"))
 
 
 def valid_file(path: str) -> bool:
@@ -72,5 +72,5 @@ def valid_file(path: str) -> bool:
     :return: **True** if path exist and is a file
     """
     path = Path(path).expanduser()
-    log.debug('checking if %s is a valid file', path)
+    log.debug("checking if %s is a valid file", path)
     return path.exists() and path.is_file()

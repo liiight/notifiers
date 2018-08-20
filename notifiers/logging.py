@@ -34,9 +34,9 @@ class NotificationHandler(logging.Handler):
          be raised
         """
         self.provider = notifiers.get_notifier(provider, strict=True)
-        if kwargs.get('fallback'):
-            self.fallback = notifiers.get_notifier(kwargs.pop('fallback'), strict=True)
-            self.fallback_defaults = kwargs.pop('fallback_defaults', {})
+        if kwargs.get("fallback"):
+            self.fallback = notifiers.get_notifier(kwargs.pop("fallback"), strict=True)
+            self.fallback_defaults = kwargs.pop("fallback_defaults", {})
 
     def emit(self, record):
         """
@@ -45,7 +45,7 @@ class NotificationHandler(logging.Handler):
         :param record: :class:`logging.LogRecord`
         """
         data = copy.deepcopy(self.defaults)
-        data['message'] = self.format(record)
+        data["message"] = self.format(record)
         try:
             self.provider.notify(raise_on_errors=True, **data)
         except Exception:
@@ -54,7 +54,7 @@ class NotificationHandler(logging.Handler):
     def __repr__(self):
         level = logging.getLevelName(self.level)
         name = self.provider.name
-        return '<%s %s(%s)>' % (self.__class__.__name__, name, level)
+        return "<%s %s(%s)>" % (self.__class__.__name__, name, level)
 
     def handleError(self, record):
         """
@@ -67,7 +67,7 @@ class NotificationHandler(logging.Handler):
             t, v, tb = sys.exc_info()
             if issubclass(t, NotifierException) and self.fallback:
                 msg = f"Could not log msg to provider '{self.provider.name}'!\n{v}"
-                self.fallback_defaults['message'] = msg
+                self.fallback_defaults["message"] = msg
                 self.fallback.notify(**self.fallback_defaults)
             else:
                 super().handleError(record)
