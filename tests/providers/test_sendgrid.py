@@ -6,13 +6,12 @@ Online functional tests require the following env variables:
 The 'from' email in the online tests will be 'test@example.com'
 """
 # pylint: disable=too-many-public-methods,no-self-use,redefined-outer-name
-# pylint: disable=protected-access,missing-docstring,invalid-name
+# pylint: disable=missing-docstring,invalid-name
 import os
-import re
 import copy
 import base64
-import pytest
 from unittest.mock import MagicMock
+import pytest
 from notifiers.exceptions import BadArguments
 provider = 'sendgrid'
 
@@ -68,23 +67,10 @@ class TestSendgridSchema:
             return MagicMock(), []
         monkeypatch.setattr('notifiers.utils.requests.post', requests_return)
 
-    old_environ = {}
-
-    @classmethod
-    def setup_class(cls):
-        """
-        deleting all the NOTIFIERS variables before the schema tests
-        so we can interact purely with the test data in this class
-        """
-        for each in os.environ:
-            if re.match('^NOTIFIERS.*', each):
-                cls.old_environ[each] = os.environ.pop(each)
-
-    @classmethod
-    def teardown_class(cls):
-        """put the NOTIFIERS variables back for other tests"""
-        for each in cls.old_environ:
-            os.environ[each] = cls.old_environ[each]
+    @pytest.fixture(autouse=True)
+    def patch_environment(self, monkeypatch):
+        monkeypatch.delenv('NOTIFIERS_SENDGRID_TO', raising=False)
+        monkeypatch.delenv('NOTIFIERS_SENDGRID_API_KEY', raising=False)
 
     def test_sendgrid_metadata(self, provider):
         assert(provider.metadata == {
@@ -94,7 +80,7 @@ class TestSendgridSchema:
         })
 
     def test_basic_payload(self, provider):
-        rsp = provider.notify(**get_basic_payload())
+        provider.notify(**get_basic_payload())
 
     to_payloads = [
         (
