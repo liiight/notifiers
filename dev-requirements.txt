@@ -43,7 +43,7 @@ six==1.11.0               # via cfgv, more-itertools, packaging, pip-tools, pre-
 snowballstemmer==1.2.1    # via sphinx
 sphinx-autodoc-annotation==1.0.post1
 sphinx-rtd-theme==0.4.1
-sphinx==1.8.0
+sphinx==1.8.1
 sphinxcontrib-websupport==1.1.0  # via sphinx
 toml==0.9.4               # via pre-commit
 urllib3==1.23             # via requests
