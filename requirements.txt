@@ -6,7 +6,7 @@
 #
 certifi==2018.4.16        # via requests
 chardet==3.0.4            # via requests
-click==6.7
+click==7.0
 idna==2.7                 # via requests
 jsonschema==2.6.0
 requests==2.19.1
