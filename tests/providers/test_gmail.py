@@ -27,7 +27,7 @@ class TestGmail:
     @pytest.mark.online
     def test_smtp_sanity(self, provider):
         """using Gmail SMTP"""
-        data = {"message": "<b>foo</b>", "html": True}
+        data = {"message": "<b>foo</b>", "html": True, "ssl": True, "port": 465}
         rsp = provider.notify(**data)
         rsp.raise_on_errors()
 

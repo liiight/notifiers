@@ -70,8 +70,8 @@ class TestSMTP(object):
         data = {
             "message": "<b>foo</b>",
             "host": "smtp.gmail.com",
-            "port": 587,
-            "tls": True,
+            "port": 465,
+            "ssl": True,
             "html": True,
         }
         rsp = provider.notify(**data)
