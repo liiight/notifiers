@@ -4,7 +4,6 @@ repos:
   hooks:
   - id: trailing-whitespace
   - id: check-yaml
-  - id: flake8
 - repo: https://github.com/ambv/black
   rev: 18.6b4
   hooks:
