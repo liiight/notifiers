@@ -108,7 +108,6 @@ class SMTP(Provider):
 
     @staticmethod
     def _build_email(data: dict) -> EmailMessage:
-        # email = MIMEMultipart("alternative")
         email = EmailMessage()
         email["To"] = data["to"]
         email["From"] = data["from"]
