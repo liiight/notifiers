@@ -42,10 +42,10 @@ class TestZulip:
         assert message in e.value.message
 
     @pytest.mark.online
-    def test_sanity(self, provider):
+    def test_sanity(self, provider, test_message):
         data = {
             "to": "general",
-            "message": str(datetime.datetime.now()),
+            "message": test_message,
             "domain": "notifiers",
             "subject": "test",
         }

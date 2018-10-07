@@ -28,8 +28,8 @@ class TestSimplePush:
         assert f"'{message}' is a required property" in e.value.message
 
     @pytest.mark.online
-    def test_simplepush_sanity(self, provider):
+    def test_simplepush_sanity(self, provider, test_message):
         """Successful simplepush notification"""
-        data = {"message": "foo"}
+        data = {"message": test_message}
         rsp = provider.notify(**data)
         rsp.raise_on_errors()

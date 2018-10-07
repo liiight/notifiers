@@ -25,9 +25,14 @@ class TestGmail:
         assert f"'{message}' is a required property" in e.value.message
 
     @pytest.mark.online
-    def test_smtp_sanity(self, provider):
+    def test_smtp_sanity(self, provider, test_message):
         """using Gmail SMTP"""
-        data = {"message": "<b>foo</b>", "html": True, "ssl": True, "port": 465}
+        data = {
+            "message": f"<b>{test_message}</b>",
+            "html": True,
+            "ssl": True,
+            "port": 465,
+        }
         rsp = provider.notify(**data)
         rsp.raise_on_errors()
 

@@ -25,15 +25,15 @@ class TestPushbullet:
         assert f"'{message}' is a required property" in e.value.message
 
     @pytest.mark.online
-    def test_sanity(self, provider):
-        data = {"message": "foo"}
+    def test_sanity(self, provider, test_message):
+        data = {"message": test_message}
         rsp = provider.notify(**data)
         rsp.raise_on_errors()
 
     @pytest.mark.online
-    def test_all_options(self, provider):
+    def test_all_options(self, provider, test_message):
         data = {
-            "message": "foo",
+            "message": test_message,
             "type": "link",
             "url": "https://google.com",
             "title": "❤",
