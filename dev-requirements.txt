@@ -34,15 +34,15 @@ py==1.5.4                 # via pytest
 pygments==2.2.0           # via sphinx
 pyparsing==2.2.0          # via packaging
 pytest-cov==2.6.0
-pytest==3.8.1
+pytest==3.8.2
 pytz==2018.5              # via babel
 pyyaml==3.13              # via aspy.yaml, pre-commit
 requests==2.19.1          # via codecov, sphinx
 six==1.11.0               # via cfgv, more-itertools, packaging, pip-tools, pre-commit, pytest, sphinx
 snowballstemmer==1.2.1    # via sphinx
 sphinx-autodoc-annotation==1.0.post1
+sphinx-rtd-theme==0.4.2
 sphinx==1.8.1
-sphinx_rtd_theme==0.4.2
 sphinxcontrib-websupport==1.1.0  # via sphinx
 toml==0.9.4               # via pre-commit
 urllib3==1.23             # via requests
