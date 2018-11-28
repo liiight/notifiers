@@ -1,5 +1,6 @@
 import logging
 import os
+from datetime import datetime
 from functools import partial
 from unittest.mock import MagicMock
 
@@ -175,3 +176,9 @@ def pytest_runtest_setup(item):
     online = item.get_closest_marker("online")
     if online and pull_request and not secure_env_vars:
         pytest.skip("skipping online tests via PRs")
+
+
+@pytest.fixture
+def test_message(request):
+    message = os.environ.get("TRAVIS_BUILD_WEB_URL") or "Local test"
+    return f"{message}-{request.node.name}-{datetime.now().isoformat()}"

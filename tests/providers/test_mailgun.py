@@ -35,11 +35,11 @@ class TestMailgun:
             provider.notify(**data)
 
     @pytest.mark.online
-    def test_mailgun_sanity(self, provider):
-        provider.notify(message="foo", raise_on_errors=True)
+    def test_mailgun_sanity(self, provider, test_message):
+        provider.notify(message=test_message, raise_on_errors=True)
 
     @pytest.mark.online
-    def test_mailgun_all_options(self, provider, tmpdir):
+    def test_mailgun_all_options(self, provider, tmpdir, test_message):
         dir_ = tmpdir.mkdir("sub")
         file_1 = dir_.join("hello.txt")
         file_1.write("content")
@@ -50,7 +50,7 @@ class TestMailgun:
         now = datetime.datetime.now() + datetime.timedelta(minutes=3)
         rfc_2822 = utils.formatdate(time.mktime(now.timetuple()))
         data = {
-            "message": "foo",
+            "message": test_message,
             "html": f"<b>{now}</b>",
             "subject": f"{now}",
             "attachment": [file_1.strpath, file_2.strpath],

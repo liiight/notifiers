@@ -1,9 +1,8 @@
 import getpass
 import smtplib
 import socket
+from email.message import EmailMessage
 from email.mime.application import MIMEApplication
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
 from email.utils import formatdate
 from pathlib import Path
 from smtplib import SMTPAuthenticationError, SMTPServerDisconnected, SMTPSenderRefused
@@ -107,19 +106,19 @@ class SMTP(Provider):
             data["from"] = data.pop("from_")
         return data
 
-    def _build_email(self, data: dict) -> MIMEMultipart:
-        email = MIMEMultipart("alternative")
+    @staticmethod
+    def _build_email(data: dict) -> EmailMessage:
+        email = EmailMessage()
         email["To"] = data["to"]
         email["From"] = data["from"]
         email["Subject"] = data["subject"]
         email["Date"] = formatdate(localtime=True)
         content_type = "html" if data["html"] else "plain"
-        email.attach(
-            MIMEText(data["message"].encode("utf-8"), content_type, _charset="utf-8")
-        )
+        email.add_alternative(data["message"], subtype=content_type)
         return email
 
-    def _add_attachments(self, data: dict, email) -> MIMEMultipart:
+    @staticmethod
+    def _add_attachments(data: dict, email: EmailMessage) -> EmailMessage:
         for attachment in data["attachments"]:
             file = Path(attachment).read_bytes()
             part = MIMEApplication(file)
@@ -131,15 +130,15 @@ class SMTP(Provider):
         self.smtp_server = smtplib.SMTP_SSL if data["ssl"] else smtplib.SMTP
         self.smtp_server = self.smtp_server(data["host"], data["port"])
         self.configuration = self._get_configuration(data)
-        if data["tls"]:
+        if data["tls"] and not data["ssl"]:
             self.smtp_server.ehlo()
             self.smtp_server.starttls()
-            self.smtp_server.ehlo()
 
         if data.get("username"):
             self.smtp_server.login(data["username"], data["password"])
 
-    def _get_configuration(self, data: dict) -> tuple:
+    @staticmethod
+    def _get_configuration(data: dict) -> tuple:
         return data["host"], data["port"], data.get("username")
 
     def _send_notification(self, data: dict) -> Response:
@@ -155,9 +154,7 @@ class SMTP(Provider):
             email = self._build_email(data)
             if data.get("attachments"):
                 email = self._add_attachments(data, email)
-            self.smtp_server.sendmail(
-                from_addr=data["from"], to_addrs=data["to"], msg=email.as_string()
-            )
+            self.smtp_server.send_message(email)
         except (
             SMTPServerDisconnected,
             SMTPSenderRefused,

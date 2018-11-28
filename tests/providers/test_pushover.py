@@ -37,9 +37,11 @@ class TestPushover:
         "data, message", [({}, "expire"), ({"expire": 30}, "retry")]
     )
     @pytest.mark.online
-    def test_pushover_priority_2_restrictions(self, data, message, provider):
+    def test_pushover_priority_2_restrictions(
+        self, data, message, provider, test_message
+    ):
         """Pushover specific API restrictions when using priority 2"""
-        base_data = {"message": "foo", "priority": 2}
+        base_data = {"message": test_message, "priority": 2}
         final_data = {**base_data, **data}
         rsp = provider.notify(**final_data)
         with pytest.raises(NotificationError) as e:
@@ -54,10 +56,10 @@ class TestPushover:
         rsp.raise_on_errors()
 
     @pytest.mark.online
-    def test_all_options(self, provider):
+    def test_all_options(self, provider, test_message):
         """Use all available pushover options"""
         data = {
-            "message": "foo",
+            "message": test_message,
             "title": "title",
             "priority": 2,
             "url": "http://foo.com",
