@@ -65,13 +65,13 @@ class TestSMTP(object):
         assert rsp.data["attachments"] == attachments
 
     @pytest.mark.online
-    def test_smtp_sanity(self, provider):
+    def test_smtp_sanity(self, provider, test_message):
         """using Gmail SMTP"""
         data = {
-            "message": "<b>foo</b>",
+            "message": f"<b>{test_message}</b>",
             "host": "smtp.gmail.com",
-            "port": 587,
-            "tls": True,
+            "port": 465,
+            "ssl": True,
             "html": True,
         }
         rsp = provider.notify(**data)

@@ -44,8 +44,8 @@ class TestGitter:
         assert "Bad Request" in e.value.message
 
     @pytest.mark.online
-    def test_sanity(self, provider):
-        data = {"message": "bar"}
+    def test_sanity(self, provider, test_message):
+        data = {"message": test_message}
         rsp = provider.notify(**data)
         rsp.raise_on_errors()
 

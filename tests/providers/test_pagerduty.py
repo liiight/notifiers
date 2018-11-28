@@ -43,9 +43,9 @@ class TestPagerDuty:
         assert f"'{message}' is a required property" in e.value.message
 
     @pytest.mark.online
-    def test_pagerduty_sanity(self, provider):
+    def test_pagerduty_sanity(self, provider, test_message):
         data = {
-            "message": "foo",
+            "message": test_message,
             "event_action": "trigger",
             "source": "foo",
             "severity": "info",
@@ -56,7 +56,7 @@ class TestPagerDuty:
         assert raw_rsp == {"status": "success", "message": "Event processed"}
 
     @pytest.mark.online
-    def test_pagerduty_all_options(self, provider):
+    def test_pagerduty_all_options(self, provider, test_message):
         images = [
             {
                 "src": "https://software.opensuse.org/package/thumbnail/python-Pillow.png",
@@ -71,7 +71,7 @@ class TestPagerDuty:
             }
         ]
         data = {
-            "message": "foo",
+            "message": test_message,
             "event_action": "trigger",
             "source": "bar",
             "severity": "info",

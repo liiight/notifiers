@@ -18,8 +18,8 @@ class TestSlack:
         }
 
     @pytest.mark.online
-    def test_sanity(self, provider):
-        data = {"message": "foo"}
+    def test_sanity(self, provider, test_message):
+        data = {"message": test_message}
         rsp = provider.notify(**data)
         rsp.raise_on_errors()
 

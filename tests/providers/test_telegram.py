@@ -46,17 +46,17 @@ class TestTelegram:
         assert "chat not found" in e.value.message
 
     @pytest.mark.online
-    def test_sanity(self, provider):
-        rsp = provider.notify(message="foo")
+    def test_sanity(self, provider, test_message):
+        rsp = provider.notify(message=test_message)
         rsp.raise_on_errors()
 
     @pytest.mark.online
-    def test_all_options(self, provider):
+    def test_all_options(self, provider, test_message):
         data = {
             "parse_mode": "markdown",
             "disable_web_page_preview": True,
             "disable_notification": True,
-            "message": "_foo_",
+            "message": test_message,
         }
         rsp = provider.notify(**data)
         rsp.raise_on_errors()
