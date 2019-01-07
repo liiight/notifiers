@@ -36,7 +36,7 @@ py==1.5.4                 # via pytest
 pygments==2.2.0           # via sphinx
 pyparsing==2.2.0          # via packaging
 pytest-cov==2.6.1
-pytest==4.0.2
+pytest==4.1.0
 pytz==2018.5              # via babel
 pyyaml==3.13              # via aspy.yaml, pre-commit
 requests==2.21.0          # via codecov, sphinx
