@@ -72,8 +72,8 @@ Directly add to your existing stdlib logging:
 >>> log = logging.getLogger(__name__)
 
 >>> defaults = {
-        'token': 'foo,
-        'user': 'bar
+        'token': 'foo',
+        'user': 'bar'
     }
 >>> hdlr = NotificationHandler('pushover', defaults=defaults)
 >>> hdlr.setLevel(logging.ERROR)
