@@ -22,7 +22,7 @@ class SMTP(Provider):
     site_url = "https://en.wikipedia.org/wiki/Email"
     name = "email"
 
-    _required = {"required": ["message", "to"]}
+    _required = {"required": ["message", "to", "username", "password"]}
 
     _schema = {
         "type": "object",
