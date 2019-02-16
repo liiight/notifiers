@@ -25,7 +25,7 @@ class TestSMTP(object):
         assert f"'{message}' is a required property" in e.value.message
 
     def test_smtp_no_host(self, provider):
-        data = {"to": "foo@foo.com", "message": "bar", "host": "nohost"}
+        data = {"to": "foo@foo.com", "message": "bar", "host": "nohost", "username": "ding", "password": "dong"}
         with pytest.raises(NotificationError) as e:
             rsp = provider.notify(**data)
             rsp.raise_on_errors()
@@ -39,7 +39,7 @@ class TestSMTP(object):
 
     def test_email_from_key(self, provider):
         rsp = provider.notify(
-            to="foo@foo.co ", from_="bla@foo.com", message="foo", host="nohost"
+            to="foo@foo.co ", from_="bla@foo.com", message="foo", host="nohost", username="ding", password="dong"
         )
         rsp_data = rsp.data
         assert not rsp_data.get("from_")
@@ -47,7 +47,7 @@ class TestSMTP(object):
 
     def test_multiple_to(self, provider):
         to = ["foo@foo.com", "bar@foo.com"]
-        rsp = provider.notify(to=to, message="foo", host="nohost")
+        rsp = provider.notify(to=to, message="foo", host="nohost", username="ding", password="dong")
         assert rsp.data["to"] == ",".join(to)
 
     def test_attachment(self, provider, tmpdir):
@@ -60,7 +60,7 @@ class TestSMTP(object):
         file_3.write("foo")
         attachments = [str(file_1), str(file_2), str(file_3)]
         rsp = provider.notify(
-            to=["foo@foo.com"], message="bar", attachments=attachments, host="nohost"
+            to=["foo@foo.com"], message="bar", attachments=attachments, host="nohost", username="ding", password="dong"
         )
         assert rsp.data["attachments"] == attachments
 
