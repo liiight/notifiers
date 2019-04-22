@@ -29,13 +29,13 @@ more-itertools==4.2.0     # via pytest
 nodeenv==1.3.2            # via pre-commit
 packaging==17.1           # via sphinx
 pip-tools==3.3.2
-pluggy==0.7.1             # via pytest
+pluggy==0.9.0             # via pytest
 pre-commit==1.14.2
 py==1.5.4                 # via pytest
 pygments==2.2.0           # via sphinx
 pyparsing==2.2.0          # via packaging
 pytest-cov==2.6.1
-pytest==4.3.0
+pytest==4.4.1
 pytz==2018.5              # via babel
 pyyaml==3.13              # via aspy.yaml, pre-commit
 requests==2.21.0          # via codecov, sphinx
