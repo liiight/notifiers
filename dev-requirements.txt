@@ -17,12 +17,11 @@ click==6.7                # via pip-tools
 codecov==2.0.15
 coverage==4.5.1           # via codecov, pytest-cov
 docutils==0.14            # via sphinx
-hypothesis==4.7.18
+hypothesis==4.23.6
 identify==1.1.4           # via pre-commit
 idna==2.7                 # via requests
 imagesize==1.0.0          # via sphinx
 importlib-metadata==0.6   # via pre-commit
-importlib-resources==1.0.1  # via pre-commit
 jinja2==2.10              # via sphinx
 markupsafe==1.0           # via jinja2
 more-itertools==4.2.0     # via pytest
@@ -48,4 +47,3 @@ sphinxcontrib-websupport==1.1.0  # via sphinx
 toml==0.9.4               # via pre-commit
 urllib3==1.23             # via requests
 virtualenv==16.0.0        # via pre-commit
-wheel==0.32.2             # via importlib-resources
