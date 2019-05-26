@@ -38,7 +38,7 @@ class TestGmail:
 
     def test_email_from_key(self, provider):
         rsp = provider.notify(
-            to="foo@foo.com", from_="bla@foo.com", message="foo", host="goo"
+            to="foo@foo.com", from_="bla@foo.com", message="foo", host="goo", username="ding", password="dong"
         )
         rsp_data = rsp.data
         assert not rsp_data.get("from_")
@@ -46,7 +46,7 @@ class TestGmail:
 
     def test_multiple_to(self, provider):
         to = ["foo@foo.com", "bar@foo.com"]
-        rsp = provider.notify(to=to, message="foo", host="goo")
+        rsp = provider.notify(to=to, message="foo", host="goo", username="ding", password="dong")
         assert rsp.data["to"] == ",".join(to)
 
     def test_gmail_negative(self, provider):
