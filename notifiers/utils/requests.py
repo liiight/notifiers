@@ -37,12 +37,12 @@ class RequestsHelper:
             args,
             kwargs,
         )
-        rsp = session.request(method, url, *args, **kwargs)
 
-        log.debug("response: %s", rsp.text)
-        errors = None
         if raise_for_status:
             try:
+                rsp = session.request(method, url, *args, **kwargs)
+                log.debug("response: %s", rsp.text)
+                errors = None
                 rsp.raise_for_status()
             except requests.RequestException as e:
                 if e.response is not None:

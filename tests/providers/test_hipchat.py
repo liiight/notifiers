@@ -56,9 +56,8 @@ class TestHipchat:
             "group": "nada",
         }
         with pytest.raises(NotificationError) as e:
-            rsp = provider.notify(**data)
-            rsp.raise_on_errors()
-        assert "Invalid OAuth session" in e.value.message
+            provider.notify(**data, raise_on_errors=True)
+        assert "Failed to establish a new connection" in e.value.message
 
     def test_hipchat_resources(self, provider):
         assert provider.resources
