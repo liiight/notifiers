@@ -22,7 +22,6 @@ identify==1.1.4           # via pre-commit
 idna==2.7                 # via requests
 imagesize==1.0.0          # via sphinx
 importlib-metadata==0.6   # via pre-commit
-importlib-resources==1.0.1  # via pre-commit
 jinja2==2.10              # via sphinx
 markupsafe==1.0           # via jinja2
 more-itertools==4.2.0     # via pytest
@@ -39,13 +38,17 @@ pytest==4.3.0
 pytz==2018.5              # via babel
 pyyaml==3.13              # via aspy.yaml, pre-commit
 requests==2.21.0          # via codecov, sphinx
-six==1.11.0               # via cfgv, more-itertools, packaging, pip-tools, pre-commit, pytest, sphinx
+six==1.11.0               # via cfgv, more-itertools, packaging, pip-tools, pre-commit, pytest
 snowballstemmer==1.2.1    # via sphinx
 sphinx-autodoc-annotation==1.0.post1
 sphinx-rtd-theme==0.4.2
-sphinx==1.8.5
-sphinxcontrib-websupport==1.1.0  # via sphinx
+sphinx==2.1.0
+sphinxcontrib-applehelp==1.0.1  # via sphinx
+sphinxcontrib-devhelp==1.0.1  # via sphinx
+sphinxcontrib-htmlhelp==1.0.2  # via sphinx
+sphinxcontrib-jsmath==1.0.1  # via sphinx
+sphinxcontrib-qthelp==1.0.2  # via sphinx
+sphinxcontrib-serializinghtml==1.1.3  # via sphinx
 toml==0.9.4               # via pre-commit
 urllib3==1.23             # via requests
 virtualenv==16.0.0        # via pre-commit
-wheel==0.32.2             # via importlib-resources
