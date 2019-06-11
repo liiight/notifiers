@@ -163,11 +163,11 @@ class TestHipchatCLI:
     def test_hipchat_rooms_negative(self, cli_runner):
         cmd = "hipchat rooms --token bad_token".split()
         result = cli_runner(cmd)
-        assert result.exit_code == 1
+        assert result.exit_code == -1
         assert not result.output
 
     def test_hipchat_users_negative(self, cli_runner):
         cmd = "hipchat users --token bad_token".split()
         result = cli_runner(cmd)
-        assert result.exit_code == 1
+        assert result.exit_code == -1
         assert not result.output
