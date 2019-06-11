@@ -110,8 +110,7 @@ class TestHipChatRooms:
         with pytest.raises(ResourceError) as e:
             resource(token="foo", group="bat")
 
-        assert e.value.errors == ["Invalid OAuth session"]
-        assert e.value.response.status_code == 401
+        assert 'Failed to establish a new connection' in e.value.errors[0]
 
 
 class TestHipChatUsers:
@@ -164,11 +163,11 @@ class TestHipchatCLI:
     def test_hipchat_rooms_negative(self, cli_runner):
         cmd = "hipchat rooms --token bad_token".split()
         result = cli_runner(cmd)
-        assert result.exit_code == -1
+        assert result.exit_code == 1
         assert not result.output
 
     def test_hipchat_users_negative(self, cli_runner):
         cmd = "hipchat users --token bad_token".split()
         result = cli_runner(cmd)
-        assert result.exit_code == -1
+        assert result.exit_code == 1
         assert not result.output
