@@ -41,8 +41,8 @@ requests==2.21.0          # via codecov, sphinx
 six==1.11.0               # via cfgv, more-itertools, packaging, pip-tools, pre-commit, pytest
 snowballstemmer==1.2.1    # via sphinx
 sphinx-autodoc-annotation==1.0.post1
-sphinx-rtd-theme==0.4.2
 sphinx==2.1.1
+sphinx_rtd_theme==0.4.3
 sphinxcontrib-applehelp==1.0.1  # via sphinx
 sphinxcontrib-devhelp==1.0.1  # via sphinx
 sphinxcontrib-htmlhelp==1.0.2  # via sphinx
