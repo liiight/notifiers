@@ -33,7 +33,7 @@ pre-commit==1.14.2
 py==1.5.4                 # via pytest
 pygments==2.2.0           # via sphinx
 pyparsing==2.2.0          # via packaging
-pytest-cov==2.6.1
+pytest-cov==2.7.1
 pytest==4.6.3
 pytz==2018.5              # via babel
 pyyaml==3.13              # via aspy.yaml, pre-commit
