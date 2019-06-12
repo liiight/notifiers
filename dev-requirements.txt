@@ -36,7 +36,7 @@ pyparsing==2.2.0          # via packaging
 pytest-cov==2.7.1
 pytest==4.6.3
 pytz==2018.5              # via babel
-pyyaml==3.13              # via aspy.yaml, pre-commit
+pyyaml==5.1               # via aspy.yaml, pre-commit
 requests==2.21.0          # via codecov, sphinx
 six==1.11.0               # via cfgv, more-itertools, packaging, pip-tools, pre-commit, pytest, sphinx
 snowballstemmer==1.2.1    # via sphinx
