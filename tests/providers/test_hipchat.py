@@ -56,9 +56,8 @@ class TestHipchat:
             "group": "nada",
         }
         with pytest.raises(NotificationError) as e:
-            rsp = provider.notify(**data)
-            rsp.raise_on_errors()
-        assert "Invalid OAuth session" in e.value.message
+            provider.notify(**data, raise_on_errors=True)
+        assert "Failed to establish a new connection" in e.value.message
 
     def test_hipchat_resources(self, provider):
         assert provider.resources
@@ -111,8 +110,7 @@ class TestHipChatRooms:
         with pytest.raises(ResourceError) as e:
             resource(token="foo", group="bat")
 
-        assert e.value.errors == ["Invalid OAuth session"]
-        assert e.value.response.status_code == 401
+        assert 'Failed to establish a new connection' in e.value.errors[0]
 
 
 class TestHipChatUsers:

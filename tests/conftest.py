@@ -141,10 +141,11 @@ def resource(request, provider):
     return resource
 
 
-@pytest.fixture(scope="session")
-def cli_runner():
+@pytest.fixture
+def cli_runner(monkeypatch):
     from notifiers_cli.core import notifiers_cli, provider_group_factory
-
+    monkeypatch.setenv('LC_ALL', 'en_US.utf-8')
+    monkeypatch.setenv('LANG', 'en_US.utf-8')
     provider_group_factory()
     runner = CliRunner()
     return partial(runner.invoke, notifiers_cli, obj={})
