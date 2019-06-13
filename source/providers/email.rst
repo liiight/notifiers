@@ -97,6 +97,9 @@ Full schema:
       username:
         title: username if relevant
         type: string
+      login:
+        title: Trigger login to server
+        type: boolean
     required:
     - message
     - to
