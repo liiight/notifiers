@@ -3,10 +3,16 @@
 Changelog
 =========
 
-Dev (Unreleased)
-----------------
+Unreleased
+----------
+
+- Added ability to cancel login to SMTP/GMAIL if credentials are used (`#210 <https://github.com/notifiers/notifiers/issues/210>`_)
+
+1.0.4
+------
 
 - Added `black <https://github.com/ambv/black>`_ and `pre-commit <https://pre-commit.com/>`_
+- Updated deps
 
 1.0.0
 -----
