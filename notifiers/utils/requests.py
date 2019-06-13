@@ -3,15 +3,22 @@ import logging
 
 import requests
 
-log = logging.getLogger('notifiers')
+log = logging.getLogger("notifiers")
 
 
 class RequestsHelper:
     """A wrapper around :class:`requests.Session` which enables generically handling HTTP requests"""
 
     @classmethod
-    def request(self, url: str, method: str, raise_for_status: bool = True, path_to_errors: tuple = None, *args,
-                **kwargs) -> tuple:
+    def request(
+        self,
+        url: str,
+        method: str,
+        raise_for_status: bool = True,
+        path_to_errors: tuple = None,
+        *args,
+        **kwargs
+    ) -> tuple:
         """
         A wrapper method for :meth:`~requests.Session.request``, which adds some defaults and logging
 
@@ -22,14 +29,20 @@ class RequestsHelper:
         :param kwargs: Additional args to be sent to the request
         :return: Dict of response body or original :class:`requests.Response`
         """
-        session = kwargs.get('session', requests.Session())
-        log.debug('sending a %s request to %s with args: %s kwargs: %s', method.upper(), url, args, kwargs)
-        rsp = session.request(method, url, *args, **kwargs)
+        session = kwargs.get("session", requests.Session())
+        log.debug(
+            "sending a %s request to %s with args: %s kwargs: %s",
+            method.upper(),
+            url,
+            args,
+            kwargs,
+        )
 
-        log.debug('response: %s', rsp.text)
-        errors = None
         if raise_for_status:
             try:
+                rsp = session.request(method, url, *args, **kwargs)
+                log.debug("response: %s", rsp.text)
+                errors = None
                 rsp.raise_for_status()
             except requests.RequestException as e:
                 if e.response is not None:
@@ -49,22 +62,24 @@ class RequestsHelper:
                 else:
                     rsp = None
                     errors = [str(e)]
-                log.debug('errors when trying to access %s: %s', url, errors)
-        log.debug('returning response %s, errors %s', rsp, errors)
+                log.debug("errors when trying to access %s: %s", url, errors)
+        log.debug("returning response %s, errors %s", rsp, errors)
         return rsp, errors
 
 
 def get(url: str, *args, **kwargs) -> tuple:
     """Send a GET request. Returns a dict or :class:`requests.Response <Response>`"""
-    return RequestsHelper.request(url, 'get', *args, **kwargs)
+    return RequestsHelper.request(url, "get", *args, **kwargs)
 
 
 def post(url: str, *args, **kwargs) -> tuple:
     """Send a POST request. Returns a dict or :class:`requests.Response <Response>`"""
-    return RequestsHelper.request(url, 'post', *args, **kwargs)
+    return RequestsHelper.request(url, "post", *args, **kwargs)
 
 
-def file_list_for_request(list_of_paths: list, key_name: str, mimetype: str = None) -> list:
+def file_list_for_request(
+    list_of_paths: list, key_name: str, mimetype: str = None
+) -> list:
     """
     Convenience function to construct a list of files for multiple files upload by :mod:`requests`
 
@@ -74,5 +89,8 @@ def file_list_for_request(list_of_paths: list, key_name: str, mimetype: str = No
     :return: List of open files ready to be used in a request
     """
     if mimetype:
-        return [(key_name, (file, open(file, mode='rb'), mimetype)) for file in list_of_paths]
-    return [(key_name, (file, open(file, mode='rb'))) for file in list_of_paths]
+        return [
+            (key_name, (file, open(file, mode="rb"), mimetype))
+            for file in list_of_paths
+        ]
+    return [(key_name, (file, open(file, mode="rb"))) for file in list_of_paths]

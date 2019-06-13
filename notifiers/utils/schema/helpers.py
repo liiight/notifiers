@@ -1,4 +1,6 @@
-def one_or_more(schema: dict, unique_items: bool = True, min: int = 1, max: int = None) -> dict:
+def one_or_more(
+    schema: dict, unique_items: bool = True, min: int = 1, max: int = None
+) -> dict:
     """
     Helper function to construct a schema that validates items matching
     `schema` or an array containing items matching `schema`.
@@ -9,19 +11,14 @@ def one_or_more(schema: dict, unique_items: bool = True, min: int = 1, max: int 
     :param max: Correlates to ``maxLength`` attribute of JSON Schema array
     """
     multi_schema = {
-        'type': 'array',
-        'items': schema,
-        'minItems': min,
-        'uniqueItems': unique_items
+        "type": "array",
+        "items": schema,
+        "minItems": min,
+        "uniqueItems": unique_items,
     }
     if max:
-        multi_schema['maxItems'] = max
-    return {
-        'oneOf': [
-            multi_schema,
-            schema
-        ]
-    }
+        multi_schema["maxItems"] = max
+    return {"oneOf": [multi_schema, schema]}
 
 
 def list_to_commas(list_of_args) -> str:

@@ -3,6 +3,11 @@
 Changelog
 =========
 
+Dev (Unreleased)
+----------------
+
+- Added `black <https://github.com/ambv/black>`_ and `pre-commit <https://pre-commit.com/>`_
+
 1.0.0
 -----
 
