@@ -72,6 +72,7 @@ class SMTP(Provider):
                 "type": "boolean",
                 "title": "should the email be parse as an HTML file",
             },
+            "login": {"type": "boolean", "title": "Trigger login to server"}
         },
         "dependencies": {
             "username": ["password"],
@@ -96,6 +97,7 @@ class SMTP(Provider):
             "tls": False,
             "ssl": False,
             "html": False,
+            "login": True,
         }
 
     def _prepare_data(self, data: dict) -> dict:
@@ -134,7 +136,7 @@ class SMTP(Provider):
             self.smtp_server.ehlo()
             self.smtp_server.starttls()
 
-        if data.get("username"):
+        if data["login"] and data.get("username"):
             self.smtp_server.login(data["username"], data["password"])
 
     @staticmethod
