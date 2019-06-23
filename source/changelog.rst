@@ -7,6 +7,9 @@ Changelog
 ------------------
 
 - Added ability to cancel login to SMTP/GMAIL if credentials are used (`#210 <https://github.com/notifiers/notifiers/issues/210>`_, `#266 <https://github.com/notifiers/notifiers/pull/266>`_)
+- Loosened dependencies (`#209 <https://github.com/notifiers/notifiers/issues/209>`_, `#266 <https://github.com/notifiers/notifiers/pull/271>`_)
+- Added mimetype guessing for email (`#239 <https://github.com/notifiers/notifiers/issues/239>`_, `#266 <https://github.com/notifiers/notifiers/pull/271>`_)
+
 
 1.0.4
 ------
