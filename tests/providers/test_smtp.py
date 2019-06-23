@@ -1,3 +1,5 @@
+from email.message import EmailMessage
+
 import pytest
 
 from notifiers.exceptions import BadArguments, NotificationError
@@ -63,6 +65,22 @@ class TestSMTP(object):
             to=["foo@foo.com"], message="bar", attachments=attachments, host="nohost", username="ding", password="dong"
         )
         assert rsp.data["attachments"] == attachments
+
+    def test_attachment_mimetypes(self, provider, tmpdir):
+        dir_ = tmpdir.mkdir("sub")
+        file_1 = dir_.join("foo.txt")
+        file_1.write("foo")
+        file_2 = dir_.join("bar.jpg")
+        file_2.write("foo")
+        file_3 = dir_.join("baz.pdf")
+        file_3.write("foo")
+        attachments = [str(file_1), str(file_2), str(file_3)]
+        email = EmailMessage()
+        provider._add_attachments(attachments=attachments, email=email)
+        attach1, attach2, attach3 = email.iter_attachments()
+        assert attach1.get_content_type() == 'text/plain'
+        assert attach2.get_content_type() == 'image/jpeg'
+        assert attach3.get_content_type() == 'application/pdf'
 
     @pytest.mark.online
     def test_smtp_sanity(self, provider, test_message):
