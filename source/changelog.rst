@@ -3,8 +3,11 @@
 Changelog
 =========
 
-1.2.0 (Unreleased)
-------------------
+(Unreleased)
+------------
+
+1.2.0
+-----
 
 - Added ability to cancel login to SMTP/GMAIL if credentials are used (`#210 <https://github.com/notifiers/notifiers/issues/210>`_, `#266 <https://github.com/notifiers/notifiers/pull/266>`_)
 - Loosened dependencies (`#209 <https://github.com/notifiers/notifiers/issues/209>`_, `#271 <https://github.com/notifiers/notifiers/pull/271>`_)
