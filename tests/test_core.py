@@ -125,7 +125,7 @@ class TestCore:
         assert (
             "Can't instantiate abstract class BadProvider with abstract methods _required,"
             " _schema, _send_notification, base_url, name, site_url"
-        ) in str(e)
+        ) in str(e.value)
 
     def test_environs(self, mock_provider, monkeypatch):
         """Test environs usage"""
