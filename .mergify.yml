@@ -1,0 +1,14 @@
+pull_request_rules:
+  - name: automatic merge for Dependabot when Travis passes
+    conditions:
+      - status-success=continuous-integration/travis-ci/pr
+      - base=master
+      - author=dependabot-preview
+    actions:
+      merge:
+        strict: true
+        strict_method: rebase
+        method: merge
+      label:
+        add:
+          - mergify
