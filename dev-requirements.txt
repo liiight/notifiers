@@ -13,7 +13,7 @@ bumpversion==0.5.3
 certifi==2018.4.16        # via requests
 cfgv==2.0.0               # via pre-commit
 chardet==3.0.4            # via requests
-click==6.7                # via pip-tools
+click==7.0                # via pip-tools
 codecov==2.0.15
 coverage==4.5.1           # via codecov, pytest-cov
 docutils==0.14            # via sphinx
