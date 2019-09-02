@@ -29,7 +29,7 @@ nodeenv==1.3.2            # via pre-commit
 packaging==17.1           # via pytest, sphinx
 pip-tools==4.0.0
 pluggy==0.12.0            # via pytest
-pre-commit==1.18.2
+pre-commit==1.18.3
 py==1.5.4                 # via pytest
 pygments==2.2.0           # via sphinx
 pyparsing==2.2.0          # via packaging
