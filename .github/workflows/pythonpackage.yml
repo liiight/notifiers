@@ -19,8 +19,10 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
+        pip install --upgrade pip setuptools
+        pip install -e .
         pip install -r requirements.txt
+        pip install -r dev-requirements.txt
     - name: Lint with flake8
       run: |
         pip install flake8
@@ -31,4 +33,7 @@ jobs:
     - name: Test with pytest
       run: |
         pip install pytest
-        pytest
+        pytest --cov=./
+    - name: Report to codecov.io
+      if: success()
+      run: codecov
