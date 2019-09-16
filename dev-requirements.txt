@@ -17,7 +17,7 @@ click==6.7                # via pip-tools
 codecov==2.0.15
 coverage==4.5.1           # via codecov, pytest-cov
 docutils==0.14            # via sphinx
-hypothesis==4.32.3
+hypothesis==4.36.0
 identify==1.1.4           # via pre-commit
 idna==2.7                 # via requests
 imagesize==1.0.0          # via sphinx
