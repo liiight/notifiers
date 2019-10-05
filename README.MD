@@ -31,6 +31,10 @@ Via pip:
 ```
 $ pip install notifiers
 ```
+Via homebrew:
+```
+$ brew install notifiers
+```
 Or Dockerhub:
 ```
 $ docker pull liiight/notifiers
