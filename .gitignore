@@ -101,3 +101,4 @@ ENV/
 .mypy_cache/
 poc*
 /docs/
+.idea/*
