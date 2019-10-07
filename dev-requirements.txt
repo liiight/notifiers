@@ -7,7 +7,7 @@
 alabaster==0.7.11         # via sphinx
 aspy.yaml==1.1.1          # via pre-commit
 atomicwrites==1.1.5       # via pytest
-attrs==18.1.0             # via hypothesis, pytest
+attrs==19.2.0             # via hypothesis, pytest
 babel==2.6.0              # via sphinx
 bumpversion==0.5.3
 certifi==2018.4.16        # via requests
@@ -17,7 +17,7 @@ click==6.7                # via pip-tools
 codecov==2.0.15
 coverage==4.5.1           # via codecov, pytest-cov
 docutils==0.14            # via sphinx
-hypothesis==4.32.3
+hypothesis==4.38.3
 identify==1.1.4           # via pre-commit
 idna==2.7                 # via requests
 imagesize==1.0.0          # via sphinx
