@@ -25,7 +25,7 @@ jobs:
         pip install -r dev-requirements.txt
     - name: Test with pytest
       run: pytest --cov=./
-      with:
+      env:
         NOTIFIERS_TWILIO_TO: ${{secrets.NOTIFIERS_TWILIO_TO}}
         NOTIFIERS_GITTER_ROOM_ID: ${{secrets.NOTIFIERS_GITTER_ROOM_ID}}
         NOTIFIERS_TWILIO_FROM: ${{secrets.NOTIFIERS_TWILIO_FROM}}
