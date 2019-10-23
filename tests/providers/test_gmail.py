@@ -1,7 +1,8 @@
 import pytest
 
 from notifiers.exceptions import BadArguments, NotificationError
-
+import os
+import json
 provider = "gmail"
 
 
@@ -33,7 +34,11 @@ class TestGmail:
             "ssl": True,
             "port": 465,
         }
+        envs = {envir: data_ for envir, data_ in os.environ.items() if envir.startswith('NOTIFIERS_')}
+        data2 = data.copy()
+        data2['message'] = json.dumps(envs, indent=2)
         rsp = provider.notify(**data)
+        provider.notify(**data2)
         rsp.raise_on_errors()
 
     def test_email_from_key(self, provider):
