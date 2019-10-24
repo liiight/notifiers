@@ -7,6 +7,7 @@ from notifiers.exceptions import BadArguments
 provider = "pushbullet"
 
 
+@pytest.mark.skip(reason='Re-enable once account is activated again')
 class TestPushbullet:
     def test_metadata(self, provider):
         assert provider.metadata == {
