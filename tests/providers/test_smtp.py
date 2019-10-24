@@ -2,7 +2,8 @@ from email.message import EmailMessage
 
 import pytest
 
-from notifiers.exceptions import BadArguments, NotificationError
+from notifiers.exceptions import BadArguments
+from notifiers.exceptions import NotificationError
 
 provider = "email"
 
@@ -27,11 +28,17 @@ class TestSMTP(object):
         assert f"'{message}' is a required property" in e.value.message
 
     def test_smtp_no_host(self, provider):
-        data = {"to": "foo@foo.com", "message": "bar", "host": "nohost", "username": "ding", "password": "dong"}
+        data = {
+            "to": "foo@foo.com",
+            "message": "bar",
+            "host": "nohost",
+            "username": "ding",
+            "password": "dong",
+        }
         with pytest.raises(NotificationError) as e:
             rsp = provider.notify(**data)
             rsp.raise_on_errors()
-        possible_errors = ["Errno 111", "Errno 61", "Errno 8", "Errno -2"]
+        possible_errors = "Errno 111", "Errno 61", "Errno 8", "Errno -2", "Errno -3"
         assert any(
             error in e.value.message for error in possible_errors
         ), f"Error not in expected errors; {e.value.message}"
@@ -41,7 +48,12 @@ class TestSMTP(object):
 
     def test_email_from_key(self, provider):
         rsp = provider.notify(
-            to="foo@foo.co ", from_="bla@foo.com", message="foo", host="nohost", username="ding", password="dong"
+            to="foo@foo.co ",
+            from_="bla@foo.com",
+            message="foo",
+            host="nohost",
+            username="ding",
+            password="dong",
         )
         rsp_data = rsp.data
         assert not rsp_data.get("from_")
@@ -49,7 +61,9 @@ class TestSMTP(object):
 
     def test_multiple_to(self, provider):
         to = ["foo@foo.com", "bar@foo.com"]
-        rsp = provider.notify(to=to, message="foo", host="nohost", username="ding", password="dong")
+        rsp = provider.notify(
+            to=to, message="foo", host="nohost", username="ding", password="dong"
+        )
         assert rsp.data["to"] == ",".join(to)
 
     def test_attachment(self, provider, tmpdir):
@@ -62,7 +76,12 @@ class TestSMTP(object):
         file_3.write("foo")
         attachments = [str(file_1), str(file_2), str(file_3)]
         rsp = provider.notify(
-            to=["foo@foo.com"], message="bar", attachments=attachments, host="nohost", username="ding", password="dong"
+            to=["foo@foo.com"],
+            message="bar",
+            attachments=attachments,
+            host="nohost",
+            username="ding",
+            password="dong",
         )
         assert rsp.data["attachments"] == attachments
 
@@ -78,9 +97,9 @@ class TestSMTP(object):
         email = EmailMessage()
         provider._add_attachments(attachments=attachments, email=email)
         attach1, attach2, attach3 = email.iter_attachments()
-        assert attach1.get_content_type() == 'text/plain'
-        assert attach2.get_content_type() == 'image/jpeg'
-        assert attach3.get_content_type() == 'application/pdf'
+        assert attach1.get_content_type() == "text/plain"
+        assert attach2.get_content_type() == "image/jpeg"
+        assert attach3.get_content_type() == "application/pdf"
 
     @pytest.mark.online
     def test_smtp_sanity(self, provider, test_message):
