@@ -34,7 +34,7 @@ def close_all_open_incidents(request):
 
 
 class TestStatusPage:
-    @pytest.mark.foo
+
     def test_metadata(self, provider):
         assert provider.metadata == {
             "base_url": "https://api.statuspage.io/v1//pages/{page_id}/",

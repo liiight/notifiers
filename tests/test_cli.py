@@ -104,7 +104,7 @@ class TestCLI:
     def test_version_command(self, cli_runner):
         result = cli_runner(["--version"])
         assert result.exit_code == 0
-        version_re = re.search("(\d+\.\d+\.\d+)", result.output)
+        version_re = re.search(r"(\d+\.\d+\.\d+)", result.output)
         assert version_re
         assert version_re.group(1) == notifiers.__version__
 
