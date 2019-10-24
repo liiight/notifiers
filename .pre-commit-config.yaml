@@ -1,18 +1,21 @@
 repos:
-- repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v1.3.0
-  hooks:
-  - id: trailing-whitespace
-  - id: check-yaml
-- repo: https://github.com/ambv/black
-  rev: 18.6b4
-  hooks:
-  - id: black
-    args: [--safe, --quiet]
-    language_version: python3.6
-- repo: https://github.com/asottile/blacken-docs
-  rev: v0.2.0
-  hooks:
-  - id: blacken-docs
-    additional_dependencies: [black==18.6b4]
-    language_version: python3.6
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v2.3.0
+    hooks:
+      - id: check-yaml
+      - id: check-json
+      - id: pretty-format-json
+        args: ['--autofix']
+      - id: trailing-whitespace
+      - id: flake8
+        args: ['--max-line-length=120']
+        additional_dependencies: ['flake8-mutable', 'flake8-comprehensions']
+  - repo: https://github.com/psf/black
+    rev: 19.3b0
+    hooks:
+      - id: black
+        language_version: python3.6
+  - repo: https://github.com/asottile/reorder_python_imports
+    rev: v1.6.1
+    hooks:
+      - id: reorder-python-imports
