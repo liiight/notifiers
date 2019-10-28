@@ -1,6 +1,8 @@
 import pytest
 
-from notifiers.exceptions import BadArguments, NotificationError, ResourceError
+from notifiers.exceptions import BadArguments
+from notifiers.exceptions import NotificationError
+from notifiers.exceptions import ResourceError
 
 provider = "hipchat"
 
@@ -110,7 +112,7 @@ class TestHipChatRooms:
         with pytest.raises(ResourceError) as e:
             resource(token="foo", group="bat")
 
-        assert 'Failed to establish a new connection' in e.value.errors[0]
+        assert "Failed to establish a new connection" in e.value.errors[0]
 
 
 class TestHipChatUsers:
@@ -163,11 +165,11 @@ class TestHipchatCLI:
     def test_hipchat_rooms_negative(self, cli_runner):
         cmd = "hipchat rooms --token bad_token".split()
         result = cli_runner(cmd)
-        assert result.exit_code == -1
+        assert result.exit_code
         assert not result.output
 
     def test_hipchat_users_negative(self, cli_runner):
         cmd = "hipchat users --token bad_token".split()
         result = cli_runner(cmd)
-        assert result.exit_code == -1
+        assert result.exit_code
         assert not result.output
