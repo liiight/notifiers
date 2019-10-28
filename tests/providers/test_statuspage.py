@@ -7,34 +7,33 @@ import pytest
 import requests
 
 from notifiers.core import FAILURE_STATUS
-from notifiers.exceptions import BadArguments, ResourceError
+from notifiers.exceptions import BadArguments
+from notifiers.exceptions import ResourceError
 
 provider = "statuspage"
 
 log = logging.getLogger("statuspage")
 
 
-@pytest.fixture(autouse=True, scope='session')
+@pytest.fixture(autouse=True, scope="module")
 def close_all_open_incidents(request):
-    if request.node.get_closest_marker("online"):
-        api_key = os.getenv("NOTIFIERS_STATUSPAGE_API_KEY")
-        page_id = os.getenv("NOTIFIERS_STATUSPAGE_PAGE_ID")
+    api_key = os.getenv("NOTIFIERS_STATUSPAGE_API_KEY")
+    page_id = os.getenv("NOTIFIERS_STATUSPAGE_PAGE_ID")
 
-        s = requests.Session()
-        base_url = f"https://api.statuspage.io/v1/pages/{page_id}/incidents"
-        s.headers = {"Authorization": f"OAuth {api_key}"}
-        url = f"{base_url}/unresolved"
-        incidents = s.get(url).json()
-        for incident in incidents:
-            incident_id = incident["id"]
-            url = f"{base_url}/{incident_id}"
-            log.debug("deleting status page incident %s", incident_id)
-            s.delete(url)
-            sleep(2)
+    s = requests.Session()
+    base_url = f"https://api.statuspage.io/v1/pages/{page_id}/incidents"
+    s.headers = {"Authorization": f"OAuth {api_key}"}
+    url = f"{base_url}/unresolved"
+    incidents = s.get(url).json()
+    for incident in incidents:
+        incident_id = incident["id"]
+        url = f"{base_url}/{incident_id}"
+        log.debug("deleting status page incident %s", incident_id)
+        s.delete(url)
+        sleep(2)
 
 
 class TestStatusPage:
-
     def test_metadata(self, provider):
         assert provider.metadata == {
             "base_url": "https://api.statuspage.io/v1//pages/{page_id}/",
