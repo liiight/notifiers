@@ -100,6 +100,6 @@ class TestTelegramCLI:
     def test_telegram_updates_positive(self, cli_runner):
         cmd = f"telegram updates".split()
         result = cli_runner(cmd)
-        assert result.exit_code
+        assert not result.exit_code
         reply = json.loads(result.output)
         assert reply == [] or reply[0]["message"]["chat"]["id"]
