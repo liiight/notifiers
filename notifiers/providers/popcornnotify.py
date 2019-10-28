@@ -1,6 +1,8 @@
-from ..core import Provider, Response
+from ..core import Provider
+from ..core import Response
 from ..utils import requests
-from ..utils.schema.helpers import one_or_more, list_to_commas
+from ..utils.schema.helpers import list_to_commas
+from ..utils.schema.helpers import one_or_more
 
 
 class PopcornNotify(Provider):
@@ -22,7 +24,8 @@ class PopcornNotify(Provider):
                 {
                     "type": "string",
                     "format": "email",
-                    "title": "The recipient email address or phone number. Or an array of email addresses and phone numbers",
+                    "title": "The recipient email address or phone number."
+                    " Or an array of email addresses and phone numbers",
                 }
             ),
             "subject": {

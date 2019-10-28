@@ -1,6 +1,7 @@
 import json
 
-from ..core import Provider, Response
+from ..core import Provider
+from ..core import Response
 from ..utils import requests
 from ..utils.schema.helpers import one_or_more
 

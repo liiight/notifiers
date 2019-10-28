@@ -1,8 +1,8 @@
 import logging
 
-from notifiers.exceptions import NoSuchNotifierError
-
 import pytest
+
+from notifiers.exceptions import NoSuchNotifierError
 
 log = logging.getLogger("test_logger")
 

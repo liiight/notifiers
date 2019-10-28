@@ -1,5 +1,9 @@
+import logging
+
 from ._version import __version__
-from .core import *
+from .core import all_providers
+from .core import get_notifier
+from .core import notify
 
 logging.getLogger("notifiers").addHandler(logging.NullHandler())
 

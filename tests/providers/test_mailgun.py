@@ -1,9 +1,11 @@
-import pytest
 import datetime
 import time
 from email import utils
-from notifiers.exceptions import BadArguments
+
+import pytest
+
 from notifiers.core import FAILURE_STATUS
+from notifiers.exceptions import BadArguments
 
 provider = "mailgun"
 
