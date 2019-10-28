@@ -1,12 +1,10 @@
 import pytest
 
-from notifiers.utils.helpers import (
-    text_to_bool,
-    merge_dicts,
-    dict_from_environs,
-    snake_to_camel_case,
-    valid_file,
-)
+from notifiers.utils.helpers import dict_from_environs
+from notifiers.utils.helpers import merge_dicts
+from notifiers.utils.helpers import snake_to_camel_case
+from notifiers.utils.helpers import text_to_bool
+from notifiers.utils.helpers import valid_file
 from notifiers.utils.requests import file_list_for_request
 
 

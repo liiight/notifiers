@@ -5,11 +5,16 @@ import socket
 from email.message import EmailMessage
 from email.utils import formatdate
 from pathlib import Path
-from smtplib import SMTPAuthenticationError, SMTPServerDisconnected, SMTPSenderRefused
-from typing import Tuple, List
+from smtplib import SMTPAuthenticationError
+from smtplib import SMTPSenderRefused
+from smtplib import SMTPServerDisconnected
+from typing import List
+from typing import Tuple
 
-from ..core import Provider, Response
-from ..utils.schema.helpers import one_or_more, list_to_commas
+from ..core import Provider
+from ..core import Response
+from ..utils.schema.helpers import list_to_commas
+from ..utils.schema.helpers import one_or_more
 
 DEFAULT_SUBJECT = "New email from 'notifiers'!"
 DEFAULT_FROM = f"{getpass.getuser()}@{socket.getfqdn()}"
@@ -73,7 +78,7 @@ class SMTP(Provider):
                 "type": "boolean",
                 "title": "should the email be parse as an HTML file",
             },
-            "login": {"type": "boolean", "title": "Trigger login to server"}
+            "login": {"type": "boolean", "title": "Trigger login to server"},
         },
         "dependencies": {
             "username": ["password"],
@@ -90,8 +95,8 @@ class SMTP(Provider):
         if ctype is None or encoding is not None:
             # No guess could be made, or the file is encoded (compressed), so
             # use a generic bag-of-bits type.
-            ctype = 'application/octet-stream'
-        maintype, subtype = ctype.split('/', 1)
+            ctype = "application/octet-stream"
+        maintype, subtype = ctype.split("/", 1)
         return maintype, subtype
 
     def __init__(self):
@@ -135,7 +140,12 @@ class SMTP(Provider):
         for attachment in attachments:
             attachment = Path(attachment)
             maintype, subtype = self._get_mimetype(attachment)
-            email.add_attachment(attachment.read_bytes(), maintype=maintype, subtype=subtype, filename=attachment.name)
+            email.add_attachment(
+                attachment.read_bytes(),
+                maintype=maintype,
+                subtype=subtype,
+                filename=attachment.name,
+            )
 
     def _connect_to_server(self, data: dict):
         self.smtp_server = smtplib.SMTP_SSL if data["ssl"] else smtplib.SMTP
@@ -164,7 +174,7 @@ class SMTP(Provider):
                 self._connect_to_server(data)
             email = self._build_email(data)
             if data.get("attachments"):
-                self._add_attachments(data['attachments'], email)
+                self._add_attachments(data["attachments"], email)
             self.smtp_server.send_message(email)
         except (
             SMTPServerDisconnected,

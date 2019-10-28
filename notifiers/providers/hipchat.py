@@ -1,6 +1,8 @@
 import copy
 
-from ..core import Provider, Response, ProviderResource
+from ..core import Provider
+from ..core import ProviderResource
+from ..core import Response
 from ..exceptions import ResourceError
 from ..utils import requests
 

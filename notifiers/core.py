@@ -1,17 +1,17 @@
 import logging
-from abc import ABC, abstractmethod
+from abc import ABC
+from abc import abstractmethod
 
 import jsonschema
 import requests
 from jsonschema.exceptions import best_match
 
-from .exceptions import (
-    SchemaError,
-    BadArguments,
-    NotificationError,
-    NoSuchNotifierError,
-)
-from .utils.helpers import merge_dicts, dict_from_environs
+from .exceptions import BadArguments
+from .exceptions import NoSuchNotifierError
+from .exceptions import NotificationError
+from .exceptions import SchemaError
+from .utils.helpers import dict_from_environs
+from .utils.helpers import merge_dicts
 from .utils.schema.formats import format_checker
 
 DEFAULT_ENVIRON_PREFIX = "NOTIFIERS_"
@@ -328,7 +328,7 @@ class ProviderResource(SchemaResource, ABC):
 
 
 # Avoid premature import
-from .providers import _all_providers
+from .providers import _all_providers  # noqa: E402
 
 
 def get_notifier(provider_name: str, strict: bool = False) -> Provider:

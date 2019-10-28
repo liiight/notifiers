@@ -2,11 +2,16 @@ from functools import partial
 
 import click
 
-from notifiers import __version__, get_notifier
+from notifiers import __version__
+from notifiers import get_notifier
 from notifiers.core import all_providers
 from notifiers.exceptions import NotifierException
-from notifiers_cli.utils.dynamic_click import schema_to_command, CORE_COMMANDS
-from notifiers_cli.utils.callbacks import func_factory, _notify, _resource, _resources
+from notifiers_cli.utils.callbacks import _notify
+from notifiers_cli.utils.callbacks import _resource
+from notifiers_cli.utils.callbacks import _resources
+from notifiers_cli.utils.callbacks import func_factory
+from notifiers_cli.utils.dynamic_click import CORE_COMMANDS
+from notifiers_cli.utils.dynamic_click import schema_to_command
 
 
 def provider_group_factory():

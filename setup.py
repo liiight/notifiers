@@ -1,6 +1,7 @@
 from pathlib import Path
 
-from setuptools import find_packages, setup
+from setuptools import find_packages
+from setuptools import setup
 
 long_description = Path("README.MD").read_text()
 

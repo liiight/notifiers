@@ -19,6 +19,6 @@ There are 3 types of tests:
 
 - "Dry" tests, tests that check the code base directly without needing 3rd party providers.
 - "Wet" tests, tests that do require 3rd party providers but are negative tests, or expected to fail. They can pass even without passing the required credentials to them.
-- "Online" tests, tests that require real API access to the various providers. Any secret information that is needed to to make these test pass is encrypted via CI settings and is accessible only to owners of the project. When running tests locally run via the negative marker as written above. When a pull request is created, these tests are skipped. 
+- "Online" tests, tests that require real API access to the various providers. Any secret information that is needed to to make these test pass is encrypted via CI settings and is accessible only to owners of the project. When running tests locally run via the negative marker as written above. When a pull request is created, these tests are skipped.
 
 Skipping these tests will have the appearance that the test coverage dropped considerably (becuase for the scope of this PR, it did). Feel free to ignore this.

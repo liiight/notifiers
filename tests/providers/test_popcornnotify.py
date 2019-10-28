@@ -1,7 +1,8 @@
 import pytest
 
 from notifiers.core import FAILURE_STATUS
-from notifiers.exceptions import BadArguments, NotificationError
+from notifiers.exceptions import BadArguments
+from notifiers.exceptions import NotificationError
 
 provider = "popcornnotify"
 
@@ -29,7 +30,7 @@ class TestPopcornNotify:
         assert f"'{message}' is a required property" in e.value.message
 
     @pytest.mark.online
-    @pytest.mark.skip('Seems like service is down?')
+    @pytest.mark.skip("Seems like service is down?")
     def test_popcornnotify_sanity(self, provider, test_message):
         data = {"message": test_message}
         provider.notify(**data, raise_on_errors=True)

@@ -7,17 +7,16 @@ from unittest.mock import MagicMock
 import pytest
 from click.testing import CliRunner
 
-from notifiers.core import (
-    Provider,
-    Response,
-    get_notifier,
-    ProviderResource,
-    SUCCESS_STATUS,
-)
+from notifiers.core import get_notifier
+from notifiers.core import Provider
+from notifiers.core import ProviderResource
+from notifiers.core import Response
+from notifiers.core import SUCCESS_STATUS
 from notifiers.logging import NotificationHandler
 from notifiers.providers import _all_providers
 from notifiers.utils.helpers import text_to_bool
-from notifiers.utils.schema.helpers import one_or_more, list_to_commas
+from notifiers.utils.schema.helpers import list_to_commas
+from notifiers.utils.schema.helpers import one_or_more
 
 log = logging.getLogger(__name__)
 
@@ -144,8 +143,9 @@ def resource(request, provider):
 @pytest.fixture
 def cli_runner(monkeypatch):
     from notifiers_cli.core import notifiers_cli, provider_group_factory
-    monkeypatch.setenv('LC_ALL', 'en_US.utf-8')
-    monkeypatch.setenv('LANG', 'en_US.utf-8')
+
+    monkeypatch.setenv("LC_ALL", "en_US.utf-8")
+    monkeypatch.setenv("LANG", "en_US.utf-8")
     provider_group_factory()
     runner = CliRunner()
     return partial(runner.invoke, notifiers_cli, obj={})
