@@ -23,9 +23,6 @@ jobs:
         pip install -e .
         pip install -r requirements.txt
         pip install -r dev-requirements.txt
-  test:
-    needs: build
-    steps:
     - name: Test with pytest
       run: pytest --cov=./
       env:
@@ -61,10 +58,8 @@ jobs:
         NOTIFIERS_ZULIP_API_KEY: ${{secrets.NOTIFIERS_ZULIP_API_KEY}}
         NOTIFIERS_ZULIP_EMAIL: ${{secrets.NOTIFIERS_ZULIP_EMAIL}}
         NOTIFIERS_ZULIP_TO: ${{secrets.NOTIFIERS_ZULIP_TO}}
-  coverage:
-    needs: test
-    steps:
     - name: Upload coverage to Codecov
+      if: success()
       uses: codecov/codecov-action@v1.0.2
       with:
         token: ${{secrets.CODECOV_TOKEN}}
