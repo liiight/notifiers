@@ -7,3 +7,4 @@ sphinx_rtd_theme
 bumpversion
 hypothesis
 pre-commit
+retry

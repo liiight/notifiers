@@ -1,6 +1,7 @@
 import json
 
 import pytest
+from retry import retry
 
 from notifiers.exceptions import BadArguments
 from notifiers.exceptions import NotificationError
@@ -97,6 +98,7 @@ class TestTelegramCLI:
         assert not result.output
 
     @pytest.mark.online
+    @retry(AssertionError, tries=3, delay=10)
     def test_telegram_updates_positive(self, cli_runner):
         cmd = f"telegram updates".split()
         result = cli_runner(cmd)
