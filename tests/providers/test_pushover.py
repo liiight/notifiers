@@ -1,6 +1,7 @@
 import pytest
 
-from notifiers.exceptions import BadArguments, NotificationError
+from notifiers.exceptions import BadArguments
+from notifiers.exceptions import NotificationError
 
 provider = "pushover"
 
@@ -144,25 +145,25 @@ class TestPushoverCLI:
     def test_pushover_sounds_negative(self, cli_runner):
         cmd = "pushover sounds --token bad_token".split()
         result = cli_runner(cmd)
-        assert result.exit_code == -1
+        assert result.exit_code
         assert not result.output
 
     @pytest.mark.online
     def test_pushover_sounds_positive(self, cli_runner):
         cmd = "pushover sounds".split()
         result = cli_runner(cmd)
-        assert result.exit_code == 0
+        assert not result.exit_code
         assert "piano" in result.output
 
     def test_pushover_limits(self, cli_runner):
         cmd = "pushover limits --token bad_token".split()
         result = cli_runner(cmd)
-        assert result.exit_code == -1
+        assert result.exit_code
         assert not result.output
 
     @pytest.mark.online
     def test_pushover_limits_positive(self, cli_runner):
         cmd = "pushover limits".split()
         result = cli_runner(cmd)
-        assert result.exit_code == 0
+        assert not result.exit_code
         assert all(key in result.output for key in ["limit", "remaining", "reset"])

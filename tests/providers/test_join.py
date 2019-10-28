@@ -1,6 +1,8 @@
 import pytest
 
-from notifiers.exceptions import BadArguments, ResourceError, NotificationError
+from notifiers.exceptions import BadArguments
+from notifiers.exceptions import NotificationError
+from notifiers.exceptions import ResourceError
 
 provider = "join"
 
@@ -69,7 +71,7 @@ class TestJoinCLI:
     def test_join_devices_negative(self, cli_runner):
         cmd = "join devices --apikey bad_token".split()
         result = cli_runner(cmd)
-        assert result.exit_code == -1
+        assert result.exit_code
         assert not result.output
 
     @pytest.mark.skip("tests fail due to no device connected")
@@ -77,6 +79,6 @@ class TestJoinCLI:
     def test_join_updates_positive(self, cli_runner):
         cmd = f"join devices".split()
         result = cli_runner(cmd)
-        assert result.exit_code == 0
+        assert not result.exit_code
         replies = ["You have no devices associated with this apikey", "Device name: "]
         assert any(reply in result.output for reply in replies)

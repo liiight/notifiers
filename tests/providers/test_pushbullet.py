@@ -7,7 +7,7 @@ from notifiers.exceptions import BadArguments
 provider = "pushbullet"
 
 
-@pytest.mark.skip(reason='Re-enable once account is activated again')
+@pytest.mark.skip(reason="Re-enable once account is activated again")
 class TestPushbullet:
     def test_metadata(self, provider):
         assert provider.metadata == {
@@ -55,7 +55,7 @@ class TestPushbulletCLI:
     def test_pushbullet_devices_negative(self, cli_runner):
         cmd = "pushbullet devices --token bad_token".split()
         result = cli_runner(cmd)
-        assert result.exit_code == -1
+        assert result.exit_code
         assert not result.output
 
     @pytest.mark.online
@@ -65,6 +65,6 @@ class TestPushbulletCLI:
 
         cmd = f"pushbullet devices --token {token}".split()
         result = cli_runner(cmd)
-        assert result.exit_code == 0
+        assert not result.exit_code
         replies = ["You have no devices associated with this token", "Nickname: "]
         assert any(reply in result.output for reply in replies)

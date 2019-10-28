@@ -1,7 +1,9 @@
-import pytest
 import json
 
-from notifiers.exceptions import BadArguments, NotificationError
+import pytest
+
+from notifiers.exceptions import BadArguments
+from notifiers.exceptions import NotificationError
 
 provider = "telegram"
 
@@ -91,13 +93,13 @@ class TestTelegramCLI:
     def test_telegram_updates_negative(self, cli_runner):
         cmd = "telegram updates --token bad_token".split()
         result = cli_runner(cmd)
-        assert result.exit_code == -1
+        assert result.exit_code
         assert not result.output
 
     @pytest.mark.online
     def test_telegram_updates_positive(self, cli_runner):
         cmd = f"telegram updates".split()
         result = cli_runner(cmd)
-        assert result.exit_code == 0
+        assert not result.exit_code
         reply = json.loads(result.output)
         assert reply == [] or reply[0]["message"]["chat"]["id"]

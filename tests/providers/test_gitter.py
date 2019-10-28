@@ -1,6 +1,8 @@
 import pytest
 
-from notifiers.exceptions import BadArguments, NotificationError, ResourceError
+from notifiers.exceptions import BadArguments
+from notifiers.exceptions import NotificationError
+from notifiers.exceptions import ResourceError
 
 provider = "gitter"
 
@@ -98,19 +100,19 @@ class TestGitterCLI:
     def test_gitter_rooms_negative(self, cli_runner):
         cmd = "gitter rooms --token bad_token".split()
         result = cli_runner(cmd)
-        assert result.exit_code == -1
+        assert result.exit_code
         assert not result.output
 
     @pytest.mark.online
     def test_gitter_rooms_positive(self, cli_runner):
         cmd = "gitter rooms".split()
         result = cli_runner(cmd)
-        assert result.exit_code == 0
+        assert not result.exit_code
         assert "notifiers/testing" in result.output
 
     @pytest.mark.online
     def test_gitter_rooms_with_query(self, cli_runner):
         cmd = f"gitter rooms --filter notifiers/testing".split()
         result = cli_runner(cmd)
-        assert result.exit_code == 0
+        assert not result.exit_code
         assert "notifiers/testing" in result.output
