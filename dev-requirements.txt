@@ -6,7 +6,6 @@
 #
 alabaster==0.7.11         # via sphinx
 aspy.yaml==1.1.1          # via pre-commit
-atomicwrites==1.1.5       # via pytest
 attrs==19.3.0             # via hypothesis, pytest
 babel==2.6.0              # via sphinx
 bumpversion==0.5.3
@@ -21,7 +20,7 @@ hypothesis==4.50.6
 identify==1.1.4           # via pre-commit
 idna==2.7                 # via requests
 imagesize==1.0.0          # via sphinx
-importlib-metadata==0.18  # via pluggy, pre-commit, pytest
+importlib-metadata==0.18  # via pluggy, pre-commit
 jinja2==2.10.1            # via sphinx
 markupsafe==1.0           # via jinja2
 more-itertools==4.2.0     # via pytest
@@ -33,7 +32,7 @@ py==1.5.4                 # via pytest, retry
 pygments==2.2.0           # via sphinx
 pyparsing==2.2.0          # via packaging
 pytest-cov==2.7.1
-pytest==5.0.1
+pytest==5.3.1
 pytz==2018.5              # via babel
 pyyaml==5.1               # via aspy.yaml, pre-commit
 requests==2.22.0          # via codecov, sphinx
