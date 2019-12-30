@@ -17,7 +17,7 @@ codecov==2.0.15
 coverage==4.5.1           # via codecov, pytest-cov
 decorator==4.4.1          # via retry
 docutils==0.14            # via sphinx
-hypothesis==4.50.6
+hypothesis==4.57.1
 identify==1.1.4           # via pre-commit
 idna==2.7                 # via requests
 imagesize==1.0.0          # via sphinx
@@ -40,6 +40,7 @@ requests==2.22.0          # via codecov, sphinx
 retry==0.9.2
 six==1.11.0               # via cfgv, more-itertools, packaging, pre-commit
 snowballstemmer==1.2.1    # via sphinx
+sortedcontainers==2.1.0   # via hypothesis
 sphinx-autodoc-annotation==1.0.post1
 sphinx-rtd-theme==0.4.3
 sphinx==2.2.1
