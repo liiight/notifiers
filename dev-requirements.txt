@@ -21,14 +21,14 @@ hypothesis==5.1.0
 identify==1.1.4           # via pre-commit
 idna==2.7                 # via requests
 imagesize==1.0.0          # via sphinx
-importlib-metadata==0.18  # via pluggy, pre-commit, pytest
+importlib-metadata==0.18  # via pluggy, pytest
 jinja2==2.10.1            # via sphinx
 markupsafe==1.0           # via jinja2
 more-itertools==4.2.0     # via pytest
 nodeenv==1.3.2            # via pre-commit
 packaging==17.1           # via pytest, sphinx
 pluggy==0.12.0            # via pytest
-pre-commit==1.18.2
+pre-commit==1.21.0
 py==1.5.4                 # via pytest, retry
 pygments==2.2.0           # via sphinx
 pyparsing==2.2.0          # via packaging
