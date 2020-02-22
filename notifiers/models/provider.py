@@ -3,9 +3,11 @@ from abc import abstractmethod
 
 import requests
 from pydantic import BaseModel
+from pydantic import ValidationError
 
 from notifiers.core import DEFAULT_ENVIRON_PREFIX
 from notifiers.core import log
+from notifiers.exceptions import BadArguments
 from notifiers.models.response import Response
 from notifiers.models.response import ResponseStatus
 from notifiers.utils.helpers import dict_from_environs
@@ -14,6 +16,12 @@ from notifiers.utils.helpers import merge_dicts
 
 class SchemaModel(BaseModel):
     """The base class for Schemas"""
+
+    @staticmethod
+    def to_list(value):
+        if not isinstance(value, list):
+            return [value]
+        return value
 
 
 class SchemaResource(ABC):
@@ -34,6 +42,13 @@ class SchemaResource(ABC):
     @property
     def arguments(self) -> dict:
         return self.schema["properties"]
+
+    def validate_data(self, data: dict) -> SchemaModel:
+        try:
+            return self.schema_model.parse_obj(data)
+        except ValidationError:
+            # todo handle validation error and return custom
+            raise BadArguments
 
     def create_response(
         self, data: dict = None, response: requests.Response = None, errors: list = None
@@ -67,17 +82,6 @@ class SchemaResource(ABC):
             prefix = DEFAULT_ENVIRON_PREFIX
         return dict_from_environs(prefix, self.name, list(self.arguments.keys()))
 
-    def _prepare_data(self, data: dict) -> dict:
-        """
-        Use this method to manipulate data that'll fit the respected provider API.
-         For example, all provider must use the ``message`` argument but sometimes provider expects a different
-         variable name for this, like ``text``.
-
-        :param data: Notification data
-        :return: Returns manipulated data, if there's a need for such manipulations.
-        """
-        return data
-
     def _process_data(self, **data) -> dict:
         """
         The main method that process all resources data. Validates schema, gets environs, validates data, prepares
@@ -91,7 +95,7 @@ class SchemaResource(ABC):
         if environs:
             data = merge_dicts(data, environs)
 
-        data = self._prepare_data(data)
+        data = self.validate_data(data).dict()
         return data
 
 
@@ -137,7 +141,6 @@ class Provider(SchemaResource, ABC):
 
         :param data: Notification data
         """
-        pass
 
     def notify(self, raise_on_errors: bool = False, **kwargs) -> Response:
         """
