@@ -11,8 +11,8 @@ from smtplib import SMTPServerDisconnected
 from typing import List
 from typing import Tuple
 
-from ..core import Provider
-from ..core import Response
+from ..models.provider import Provider
+from ..models.response import Response
 from ..utils.schema.helpers import list_to_commas
 from ..utils.schema.helpers import one_or_more
 

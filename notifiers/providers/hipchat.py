@@ -1,9 +1,9 @@
 import copy
 
-from ..core import Provider
-from ..core import ProviderResource
-from ..core import Response
 from ..exceptions import ResourceError
+from ..models.provider import Provider
+from ..models.provider import ProviderResource
+from ..models.response import Response
 from ..utils import requests
 
 

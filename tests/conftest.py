@@ -8,11 +8,11 @@ import pytest
 from click.testing import CliRunner
 
 from notifiers.core import get_notifier
-from notifiers.core import Provider
-from notifiers.core import ProviderResource
-from notifiers.core import Response
 from notifiers.core import SUCCESS_STATUS
 from notifiers.logging import NotificationHandler
+from notifiers.models.provider import Provider
+from notifiers.models.provider import ProviderResource
+from notifiers.models.response import Response
 from notifiers.providers import _all_providers
 from notifiers.utils.helpers import text_to_bool
 from notifiers.utils.schema.helpers import list_to_commas

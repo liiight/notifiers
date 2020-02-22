@@ -1,6 +1,6 @@
-from ..core import Provider
-from ..core import Response
 from ..exceptions import NotifierException
+from ..models.provider import Provider
+from ..models.response import Response
 from ..utils import requests
 
 

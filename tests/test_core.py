@@ -2,13 +2,13 @@ import pytest
 
 import notifiers
 from notifiers import notify
-from notifiers.core import Provider
-from notifiers.core import Response
 from notifiers.core import SUCCESS_STATUS
 from notifiers.exceptions import BadArguments
 from notifiers.exceptions import NoSuchNotifierError
 from notifiers.exceptions import NotificationError
 from notifiers.exceptions import SchemaError
+from notifiers.models.provider import Provider
+from notifiers.models.response import Response
 
 
 class TestCore:
