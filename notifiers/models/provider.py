@@ -1,17 +1,19 @@
 from abc import ABC
 from abc import abstractmethod
+from typing import List
+from typing import Union
 
 import requests
 from pydantic import BaseModel
 from pydantic import ValidationError
 
-from notifiers.core import DEFAULT_ENVIRON_PREFIX
-from notifiers.core import log
 from notifiers.exceptions import BadArguments
 from notifiers.models.response import Response
 from notifiers.models.response import ResponseStatus
 from notifiers.utils.helpers import dict_from_environs
 from notifiers.utils.helpers import merge_dicts
+
+DEFAULT_ENVIRON_PREFIX = "NOTIFIERS_"
 
 
 class SchemaModel(BaseModel):
@@ -22,6 +24,10 @@ class SchemaModel(BaseModel):
         if not isinstance(value, list):
             return [value]
         return value
+
+    @staticmethod
+    def single_or_list(type_):
+        return Union[type_, List[type_]]
 
 
 class SchemaResource(ABC):
@@ -69,7 +75,7 @@ class SchemaResource(ABC):
             errors=errors,
         )
 
-    def _get_environs(self, prefix: str = None) -> dict:
+    def _get_environs(self, prefix: str = DEFAULT_ENVIRON_PREFIX) -> dict:
         """
         Fetches set environment variables if such exist, via the :func:`~notifiers.utils.helpers.dict_from_environs`
         Searches for `[PREFIX_NAME]_[PROVIDER_NAME]_[ARGUMENT]` for each of the arguments defined in the schema
@@ -77,12 +83,9 @@ class SchemaResource(ABC):
         :param prefix: The environ prefix to use. If not supplied, uses the default
         :return: A dict of arguments and value retrieved from environs
         """
-        if not prefix:
-            log.debug("using default environ prefix")
-            prefix = DEFAULT_ENVIRON_PREFIX
         return dict_from_environs(prefix, self.name, list(self.arguments.keys()))
 
-    def _process_data(self, **data) -> dict:
+    def _process_data(self, data: dict) -> dict:
         """
         The main method that process all resources data. Validates schema, gets environs, validates data, prepares
          it via provider requirements, merges defaults and check for data dependencies
@@ -92,8 +95,7 @@ class SchemaResource(ABC):
         """
         env_prefix = data.pop("env_prefix", None)
         environs = self._get_environs(env_prefix)
-        if environs:
-            data = merge_dicts(data, environs)
+        data = merge_dicts(data, environs)
 
         data = self.validate_data(data).dict()
         return data
@@ -154,7 +156,7 @@ class Provider(SchemaResource, ABC):
         :raises: :class:`~notifiers.exceptions.NotificationError` if ``raise_on_errors`` is set to True and response
          contained errors
         """
-        data = self._process_data(**kwargs)
+        data = self._process_data(kwargs)
         rsp = self._send_notification(data)
         if raise_on_errors:
             rsp.raise_on_errors()

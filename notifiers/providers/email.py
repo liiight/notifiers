@@ -10,14 +10,12 @@ from smtplib import SMTPSenderRefused
 from smtplib import SMTPServerDisconnected
 from typing import List
 from typing import Tuple
-from typing import Union
 
 from pydantic import AnyUrl
 from pydantic import EmailStr
 from pydantic import Field
 from pydantic import FilePath
 from pydantic import root_validator
-from pydantic import StrictInt
 from pydantic import validator
 
 from ..models.provider import Provider
@@ -25,29 +23,25 @@ from ..models.provider import SchemaModel
 from ..models.response import Response
 
 
-def single_or_list(type_):
-    return Union[type_, List[type_]]
-
-
 class SMTPSchema(SchemaModel):
     message: str = Field(..., description="The content of the email message")
     subject: str = Field(
         "New email from 'notifiers'!", description="The subject of the email message"
     )
-    to: single_or_list(EmailStr) = Field(
+    to: SchemaModel.single_or_list(EmailStr) = Field(
         ..., description="One or more email addresses to use"
     )
-    from_: single_or_list(EmailStr) = Field(
+    from_: SchemaModel.single_or_list(EmailStr) = Field(
         f"{getpass.getuser()}@{socket.getfqdn()}",
         description="One or more FROM addresses to use",
         alias="from",
         title="from",
     )
-    attachment: single_or_list(FilePath) = Field(
+    attachments: SchemaModel.single_or_list(FilePath) = Field(
         None, description="One or more attachments to use in the email"
     )
-    hostname: AnyUrl = Field("localhost", description="The host of the SMTP server")
-    port: StrictInt = Field(25, gt=0, lte=65535, description="The port number to use")
+    host: AnyUrl = Field("localhost", description="The host of the SMTP server")
+    port: int = Field(25, gt=0, lte=65535, description="The port number to use")
     username: str = Field(None, description="Username if relevant")
     password: str = Field(None, description="Password if relevant")
     tls: bool = Field(False, description="Should TLS be used")
@@ -61,7 +55,7 @@ class SMTPSchema(SchemaModel):
             raise ValueError("Cannot set password without sending a username")
         return values
 
-    @validator("to", "from_", "attachment")
+    @validator("to", "from_", "attachments")
     def values_to_list(cls, v):
         return cls.to_list(v)
 

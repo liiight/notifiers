@@ -4,8 +4,6 @@ from .exceptions import NoSuchNotifierError
 from .models.provider import Provider
 from .models.response import Response
 
-DEFAULT_ENVIRON_PREFIX = "NOTIFIERS_"
-
 log = logging.getLogger("notifiers")
 
 FAILURE_STATUS = "Failure"
