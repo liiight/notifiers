@@ -66,6 +66,7 @@ class SchemaResource(ABC):
         :param response: :class:`requests.Response` if exist
         :param errors: List of errors if relevant
         """
+        # todo save both original and validated data, add to the response
         status = ResponseStatus.FAILURE if errors else ResponseStatus.SUCCESS
         return Response(
             status=status,
@@ -85,7 +86,7 @@ class SchemaResource(ABC):
         """
         return dict_from_environs(prefix, self.name, list(self.arguments.keys()))
 
-    def _process_data(self, data: dict) -> dict:
+    def _process_data(self, data: dict) -> SchemaModel:
         """
         The main method that process all resources data. Validates schema, gets environs, validates data, prepares
          it via provider requirements, merges defaults and check for data dependencies
@@ -97,7 +98,7 @@ class SchemaResource(ABC):
         environs = self._get_environs(env_prefix)
         data = merge_dicts(data, environs)
 
-        data = self.validate_data(data).dict()
+        data = self.validate_data(data)
         return data
 
 
@@ -137,7 +138,7 @@ class Provider(SchemaResource, ABC):
         return list(self._resources.keys())
 
     @abstractmethod
-    def _send_notification(self, data: dict) -> Response:
+    def _send_notification(self, data: SchemaModel) -> Response:
         """
         The core method to trigger the provider notification. Must be overridden.
 

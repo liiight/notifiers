@@ -1,17 +1,21 @@
+from pydantic import AnyUrl
+from pydantic import Field
+
 from . import email
+
+GMAIL_SMTP_HOST = "smtp.gmail.com"
+
+
+class GmailSchema(email.SMTPSchema):
+    host: AnyUrl = Field(GMAIL_SMTP_HOST, description="The host of the SMTP server")
+    port: int = Field(587, gt=0, lte=65535, description="The port number to use")
+    tls: bool = Field(True, description="Should TLS be used")
 
 
 class Gmail(email.SMTP):
     """Send email via Gmail"""
 
     site_url = "https://www.google.com/gmail/about/"
-    base_url = "smtp.gmail.com"
+    base_url = GMAIL_SMTP_HOST
     name = "gmail"
-
-    @property
-    def defaults(self) -> dict:
-        data = super().defaults
-        data["host"] = self.base_url
-        data["port"] = 587
-        data["tls"] = True
-        return data
+    schema_model = GmailSchema

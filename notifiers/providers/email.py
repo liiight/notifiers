@@ -86,14 +86,14 @@ class SMTP(Provider):
         self.configuration = None
 
     @staticmethod
-    def _build_email(data: dict) -> EmailMessage:
+    def _build_email(data: SMTPSchema) -> EmailMessage:
         email = EmailMessage()
-        email["To"] = data["to"]
-        email["From"] = data["from"]
-        email["Subject"] = data["subject"]
+        email["To"] = data.to
+        email["From"] = data.from_
+        email["Subject"] = data.subject
         email["Date"] = formatdate(localtime=True)
-        content_type = "html" if data["html"] else "plain"
-        email.add_alternative(data["message"], subtype=content_type)
+        content_type = "html" if data.html else "plain"
+        email.add_alternative(data.message, subtype=content_type)
         return email
 
     def _add_attachments(self, attachments: List[Path], email: EmailMessage):
@@ -106,22 +106,22 @@ class SMTP(Provider):
                 filename=attachment.name,
             )
 
-    def _connect_to_server(self, data: dict):
-        self.smtp_server = smtplib.SMTP_SSL if data["ssl"] else smtplib.SMTP
-        self.smtp_server = self.smtp_server(data["host"], data["port"])
+    def _connect_to_server(self, data: SMTPSchema):
+        self.smtp_server = smtplib.SMTP_SSL if data.ssl else smtplib.SMTP
+        self.smtp_server = self.smtp_server(data.host, data.port)
         self.configuration = self._get_configuration(data)
-        if data["tls"] and not data["ssl"]:
+        if data.tls and not data.ssl:
             self.smtp_server.ehlo()
             self.smtp_server.starttls()
 
-        if data["login"] and data.get("username"):
-            self.smtp_server.login(data["username"], data["password"])
+        if data.login and data.username:
+            self.smtp_server.login(data.username, data.password)
 
     @staticmethod
-    def _get_configuration(data: dict) -> tuple:
-        return data["host"], data["port"], data.get("username")
+    def _get_configuration(data: SMTPSchema) -> tuple:
+        return data.host, data.port, data.username
 
-    def _send_notification(self, data: dict) -> Response:
+    def _send_notification(self, data: SMTPSchema) -> Response:
         errors = None
         try:
             configuration = self._get_configuration(data)
@@ -132,8 +132,8 @@ class SMTP(Provider):
             ):
                 self._connect_to_server(data)
             email = self._build_email(data)
-            if data.get("attachments"):
-                self._add_attachments(data["attachments"], email)
+            if data.attachments:
+                self._add_attachments(data.attachments, email)
             self.smtp_server.send_message(email)
         except (
             SMTPServerDisconnected,
@@ -144,4 +144,4 @@ class SMTP(Provider):
             SMTPAuthenticationError,
         ) as e:
             errors = [str(e)]
-        return self.create_response(data, errors=errors)
+        return self.create_response(data.dict(), errors=errors)
