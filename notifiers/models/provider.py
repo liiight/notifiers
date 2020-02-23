@@ -5,6 +5,7 @@ from typing import Union
 
 import requests
 from pydantic import BaseModel
+from pydantic import Extra
 from pydantic import ValidationError
 
 from notifiers.exceptions import BadArguments
@@ -28,6 +29,10 @@ class SchemaModel(BaseModel):
     @staticmethod
     def single_or_list(type_):
         return Union[type_, List[type_]]
+
+    class Config:
+        allow_population_by_field_name = True
+        extra = Extra.forbid
 
 
 class SchemaResource(ABC):
