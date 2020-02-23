@@ -1,8 +1,24 @@
+from urllib.parse import urljoin
+
+from pydantic import Field
+
 from ..exceptions import ResourceError
 from ..models.provider import Provider
 from ..models.provider import ProviderResource
+from ..models.provider import SchemaModel
 from ..models.response import Response
 from ..utils import requests
+
+
+class GitterRoomSchema(SchemaModel):
+    token: str = Field(..., description="Access token")
+    filter: str = Field(None, description="Filter results")
+
+
+class GitterSchema(SchemaModel):
+    text: str = Field(..., description="Body of the message", alias="message")
+    token: str = Field(..., description="Access token")
+    room_id: str = Field(..., description="ID of the room to send the notification to")
 
 
 class GitterMixin:
@@ -13,7 +29,8 @@ class GitterMixin:
     path_to_errors = "errors", "error"
     base_url = "https://api.gitter.im/v1/rooms"
 
-    def _get_headers(self, token: str) -> dict:
+    @staticmethod
+    def _get_headers(token: str) -> dict:
         """
         Builds Gitter requests header bases on the token provided
 
@@ -27,22 +44,14 @@ class GitterRooms(GitterMixin, ProviderResource):
     """Returns a list of Gitter rooms via token"""
 
     resource_name = "rooms"
+    schema_model = GitterRoomSchema
 
-    _required = {"required": ["token"]}
+    def _get_resource(self, data: GitterRoomSchema) -> list:
+        headers = self._get_headers(data.token)
+        params = {}
+        if data.filter:
+            params["q"] = data.filter
 
-    _schema = {
-        "type": "object",
-        "properties": {
-            "token": {"type": "string", "title": "access token"},
-            "filter": {"type": "string", "title": "Filter results"},
-        },
-        "additionalProperties": False,
-    }
-
-    def _get_resource(self, data: dict) -> list:
-        headers = self._get_headers(data["token"])
-        filter_ = data.get("filter")
-        params = {"q": filter_} if filter_ else {}
         response, errors = requests.get(
             self.base_url,
             headers=headers,
@@ -58,7 +67,7 @@ class GitterRooms(GitterMixin, ProviderResource):
                 response=response,
             )
         rsp = response.json()
-        return rsp["results"] if filter_ else rsp
+        return rsp["results"] if data.filter else rsp
 
 
 class Gitter(GitterMixin, Provider):
@@ -66,26 +75,9 @@ class Gitter(GitterMixin, Provider):
 
     message_url = "/{room_id}/chatMessages"
     site_url = "https://gitter.im"
+    schema_model = GitterSchema
 
     _resources = {"rooms": GitterRooms()}
-
-    _required = {"required": ["message", "token", "room_id"]}
-    _schema = {
-        "type": "object",
-        "properties": {
-            "message": {"type": "string", "title": "Body of the message"},
-            "token": {"type": "string", "title": "access token"},
-            "room_id": {
-                "type": "string",
-                "title": "ID of the room to send the notification to",
-            },
-        },
-        "additionalProperties": False,
-    }
-
-    def _prepare_data(self, data: dict) -> dict:
-        data["text"] = data.pop("message")
-        return data
 
     @property
     def metadata(self) -> dict:
@@ -93,9 +85,10 @@ class Gitter(GitterMixin, Provider):
         metadata["message_url"] = self.message_url
         return metadata
 
-    def _send_notification(self, data: dict) -> Response:
+    def _send_notification(self, data: GitterSchema) -> Response:
+        data = data.dict()
         room_id = data.pop("room_id")
-        url = self.base_url + self.message_url.format(room_id=room_id)
+        url = urljoin(self.base_url, self.message_url.format(room_id=room_id))
 
         headers = self._get_headers(data.pop("token"))
         response, errors = requests.post(

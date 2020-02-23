@@ -61,6 +61,7 @@ class NotificationError(NotifierException):
     """
 
     def __init__(self, *args, **kwargs):
+        # todo improve visibility of original exception
         self.errors = kwargs.pop("errors", None)
         kwargs["message"] = f'Notification errors: {",".join(self.errors)}'
         super().__init__(*args, **kwargs)

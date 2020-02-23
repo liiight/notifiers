@@ -182,7 +182,7 @@ class ProviderResource(SchemaResource, ABC):
         pass
 
     def __call__(self, **kwargs):
-        data = self._process_data(**kwargs)
+        data = self._process_data(kwargs)
         return self._get_resource(data)
 
     def __repr__(self):
