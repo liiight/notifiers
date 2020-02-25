@@ -15,62 +15,11 @@ from ..models.provider import SchemaModel
 from ..models.response import Response
 
 
-class JoinMixin:
-    """Shared resources between :class:`Join` and :class:`JoinDevices`"""
-
-    name = "join"
-    base_url = "https://joinjoaomgcd.appspot.com/_ah/api/messaging/v1"
-
-    @staticmethod
-    def _join_request(url: str, data: dict) -> tuple:
-        # Can 't use generic requests util since API doesn't always return error status
-        errors = None
-        try:
-            response = requests.get(url, params=data)
-            response.raise_for_status()
-            rsp = response.json()
-            if not rsp["success"]:
-                errors = [rsp["errorMessage"]]
-        except requests.RequestException as e:
-            if e.response is not None:
-                response = e.response
-                try:
-                    errors = [response.json()["errorMessage"]]
-                except json.decoder.JSONDecodeError:
-                    errors = [response.text]
-            else:
-                response = None
-                errors = [(str(e))]
-
-        return response, errors
-
-
 class JoinBaseSchema(SchemaModel):
     api_key: str = Field(..., description="User API key", alias="apikey")
 
     class Config:
         extra = Extra.forbid
-
-
-class JoinDevices(JoinMixin, ProviderResource):
-    """Return a list of Join devices IDs"""
-
-    resource_name = "devices"
-    devices_url = "/listDevices"
-    schema_model = JoinBaseSchema
-
-    def _get_resource(self, data: dict):
-        url = urljoin(self.base_url, self.devices_url)
-        response, errors = self._join_request(url, data)
-        if errors:
-            raise ResourceError(
-                errors=errors,
-                resource=self.resource_name,
-                provider=self.name,
-                data=data,
-                response=response,
-            )
-        return response.json()["records"]
 
 
 class JoinSchema(JoinBaseSchema):
@@ -171,6 +120,57 @@ class JoinSchema(JoinBaseSchema):
         allow_population_by_field_name = True
 
 
+class JoinMixin:
+    """Shared resources between :class:`Join` and :class:`JoinDevices`"""
+
+    name = "join"
+    base_url = "https://joinjoaomgcd.appspot.com/_ah/api/messaging/v1"
+
+    @staticmethod
+    def _join_request(url: str, data: JoinBaseSchema) -> tuple:
+        # Can 't use generic requests util since API doesn't always return error status
+        errors = None
+        try:
+            response = requests.get(url, params=data.dict(by_alias=True))
+            response.raise_for_status()
+            rsp = response.json()
+            if not rsp["success"]:
+                errors = [rsp["errorMessage"]]
+        except requests.RequestException as e:
+            if e.response is not None:
+                response = e.response
+                try:
+                    errors = [response.json()["errorMessage"]]
+                except json.decoder.JSONDecodeError:
+                    errors = [response.text]
+            else:
+                response = None
+                errors = [(str(e))]
+
+        return response, errors
+
+
+class JoinDevices(JoinMixin, ProviderResource):
+    """Return a list of Join devices IDs"""
+
+    resource_name = "devices"
+    devices_url = "/listDevices"
+    schema_model = JoinBaseSchema
+
+    def _get_resource(self, data: JoinBaseSchema):
+        url = urljoin(self.base_url, self.devices_url)
+        response, errors = self._join_request(url, data)
+        if errors:
+            raise ResourceError(
+                errors=errors,
+                resource=self.resource_name,
+                provider=self.name,
+                data=data,
+                response=response,
+            )
+        return response.json()["records"]
+
+
 class Join(JoinMixin, Provider):
     """Send Join notifications"""
 
@@ -180,8 +180,8 @@ class Join(JoinMixin, Provider):
     _resources = {"devices": JoinDevices()}
     schema_model = JoinSchema
 
-    def _send_notification(self, data: dict) -> Response:
+    def _send_notification(self, data: JoinSchema) -> Response:
         # Can 't use generic requests util since API doesn't always return error status
         url = urljoin(self.base_url, self.push_url)
         response, errors = self._join_request(url, data)
-        return self.create_response(data, response, errors)
+        return self.create_response(data.dict(), response, errors)
