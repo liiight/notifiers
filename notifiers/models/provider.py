@@ -1,5 +1,6 @@
 from abc import ABC
 from abc import abstractmethod
+from typing import Any
 from typing import List
 from typing import Union
 
@@ -21,10 +22,16 @@ class SchemaModel(BaseModel):
     """The base class for Schemas"""
 
     @staticmethod
-    def to_list(value):
+    def to_list(value: Union[Any, List[Any]]) -> List[Any]:
         if not isinstance(value, list):
             return [value]
         return value
+
+    @staticmethod
+    def to_comma_separated(values: Union[Any, List[Any]]) -> str:
+        if not isinstance(values, list):
+            values = [values]
+        return ",".join(values)
 
     @staticmethod
     def single_or_list(type_):
