@@ -19,19 +19,25 @@ class TestMailgun:
     @pytest.mark.parametrize(
         "data, message",
         [
-            ({}, "to"),
-            ({"to": "foo"}, "domain"),
-            ({"to": "foo", "domain": "bla"}, "api_key"),
-            ({"to": "foo", "domain": "bla", "api_key": "bla"}, "from"),
+            ({}, "Either 'text' or 'html' are required"),
+            ({"message": "foo"}, "api_key\n  field required"),
             (
-                {"to": "foo", "domain": "bla", "api_key": "bla", "from": "bbb"},
-                "message",
+                {"message": "foo", "to": "non-email"},
+                "to\n  value is not a valid email address",
+            ),
+            (
+                {"message": "foo", "to": "1@1.com", "api_key": "foo"},
+                "domain\n  field required",
+            ),
+            (
+                {"message": "foo", "to": "1@1.com", "api_key": "foo", "domain": "foo"},
+                "from\n  field required",
             ),
         ],
     )
     def test_mailgun_missing_required(self, data, message, provider):
         data["env_prefix"] = "test"
-        with pytest.raises(BadArguments, match=f"'{message}' is a required property"):
+        with pytest.raises(BadArguments, match=message):
             provider.notify(**data)
 
     @pytest.mark.online
