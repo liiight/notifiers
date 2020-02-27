@@ -27,7 +27,7 @@ which is shared among all notifiers and replaced internally as needed.
 Snake Case
 ~~~~~~~~~~
 
-While the majority of providers already expect lower case and speicfically snake cased properties in their request, some do not.
+While the majority of providers already expect lower case and specifically snake cased properties in their request, some do not.
 Notifiers normalizes this by making all request properties snake case and converting to relevant usage behind the scenes.
 
 Reserved words issue
@@ -44,7 +44,7 @@ The first is to construct data via a dict and unpack it into the :meth:`~notifie
    ... }
    >>> provider.notify(**data)
 
-The other is to use an alternate key word, which would always be the reservred key word followed by an underscore:
+The other is to use an alternate key word, which would always be the reserved key word followed by an underscore:
 
 .. code:: python
 
