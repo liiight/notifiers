@@ -1,4 +1,3 @@
-import json
 from datetime import datetime
 from enum import Enum
 from typing import List
@@ -119,9 +118,8 @@ class PagerDuty(Provider):
     schema_model = PagerDutySchema
 
     def _send_notification(self, data: PagerDutySchema) -> Response:
-        data = json.loads(data.json(exclude_none=True, by_alias=True))
         url = self.base_url
         response, errors = requests.post(
-            url, json=data, path_to_errors=self.path_to_errors
+            url, json=data.to_dict(), path_to_errors=self.path_to_errors
         )
         return self.create_response(data, response, errors)

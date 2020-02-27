@@ -1,3 +1,4 @@
+import json
 from abc import ABC
 from abc import abstractmethod
 from typing import Any
@@ -37,6 +38,12 @@ class SchemaModel(BaseModel):
     @staticmethod
     def single_or_list(type_):
         return Union[List[type_], type_]
+
+    def to_dict(self, exclude_none: bool = True, by_alias: bool = True) -> dict:
+        """A helper method to a very common dict builder.
+        Round tripping to json and back to dict is needed since the model can contain special object that need
+         to be transformed to json first (like enums)"""
+        return json.loads(self.json(exclude_none=exclude_none, by_alias=by_alias))
 
     class Config:
         allow_population_by_field_name = True
