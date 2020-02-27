@@ -2,7 +2,6 @@
 from . import email
 from . import gitter
 from . import gmail
-from . import hipchat
 from . import join
 from . import mailgun
 from . import pagerduty
@@ -26,7 +25,6 @@ _all_providers = {
     "gitter": gitter.Gitter,
     # "pushbullet": pushbullet.Pushbullet,
     # "join": join.Join,
-    # "hipchat": hipchat.HipChat,
     # "zulip": zulip.Zulip,
     # "twilio": twilio.Twilio,
     # "pagerduty": pagerduty.PagerDuty,
