@@ -2,6 +2,7 @@ from abc import ABC
 from abc import abstractmethod
 from typing import Any
 from typing import List
+from typing import Optional
 from typing import Union
 
 import requests
@@ -51,15 +52,21 @@ class SchemaResource(ABC):
     @abstractmethod
     def name(self) -> str:
         """Resource provider name"""
-        pass
 
     @property
     def schema(self) -> dict:
+        """Resource's JSON schema as a dict"""
         return self.schema_model.schema()
 
     @property
     def arguments(self) -> dict:
+        """Resource's arguments"""
         return self.schema["properties"]
+
+    @property
+    def required(self) -> Optional[List[str]]:
+        """Resource's required arguments. Note that additional validation may not be represented here"""
+        return self.schema.get("required")
 
     def validate_data(self, data: dict) -> SchemaModel:
         try:
