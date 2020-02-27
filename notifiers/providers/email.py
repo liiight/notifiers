@@ -11,7 +11,6 @@ from smtplib import SMTPServerDisconnected
 from typing import List
 from typing import Tuple
 
-from pydantic import AnyUrl
 from pydantic import EmailStr
 from pydantic import Field
 from pydantic import FilePath
@@ -40,7 +39,7 @@ class SMTPSchema(SchemaModel):
     attachments: SchemaModel.single_or_list(FilePath) = Field(
         None, description="One or more attachments to use in the email"
     )
-    host: AnyUrl = Field("localhost", description="The host of the SMTP server")
+    host: str = Field("localhost", description="The host of the SMTP server")
     port: int = Field(25, gt=0, lte=65535, description="The port number to use")
     username: str = Field(None, description="Username if relevant")
     password: str = Field(None, description="Password if relevant")
@@ -55,9 +54,13 @@ class SMTPSchema(SchemaModel):
             raise ValueError("Cannot set password without sending a username")
         return values
 
-    @validator("to", "from_", "attachments")
+    @validator("attachments")
     def values_to_list(cls, v):
         return cls.to_list(v)
+
+    @validator("to", "from_")
+    def comma_separated(cls, v):
+        return cls.to_comma_separated(v)
 
 
 class SMTP(Provider):
