@@ -31,11 +31,11 @@ class SchemaModel(BaseModel):
     def to_comma_separated(values: Union[Any, List[Any]]) -> str:
         if not isinstance(values, list):
             values = [values]
-        return ",".join(values)
+        return ",".join(str(value) for value in values)
 
     @staticmethod
     def single_or_list(type_):
-        return Union[type_, List[type_]]
+        return Union[List[type_], type_]
 
     class Config:
         allow_population_by_field_name = True
@@ -64,9 +64,8 @@ class SchemaResource(ABC):
     def validate_data(self, data: dict) -> SchemaModel:
         try:
             return self.schema_model.parse_obj(data)
-        except ValidationError:
-            # todo handle validation error and return custom
-            raise BadArguments
+        except ValidationError as e:
+            raise BadArguments(validation_error=(str(e)), orig_excp=e)
 
     def create_response(
         self, data: dict = None, response: requests.Response = None, errors: list = None
@@ -88,7 +87,7 @@ class SchemaResource(ABC):
             errors=errors,
         )
 
-    def _get_environs(self, prefix: str = DEFAULT_ENVIRON_PREFIX) -> dict:
+    def _get_environs(self, prefix: str) -> dict:
         """
         Fetches set environment variables if such exist, via the :func:`~notifiers.utils.helpers.dict_from_environs`
         Searches for `[PREFIX_NAME]_[PROVIDER_NAME]_[ARGUMENT]` for each of the arguments defined in the schema
@@ -106,7 +105,7 @@ class SchemaResource(ABC):
         :param data: The raw data passed by the notifiers client
         :return: Processed data
         """
-        env_prefix = data.pop("env_prefix", None)
+        env_prefix = data.pop("env_prefix", DEFAULT_ENVIRON_PREFIX)
         environs = self._get_environs(env_prefix)
         data = merge_dicts(data, environs)
 

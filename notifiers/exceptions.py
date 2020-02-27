@@ -1,3 +1,6 @@
+from pydantic import ValidationError
+
+
 class NotifierException(Exception):
     """Base notifier exception. Catch this to catch all of :mod:`notifiers` errors"""
 
@@ -26,7 +29,9 @@ class BadArguments(NotifierException):
     :param kwargs: Exception kwargs
     """
 
-    def __init__(self, validation_error: str, *args, **kwargs):
+    def __init__(
+        self, validation_error: str, orig_excp: ValidationError, *args, **kwargs
+    ):
         kwargs["message"] = f"Error with sent data: {validation_error}"
         super().__init__(*args, **kwargs)
 

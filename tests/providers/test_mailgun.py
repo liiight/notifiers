@@ -1,6 +1,4 @@
 import datetime
-import time
-from email import utils
 
 import pytest
 
@@ -50,7 +48,6 @@ class TestMailgun:
         file_2.write("content")
 
         now = datetime.datetime.now() + datetime.timedelta(minutes=3)
-        rfc_2822 = utils.formatdate(time.mktime(now.timetuple()))
         data = {
             "message": test_message,
             "html": f"<b>{now}</b>",
@@ -59,8 +56,8 @@ class TestMailgun:
             "inline": [file_1.strpath, file_2.strpath],
             "tag": ["foo", "bar"],
             "dkim": True,
-            "deliverytime": rfc_2822,
-            "testmode": False,
+            "delivery_time": now,
+            "test_mode": False,
             "tracking": True,
             "tracking_clicks": "htmlonly",
             "tracking_opens": True,

@@ -1,5 +1,7 @@
 import json
 import logging
+from pathlib import Path
+from typing import List
 
 import requests
 
@@ -80,7 +82,7 @@ def post(url: str, *args, **kwargs) -> tuple:
 
 
 def file_list_for_request(
-    list_of_paths: list, key_name: str, mimetype: str = None
+    list_of_paths: List[Path], key_name: str, mimetype: str = None
 ) -> list:
     """
     Convenience function to construct a list of files for multiple files upload by :mod:`requests`
@@ -92,7 +94,7 @@ def file_list_for_request(
     """
     if mimetype:
         return [
-            (key_name, (file, open(file, mode="rb"), mimetype))
+            (key_name, (file.name, file.read_bytes(), mimetype))
             for file in list_of_paths
         ]
-    return [(key_name, (file, open(file, mode="rb"))) for file in list_of_paths]
+    return [(key_name, (file.name, file.read_bytes())) for file in list_of_paths]

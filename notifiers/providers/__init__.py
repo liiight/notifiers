@@ -30,7 +30,7 @@ _all_providers = {
     # "zulip": zulip.Zulip,
     # "twilio": twilio.Twilio,
     # "pagerduty": pagerduty.PagerDuty,
-    # "mailgun": mailgun.MailGun,
+    "mailgun": mailgun.MailGun,
     # "popcornnotify": popcornnotify.PopcornNotify,
     # "statuspage": statuspage.Statuspage,
 }

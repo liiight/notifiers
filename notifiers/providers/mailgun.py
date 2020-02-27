@@ -1,14 +1,15 @@
 import json
+import time
+from datetime import datetime
+from email import utils as email_utils
 from typing import Dict
+from typing import List
 from typing import Union
 
-from pendulum import DateTime
-from pendulum import now
 from pydantic import conint
 from pydantic import EmailStr
 from pydantic import Field
 from pydantic import FilePath
-from pydantic import Json
 from pydantic import NameEmail
 from pydantic import root_validator
 from pydantic import validator
@@ -26,7 +27,7 @@ class MailGunSchema(SchemaModel):
     from_: NameEmail = Field(
         ..., description="Email address for 'From' header", alias="from"
     )
-    to: SchemaModel.single_or_list(NameEmail) = Field(
+    to: SchemaModel.single_or_list(Union[EmailStr, NameEmail]) = Field(
         ..., description="Email address of the recipient(s)"
     )
     cc: SchemaModel.single_or_list(NameEmail) = Field(
@@ -66,7 +67,7 @@ class MailGunSchema(SchemaModel):
         " in case of template sending",
         alias="t:text",
     )
-    tag: SchemaModel.single_or_list(str) = Field(
+    tag: List[str] = Field(
         None,
         description="Tag string. See Tagging for more information",
         alias="o:tag",
@@ -78,7 +79,7 @@ class MailGunSchema(SchemaModel):
         description="Enables/disables DKIM signatures on per-message basis. Pass yes, no, true or false",
         alias="o:dkim",
     )
-    delivery_time: DateTime = Field(
+    delivery_time: datetime = Field(
         None,
         description="Desired time of delivery. Note: Messages can be scheduled for a maximum of 3 days in the future.",
         alias="o:deliverytime",
@@ -126,7 +127,7 @@ class MailGunSchema(SchemaModel):
         None,
         description="Add arbitrary value(s) to append a custom MIME header to the message",
     )
-    data: SchemaModel.single_or_list(Dict[str, Json]) = Field(
+    data: Dict[str, dict] = Field(
         None, description="Attach a custom JSON data to the message"
     )
     recipient_variables: Dict[EmailStr, Dict[str, str]] = Field(
@@ -138,13 +139,10 @@ class MailGunSchema(SchemaModel):
 
     @validator("tag", pre=True, each_item=True)
     def validate_tag(cls, v):
-        if not isinstance(v, list):
-            v = [v]
-        for v_ in v:
-            try:
-                v_.encode("ascii")
-            except UnicodeEncodeError:
-                raise ValueError("Value must be valid ascii")
+        try:
+            v.encode("ascii")
+        except UnicodeEncodeError:
+            raise ValueError("Value must be valid ascii")
         return v
 
     @root_validator()
@@ -174,13 +172,15 @@ class MailGunSchema(SchemaModel):
     def hours_to_str(cls, v):
         return f"{v}h"
 
-    @validator("delivery_time", pre=True)
-    def valid_delivery_time(cls, v: DateTime):
-        if v.diff(now("utc")).days > 3:
+    @validator("delivery_time")
+    def valid_delivery_time(cls, v: datetime):
+        now = datetime.now()
+        delta = now - v
+        if delta.days > 3:
             raise ValueError(
                 "Messages can be scheduled for a maximum of 3 days in the future"
             )
-        return v.to_rfc2822_string()
+        return email_utils.formatdate(time.mktime(v.timetuple()))
 
     @validator("t_text", "test_mode")
     def true_to_yes(cls, v):
@@ -202,6 +202,8 @@ class MailGun(Provider):
     site_url = "https://documentation.mailgun.com/"
     name = "mailgun"
     path_to_errors = ("message",)
+
+    schema_model = MailGunSchema
 
     def _send_notification(self, data: MailGunSchema) -> Response:
         data = data.dict(by_alias=True, exclude_none=True)
