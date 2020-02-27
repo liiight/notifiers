@@ -1,4 +1,6 @@
 import json
+from enum import Enum
+from typing import Union
 from urllib.parse import urljoin
 
 import requests
@@ -15,11 +17,21 @@ from ..models.provider import SchemaModel
 from ..models.response import Response
 
 
+class JoinGroup(Enum):
+    all_ = "group.all"
+    android = "group.android"
+    windows_10 = "group.windows10"
+    phone = "group.phone"
+    tablet = "group.tablet"
+    pc = "group.pc"
+
+
 class JoinBaseSchema(SchemaModel):
     api_key: str = Field(..., description="User API key", alias="apikey")
 
     class Config:
         extra = Extra.forbid
+        json_encoders = {JoinGroup: lambda v: v.value}
 
 
 class JoinSchema(JoinBaseSchema):
@@ -29,8 +41,8 @@ class JoinSchema(JoinBaseSchema):
         description="Usually used as a Tasker or EventGhost command."
         " Can also be used with URLs and Files to add a description for those elements",
     )
-    device_id: str = Field(
-        "group.all",
+    device_id: Union[str, JoinGroup] = Field(
+        JoinGroup.all_,
         description="The device ID or group ID of the device you want to send the message to",
         alias="deviceId",
     )
@@ -57,8 +69,24 @@ class JoinSchema(JoinBaseSchema):
     mms_file: HttpUrl = Field(
         None, description="A publicly accessible MMS file URL", alias="mmsfile"
     )
+    mms_subject: str = Field(
+        None,
+        description="Subject for the message. This will make the sent message be an MMS instead of an SMS",
+        alias="mmssubject",
+    )
+    mms_urgent: bool = Field(
+        None,
+        description="Set to 1 if this is an urgent MMS. This will make the sent message be an MMS instead of an SMS",
+        alias="mmsurgent",
+    )
     wallpaper: HttpUrl = Field(
         None, description="A publicly accessible URL of an image file"
+    )
+    lock_wallpaper: HttpUrl = Field(
+        None,
+        description="A publicly accessible URL of an image file."
+        " Will set the lockscreen wallpaper on the receiving device if the device has Android 7 or above",
+        alias="lockWallpaper",
     )
     icon: HttpUrl = Field(None, description="Notification's icon URL")
     small_icon: HttpUrl = Field(
@@ -70,6 +98,12 @@ class JoinSchema(JoinBaseSchema):
     )
     sms_text: str = Field(
         None, description="Some text to send in an SMS", alias="smstext"
+    )
+    sms_contact_name: str = Field(
+        None,
+        description="Alternatively to the smsnumber you can specify this and Join will send the SMS"
+        " to the first number that matches the name",
+        alias="smscontactname",
     )
     call_number: str = Field(None, description="Number to call to", alias="callnumber")
     interruption_filter: int = Field(
@@ -100,6 +134,25 @@ class JoinSchema(JoinBaseSchema):
     group: str = Field(
         None, description="Allows you to join notifications in different groups"
     )
+    say: str = Field(None, description="Say some text out loud")
+    language: str = Field(None, description="The language to use for the say text")
+    app: str = Field(
+        None, description="App name of the app you want to open on the remote device"
+    )
+    app_package: str = Field(
+        None,
+        description="Package name of the app you want to open on the remote device",
+        alias="appPackage",
+    )
+    dismiss_on_touch: bool = Field(
+        None,
+        description="Set to true to make the notification go away when you touch it",
+        alias="dismissOnTouch",
+    )
+
+    @validator("mms_urgent", pre=True)
+    def mms_urgent(cls, v):
+        return int(v)
 
     @root_validator(pre=True)
     def sms_validation(cls, values):
@@ -130,8 +183,9 @@ class JoinMixin:
     def _join_request(url: str, data: JoinBaseSchema) -> tuple:
         # Can 't use generic requests util since API doesn't always return error status
         errors = None
+        params = json.loads(data.json(by_alias=True, exclude_none=True))
         try:
-            response = requests.get(url, params=data.dict(by_alias=True))
+            response = requests.get(url, params=params)
             response.raise_for_status()
             rsp = response.json()
             if not rsp["success"]:
