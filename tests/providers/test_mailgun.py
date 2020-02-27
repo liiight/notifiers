@@ -2,8 +2,8 @@ import datetime
 
 import pytest
 
-from notifiers.core import FAILURE_STATUS
 from notifiers.exceptions import BadArguments
+from notifiers.models.response import ResponseStatus
 
 provider = "mailgun"
 
@@ -83,5 +83,5 @@ class TestMailgun:
             "from": "foo@foo.com",
         }
         rsp = provider.notify(**data)
-        assert rsp.status == FAILURE_STATUS
+        assert rsp.status is ResponseStatus.FAILURE
         assert "Forbidden" in rsp.errors
