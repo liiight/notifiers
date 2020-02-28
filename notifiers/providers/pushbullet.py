@@ -22,12 +22,15 @@ class PushbulletType(Enum):
     link = "link"
 
 
-class PushbulletSchema(SchemaModel):
+class PushbulletBaseSchema(SchemaModel):
+    token: str = Field(..., description="API access token")
+
+
+class PushbulletSchema(PushbulletBaseSchema):
     type: PushbulletType = Field(PushbulletType.note, description="Type of the push")
     message: str = Field(
         ..., description="Body of the push, used for all types of pushes", alias="body"
     )
-    token: str = Field(..., description="API access token")
     title: str = Field(
         None, description="Title of the push, used for all types of pushes"
     )
@@ -93,14 +96,10 @@ class PushbulletDevices(PushbulletMixin, ProviderResource):
     devices_url = "https://api.pushbullet.com/v2/devices"
 
     _required = {"required": ["token"]}
-    _schema = {
-        "type": "object",
-        "properties": {"token": {"type": "string", "title": "API access token"}},
-        "additionalProperties": False,
-    }
+    schema_model = PushbulletBaseSchema
 
-    def _get_resource(self, data: dict) -> list:
-        headers = self._get_headers(data["token"])
+    def _get_resource(self, data: PushbulletBaseSchema) -> list:
+        headers = self._get_headers(data.token)
         response, errors = requests.get(
             self.devices_url, headers=headers, path_to_errors=self.path_to_errors
         )
