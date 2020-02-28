@@ -90,7 +90,7 @@ class PushoverSchema(PushoverBaseSchema):
     retry: conint(ge=30) = Field(
         None,
         description="Specifies how often (in seconds) the Pushover servers will send the same notification to the user."
-        " requires setting priorty to 2",
+        " requires setting priority to 2",
     )
     expire: conint(le=10800) = Field(
         None,
