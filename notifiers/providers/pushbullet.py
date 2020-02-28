@@ -146,7 +146,7 @@ class Pushbullet(PushbulletMixin, Provider):
             raise error()
         file_data = response.json()
         files = requests.file_list_for_request(
-            [file], "file", mimetype=file_data["file_type"]
+            file, "file", mimetype=file_data["file_type"]
         )
         response, errors = requests.post(
             file_data.pop("upload_url"),
