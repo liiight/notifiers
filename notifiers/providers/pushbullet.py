@@ -66,7 +66,7 @@ class PushbulletSchema(SchemaModel):
         'Example: "993aaa48567d91068e96c75a74644159"',
     )
 
-    @root_validator()
+    @root_validator(skip_on_failure=True)
     def validate_types(cls, values):
         type = values["type"]
         if type is PushbulletType.link and not values.get("url"):
@@ -127,9 +127,9 @@ class Pushbullet(PushbulletMixin, Provider):
 
     def _upload_file(self, file: FilePath, headers: dict) -> dict:
         """Fetches an upload URL and upload the content of the file"""
-        data = {"file_name": file.name, "file_type": guess_type(str(file))}
+        data = {"file_name": file.name, "file_type": guess_type(str(file))[0]}
         response, errors = requests.post(
-            self.file_upload,
+            self.upload_request,
             json=data,
             headers=headers,
             path_to_errors=self.path_to_errors,
@@ -137,7 +137,7 @@ class Pushbullet(PushbulletMixin, Provider):
         error = partial(
             ResourceError,
             errors=errors,
-            resource=self.resource_name,
+            resource="pushbullet_file_upload",
             provider=self.name,
             data=data,
             response=response,
