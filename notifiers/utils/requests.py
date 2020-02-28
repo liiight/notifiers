@@ -14,7 +14,7 @@ class RequestsHelper:
 
     @classmethod
     def request(
-        self,
+        cls,
         url: str,
         method: str,
         raise_for_status: bool = True,
