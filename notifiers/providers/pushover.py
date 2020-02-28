@@ -1,10 +1,129 @@
+from datetime import datetime
+from enum import Enum
+from urllib.parse import urljoin
+
+from pydantic import conint
+from pydantic import Field
+from pydantic import FilePath
+from pydantic import HttpUrl
+from pydantic import root_validator
+from pydantic import validator
+
 from ..exceptions import ResourceError
 from ..models.provider import Provider
 from ..models.provider import ProviderResource
+from ..models.provider import SchemaModel
 from ..models.response import Response
 from ..utils import requests
-from ..utils.schema.helpers import list_to_commas
-from ..utils.schema.helpers import one_or_more
+
+
+class PushoverSound(Enum):
+    pushover = "pushover"
+    bike = "bike"
+    bugle = "bugle"
+    cash_register = "cashregister"
+    classical = "classical"
+    cosmic = "cosmic"
+    falling = "falling"
+    gamelan = "gamelan"
+    incoming = "incoming"
+    intermission = "intermission"
+    magic = "magic"
+    mechanical = "mechanical"
+    piano_bar = "pianobar"
+    siren = "siren"
+    space_alarm = "spacealarm"
+    tug_boat = "tugboat"
+    alien = "alien"
+    climb = "climb"
+    persistent = "persistent"
+    echo = "echo"
+    updown = "updown"
+    none = None
+
+
+class PushoverBaseSchema(SchemaModel):
+    token: str = Field(..., description="Your application's API token ")
+
+
+class PushoverSchema(PushoverBaseSchema):
+    user: PushoverBaseSchema.single_or_list(str) = Field(
+        ..., description="The user/group key (not e-mail address) of your user (or you)"
+    )
+    message: str = Field(..., description="Your message")
+    attachment: FilePath = Field(
+        None, description="An image attachment to send with the message"
+    )
+    device: PushoverBaseSchema.single_or_list(str) = Field(
+        None,
+        description="Your user's device name to send the message directly to that device,"
+        " rather than all of the user's devices",
+    )
+    title: str = Field(
+        None, description="Your message's title, otherwise your app's name is used"
+    )
+    url: HttpUrl = Field(
+        None, description="A supplementary URL to show with your message"
+    )
+    url_title: str = Field(
+        None,
+        description="A title for your supplementary URL, otherwise just the URL is shown",
+    )
+    priority: conint(ge=1, le=5) = Field(
+        None,
+        description="send as -2 to generate no notification/alert, -1 to always send as a quiet notification,"
+        " 1 to display as high-priority and bypass the user's quiet hours,"
+        " or 2 to also require confirmation from the user",
+    )
+    sound: PushoverSound = Field(
+        None,
+        description="The name of one of the sounds supported by device clients to override the "
+        "user's default sound choice ",
+    )
+    timestamp: datetime = Field(
+        None,
+        description="A Unix timestamp of your message's date and time to display to the user,"
+        " rather than the time your message is received by our API ",
+    )
+    html: bool = Field(None, description="Enable HTML formatting")
+    monospace: bool = Field(None, description="Enable monospace messages")
+    retry: conint(ge=30) = Field(
+        None,
+        description="Specifies how often (in seconds) the Pushover servers will send the same notification to the user."
+        " requires setting priorty to 2",
+    )
+    expire: conint(le=10800) = Field(
+        None,
+        description="Specifies how many seconds your notification will continue to be retried for "
+        "(every retry seconds). requires setting priorty to 2",
+    )
+    callback: HttpUrl = Field(
+        None,
+        description="A publicly-accessible URL that our servers will send a request to when the user has"
+        " acknowledged your notification. requires setting priorty to 2",
+    )
+    tags: PushoverBaseSchema.single_or_list(str) = Field(
+        None,
+        description="Arbitrary tags which will be stored with the receipt on our servers",
+    )
+
+    @validator("html", "monospace")
+    def bool_to_num(cls, v):
+        return int(v)
+
+    @validator("user", "device", "tags")
+    def to_csv(cls, v):
+        return cls.to_comma_separated(v)
+
+    @validator("timestamp")
+    def to_timestamp(cls, v: datetime):
+        return v.timestamp()
+
+    @root_validator
+    def html_or_monospace(cls, values):
+        if all(value in values for value in ("html", "monospace")):
+            raise ValueError("Cannot use both 'html' and 'monospace'")
+        return values
 
 
 class PushoverMixin:
@@ -13,26 +132,16 @@ class PushoverMixin:
     path_to_errors = ("errors",)
 
 
-class PushoverResourceMixin(PushoverMixin):
-    _required = {"required": ["token"]}
-
-    _schema = {
-        "type": "object",
-        "properties": {
-            "token": {"type": "string", "title": "your application's API token"}
-        },
-    }
-
-
-class PushoverSounds(PushoverResourceMixin, ProviderResource):
+class PushoverSounds(PushoverMixin, ProviderResource):
     resource_name = "sounds"
     sounds_url = "sounds.json"
 
-    def _get_resource(self, data: dict):
-        url = self.base_url + self.sounds_url
-        params = {"token": data["token"]}
+    schema_model = PushoverBaseSchema
+
+    def _get_resource(self, data: PushoverBaseSchema):
+        url = urljoin(self.base_url, self.sounds_url)
         response, errors = requests.get(
-            url, params=params, path_to_errors=self.path_to_errors
+            url, params=data.to_dict(), path_to_errors=self.path_to_errors
         )
         if errors:
             raise ResourceError(
@@ -45,15 +154,16 @@ class PushoverSounds(PushoverResourceMixin, ProviderResource):
         return list(response.json()["sounds"].keys())
 
 
-class PushoverLimits(PushoverResourceMixin, ProviderResource):
+class PushoverLimits(PushoverMixin, ProviderResource):
     resource_name = "limits"
     limits_url = "apps/limits.json"
 
-    def _get_resource(self, data: dict):
-        url = self.base_url + self.limits_url
-        params = {"token": data["token"]}
+    schema_model = PushoverBaseSchema
+
+    def _get_resource(self, data: PushoverBaseSchema):
+        url = urljoin(self.base_url, self.limits_url)
         response, errors = requests.get(
-            url, params=params, path_to_errors=self.path_to_errors
+            url, params=data.to_dict(), path_to_errors=self.path_to_errors
         )
         if errors:
             raise ResourceError(
@@ -75,105 +185,15 @@ class Pushover(PushoverMixin, Provider):
 
     _resources = {"sounds": PushoverSounds(), "limits": PushoverLimits()}
 
-    _required = {"required": ["user", "message", "token"]}
-    _schema = {
-        "type": "object",
-        "properties": {
-            "user": one_or_more(
-                {
-                    "type": "string",
-                    "title": "the user/group key (not e-mail address) of your user (or you)",
-                }
-            ),
-            "message": {"type": "string", "title": "your message"},
-            "title": {
-                "type": "string",
-                "title": "your message's title, otherwise your app's name is used",
-            },
-            "token": {"type": "string", "title": "your application's API token"},
-            "device": one_or_more(
-                {
-                    "type": "string",
-                    "title": "your user's device name to send the message directly to that device",
-                }
-            ),
-            "priority": {
-                "type": "integer",
-                "minimum": -2,
-                "maximum": 2,
-                "title": "notification priority",
-            },
-            "url": {
-                "type": "string",
-                "format": "uri",
-                "title": "a supplementary URL to show with your message",
-            },
-            "url_title": {
-                "type": "string",
-                "title": "a title for your supplementary URL, otherwise just the URL is shown",
-            },
-            "sound": {
-                "type": "string",
-                "title": "the name of one of the sounds supported by device clients to override the "
-                "user's default sound choice. See `sounds` resource",
-            },
-            "timestamp": {
-                "type": ["integer", "string"],
-                "format": "timestamp",
-                "minimum": 0,
-                "title": "a Unix timestamp of your message's date and time to display to the user, "
-                "rather than the time your message is received by our API",
-            },
-            "retry": {
-                "type": "integer",
-                "minimum": 30,
-                "title": "how often (in seconds) the Pushover servers will send the same notification to the "
-                "user. priority must be set to 2",
-            },
-            "expire": {
-                "type": "integer",
-                "maximum": 86400,
-                "title": "how many seconds your notification will continue to be retried for. "
-                "priority must be set to 2",
-            },
-            "callback": {
-                "type": "string",
-                "format": "uri",
-                "title": "a publicly-accessible URL that our servers will send a request to when the user"
-                " has acknowledged your notification. priority must be set to 2",
-            },
-            "html": {"type": "boolean", "title": "enable HTML formatting"},
-            "attachment": {
-                "type": "string",
-                "format": "valid_file",
-                "title": "an image attachment to send with the message",
-            },
-        },
-        "additionalProperties": False,
-    }
-
-    def _prepare_data(self, data: dict) -> dict:
-        data["user"] = list_to_commas(data["user"])
-        if data.get("device"):
-            data["device"] = list_to_commas(data["device"])
-        if data.get("html") is not None:
-            data["html"] = int(data["html"])
-        if data.get("attachment") and not isinstance(data["attachment"], list):
-            data["attachment"] = [data["attachment"]]
-        return data
+    schema_model = PushoverSchema
 
     def _send_notification(self, data: dict) -> Response:
-        url = self.base_url + self.message_url
-        headers = {}
+        url = urljoin(self.base_url, self.message_url)
         files = []
         if data.get("attachment"):
             files = requests.file_list_for_request(data["attachment"], "attachment")
         response, errors = requests.post(
-            url,
-            data=data,
-            headers=headers,
-            files=files,
-            path_to_errors=self.path_to_errors,
+            url, data=data, files=files, path_to_errors=self.path_to_errors
         )
         return self.create_response(data, response, errors)
 
