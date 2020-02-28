@@ -1,4 +1,6 @@
 from enum import Enum
+from functools import partial
+from mimetypes import guess_type
 
 from pydantic import EmailStr
 from pydantic import Field
@@ -22,10 +24,8 @@ class PushbulletType(Enum):
 
 class PushbulletSchema(SchemaModel):
     type: PushbulletType = Field(PushbulletType.note, description="Type of the push")
-    body: str = Field(
-        ...,
-        description="Body of the push, used for all types of pushes",
-        alias="message",
+    message: str = Field(
+        ..., description="Body of the push, used for all types of pushes", alias="body"
     )
     token: str = Field(..., description="API access token")
     title: str = Field(
@@ -66,7 +66,7 @@ class PushbulletSchema(SchemaModel):
         'Example: "993aaa48567d91068e96c75a74644159"',
     )
 
-    @root_validator(pre=True)
+    @root_validator()
     def validate_types(cls, values):
         type = values["type"]
         if type is PushbulletType.link and not values.get("url"):
@@ -119,82 +119,55 @@ class Pushbullet(PushbulletMixin, Provider):
     """Send Pushbullet notifications"""
 
     base_url = "https://api.pushbullet.com/v2/pushes"
+    upload_request = "https://api.pushbullet.com/v2/upload-request"
     site_url = "https://www.pushbullet.com"
 
-    __type = {
-        "type": "string",
-        "title": 'Type of the push, one of "note" or "link"',
-        "enum": ["note", "link"],
-    }
-
     _resources = {"devices": PushbulletDevices()}
-    _required = {"required": ["message", "token"]}
-    _schema = {
-        "type": "object",
-        "properties": {
-            "message": {"type": "string", "title": "Body of the push"},
-            "token": {"type": "string", "title": "API access token"},
-            "title": {"type": "string", "title": "Title of the push"},
-            "type": __type,
-            "type_": __type,
-            "url": {
-                "type": "string",
-                "title": 'URL field, used for type="link" pushes',
-            },
-            "source_device_iden": {
-                "type": "string",
-                "title": "Device iden of the sending device",
-            },
-            "device_iden": {
-                "type": "string",
-                "title": "Device iden of the target device, if sending to a single device",
-            },
-            "client_iden": {
-                "type": "string",
-                "title": "Client iden of the target client, sends a push to all users who have granted access to "
-                "this client. The current user must own this client",
-            },
-            "channel_tag": {
-                "type": "string",
-                "title": "Channel tag of the target channel, sends a push to all people who are subscribed to "
-                "this channel. The current user must own this channel.",
-            },
-            "email": {
-                "type": "string",
-                "format": "email",
-                "title": "Email address to send the push to. If there is a pushbullet user with this address,"
-                " they get a push, otherwise they get an email",
-            },
-            "guid": {
-                "type": "string",
-                "title": "Unique identifier set by the client, used to identify a push in case you receive it "
-                "from /v2/everything before the call to /v2/pushes has completed. This should be a unique"
-                " value. Pushes with guid set are mostly idempotent, meaning that sending another push "
-                "with the same guid is unlikely to create another push (it will return the previously"
-                " created push).",
-            },
-        },
-        "additionalProperties": False,
-    }
+    schema_model = PushbulletSchema
 
-    @property
-    def defaults(self) -> dict:
-        return {"type": "note"}
-
-    def _prepare_data(self, data: dict) -> dict:
-        data["body"] = data.pop("message")
-
-        # Workaround since `type` is a reserved word
-        if data.get("type_"):
-            data["type"] = data.pop("type_")
-        return data
-
-    def _send_notification(self, data: dict) -> Response:
-        headers = self._get_headers(data.pop("token"))
+    def _upload_file(self, file: FilePath, headers: dict) -> dict:
+        """Fetches an upload URL and upload the content of the file"""
+        data = {"file_name": file.name, "file_type": guess_type(str(file))}
         response, errors = requests.post(
-            self.base_url,
+            self.file_upload,
             json=data,
             headers=headers,
             path_to_errors=self.path_to_errors,
         )
-        return self.create_response(data, response, errors)
+        error = partial(
+            ResourceError,
+            errors=errors,
+            resource=self.resource_name,
+            provider=self.name,
+            data=data,
+            response=response,
+        )
+        if errors:
+            raise error()
+        file_data = response.json()
+        files = requests.file_list_for_request(
+            [file], "file", mimetype=file_data["file_type"]
+        )
+        response, errors = requests.post(
+            file_data.pop("upload_url"),
+            files=files,
+            headers=headers,
+            path_to_errors=self.path_to_errors,
+        )
+        if errors:
+            raise error()
+
+        return file_data
+
+    def _send_notification(self, data: PushbulletSchema) -> Response:
+        request_data = data.to_dict()
+        headers = self._get_headers(request_data.pop("token"))
+        if data.file:
+            request_data.update(self._upload_file(data.file, headers))
+        response, errors = requests.post(
+            self.base_url,
+            json=request_data,
+            headers=headers,
+            path_to_errors=self.path_to_errors,
+        )
+        return self.create_response(request_data, response, errors)

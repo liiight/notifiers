@@ -151,7 +151,7 @@ class JoinSchema(JoinBaseSchema):
     )
 
     @validator("mms_urgent", pre=True)
-    def mms_urgent(cls, v):
+    def mms_urgent_format(cls, v):
         return int(v)
 
     @root_validator(pre=True)

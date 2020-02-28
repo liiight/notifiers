@@ -23,7 +23,7 @@ _all_providers = {
     "gmail": gmail.Gmail,
     # "telegram": telegram.Telegram,
     "gitter": gitter.Gitter,
-    # "pushbullet": pushbullet.Pushbullet,
+    "pushbullet": pushbullet.Pushbullet,
     # "join": join.Join,
     # "zulip": zulip.Zulip,
     # "twilio": twilio.Twilio,
