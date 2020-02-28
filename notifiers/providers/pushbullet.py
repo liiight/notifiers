@@ -1,8 +1,79 @@
+from enum import Enum
+
+from pydantic import EmailStr
+from pydantic import Field
+from pydantic import FilePath
+from pydantic import HttpUrl
+from pydantic import root_validator
+
 from ..exceptions import ResourceError
 from ..models.provider import Provider
 from ..models.provider import ProviderResource
+from ..models.provider import SchemaModel
 from ..models.response import Response
 from ..utils import requests
+
+
+class PushbulletType(Enum):
+    note = "note"
+    file = "file"
+    link = "link"
+
+
+class PushbulletSchema(SchemaModel):
+    type: PushbulletType = Field(PushbulletType.note, description="Type of the push")
+    body: str = Field(
+        ...,
+        description="Body of the push, used for all types of pushes",
+        alias="message",
+    )
+    token: str = Field(..., description="API access token")
+    title: str = Field(
+        None, description="Title of the push, used for all types of pushes"
+    )
+    url: HttpUrl = Field(None, description='URL field, used for type="link" pushes')
+    file: FilePath = Field(None, description="A path to a file to upload")
+    source_device_iden: str = Field(
+        None,
+        description='Device iden of the sending device. Optional. Example: "ujpah72o0sjAoRtnM0jc"',
+    )
+    device_iden: str = Field(
+        None,
+        description="Device iden of the target device, if sending to a single device. "
+        'Appears as target_device_iden on the push. Example: "ujpah72o0sjAoRtnM0jc"',
+    )
+    client_iden: str = Field(
+        None,
+        description="Client iden of the target client, sends a push to all users who have granted access"
+        ' to this client. The current user must own this client. Example: "ujpah72o0sjAoRtnM0jc"',
+    )
+    channel_tag: str = Field(
+        None,
+        description="Channel tag of the target channel, sends a push to all people who are subscribed to this channel. "
+        "The current user must own this channel.",
+    )
+    email: EmailStr = Field(
+        None,
+        description="Email address to send the push to. If there is a pushbullet user with this address, "
+        'they get a push, otherwise they get an email. Example: "elon@teslamotors.com"',
+    )
+    guid: str = Field(
+        None,
+        description="Unique identifier set by the client, used to identify a push in case you receive it from "
+        "/v2/everything before the call to /v2/pushes has completed. This should be a unique value."
+        " Pushes with guid set are mostly idempotent, meaning that sending another push with the same"
+        " guid is unlikely to create another push (it will return the previously created push). "
+        'Example: "993aaa48567d91068e96c75a74644159"',
+    )
+
+    @root_validator(pre=True)
+    def validate_types(cls, values):
+        type = values["type"]
+        if type is PushbulletType.link and not values.get("url"):
+            raise ValueError("'url' must be passed when push type is link")
+        elif type is PushbulletType.file and not values.get("file"):
+            raise ValueError("'file' must be passed when push type is file")
+        return values
 
 
 class PushbulletMixin:
