@@ -41,7 +41,7 @@ class JoinSchema(JoinBaseSchema):
         description="Usually used as a Tasker or EventGhost command."
         " Can also be used with URLs and Files to add a description for those elements",
     )
-    device_id: Union[str, JoinGroup] = Field(
+    device_id: Union[JoinGroup, str] = Field(
         JoinGroup.all_,
         description="The device ID or group ID of the device you want to send the message to",
         alias="deviceId",
