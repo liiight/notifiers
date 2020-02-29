@@ -182,8 +182,8 @@ class JoinMixin:
     @staticmethod
     def _join_request(url: str, data: JoinBaseSchema) -> tuple:
         # Can 't use generic requests util since API doesn't always return error status
+        params = data.to_dict()
         errors = None
-        params = json.loads(data.json(by_alias=True, exclude_none=True))
         try:
             response = requests.get(url, params=params)
             response.raise_for_status()
