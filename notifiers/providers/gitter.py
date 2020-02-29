@@ -10,14 +10,16 @@ from ..models.response import Response
 from ..utils import requests
 
 
-class GitterRoomSchema(SchemaModel):
+class GitterSchemaBase(SchemaModel):
     token: str = Field(..., description="Access token")
+
+
+class GitterRoomSchema(GitterSchemaBase):
     filter: str = Field(None, description="Filter results")
 
 
-class GitterSchema(SchemaModel):
+class GitterSchema(GitterSchemaBase):
     text: str = Field(..., description="Body of the message", alias="message")
-    token: str = Field(..., description="Access token")
     room_id: str = Field(..., description="ID of the room to send the notification to")
 
 
@@ -86,7 +88,7 @@ class Gitter(GitterMixin, Provider):
         return metadata
 
     def _send_notification(self, data: GitterSchema) -> Response:
-        data = data.dict()
+        data = data.to_dict()
         room_id = data.pop("room_id")
         url = urljoin(self.base_url, self.message_url.format(room_id=room_id))
 
