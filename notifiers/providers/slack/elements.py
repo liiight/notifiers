@@ -3,10 +3,10 @@ from enum import Enum
 from typing import List
 from typing import Union
 
-from pydantic import conint
 from pydantic import constr
 from pydantic import Field
 from pydantic import HttpUrl
+from pydantic import PositiveInt
 from pydantic import root_validator
 from pydantic import validator
 
@@ -24,6 +24,8 @@ class SlackElementType(Enum):
     date_picker = "datepicker"
     image = "image"
     multi_static_select = "multi_static_select"
+    multi_external_select = "multi_external_select"
+    multi_users_select = "multi_users_select"
 
 
 class SlackBaseElementSchema(SchemaModel):
@@ -124,19 +126,12 @@ class SlackImageElement(SlackBaseElementSchema):
     )
 
 
-class SlackMultiSelectMenuElement(SlackBaseElementSchema):
-    type = SlackElementType.multi_static_select
+class SlackMultiSelectBaseElement(SlackBaseElementSchema):
     placeholder: _text_object_factory(
         type_=SlackTextType.plain_text, max_length=150
     ) = Field(
         ...,
         description="A plain_text only text object that defines the placeholder text shown on the menu",
-    )
-    options: List[SlackOption] = Field(
-        None, description="An array of option objects.", max_items=100
-    )
-    option_groups: List[SlackOptionGroup] = Field(
-        None, description="An array of option group objects"
     )
     initial_options: List[SlackOption] = Field(
         None,
@@ -148,9 +143,22 @@ class SlackMultiSelectMenuElement(SlackBaseElementSchema):
         description="A confirm object that defines an optional confirmation dialog that appears before "
         "the multi-select choices are submitted",
     )
-    max_selected_items: conint(ge=1) = Field(
+    max_selected_items: PositiveInt = Field(
         None,
         description="Specifies the maximum number of items that can be selected in the menu",
+    )
+
+
+class SlackMultiSelectMenuElement(SlackMultiSelectBaseElement):
+    """This is the simplest form of select menu, with a static list of options passed in when defining the element."""
+
+    type = SlackElementType.multi_static_select
+
+    options: List[SlackOption] = Field(
+        None, description="An array of option objects.", max_items=100
+    )
+    option_groups: List[SlackOptionGroup] = Field(
+        None, description="An array of option group objects"
     )
 
     @root_validator
@@ -163,10 +171,35 @@ class SlackMultiSelectMenuElement(SlackBaseElementSchema):
         return values
 
 
+class SlackMultiSelectExternalMenuElement(SlackMultiSelectBaseElement):
+    """This menu will load its options from an external data source, allowing for a dynamic list of options."""
+
+    type = SlackElementType.multi_external_select
+    min_query_length: PositiveInt = Field(
+        None,
+        description="When the typeahead field is used, a request will be sent on every character change. "
+        "If you prefer fewer requests or more fully ideated queries, use the min_query_length attribute"
+        " to tell Slack the fewest number of typed characters required before dispatch",
+    )
+
+
+class SlackMultiSelectUserList(SlackMultiSelectBaseElement):
+    """This multi-select menu will populate its options with a list of Slack users visible to the
+    current user in the active workspace."""
+
+    type = SlackElementType.multi_users_select
+    initial_users: List[str] = Field(
+        None,
+        description="An array of user IDs of any valid users to be pre-selected when the menu loads.",
+    )
+
+
 SlackElementTypes = Union[
     SlackButtonElement,
     SlackCheckboxElement,
     SlackDatePickerElement,
     SlackImageElement,
     SlackMultiSelectMenuElement,
+    SlackMultiSelectExternalMenuElement,
+    SlackMultiSelectUserList,
 ]
