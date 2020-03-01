@@ -53,6 +53,9 @@ def _text_object_factory(max_length: int, type_: SlackTextType = None):
 
 
 class SlackOption(SchemaModel):
+    """An object that represents a single selectable item in a select menu, multi-select menu, radio button group,
+    or overflow menu."""
+
     text: _text_object_factory(type_=SlackTextType.plain_text, max_length=75) = Field(
         ...,
         description="A plain_text only text object that defines the text shown in the option on the menu."
@@ -79,6 +82,9 @@ class SlackOption(SchemaModel):
 
 
 class SlackConfirmationDialog(SchemaModel):
+    """An object that defines a dialog that provides a confirmation step to any interactive element.
+     This dialog will ask the user to confirm their action by offering a confirm and deny buttons."""
+
     title: _text_object_factory(type_=SlackTextType.plain_text, max_length=100)
     text: _text_object_factory(max_length=300)
     confirm: _text_object_factory(max_length=30)
