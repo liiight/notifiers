@@ -19,6 +19,7 @@ class SlackElementType(Enum):
     button = "button"
     checkboxes = "checkboxes"
     date_picker = "datepicker"
+    image = "image"
 
 
 class SlackBaseElementSchema(SchemaModel):
@@ -108,6 +109,17 @@ class SlackDatePickerElement(SlackBaseElementSchema):
         return str(v)
 
 
+class SlackImageElement(SlackBaseElementSchema):
+    """A plain-text summary of the image. This should not contain any markup"""
+
+    type = SlackElementType.image
+    image_url: HttpUrl = Field(..., description="The URL of the image to be displayed")
+    alt_text: str = Field(
+        ...,
+        description="A plain-text summary of the image. This should not contain any markup",
+    )
+
+
 SlackElementTypes = Union[
-    SlackButtonElement, SlackCheckboxElement, SlackDatePickerElement
+    SlackButtonElement, SlackCheckboxElement, SlackDatePickerElement, SlackImageElement
 ]
