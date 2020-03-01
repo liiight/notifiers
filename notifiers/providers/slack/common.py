@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import Type
 
 from pydantic import constr
 from pydantic import create_model
@@ -41,7 +42,9 @@ class SlackBlockTextObject(SchemaModel):
         json_encoders = {SlackTextType: lambda v: v.value}
 
 
-def _text_object_factory(max_length: int, type_: SlackTextType = None):
+def _text_object_factory(
+    max_length: int, type_: SlackTextType = None
+) -> Type[SlackBlockTextObject]:
     """Returns a custom text object schema"""
     type_value = (SlackTextType, type_) if type_ else (SlackTextType, ...)
     return create_model(

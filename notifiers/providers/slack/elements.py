@@ -1,3 +1,4 @@
+from datetime import date
 from enum import Enum
 from typing import List
 from typing import Union
@@ -5,6 +6,7 @@ from typing import Union
 from pydantic import constr
 from pydantic import Field
 from pydantic import HttpUrl
+from pydantic import validator
 
 from notifiers.models.provider import SchemaModel
 from notifiers.providers.slack.common import _text_object_factory
@@ -16,6 +18,7 @@ from notifiers.providers.slack.common import SlackTextType
 class SlackElementType(Enum):
     button = "button"
     checkboxes = "checkboxes"
+    date_picker = "datepicker"
 
 
 class SlackBaseElementSchema(SchemaModel):
@@ -81,4 +84,30 @@ class SlackCheckboxElement(SlackBaseElementSchema):
     )
 
 
-SlackElementTypes = Union[SlackButtonElement]
+class SlackDatePickerElement(SlackBaseElementSchema):
+    """An element which lets users easily select a date from a calendar style UI."""
+
+    placeholder: _text_object_factory(
+        type_=SlackTextType.plain_text, max_length=150
+    ) = Field(
+        None,
+        description="A plain_text only text object that defines the placeholder text shown on the datepicker."
+        " Maximum length for the text in this field is 150 characters",
+    )
+    initial_date: date = Field(
+        None, description="The initial date that is selected when the element is loaded"
+    )
+    confirm: SlackConfirmationDialog = Field(
+        None,
+        description="A confirm object that defines an optional confirmation dialog that appears"
+        " after a date is selected.",
+    )
+
+    @validator("initial_date")
+    def format_date(cls, v: date):
+        return str(v)
+
+
+SlackElementTypes = Union[
+    SlackButtonElement, SlackCheckboxElement, SlackDatePickerElement
+]
