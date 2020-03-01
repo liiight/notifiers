@@ -9,7 +9,7 @@ from . import popcornnotify
 from . import pushbullet
 from . import pushover
 from . import simplepush
-from . import slack
+from . import slack_
 from . import statuspage
 from . import telegram
 from . import twilio
