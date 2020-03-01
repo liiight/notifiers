@@ -12,11 +12,11 @@ from pydantic import root_validator
 from pydantic import validator
 
 from notifiers.models.provider import SchemaModel
-from notifiers.providers.slack.common import _text_object_factory
-from notifiers.providers.slack.common import SlackConfirmationDialog
-from notifiers.providers.slack.common import SlackOption
-from notifiers.providers.slack.common import SlackOptionGroup
-from notifiers.providers.slack.common import SlackTextType
+from notifiers.providers.slack.composition import _text_object_factory
+from notifiers.providers.slack.composition import SlackConfirmationDialog
+from notifiers.providers.slack.composition import SlackOption
+from notifiers.providers.slack.composition import SlackOptionGroup
+from notifiers.providers.slack.composition import SlackTextType
 
 
 class SlackElementType(Enum):
@@ -24,17 +24,24 @@ class SlackElementType(Enum):
     checkboxes = "checkboxes"
     date_picker = "datepicker"
     image = "image"
+    overflow = "overflow"
+    plain_text_input = "plain_text_input"
+    radio_buttons = "radio_buttons"
+
     multi_static_select = "multi_static_select"
     multi_external_select = "multi_external_select"
     multi_users_select = "multi_users_select"
     multi_conversations_select = "multi_conversations_select"
     multi_channels_select = "multi_channels_select"
-    overflow = "overflow"
-    plain_text_input = "plain_text_input"
-    radio_buttons = "radio_buttons"
+
+    static_select = "static_select"
+    external_select = "external_select"
+    conversations_select = "conversations_select"
+    users_select = "users_select"
+    channels_select = "channels_select"
 
 
-class SlackBaseElementSchema(SchemaModel):
+class SlackBaseElement(SchemaModel):
     type: SlackElementType = Field(..., description="The type of element")
     action_id: constr(max_length=255) = Field(
         ...,
@@ -53,7 +60,7 @@ class SlackButtonElementStyle(Enum):
     default = None
 
 
-class SlackButtonElement(SlackBaseElementSchema):
+class SlackButtonElement(SlackBaseElement):
     """An interactive component that inserts a button.
      The button can be a trigger for anything from opening a simple link to starting a complex workflow."""
 
@@ -80,7 +87,7 @@ class SlackButtonElement(SlackBaseElementSchema):
     )
 
 
-class SlackCheckboxElement(SlackBaseElementSchema):
+class SlackCheckboxElement(SlackBaseElement):
     """A checkbox group that allows a user to choose multiple items from a list of possible options"""
 
     type = SlackElementType.checkboxes
@@ -97,7 +104,7 @@ class SlackCheckboxElement(SlackBaseElementSchema):
     )
 
 
-class SlackDatePickerElement(SlackBaseElementSchema):
+class SlackDatePickerElement(SlackBaseElement):
     """An element which lets users easily select a date from a calendar style UI."""
 
     placeholder: _text_object_factory(
@@ -121,7 +128,7 @@ class SlackDatePickerElement(SlackBaseElementSchema):
         return str(v)
 
 
-class SlackImageElement(SlackBaseElementSchema):
+class SlackImageElement(SlackBaseElement):
     """A plain-text summary of the image. This should not contain any markup"""
 
     type = SlackElementType.image
@@ -132,7 +139,7 @@ class SlackImageElement(SlackBaseElementSchema):
     )
 
 
-class SlackMultiSelectBaseElement(SlackBaseElementSchema):
+class SlackMultiSelectBaseElement(SlackBaseElement):
     placeholder: _text_object_factory(
         type_=SlackTextType.plain_text, max_length=150
     ) = Field(
@@ -155,7 +162,7 @@ class SlackMultiSelectBaseElement(SlackBaseElementSchema):
     )
 
 
-class SlackMultiSelectMenuElement(SlackMultiSelectBaseElement):
+class SlackMultiStaticSelectMenuElement(SlackMultiSelectBaseElement):
     """This is the simplest form of select menu, with a static list of options passed in when defining the element."""
 
     type = SlackElementType.multi_static_select
@@ -164,7 +171,7 @@ class SlackMultiSelectMenuElement(SlackMultiSelectBaseElement):
         None, description="An array of option objects.", max_items=100
     )
     option_groups: List[SlackOptionGroup] = Field(
-        None, description="An array of option group objects"
+        None, description="An array of option group objects", max_items=100
     )
 
     @root_validator
@@ -189,7 +196,7 @@ class SlackMultiSelectExternalMenuElement(SlackMultiSelectBaseElement):
     )
 
 
-class SlackMultiSelectUserList(SlackMultiSelectBaseElement):
+class SlackMultiSelectUserListElement(SlackMultiSelectBaseElement):
     """This multi-select menu will populate its options with a list of Slack users visible to the
     current user in the active workspace."""
 
@@ -200,7 +207,7 @@ class SlackMultiSelectUserList(SlackMultiSelectBaseElement):
     )
 
 
-class SlackMultiSelectConversations(SlackMultiSelectBaseElement):
+class SlackMultiSelectConversationsElement(SlackMultiSelectBaseElement):
     """This multi-select menu will populate its options with a list of public and private channels,
     DMs, and MPIMs visible to the current user in the active workspace"""
 
@@ -211,7 +218,7 @@ class SlackMultiSelectConversations(SlackMultiSelectBaseElement):
     )
 
 
-class SlackMultiSelectChannels(SlackMultiSelectBaseElement):
+class SlackMultiSelectChannelsElement(SlackMultiSelectBaseElement):
     """This multi-select menu will populate its options with a list of public channels visible to the current
      user in the active workspace"""
 
@@ -222,7 +229,7 @@ class SlackMultiSelectChannels(SlackMultiSelectBaseElement):
     )
 
 
-class SlackOverflowElement(SlackBaseElementSchema):
+class SlackOverflowElement(SlackBaseElement):
     """This is like a cross between a button and a select menu - when a user clicks on this overflow button,
     they will be presented with a list of options to choose from. Unlike the select menu,
      there is no typeahead field, and the button always appears with an ellipsis ("…") rather than customisable text."""
@@ -241,7 +248,7 @@ class SlackOverflowElement(SlackBaseElementSchema):
     )
 
 
-class SlackPlainTextInputElement(SlackBaseElementSchema):
+class SlackPlainTextInputElement(SlackBaseElement):
     """A plain-text input, similar to the HTML <input> tag, creates a field where a user can enter freeform data.
     It can appear as a single-line field or a larger textarea using the multiline flag."""
 
@@ -271,7 +278,7 @@ class SlackPlainTextInputElement(SlackBaseElementSchema):
     )
 
 
-class SlackRadioButtonGroupElement(SlackBaseElementSchema):
+class SlackRadioButtonGroupElement(SlackBaseElement):
     """A radio button group that allows a user to choose one item from a list of possible options"""
 
     type = SlackElementType.radio_buttons
@@ -288,17 +295,82 @@ class SlackRadioButtonGroupElement(SlackBaseElementSchema):
     )
 
 
-SlackElementTypes = Union[
+class SlackStaticSelectElement(SlackMultiStaticSelectMenuElement):
+    """This is the simplest form of select menu, with a static list of options passed in when defining the element"""
+
+    type = SlackElementType.static_select
+
+
+class SlackExternalSelectElement(SlackMultiSelectExternalMenuElement):
+    """This select menu will load its options from an external data source, allowing for a dynamic list of options"""
+
+    type = SlackElementType.external_select
+
+
+class SlackSelectConversationsElement(SlackMultiSelectConversationsElement):
+    """This select menu will populate its options with a list of public and private channels,
+     DMs, and MPIMs visible to the current user in the active workspace."""
+
+    type = SlackElementType.conversations_select
+
+
+class SlackSelectChannelsElement(SlackMultiSelectChannelsElement):
+    """This select menu will populate its options with a list of public channels visible to the current user
+     in the active workspace."""
+
+    type = SlackElementType.channels_select
+
+
+class SlackSelectUsersElement(SlackMultiSelectUserListElement):
+    """This select menu will populate its options with a list of Slack users visible to the
+     current user in the active workspace"""
+
+    type = SlackElementType.users_select
+
+
+SectionElements = Union[
     SlackButtonElement,
     SlackCheckboxElement,
     SlackDatePickerElement,
     SlackImageElement,
-    SlackMultiSelectMenuElement,
+    SlackMultiStaticSelectMenuElement,
     SlackMultiSelectExternalMenuElement,
-    SlackMultiSelectUserList,
-    SlackMultiSelectConversations,
-    SlackMultiSelectChannels,
+    SlackMultiSelectUserListElement,
+    SlackMultiSelectConversationsElement,
+    SlackMultiSelectChannelsElement,
     SlackOverflowElement,
     SlackPlainTextInputElement,
     SlackRadioButtonGroupElement,
+    SlackStaticSelectElement,
+    SlackExternalSelectElement,
+    SlackSelectUsersElement,
+    SlackSelectChannelsElement,
 ]
+ActionsElements = Union[
+    SlackButtonElement,
+    SlackCheckboxElement,
+    SlackDatePickerElement,
+    SlackOverflowElement,
+    SlackPlainTextInputElement,
+    SlackRadioButtonGroupElement,
+    SlackStaticSelectElement,
+    SlackExternalSelectElement,
+    SlackSelectUsersElement,
+    SlackSelectChannelsElement,
+]
+InputElements = Union[
+    SlackCheckboxElement,
+    SlackDatePickerElement,
+    SlackMultiStaticSelectMenuElement,
+    SlackMultiSelectExternalMenuElement,
+    SlackMultiSelectUserListElement,
+    SlackMultiSelectConversationsElement,
+    SlackMultiSelectChannelsElement,
+    SlackPlainTextInputElement,
+    SlackRadioButtonGroupElement,
+    SlackStaticSelectElement,
+    SlackExternalSelectElement,
+    SlackSelectUsersElement,
+    SlackSelectChannelsElement,
+]
+ContextElements = Union[SlackImageElement]

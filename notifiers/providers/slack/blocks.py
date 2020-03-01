@@ -5,7 +5,7 @@ from pydantic import constr
 from pydantic import Field
 
 from notifiers.models.provider import SchemaModel
-from notifiers.providers.slack.common import SlackBlockTextObject
+from notifiers.providers.slack.composition import SlackBlockTextObject
 from notifiers.providers.slack.elements import SlackElementTypes
 
 
