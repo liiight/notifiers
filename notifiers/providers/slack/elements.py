@@ -3,7 +3,6 @@ from enum import Enum
 from typing import List
 from typing import Union
 
-from pydantic import conint
 from pydantic import constr
 from pydantic import Field
 from pydantic import HttpUrl
@@ -248,36 +247,6 @@ class SlackOverflowElement(SlackBaseElement):
     )
 
 
-class SlackPlainTextInputElement(SlackBaseElement):
-    """A plain-text input, similar to the HTML <input> tag, creates a field where a user can enter freeform data.
-    It can appear as a single-line field or a larger textarea using the multiline flag."""
-
-    type = SlackElementType.plain_text_input
-    placeholder: _text_object_factory(
-        type_=SlackTextType.plain_text, max_length=150
-    ) = Field(
-        None,
-        description="A plain_text only text object that defines the placeholder text shown in the plain-text input",
-    )
-    initial_value: str = Field(
-        None, description="The initial value in the plain-text input when it is loaded"
-    )
-    multiline: bool = Field(
-        None,
-        description="Indicates whether the input will be a single line (false) or a larger textarea (true)",
-    )
-    min_length: conint(gt=0, le=3000) = Field(
-        None,
-        description="The minimum length of input that the user must provide. If the user provides less,"
-        " they will receive an error",
-    )
-    max_length: PositiveInt = Field(
-        None,
-        description="The maximum length of input that the user can provide. If the user provides more,"
-        " they will receive an error",
-    )
-
-
 class SlackRadioButtonGroupElement(SlackBaseElement):
     """A radio button group that allows a user to choose one item from a list of possible options"""
 
@@ -339,7 +308,6 @@ SectionElements = Union[
     SlackMultiSelectConversationsElement,
     SlackMultiSelectChannelsElement,
     SlackOverflowElement,
-    SlackPlainTextInputElement,
     SlackRadioButtonGroupElement,
     SlackStaticSelectElement,
     SlackExternalSelectElement,
@@ -351,22 +319,6 @@ ActionsElements = Union[
     SlackCheckboxElement,
     SlackDatePickerElement,
     SlackOverflowElement,
-    SlackPlainTextInputElement,
-    SlackRadioButtonGroupElement,
-    SlackStaticSelectElement,
-    SlackExternalSelectElement,
-    SlackSelectUsersElement,
-    SlackSelectChannelsElement,
-]
-InputElements = Union[
-    SlackCheckboxElement,
-    SlackDatePickerElement,
-    SlackMultiStaticSelectMenuElement,
-    SlackMultiSelectExternalMenuElement,
-    SlackMultiSelectUserListElement,
-    SlackMultiSelectConversationsElement,
-    SlackMultiSelectChannelsElement,
-    SlackPlainTextInputElement,
     SlackRadioButtonGroupElement,
     SlackStaticSelectElement,
     SlackExternalSelectElement,
