@@ -30,6 +30,8 @@ class SlackElementType(Enum):
     multi_conversations_select = "multi_conversations_select"
     multi_channels_select = "multi_channels_select"
     overflow = "overflow"
+    plain_text_input = "plain_text_input"
+    radio_buttons = "radio_buttons"
 
 
 class SlackBaseElementSchema(SchemaModel):
@@ -243,6 +245,7 @@ class SlackPlainTextInputElement(SlackBaseElementSchema):
     """A plain-text input, similar to the HTML <input> tag, creates a field where a user can enter freeform data.
     It can appear as a single-line field or a larger textarea using the multiline flag."""
 
+    type = SlackElementType.plain_text_input
     placeholder: _text_object_factory(
         type_=SlackTextType.plain_text, max_length=150
     ) = Field(
@@ -268,6 +271,23 @@ class SlackPlainTextInputElement(SlackBaseElementSchema):
     )
 
 
+class SlackRadioButtonGroupElement(SlackBaseElementSchema):
+    """A radio button group that allows a user to choose one item from a list of possible options"""
+
+    type = SlackElementType.radio_buttons
+    options: List[SlackOption] = Field(..., description="An array of option objects")
+    initial_option: SlackOption = Field(
+        None,
+        description="An option object that exactly matches one of the options within options."
+        " This option will be selected when the radio button group initially loads.",
+    )
+    confirm: SlackConfirmationDialog = Field(
+        None,
+        description="A confirm object that defines an optional confirmation dialog that appears after "
+        "clicking one of the radio buttons in this element",
+    )
+
+
 SlackElementTypes = Union[
     SlackButtonElement,
     SlackCheckboxElement,
@@ -280,4 +300,5 @@ SlackElementTypes = Union[
     SlackMultiSelectChannels,
     SlackOverflowElement,
     SlackPlainTextInputElement,
+    SlackRadioButtonGroupElement,
 ]
