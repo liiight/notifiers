@@ -3,7 +3,6 @@ from typing import Union
 
 from pydantic import Field
 from pydantic import HttpUrl
-from pydantic import validator
 
 from notifiers.models.provider import Provider
 from notifiers.models.provider import SchemaModel
@@ -49,19 +48,6 @@ class SlackSchema(SchemaModel):
         " Defaults to true",
         alias="mrkdwn",
     )
-    icon_url: HttpUrl = Field(None, description="Override bot icon with image URL")
-    icon_emoji: str = Field(None, description="Override bot icon with emoji name")
-    username: str = Field(None, description="Override the displayed bot name")
-    channel: str = Field(
-        None, description="Override default channel or private message"
-    )
-    unfurl_links: bool = Field(
-        None, description="Avoid or enable automatic attachment creation from URLs"
-    )
-
-    @validator("icon_emoji")
-    def emoji(cls, v: str):
-        return f':{v.strip(":")}:'
 
 
 class Slack(Provider):
