@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import List
 from typing import Type
 
 from pydantic import constr
@@ -81,6 +82,20 @@ class SlackOption(SchemaModel):
         "The url attribute is only available in overflow menus. Maximum length for this field is 3000 characters. "
         "If you're using url, you'll still receive an interaction payload and will need to send an "
         "acknowledgement response.",
+    )
+
+
+class SlackOptionGroup(SchemaModel):
+    """Provides a way to group options in a select menu or multi-select menu"""
+
+    label: _text_object_factory(type_=SlackTextType.plain_text, max_length=75) = Field(
+        ...,
+        description="A plain_text only text object that defines the label shown above this group of options",
+    )
+    options: List[SlackOption] = Field(
+        ...,
+        description="An array of option objects that belong to this specific group. Maximum of 100 items",
+        max_items=100,
     )
 
 

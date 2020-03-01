@@ -3,15 +3,18 @@ from enum import Enum
 from typing import List
 from typing import Union
 
+from pydantic import conint
 from pydantic import constr
 from pydantic import Field
 from pydantic import HttpUrl
+from pydantic import root_validator
 from pydantic import validator
 
 from notifiers.models.provider import SchemaModel
 from notifiers.providers.slack.common import _text_object_factory
 from notifiers.providers.slack.common import SlackConfirmationDialog
 from notifiers.providers.slack.common import SlackOption
+from notifiers.providers.slack.common import SlackOptionGroup
 from notifiers.providers.slack.common import SlackTextType
 
 
@@ -20,6 +23,7 @@ class SlackElementType(Enum):
     checkboxes = "checkboxes"
     date_picker = "datepicker"
     image = "image"
+    multi_static_select = "multi_static_select"
 
 
 class SlackBaseElementSchema(SchemaModel):
@@ -120,6 +124,49 @@ class SlackImageElement(SlackBaseElementSchema):
     )
 
 
+class SlackMultiSelectMenuElement(SlackBaseElementSchema):
+    type = SlackElementType.multi_static_select
+    placeholder: _text_object_factory(
+        type_=SlackTextType.plain_text, max_length=150
+    ) = Field(
+        ...,
+        description="A plain_text only text object that defines the placeholder text shown on the menu",
+    )
+    options: List[SlackOption] = Field(
+        None, description="An array of option objects.", max_items=100
+    )
+    option_groups: List[SlackOptionGroup] = Field(
+        None, description="An array of option group objects"
+    )
+    initial_options: List[SlackOption] = Field(
+        None,
+        description="An array of option objects that exactly match one or more of the options within options "
+        "or option_groups. These options will be selected when the menu initially loads.",
+    )
+    confirm: SlackConfirmationDialog = Field(
+        None,
+        description="A confirm object that defines an optional confirmation dialog that appears before "
+        "the multi-select choices are submitted",
+    )
+    max_selected_items: conint(ge=1) = Field(
+        None,
+        description="Specifies the maximum number of items that can be selected in the menu",
+    )
+
+    @root_validator
+    def option_check(cls, values):
+        if not any(value in values for value in ("options", "option_groups")):
+            raise ValueError("Either 'options' or 'option_groups' are required")
+
+        if all(value in values for value in ("options", "option_groups")):
+            raise ValueError("Cannot use both 'options' and 'option_groups'")
+        return values
+
+
 SlackElementTypes = Union[
-    SlackButtonElement, SlackCheckboxElement, SlackDatePickerElement, SlackImageElement
+    SlackButtonElement,
+    SlackCheckboxElement,
+    SlackDatePickerElement,
+    SlackImageElement,
+    SlackMultiSelectMenuElement,
 ]
