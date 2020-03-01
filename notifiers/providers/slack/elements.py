@@ -3,6 +3,7 @@ from enum import Enum
 from typing import List
 from typing import Union
 
+from pydantic import conint
 from pydantic import constr
 from pydantic import Field
 from pydantic import HttpUrl
@@ -26,6 +27,9 @@ class SlackElementType(Enum):
     multi_static_select = "multi_static_select"
     multi_external_select = "multi_external_select"
     multi_users_select = "multi_users_select"
+    multi_conversations_select = "multi_conversations_select"
+    multi_channels_select = "multi_channels_select"
+    overflow = "overflow"
 
 
 class SlackBaseElementSchema(SchemaModel):
@@ -194,6 +198,76 @@ class SlackMultiSelectUserList(SlackMultiSelectBaseElement):
     )
 
 
+class SlackMultiSelectConversations(SlackMultiSelectBaseElement):
+    """This multi-select menu will populate its options with a list of public and private channels,
+    DMs, and MPIMs visible to the current user in the active workspace"""
+
+    type = SlackElementType.multi_conversations_select
+    initial_conversations: List[str] = Field(
+        None,
+        description="An array of one or more IDs of any valid conversations to be pre-selected when the menu loads",
+    )
+
+
+class SlackMultiSelectChannels(SlackMultiSelectBaseElement):
+    """This multi-select menu will populate its options with a list of public channels visible to the current
+     user in the active workspace"""
+
+    type = SlackElementType.multi_channels_select
+    initial_channels: List[str] = Field(
+        None,
+        description="An array of one or more IDs of any valid public channel to be pre-selected when the menu loads",
+    )
+
+
+class SlackOverflowElement(SlackBaseElementSchema):
+    """This is like a cross between a button and a select menu - when a user clicks on this overflow button,
+    they will be presented with a list of options to choose from. Unlike the select menu,
+     there is no typeahead field, and the button always appears with an ellipsis ("…") rather than customisable text."""
+
+    type = SlackElementType.overflow
+    options: List[SlackOption] = Field(
+        ...,
+        description="An array of option objects to display in the menu",
+        min_items=2,
+        max_items=5,
+    )
+    confirm: SlackConfirmationDialog = Field(
+        None,
+        description="A confirm object that defines an optional confirmation dialog that appears after a menu "
+        "item is selected",
+    )
+
+
+class SlackPlainTextInputElement(SlackBaseElementSchema):
+    """A plain-text input, similar to the HTML <input> tag, creates a field where a user can enter freeform data.
+    It can appear as a single-line field or a larger textarea using the multiline flag."""
+
+    placeholder: _text_object_factory(
+        type_=SlackTextType.plain_text, max_length=150
+    ) = Field(
+        None,
+        description="A plain_text only text object that defines the placeholder text shown in the plain-text input",
+    )
+    initial_value: str = Field(
+        None, description="The initial value in the plain-text input when it is loaded"
+    )
+    multiline: bool = Field(
+        None,
+        description="Indicates whether the input will be a single line (false) or a larger textarea (true)",
+    )
+    min_length: conint(gt=0, le=3000) = Field(
+        None,
+        description="The minimum length of input that the user must provide. If the user provides less,"
+        " they will receive an error",
+    )
+    max_length: PositiveInt = Field(
+        None,
+        description="The maximum length of input that the user can provide. If the user provides more,"
+        " they will receive an error",
+    )
+
+
 SlackElementTypes = Union[
     SlackButtonElement,
     SlackCheckboxElement,
@@ -202,4 +276,8 @@ SlackElementTypes = Union[
     SlackMultiSelectMenuElement,
     SlackMultiSelectExternalMenuElement,
     SlackMultiSelectUserList,
+    SlackMultiSelectConversations,
+    SlackMultiSelectChannels,
+    SlackOverflowElement,
+    SlackPlainTextInputElement,
 ]
