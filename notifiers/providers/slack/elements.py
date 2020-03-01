@@ -373,4 +373,4 @@ InputElements = Union[
     SlackSelectUsersElement,
     SlackSelectChannelsElement,
 ]
-ContextElements = Union[SlackImageElement]
+ContextElements = SlackImageElement
