@@ -9,8 +9,11 @@ from notifiers.models.provider import Provider
 from notifiers.models.provider import SchemaModel
 from notifiers.models.response import Response
 from notifiers.providers.slack.blocks import SlackSectionBlock
-from notifiers.providers.slack_ import SlackAttachmentSchema
 from notifiers.utils import requests
+
+
+class SlackAttachmentSchema(SchemaModel):
+    pass
 
 
 class SlackSchema(SchemaModel):
