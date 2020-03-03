@@ -8,12 +8,57 @@ from pydantic import HttpUrl
 from pydantic import root_validator
 from typing_extensions import Literal
 
+from .elements import SlackButtonElement
+from .elements import SlackCheckboxElement
+from .elements import SlackDatePickerElement
+from .elements import SlackExternalSelectElement
+from .elements import SlackImageElement
+from .elements import SlackMultiSelectChannelsElement
+from .elements import SlackMultiSelectConversationsElement
+from .elements import SlackMultiSelectExternalMenuElement
+from .elements import SlackMultiSelectUserListElement
+from .elements import SlackMultiStaticSelectMenuElement
+from .elements import SlackOverflowElement
+from .elements import SlackRadioButtonGroupElement
+from .elements import SlackSelectChannelsElement
+from .elements import SlackSelectUsersElement
+from .elements import SlackStaticSelectElement
 from notifiers.models.provider import SchemaModel
 from notifiers.providers.slack.composition import _text_object_factory
+from notifiers.providers.slack.composition import SlackBlockTextObject
 from notifiers.providers.slack.composition import SlackTextType
-from notifiers.providers.slack.elements import ActionsElements
-from notifiers.providers.slack.elements import ContextElements
-from notifiers.providers.slack.elements import SectionElements
+
+SectionBlockElements = Union[
+    SlackButtonElement,
+    SlackCheckboxElement,
+    SlackDatePickerElement,
+    SlackImageElement,
+    SlackMultiStaticSelectMenuElement,
+    SlackMultiSelectExternalMenuElement,
+    SlackMultiSelectUserListElement,
+    SlackMultiSelectConversationsElement,
+    SlackMultiSelectChannelsElement,
+    SlackOverflowElement,
+    SlackRadioButtonGroupElement,
+    SlackStaticSelectElement,
+    SlackExternalSelectElement,
+    SlackSelectUsersElement,
+    SlackSelectChannelsElement,
+]
+
+ActionsBlockElements = Union[
+    SlackButtonElement,
+    SlackCheckboxElement,
+    SlackDatePickerElement,
+    SlackOverflowElement,
+    SlackRadioButtonGroupElement,
+    SlackStaticSelectElement,
+    SlackExternalSelectElement,
+    SlackSelectUsersElement,
+    SlackSelectChannelsElement,
+]
+
+ContextBlockElements = Union[SlackImageElement, SlackBlockTextObject]
 
 
 class SlackBlockType(Enum):
@@ -57,7 +102,7 @@ class SlackSectionBlock(SlackBaseBlock):
         max_items=10,
         alias="fields",
     )
-    accessory: SectionElements = Field(
+    accessory: SectionBlockElements = Field(
         None, description="One of the available element objects"
     )
 
@@ -102,7 +147,7 @@ class SlackActionsBlock(SlackBaseBlock):
         ...,
         description="The type of block. For an actions block, type will always be actions",
     )
-    elements: List[ActionsElements] = Field(
+    elements: List[ActionsBlockElements] = Field(
         ...,
         description="An array of interactive element objects - buttons, select menus, overflow menus, or date pickers",
         max_items=5,
@@ -116,7 +161,7 @@ class SlackContextBlock(SlackBaseBlock):
         ...,
         description="The type of block. For a context block, type will always be context",
     )
-    elements: List[ContextElements] = Field(
+    elements: List[ContextBlockElements] = Field(
         ..., description="An array of image elements and text objects", max_items=10
     )
 

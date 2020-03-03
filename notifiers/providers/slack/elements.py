@@ -1,7 +1,6 @@
 from datetime import date
 from enum import Enum
 from typing import List
-from typing import Union
 
 from pydantic import constr
 from pydantic import Field
@@ -12,7 +11,6 @@ from pydantic import validator
 
 from notifiers.models.provider import SchemaModel
 from notifiers.providers.slack.composition import _text_object_factory
-from notifiers.providers.slack.composition import SlackBlockTextObject
 from notifiers.providers.slack.composition import SlackConfirmationDialog
 from notifiers.providers.slack.composition import SlackOption
 from notifiers.providers.slack.composition import SlackOptionGroup
@@ -298,34 +296,3 @@ class SlackSelectUsersElement(SlackMultiSelectUserListElement):
      current user in the active workspace"""
 
     type = SlackElementType.users_select
-
-
-SectionElements = Union[
-    SlackButtonElement,
-    SlackCheckboxElement,
-    SlackDatePickerElement,
-    SlackImageElement,
-    SlackMultiStaticSelectMenuElement,
-    SlackMultiSelectExternalMenuElement,
-    SlackMultiSelectUserListElement,
-    SlackMultiSelectConversationsElement,
-    SlackMultiSelectChannelsElement,
-    SlackOverflowElement,
-    SlackRadioButtonGroupElement,
-    SlackStaticSelectElement,
-    SlackExternalSelectElement,
-    SlackSelectUsersElement,
-    SlackSelectChannelsElement,
-]
-ActionsElements = Union[
-    SlackButtonElement,
-    SlackCheckboxElement,
-    SlackDatePickerElement,
-    SlackOverflowElement,
-    SlackRadioButtonGroupElement,
-    SlackStaticSelectElement,
-    SlackExternalSelectElement,
-    SlackSelectUsersElement,
-    SlackSelectChannelsElement,
-]
-ContextElements = Union[SlackImageElement, SlackBlockTextObject]
