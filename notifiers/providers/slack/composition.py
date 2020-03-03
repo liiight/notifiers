@@ -44,12 +44,12 @@ class SlackBlockTextObject(SchemaModel):
 
 
 def _text_object_factory(
-    max_length: int, type_: SlackTextType = None
+    model_name: str, max_length: int, type_: SlackTextType = None
 ) -> Type[SlackBlockTextObject]:
     """Returns a custom text object schema"""
     type_value = (SlackTextType, type_) if type_ else (SlackTextType, ...)
     return create_model(
-        "CustomTextObject",
+        model_name,
         type=type_value,
         text=(constr(max_length=max_length), ...),
         __base__=SlackBlockTextObject,
@@ -60,7 +60,9 @@ class SlackOption(SchemaModel):
     """An object that represents a single selectable item in a select menu, multi-select menu, radio button group,
     or overflow menu."""
 
-    text: _text_object_factory(type_=SlackTextType.plain_text, max_length=75) = Field(
+    text: _text_object_factory(
+        "OptionText", type_=SlackTextType.plain_text, max_length=75
+    ) = Field(
         ...,
         description="A plain_text only text object that defines the text shown in the option on the menu."
         " Maximum length for the text in this field is 75 characters",
@@ -70,7 +72,7 @@ class SlackOption(SchemaModel):
         description="The string value that will be passed to your app when this option is chosen",
     )
     description: _text_object_factory(
-        type_=SlackTextType.plain_text, max_length=75
+        "DescriptionText", type_=SlackTextType.plain_text, max_length=75
     ) = Field(
         None,
         description="A plain_text only text object that defines a line of descriptive text shown below the "
@@ -88,7 +90,9 @@ class SlackOption(SchemaModel):
 class SlackOptionGroup(SchemaModel):
     """Provides a way to group options in a select menu or multi-select menu"""
 
-    label: _text_object_factory(type_=SlackTextType.plain_text, max_length=75) = Field(
+    label: _text_object_factory(
+        "OptionGroupText", type_=SlackTextType.plain_text, max_length=75
+    ) = Field(
         ...,
         description="A plain_text only text object that defines the label shown above this group of options",
     )
@@ -103,10 +107,14 @@ class SlackConfirmationDialog(SchemaModel):
     """An object that defines a dialog that provides a confirmation step to any interactive element.
      This dialog will ask the user to confirm their action by offering a confirm and deny buttons."""
 
-    title: _text_object_factory(type_=SlackTextType.plain_text, max_length=100)
-    text: _text_object_factory(max_length=300)
-    confirm: _text_object_factory(max_length=30)
-    deny: _text_object_factory(type_=SlackTextType.plain_text, max_length=30)
+    title: _text_object_factory(
+        "DialogTitleText", type_=SlackTextType.plain_text, max_length=100
+    )
+    text: _text_object_factory("DialogTextText", max_length=300)
+    confirm: _text_object_factory("DialogConfirmText", max_length=30)
+    deny: _text_object_factory(
+        "DialogDenyText", type_=SlackTextType.plain_text, max_length=30
+    )
 
 
 class SlackColor(Enum):

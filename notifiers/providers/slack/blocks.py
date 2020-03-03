@@ -41,15 +41,18 @@ class SlackSectionBlock(SlackBaseBlock):
     in combination with text fields, or side-by-side with any of the available block elements"""
 
     type = SlackBlockType.section
-    text: _text_object_factory(max_length=3000) = Field(
+    text: _text_object_factory("SectionBlockText", max_length=3000) = Field(
         None, description="The text for the block, in the form of a text object"
     )
 
-    fields: List[_text_object_factory(max_length=2000)] = Field(
+    block_fields: List[
+        _text_object_factory("SectionBlockFieldText", max_length=2000)
+    ] = Field(
         None,
         description="An array of text objects. Any text objects included with fields will be rendered in a compact "
         "format that allows for 2 columns of side-by-side text",
-        max_length=10,
+        max_items=10,
+        alias="fields",
     )
     accessory: SectionElements = Field(
         None, description="One of the available element objects"
@@ -79,7 +82,7 @@ class SlackImageBlock(SlackBaseBlock):
         description="A plain-text summary of the image. This should not contain any markup",
     )
     title: _text_object_factory(
-        type_=SlackTextType.plain_text, max_length=2000
+        "ImageText", type_=SlackTextType.plain_text, max_length=2000
     ) = Field(None, description="An optional title for the image")
 
 
@@ -87,10 +90,10 @@ class SlackActionsBlock(SlackBaseBlock):
     """A block that is used to hold interactive elements"""
 
     type = SlackBlockType.actions
-    elements: ActionsElements = Field(
+    elements: List[ActionsElements] = Field(
         ...,
         description="An array of interactive element objects - buttons, select menus, overflow menus, or date pickers",
-        max_length=5,
+        max_items=5,
     )
 
 
@@ -98,7 +101,7 @@ class SlackContextBlock(SlackBaseBlock):
     """Displays message context, which can include both images and text"""
 
     type = SlackBlockType.context
-    elements: ContextElements = Field(
+    elements: List[ContextElements] = Field(
         ..., description="An array of image elements and text objects", max_items=10
     )
 

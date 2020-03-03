@@ -9,16 +9,16 @@ from . import popcornnotify
 from . import pushbullet
 from . import pushover
 from . import simplepush
-from . import slack_
 from . import statuspage
 from . import telegram
 from . import twilio
 from . import zulip
+from .slack import Slack
 
 _all_providers = {
     # "pushover": pushover.Pushover,
     # "simplepush": simplepush.SimplePush,
-    # "slack": slack.Slack,
+    "slack": Slack,
     "email": email.SMTP,
     "gmail": gmail.Gmail,
     # "telegram": telegram.Telegram,

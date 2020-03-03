@@ -64,7 +64,9 @@ class SlackButtonElement(SlackBaseElement):
      The button can be a trigger for anything from opening a simple link to starting a complex workflow."""
 
     type = SlackElementType.button
-    text: _text_object_factory(type_=SlackTextType.plain_text, max_length=75)
+    text: _text_object_factory(
+        "ElementText", type_=SlackTextType.plain_text, max_length=75
+    )
     url: HttpUrl = Field(
         None,
         description="A URL to load in the user's browser when the button is clicked. "
@@ -107,7 +109,7 @@ class SlackDatePickerElement(SlackBaseElement):
     """An element which lets users easily select a date from a calendar style UI."""
 
     placeholder: _text_object_factory(
-        type_=SlackTextType.plain_text, max_length=150
+        "DatePicketText", type_=SlackTextType.plain_text, max_length=150
     ) = Field(
         None,
         description="A plain_text only text object that defines the placeholder text shown on the datepicker."
@@ -140,7 +142,7 @@ class SlackImageElement(SlackBaseElement):
 
 class SlackMultiSelectBaseElement(SlackBaseElement):
     placeholder: _text_object_factory(
-        type_=SlackTextType.plain_text, max_length=150
+        "MultiSelectText", type_=SlackTextType.plain_text, max_length=150
     ) = Field(
         ...,
         description="A plain_text only text object that defines the placeholder text shown on the menu",

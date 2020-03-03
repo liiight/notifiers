@@ -43,7 +43,7 @@ class SlackAttachmentSchema(SchemaModel):
     blocks: List[Union[SlackSectionBlock]] = Field(
         None,
         description="An array of layout blocks in the same format as described in the building blocks guide.",
-        max_length=50,
+        max_items=50,
     )
     color: Union[SlackColor, ColorType] = Field(
         None,
@@ -66,11 +66,12 @@ class SlackAttachmentSchema(SchemaModel):
         description="A plain text summary of the attachment used in clients that don't show "
         "formatted text (eg. IRC, mobile notifications)",
     )
-    fields: List[SlackFieldObject] = Field(
+    attachment_fields: List[SlackFieldObject] = Field(
         None,
         description="An array of field objects that get displayed in a table-like way."
         " For best results, include no more than 2-3 field objects",
         min_items=1,
+        alias="fields",
     )
     footer: constr(max_length=300) = Field(
         None,
@@ -169,7 +170,7 @@ class SlackSchema(SchemaModel):
     blocks: List[Union[SlackSectionBlock]] = Field(
         None,
         description="An array of layout blocks in the same format as described in the building blocks guide.",
-        max_length=50,
+        max_items=50,
     )
     attachments: List[SlackAttachmentSchema] = Field(
         None,
