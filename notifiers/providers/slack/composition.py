@@ -107,3 +107,9 @@ class SlackConfirmationDialog(SchemaModel):
     text: _text_object_factory(max_length=300)
     confirm: _text_object_factory(max_length=30)
     deny: _text_object_factory(type_=SlackTextType.plain_text, max_length=30)
+
+
+class SlackColor(Enum):
+    good = "good"
+    warning = "warning"
+    danger = "danger"

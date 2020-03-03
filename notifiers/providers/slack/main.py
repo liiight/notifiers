@@ -1,21 +1,157 @@
+from datetime import datetime
 from typing import List
 from typing import Union
 
+from pydantic import constr
 from pydantic import Field
 from pydantic import HttpUrl
+from pydantic import root_validator
+from pydantic import validator
+from pydantic.color import Color as ColorType
 
 from notifiers.models.provider import Provider
 from notifiers.models.provider import SchemaModel
 from notifiers.models.response import Response
 from notifiers.providers.slack.blocks import SlackSectionBlock
+from notifiers.providers.slack.composition import SlackColor
 from notifiers.utils import requests
 
 
+class SlackFieldObject(SchemaModel):
+    title: str = Field(
+        None,
+        description="Shown as a bold heading displayed in the field object."
+        " It cannot contain markup and will be escaped for you",
+    )
+    value: str = Field(
+        None,
+        description="The text value displayed in the field object. "
+        "It can be formatted as plain text, or with mrkdwn by using the mrkdwn_in",
+    )
+    short: bool = Field(
+        None,
+        description="Indicates whether the field object is short enough to be "
+        "displayed side-by-side with other field objects",
+    )
+
+
 class SlackAttachmentSchema(SchemaModel):
-    pass
+    """Secondary content can be attached to messages to include lower priority content - content that
+     doesn't necessarily need to be seen to appreciate the intent of the message,
+      but perhaps adds further context or additional information."""
+
+    blocks: List[Union[SlackSectionBlock]] = Field(
+        None,
+        description="An array of layout blocks in the same format as described in the building blocks guide.",
+        max_length=50,
+    )
+    color: Union[SlackColor, ColorType] = Field(
+        None,
+        description="Changes the color of the border on the left side of this attachment from the default gray",
+    )
+    author_icon: HttpUrl = Field(
+        None,
+        description="A valid URL that displays a small 16px by 16px image to the left of the author_name text."
+        " Will only work if author_name is present",
+    )
+    author_link: HttpUrl = Field(
+        None,
+        description="A valid URL that will hyperlink the author_name text. Will only work if author_name is present.",
+    )
+    author_name: str = Field(
+        None, description="Small text used to display the author's name"
+    )
+    fallback: str = Field(
+        None,
+        description="A plain text summary of the attachment used in clients that don't show "
+        "formatted text (eg. IRC, mobile notifications)",
+    )
+    fields: List[SlackFieldObject] = Field(
+        None,
+        description="An array of field objects that get displayed in a table-like way."
+        " For best results, include no more than 2-3 field objects",
+        min_items=1,
+    )
+    footer: constr(max_length=300) = Field(
+        None,
+        description="Some brief text to help contextualize and identify an attachment."
+        " Limited to 300 characters, and may be truncated further when displayed to users in "
+        "environments with limited screen real estate",
+    )
+    footer_icon: HttpUrl = Field(
+        None,
+        description="A valid URL to an image file that will be displayed beside the footer text. "
+        "Will only work if author_name is present. We'll render what you provide at 16px by 16px. "
+        "It's best to use an image that is similarly sized",
+    )
+    image_url: HttpUrl = Field(
+        None,
+        description="A valid URL to an image file that will be displayed at the bottom of the attachment."
+        " We support GIF, JPEG, PNG, and BMP formats. "
+        "Large images will be resized to a maximum width of 360px or a maximum height of 500px,"
+        " while still maintaining the original aspect ratio. Cannot be used with thumb_url",
+    )
+    markdown_in: List[str] = Field(
+        None,
+        description="An array of field names that should be formatted by markdown syntax",
+        alias="mrkdwn_in",
+    )
+    pretext: str = Field(
+        None,
+        description="Text that appears above the message attachment block. "
+        "It can be formatted as plain text, or with mrkdwn by including it in the mrkdwn_in field",
+    )
+    text: str = Field(
+        None,
+        description="The main body text of the attachment. It can be formatted as plain text, "
+        "or with mrkdwn by including it in the mrkdwn_in field."
+        " The content will automatically collapse if it contains 700+ characters or 5+ linebreaks,"
+        ' and will display a "Show more..." link to expand the content',
+    )
+    thumb_url: HttpUrl = Field(
+        None,
+        description="A valid URL to an image file that will be displayed as a thumbnail on the right side "
+        "of a message attachment. We currently support the following formats: GIF, JPEG, PNG,"
+        " and BMP. The thumbnail's longest dimension will be scaled down to 75px while maintaining "
+        "the aspect ratio of the image. The filesize of the image must also be less than 500 KB."
+        " For best results, please use images that are already 75px by 75px",
+    )
+    title: str = Field(
+        None, description="Large title text near the top of the attachment"
+    )
+    title_link: HttpUrl = Field(
+        None, description="A valid URL that turns the title text into a hyperlink"
+    )
+    timestamp: datetime = Field(
+        None,
+        description="A datetime that is used to related your attachment to a specific time."
+        " The attachment will display the additional timestamp value as part of the attachment's footer. "
+        "Your message's timestamp will be displayed in varying ways, depending on how far in the past "
+        "or future it is, relative to the present. Form factors, like mobile versus desktop may "
+        "also transform its rendered appearance",
+        alias="ts",
+    )
+
+    @validator("color")
+    def color_format(cls, v: Union[SlackColor, ColorType]):
+        return v.as_hex() if isinstance(v, ColorType) else v.value
+
+    @validator("timestamp")
+    def timestamp_format(cls, v: datetime):
+        return v.timestamp()
+
+    @root_validator
+    def check_values(cls, values):
+        if "blocks" not in values and not any(
+            value in values for value in ("fallback", "text")
+        ):
+            raise ValueError("Either 'blocks' or 'fallback' or 'text' are required")
+        return values
 
 
 class SlackSchema(SchemaModel):
+    """Slack's webhook schema"""
+
     webhook_url: HttpUrl = Field(
         ...,
         description="The webhook URL to use. Register one at https://my.slack.com/services/new/incoming-webhook/",
@@ -58,126 +194,6 @@ class Slack(Provider):
     name = "slack"
 
     schema_model = SlackSchema
-
-    __fields = {
-        "type": "array",
-        "title": "Fields are displayed in a table on the message",
-        "minItems": 1,
-        "items": {
-            "type": "object",
-            "properties": {
-                "title": {"type": "string", "title": "Required Field Title"},
-                "value": {
-                    "type": "string",
-                    "title": "Text value of the field. May contain standard message markup and must"
-                    " be escaped as normal. May be multi-line",
-                },
-                "short": {
-                    "type": "boolean",
-                    "title": "Optional flag indicating whether the `value` is short enough to be displayed"
-                    " side-by-side with other values",
-                },
-            },
-            "required": ["title"],
-            "additionalProperties": False,
-        },
-    }
-    __attachments = {
-        "type": "array",
-        "items": {
-            "type": "object",
-            "properties": {
-                "title": {"type": "string", "title": "Attachment title"},
-                "author_name": {
-                    "type": "string",
-                    "title": "Small text used to display the author's name",
-                },
-                "author_link": {
-                    "type": "string",
-                    "title": "A valid URL that will hyperlink the author_name text mentioned above. "
-                    "Will only work if author_name is present",
-                },
-                "author_icon": {
-                    "type": "string",
-                    "title": "A valid URL that displays a small 16x16px image to the left of the author_name text. "
-                    "Will only work if author_name is present",
-                },
-                "title_link": {"type": "string", "title": "Attachment title URL"},
-                "image_url": {"type": "string", "format": "uri", "title": "Image URL"},
-                "thumb_url": {
-                    "type": "string",
-                    "format": "uri",
-                    "title": "Thumbnail URL",
-                },
-                "footer": {"type": "string", "title": "Footer text"},
-                "footer_icon": {
-                    "type": "string",
-                    "format": "uri",
-                    "title": "Footer icon URL",
-                },
-                "ts": {
-                    "type": ["integer", "string"],
-                    "format": "timestamp",
-                    "title": "Provided timestamp (epoch)",
-                },
-                "fallback": {
-                    "type": "string",
-                    "title": "A plain-text summary of the attachment. This text will be used in clients that don't"
-                    " show formatted text (eg. IRC, mobile notifications) and should not contain any markup.",
-                },
-                "text": {
-                    "type": "string",
-                    "title": "Optional text that should appear within the attachment",
-                },
-                "pretext": {
-                    "type": "string",
-                    "title": "Optional text that should appear above the formatted data",
-                },
-                "color": {
-                    "type": "string",
-                    "title": "Can either be one of 'good', 'warning', 'danger', or any hex color code",
-                },
-                "fields": __fields,
-            },
-            "required": ["fallback"],
-            "additionalProperties": False,
-        },
-    }
-    _required = {"required": ["webhook_url", "message"]}
-    _schema = {
-        "type": "object",
-        "properties": {
-            "webhook_url": {
-                "type": "string",
-                "format": "uri",
-                "title": "the webhook URL to use. Register one at https://my.slack.com/services/new/incoming-webhook/",
-            },
-            "icon_url": {
-                "type": "string",
-                "format": "uri",
-                "title": "override bot icon with image URL",
-            },
-            "icon_emoji": {
-                "type": "string",
-                "title": "override bot icon with emoji name.",
-            },
-            "username": {"type": "string", "title": "override the displayed bot name"},
-            "channel": {
-                "type": "string",
-                "title": "override default channel or private message",
-            },
-            "unfurl_links": {
-                "type": "boolean",
-                "title": "avoid automatic attachment creation from URLs",
-            },
-            "message": {
-                "type": "string",
-                "title": "This is the text that will be posted to the channel",
-            },
-            "attachments": __attachments,
-        },
-        "additionalProperties": False,
-    }
 
     def _send_notification(self, data: dict) -> Response:
         url = data.pop("webhook_url")
