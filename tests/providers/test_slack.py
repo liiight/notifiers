@@ -25,11 +25,9 @@ class TestSlack:
 
     @pytest.mark.online
     def test_all_options(self, provider):
+        # todo add all blocks tests
         data = {
             "message": "http://foo.com",
-            "icon_emoji": "poop",
-            "username": "test",
-            "channel": "test",
             "attachments": [
                 {
                     "title": "attachment 1",
@@ -75,5 +73,4 @@ class TestSlack:
                 },
             ],
         }
-        rsp = provider.notify(**data)
-        rsp.raise_on_errors()
+        provider.notify(**data, raise_on_errors=True)
