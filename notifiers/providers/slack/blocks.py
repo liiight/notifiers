@@ -1,5 +1,6 @@
 from enum import Enum
 from typing import List
+from typing import Union
 
 from pydantic import constr
 from pydantic import Field
@@ -82,7 +83,7 @@ class SlackImageBlock(SlackBaseBlock):
         description="A plain-text summary of the image. This should not contain any markup",
     )
     title: _text_object_factory(
-        "ImageText", type_=SlackTextType.plain_text, max_length=2000
+        "ImageText", max_length=2000, type=SlackTextType.plain_text
     ) = Field(None, description="An optional title for the image")
 
 
@@ -115,3 +116,13 @@ class SlackFileBlock(SlackBaseBlock):
         "remote",
         description="At the moment, source will always be remote for a remote file",
     )
+
+
+Blocks = Union[
+    SlackSectionBlock,
+    SlackDividerBlock,
+    SlackImageBlock,
+    SlackActionsBlock,
+    SlackContextBlock,
+    SlackFileBlock,
+]

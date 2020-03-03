@@ -12,7 +12,7 @@ from pydantic.color import Color as ColorType
 from notifiers.models.provider import Provider
 from notifiers.models.provider import SchemaModel
 from notifiers.models.response import Response
-from notifiers.providers.slack.blocks import SlackSectionBlock
+from notifiers.providers.slack.blocks import Blocks
 from notifiers.providers.slack.composition import SlackColor
 from notifiers.utils import requests
 
@@ -40,7 +40,7 @@ class SlackAttachmentSchema(SchemaModel):
      doesn't necessarily need to be seen to appreciate the intent of the message,
       but perhaps adds further context or additional information."""
 
-    blocks: List[Union[SlackSectionBlock]] = Field(
+    blocks: List[Blocks] = Field(
         None,
         description="An array of layout blocks in the same format as described in the building blocks guide.",
         max_items=50,
@@ -167,7 +167,7 @@ class SlackSchema(SchemaModel):
         "however it is highly recommended that you include it as the aforementioned fallback.",
         alias="text",
     )
-    blocks: List[Union[SlackSectionBlock]] = Field(
+    blocks: List[Blocks] = Field(
         None,
         description="An array of layout blocks in the same format as described in the building blocks guide.",
         max_items=50,

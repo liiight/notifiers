@@ -43,7 +43,7 @@ class SlackElementType(Enum):
 class SlackBaseElement(SchemaModel):
     type: SlackElementType = Field(..., description="The type of element")
     action_id: constr(max_length=255) = Field(
-        ...,
+        None,
         description="An identifier for this action. You can use this when you receive an interaction payload to "
         "identify the source of the action. Should be unique among all other action_ids used "
         "elsewhere by your app",
@@ -64,9 +64,9 @@ class SlackButtonElement(SlackBaseElement):
      The button can be a trigger for anything from opening a simple link to starting a complex workflow."""
 
     type = SlackElementType.button
-    text: _text_object_factory(
-        "ElementText", type_=SlackTextType.plain_text, max_length=75
-    ) = Field(..., description="A text object that defines the button's text")
+    text: _text_object_factory("ElementText", max_length=75) = Field(
+        ..., description="A text object that defines the button's text"
+    )
     url: HttpUrl = Field(
         None,
         description="A URL to load in the user's browser when the button is clicked. "
@@ -109,7 +109,7 @@ class SlackDatePickerElement(SlackBaseElement):
     """An element which lets users easily select a date from a calendar style UI."""
 
     placeholder: _text_object_factory(
-        "DatePicketText", type_=SlackTextType.plain_text, max_length=150
+        "DatePicketText", max_length=150, type=SlackTextType.plain_text
     ) = Field(
         None,
         description="A plain_text only text object that defines the placeholder text shown on the datepicker."
@@ -142,7 +142,7 @@ class SlackImageElement(SlackBaseElement):
 
 class SlackMultiSelectBaseElement(SlackBaseElement):
     placeholder: _text_object_factory(
-        "MultiSelectText", type_=SlackTextType.plain_text, max_length=150
+        "MultiSelectText", max_length=150, type=SlackTextType.plain_text
     ) = Field(
         ...,
         description="A plain_text only text object that defines the placeholder text shown on the menu",
