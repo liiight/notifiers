@@ -12,6 +12,7 @@ from pydantic import validator
 
 from notifiers.models.provider import SchemaModel
 from notifiers.providers.slack.composition import _text_object_factory
+from notifiers.providers.slack.composition import SlackBlockTextObject
 from notifiers.providers.slack.composition import SlackConfirmationDialog
 from notifiers.providers.slack.composition import SlackOption
 from notifiers.providers.slack.composition import SlackOptionGroup
@@ -327,4 +328,4 @@ ActionsElements = Union[
     SlackSelectUsersElement,
     SlackSelectChannelsElement,
 ]
-ContextElements = SlackImageElement
+ContextElements = Union[SlackImageElement, SlackBlockTextObject]
