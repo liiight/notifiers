@@ -66,7 +66,7 @@ class SlackButtonElement(SlackBaseElement):
     type = SlackElementType.button
     text: _text_object_factory(
         "ElementText", type_=SlackTextType.plain_text, max_length=75
-    )
+    ) = Field(..., description="A text object that defines the button's text")
     url: HttpUrl = Field(
         None,
         description="A URL to load in the user's browser when the button is clicked. "

@@ -7,6 +7,7 @@ from pydantic import create_model
 from pydantic import Field
 from pydantic import HttpUrl
 from pydantic import root_validator
+from typing_extensions import Literal
 
 from notifiers.models.provider import SchemaModel
 
@@ -53,8 +54,9 @@ class SlackBlockTextObject(SchemaModel):
 def _text_object_factory(
     model_name: str, max_length: int, type_: SlackTextType = None
 ) -> Type[SlackBlockTextObject]:
-    """Returns a custom text object schema"""
-    type_value = (SlackTextType, type_) if type_ else (SlackTextType, ...)
+    """Returns a custom text object schema. If a `type_` is passed,
+    it's enforced as the only possible value (both the enum and its value) and set as the default"""
+    type_value = (Literal[type_, type_.value], type_) if type_ else (SlackTextType, ...)
     return create_model(
         model_name,
         type=type_value,
