@@ -26,7 +26,6 @@ class SlackBlockType(Enum):
 
 
 class SlackBaseBlock(SchemaModel):
-    type: SlackBlockType = Field(..., description="The type of block")
     block_id: constr(max_length=255) = Field(
         None,
         description="A string acting as a unique identifier for a block. "
