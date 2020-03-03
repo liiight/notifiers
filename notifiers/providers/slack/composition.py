@@ -6,6 +6,7 @@ from pydantic import constr
 from pydantic import create_model
 from pydantic import Field
 from pydantic import HttpUrl
+from pydantic import root_validator
 
 from notifiers.models.provider import SchemaModel
 
@@ -38,6 +39,12 @@ class SlackBlockTextObject(SchemaModel):
         " Using a value of true will skip any preprocessing of this nature, although you can still"
         " include manual parsing strings. This field is only usable when type is mrkdwn.",
     )
+
+    @root_validator
+    def check_emoji(cls, values):
+        if values.get("emoji") and values["type"] is not SlackTextType.plain_text:
+            raise ValueError("Cannot use 'emoji' when type is not 'plain_text'")
+        return values
 
     class Config:
         json_encoders = {SlackTextType: lambda v: v.value}
