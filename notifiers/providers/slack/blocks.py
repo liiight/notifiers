@@ -86,7 +86,7 @@ class SlackSectionBlock(SlackBaseBlock):
     in combination with text fields, or side-by-side with any of the available block elements"""
 
     type: Literal[SlackBlockType.section, SlackBlockType.section.value] = Field(
-        ...,
+        SlackBlockType.section,
         description="The type of block. For a section block, type will always be section",
     )
     text: _text_object_factory("SectionBlockText", max_length=3000) = Field(
@@ -118,7 +118,7 @@ class SlackDividerBlock(SlackBaseBlock):
      The divider block is nice and neat, requiring only a type."""
 
     type: Literal[SlackBlockType.divider, SlackBlockType.divider.value] = Field(
-        ...,
+        SlackBlockType.divider,
         description="The type of block. For a divider block, type will always be divider",
     )
 
@@ -127,7 +127,7 @@ class SlackImageBlock(SlackBaseBlock):
     """A simple image block, designed to make those cat photos really pop"""
 
     type: Literal[SlackBlockType.image, SlackBlockType.image.value] = Field(
-        ...,
+        SlackBlockType.image,
         description="The type of block. For a image block, type will always be image",
     )
     image_url: HttpUrl = Field(..., description="The URL of the image to be displayed")
@@ -144,7 +144,7 @@ class SlackActionsBlock(SlackBaseBlock):
     """A block that is used to hold interactive elements"""
 
     type: Literal[SlackBlockType.actions, SlackBlockType.actions.value] = Field(
-        ...,
+        SlackBlockType.actions,
         description="The type of block. For an actions block, type will always be actions",
     )
     elements: List[ActionsBlockElements] = Field(
@@ -158,7 +158,7 @@ class SlackContextBlock(SlackBaseBlock):
     """Displays message context, which can include both images and text"""
 
     type: Literal[SlackBlockType.context, SlackBlockType.context.value] = Field(
-        ...,
+        SlackBlockType.context,
         description="The type of block. For a context block, type will always be context",
     )
     elements: List[ContextBlockElements] = Field(
@@ -170,7 +170,8 @@ class SlackFileBlock(SlackBaseBlock):
     """Displays a remote file"""
 
     type: Literal[SlackBlockType.file, SlackBlockType.file.value] = Field(
-        ..., description="The type of block. For a file block, type will always be file"
+        SlackBlockType.file,
+        description="The type of block. For a file block, type will always be file",
     )
     external_id: str = Field(..., description="The external unique ID for this file")
     source: Literal["remote"] = Field(

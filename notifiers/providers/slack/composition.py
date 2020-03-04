@@ -21,7 +21,7 @@ class SlackBlockTextObject(SchemaModel):
     """An object containing some text, formatted either as plain_text or using mrkdwn"""
 
     type: SlackTextType = Field(
-        ..., description="The formatting to use for this text object"
+        SlackTextType.markdown, description="The formatting to use for this text object"
     )
     text: constr(max_length=3000) = Field(
         ...,

@@ -28,9 +28,11 @@ from .elements import SlackSelectConversationsElement
 from .elements import SlackSelectUsersElement
 from .elements import SlackStaticSelectElement
 from .main import Slack
+from .main import SlackSchema
 
 __all__ = [
     "Slack",
+    "SlackSchema",
     "SlackActionsBlock",
     "SlackSectionBlock",
     "SlackContextBlock",
