@@ -180,7 +180,7 @@ class StatuspageSchema(StatuspageBaseSchema):
 class StatuspageMixin:
     """Shared resources between :class:`Statuspage` and :class:`StatuspageComponents`"""
 
-    base_url = "https://api.statuspage.io/v1//pages/{page_id}/"
+    base_url = "https://api.statuspage.io/v1/pages/{page_id}/"
     name = "statuspage"
     path_to_errors = ("error",)
     site_url = "https://statuspage.io"
