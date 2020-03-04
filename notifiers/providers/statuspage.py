@@ -1,9 +1,180 @@
-from ..exceptions import BadArguments
+from datetime import datetime
+from enum import Enum
+from typing import Dict
+from typing import List
+from urllib.parse import urljoin
+
+from pydantic import Field
+from pydantic import root_validator
+from pydantic.json import isoformat
+
 from ..exceptions import ResourceError
 from ..models.provider import Provider
 from ..models.provider import ProviderResource
+from ..models.provider import SchemaModel
 from ..models.response import Response
 from ..utils import requests
+
+
+class Impact(Enum):
+    critical = "critical"
+    major = "major"
+    minor = "minor"
+    maintenance = "maintenance"
+    none = "none"
+
+
+class IncidentStatus(Enum):
+    postmortem = "postmortem"
+    investigating = "investigating"
+    identified = "identified"
+    resolved = "resolved"
+    update = "update"
+    scheduled = "scheduled"
+    in_progress = "in_progress"
+    verifying = "verifying"
+    monitoring = "monitoring"
+    completed = "completed"
+
+
+class ComponentStatus(Enum):
+    operational = "operational"
+    under_maintenance = "under_maintenance"
+    degraded_performance = "degraded_performance"
+    partial_outage = "partial_outage"
+    major_outage = "major_outage"
+    empty = ""
+
+
+class StatuspageBaseSchema(SchemaModel):
+    api_key: str = Field(..., description="Authentication token")
+    page_id: str = Field(..., description="Paged ID")
+
+
+class StatuspageSchema(StatuspageBaseSchema):
+    """Statuspage incident creation schema"""
+
+    message: str = Field(..., description="Incident Name", alias="name")
+    status: IncidentStatus = Field(None, description="Incident status")
+    impact_override: Impact = Field(
+        None, description="Value to override calculated impact value"
+    )
+    scheduled_for: datetime = Field(
+        None, description="The timestamp the incident is scheduled for"
+    )
+    scheduled_until: datetime = Field(
+        None, description="The timestamp the incident is scheduled until"
+    )
+    scheduled_remind_prior: bool = Field(
+        None,
+        description="Controls whether to remind subscribers prior to scheduled incidents",
+    )
+    scheduled_auto_in_progress: bool = Field(
+        None,
+        description="Controls whether the incident is scheduled to automatically change to in progress",
+    )
+    scheduled_auto_completed: bool = Field(
+        None,
+        description="Controls whether the incident is scheduled to automatically change to complete",
+    )
+    metadata: dict = Field(
+        None,
+        description="Attach a json object to the incident. All top-level values in the object must also be objects",
+    )
+    deliver_notifications: bool = Field(
+        None,
+        description="Deliver notifications to subscribers if this is true. If this is false, "
+        "create an incident without notifying customers",
+    )
+    auto_transition_deliver_notifications_at_end: bool = Field(
+        None,
+        description="Controls whether send notification when scheduled maintenances auto transition to completed",
+    )
+    auto_transition_deliver_notifications_at_start: bool = Field(
+        None,
+        description="Controls whether send notification when scheduled maintenances auto transition to started",
+    )
+    auto_transition_to_maintenance_state: bool = Field(
+        None,
+        description="Controls whether send notification when scheduled maintenances auto transition to in progress",
+    )
+    auto_transition_to_operational_state: bool = Field(
+        None,
+        description="Controls whether change components status to operational once scheduled maintenance completes",
+    )
+    auto_tweet_at_beginning: bool = Field(
+        None,
+        description="Controls whether tweet automatically when scheduled maintenance starts",
+    )
+    auto_tweet_on_completion: bool = Field(
+        None,
+        description="Controls whether tweet automatically when scheduled maintenance completes",
+    )
+    auto_tweet_on_creation: bool = Field(
+        None,
+        description="Controls whether tweet automatically when scheduled maintenance is created",
+    )
+    auto_tweet_one_hour_before: bool = Field(
+        None,
+        description="Controls whether tweet automatically one hour before scheduled maintenance starts",
+    )
+    backfill_date: datetime = Field(
+        None, description="TimeStamp when incident was backfilled"
+    )
+    backfilled: bool = Field(
+        None,
+        description="Controls whether incident is backfilled. If true, components cannot be specified",
+    )
+    body: str = Field(
+        None, description="The initial message, created as the first incident update"
+    )
+    components: Dict[str, ComponentStatus] = Field(
+        None, description="Map of status changes to apply to affected components"
+    )
+    component_ids: List[str] = Field(
+        None, description="List of component_ids affected by this incident"
+    )
+    scheduled_auto_transition: bool = Field(
+        None,
+        description="Same as 'scheduled_auto_transition_in_progress'. Controls whether the incident is "
+        "scheduled to automatically change to in progress",
+    )
+
+    @root_validator
+    def values_dependencies(cls, values):
+        backfill_values = [values.get(v) for v in ("backfill_date", "backfilled")]
+        scheduled_values = [values.get(v) for v in ("scheduled_for", "scheduled_until")]
+
+        if any(backfill_values) and not all(backfill_values):
+            raise ValueError(
+                "Cannot set just one of 'backfill_date' and 'backfilled', both need to be set"
+            )
+        if any(scheduled_values) and not all(scheduled_values):
+            raise ValueError(
+                "Cannot set just one of 'scheduled_for' and 'scheduled_until', both need to be set"
+            )
+        if any(
+            values.get(v)
+            for v in (
+                "scheduled_until",
+                "scheduled_remind_prior",
+                "scheduled_auto_in_progress",
+                "scheduled_auto_completed",
+            )
+        ) and not values.get("scheduled_for"):
+            raise ValueError(
+                "'scheduled_for' must be set when setting scheduled attributes"
+            )
+        if any(backfill_values) and any(scheduled_values):
+            raise ValueError(
+                "Cannot set both backfill attributes and scheduled attributes"
+            )
+        if any(backfill_values) and values.get("status"):
+            raise ValueError("Cannot set 'status' when setting 'backfill'")
+        return values
+
+    class Config:
+        json_encoders = {datetime: isoformat}
 
 
 class StatuspageMixin:
@@ -14,12 +185,16 @@ class StatuspageMixin:
     path_to_errors = ("error",)
     site_url = "https://statuspage.io"
 
+    @staticmethod
+    def request_headers(api_key: str) -> dict:
+        return {"Authorization": f"OAuth {api_key}"}
+
 
 class StatuspageComponents(StatuspageMixin, ProviderResource):
     """Return a list of Statuspage components for the page ID"""
 
     resource_name = "components"
-    components_url = "components.json"
+    components_url = "components"
 
     _required = {"required": ["api_key", "page_id"]}
 
@@ -33,10 +208,12 @@ class StatuspageComponents(StatuspageMixin, ProviderResource):
     }
 
     def _get_resource(self, data: dict) -> dict:
-        url = self.base_url.format(page_id=data["page_id"]) + self.components_url
-        params = {"api_key": data.pop("api_key")}
+        url = urljoin(
+            self.base_url.format(page_id=data["page_id"]), self.components_url
+        )
+        headers = self.request_headers(data.pop("api_key"))
         response, errors = requests.get(
-            url, params=params, path_to_errors=self.path_to_errors
+            url, headers=headers, path_to_errors=self.path_to_errors
         )
         if errors:
             raise ResourceError(
@@ -52,138 +229,19 @@ class StatuspageComponents(StatuspageMixin, ProviderResource):
 class Statuspage(StatuspageMixin, Provider):
     """Create Statuspage incidents"""
 
-    incidents_url = "incidents.json"
+    incidents_url = "incidents"
 
     _resources = {"components": StatuspageComponents()}
 
-    realtime_statuses = ["investigating", "identified", "monitoring", "resolved"]
+    schema_model = StatuspageSchema
 
-    scheduled_statuses = ["scheduled", "in_progress", "verifying", "completed"]
-
-    __component_ids = {
-        "type": "array",
-        "items": {"type": "string"},
-        "title": "List of components whose subscribers should be notified (only applicable for pages with "
-        "component subscriptions enabled)",
-    }
-
-    _required = {"required": ["message", "api_key", "page_id"]}
-
-    _schema = {
-        "type": "object",
-        "properties": {
-            "message": {"type": "string", "title": "The name of the incident"},
-            "api_key": {"type": "string", "title": "OAuth2 token"},
-            "page_id": {"type": "string", "title": "Page ID"},
-            "status": {
-                "type": "string",
-                "title": "Status of the incident",
-                "enum": realtime_statuses + scheduled_statuses,
-            },
-            "body": {
-                "type": "string",
-                "title": "The initial message, created as the first incident update",
-            },
-            "wants_twitter_update": {
-                "type": "boolean",
-                "title": "Post the new incident to twitter",
-            },
-            "impact_override": {
-                "type": "string",
-                "title": "Override calculated impact value",
-                "enum": ["none", "minor", "major", "critical"],
-            },
-            "component_ids": __component_ids,
-            "deliver_notifications": {
-                "type": "boolean",
-                "title": "Control whether notifications should be delivered for the initial incident update",
-            },
-            "scheduled_for": {
-                "type": "string",
-                "format": "iso8601",
-                "title": "Time the scheduled maintenance should begin",
-            },
-            "scheduled_until": {
-                "type": "string",
-                "format": "iso8601",
-                "title": "Time the scheduled maintenance should end",
-            },
-            "scheduled_remind_prior": {
-                "type": "boolean",
-                "title": "Remind subscribers 60 minutes before scheduled start",
-            },
-            "scheduled_auto_in_progress": {
-                "type": "boolean",
-                "title": "Automatically transition incident to 'In Progress' at start",
-            },
-            "scheduled_auto_completed": {
-                "type": "boolean",
-                "title": "Automatically transition incident to 'Completed' at end",
-            },
-            "backfilled": {"type": "boolean", "title": "Create an historical incident"},
-            "backfill_date": {
-                "format": "date",
-                "type": "string",
-                "title": "Date of incident in YYYY-MM-DD format",
-            },
-        },
-        "dependencies": {
-            "backfill_date": ["backfilled"],
-            "backfilled": ["backfill_date"],
-            "scheduled_for": ["scheduled_until"],
-            "scheduled_until": ["scheduled_for"],
-            "scheduled_remind_prior": ["scheduled_for"],
-            "scheduled_auto_in_progress": ["scheduled_for"],
-            "scheduled_auto_completed": ["scheduled_for"],
-        },
-        "additionalProperties": False,
-    }
-
-    def _validate_data_dependencies(self, data: dict) -> dict:
-        scheduled_properties = [prop for prop in data if prop.startswith("scheduled")]
-        scheduled = any(data.get(prop) is not None for prop in scheduled_properties)
-
-        backfill_properties = [prop for prop in data if prop.startswith("backfill")]
-        backfill = any(data.get(prop) is not None for prop in backfill_properties)
-
-        if scheduled and backfill:
-            raise BadArguments(
-                provider=self.name,
-                validation_error="Cannot set both 'backfill' and 'scheduled' incident properties "
-                "in the same notification!",
-            )
-
-        status = data.get("status")
-        if scheduled and status and status not in self.scheduled_statuses:
-            raise BadArguments(
-                provider=self.name,
-                validation_error=f"Status '{status}' is a realtime incident status! "
-                f"Please choose one of {self.scheduled_statuses}",
-            )
-        elif backfill and status:
-            raise BadArguments(
-                provider=self.name,
-                validation_error="Cannot set 'status' when setting 'backfill'!",
-            )
-
-        return data
-
-    def _prepare_data(self, data: dict) -> dict:
-        new_data = {
-            "incident[name]": data.pop("message"),
-            "api_key": data.pop("api_key"),
-            "page_id": data.pop("page_id"),
-        }
-        for key, value in data.items():
-            if isinstance(value, bool):
-                value = "t" if value else "f"
-            new_data[f"incident[{key}]"] = value
-        return new_data
-
-    def _send_notification(self, data: dict) -> Response:
-        url = self.base_url.format(page_id=data.pop("page_id")) + self.incidents_url
-        params = {"api_key": data.pop("api_key")}
+    def _send_notification(self, data: StatuspageSchema) -> Response:
+        data = data.to_dict()
+        url = urljoin(
+            self.base_url.format(page_id=data.pop("page_id")), self.incidents_url
+        )
+        headers = self.request_headers(data.pop("api_key"))
         response, errors = requests.post(
-            url, data=data, params=params, path_to_errors=self.path_to_errors
+            url, data=data, headers=headers, path_to_errors=self.path_to_errors
         )
         return self.create_response(data, response, errors)
