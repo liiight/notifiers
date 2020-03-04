@@ -17,8 +17,9 @@ class TextType(Enum):
     markdown = "mrkdwn"
 
 
-class BlockTextObject(SchemaModel):
-    """An object containing some text, formatted either as plain_text or using mrkdwn"""
+class Text(SchemaModel):
+    """An object containing some text, formatted either as plain_text or using mrkdwn,
+     our proprietary textual markup that's just different enough from Markdown to frustrate you"""
 
     type: TextType = Field(
         TextType.markdown, description="The formatting to use for this text object"
@@ -53,7 +54,7 @@ class BlockTextObject(SchemaModel):
 
 def _text_object_factory(
     model_name: str, max_length: int, type: TextType = None
-) -> Type[BlockTextObject]:
+) -> Type[Text]:
     """Returns a custom text object schema. If a `type_` is passed,
     it's enforced as the only possible value (both the enum and its value) and set as the default"""
     type_value = (Literal[type, type.value], type) if type else (TextType, ...)
@@ -61,7 +62,7 @@ def _text_object_factory(
         model_name,
         type=type_value,
         text=(constr(max_length=max_length), ...),
-        __base__=BlockTextObject,
+        __base__=Text,
     )
 
 

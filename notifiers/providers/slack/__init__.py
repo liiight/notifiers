@@ -4,11 +4,11 @@ from .blocks import DividerBlock
 from .blocks import FileBlock
 from .blocks import ImageBlock
 from .blocks import SectionBlock
-from .composition import BlockTextObject
 from .composition import Color
 from .composition import ConfirmationDialog
 from .composition import Option
 from .composition import OptionGroup
+from .composition import Text
 from .composition import TextType
 from .elements import ButtonElement
 from .elements import CheckboxElement
@@ -56,7 +56,7 @@ __all__ = [
     "SelectConversationsElement",
     "SelectChannelsElement",
     "SelectUsersElement",
-    "BlockTextObject",
+    "Text",
     "Option",
     "OptionGroup",
     "ConfirmationDialog",

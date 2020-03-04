@@ -25,7 +25,7 @@ from .elements import SelectUsersElement
 from .elements import StaticSelectElement
 from notifiers.models.provider import SchemaModel
 from notifiers.providers.slack.composition import _text_object_factory
-from notifiers.providers.slack.composition import BlockTextObject
+from notifiers.providers.slack.composition import Text
 from notifiers.providers.slack.composition import TextType
 
 SectionBlockElements = Union[
@@ -58,7 +58,7 @@ ActionsBlockElements = Union[
     SelectChannelsElement,
 ]
 
-ContextBlockElements = Union[ImageElement, BlockTextObject]
+ContextBlockElements = Union[ImageElement, Text]
 
 
 class BlockType(Enum):
