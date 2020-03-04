@@ -13,11 +13,11 @@ from notifiers.models.provider import Provider
 from notifiers.models.provider import SchemaModel
 from notifiers.models.response import Response
 from notifiers.providers.slack.blocks import Blocks
-from notifiers.providers.slack.composition import SlackColor
+from notifiers.providers.slack.composition import Color
 from notifiers.utils import requests
 
 
-class SlackFieldObject(SchemaModel):
+class FieldObject(SchemaModel):
     title: str = Field(
         None,
         description="Shown as a bold heading displayed in the field object."
@@ -35,7 +35,7 @@ class SlackFieldObject(SchemaModel):
     )
 
 
-class SlackAttachmentSchema(SchemaModel):
+class AttachmentSchema(SchemaModel):
     """Secondary content can be attached to messages to include lower priority content - content that
      doesn't necessarily need to be seen to appreciate the intent of the message,
       but perhaps adds further context or additional information."""
@@ -45,7 +45,7 @@ class SlackAttachmentSchema(SchemaModel):
         description="An array of layout blocks in the same format as described in the building blocks guide.",
         max_items=50,
     )
-    color: Union[SlackColor, ColorType] = Field(
+    color: Union[Color, ColorType] = Field(
         None,
         description="Changes the color of the border on the left side of this attachment from the default gray",
     )
@@ -66,7 +66,7 @@ class SlackAttachmentSchema(SchemaModel):
         description="A plain text summary of the attachment used in clients that don't show "
         "formatted text (eg. IRC, mobile notifications)",
     )
-    attachment_fields: List[SlackFieldObject] = Field(
+    attachment_fields: List[FieldObject] = Field(
         None,
         description="An array of field objects that get displayed in a table-like way."
         " For best results, include no more than 2-3 field objects",
@@ -134,7 +134,7 @@ class SlackAttachmentSchema(SchemaModel):
     )
 
     @validator("color")
-    def color_format(cls, v: Union[SlackColor, ColorType]):
+    def color_format(cls, v: Union[Color, ColorType]):
         return v.as_hex() if isinstance(v, ColorType) else v.value
 
     @validator("timestamp")
@@ -172,7 +172,7 @@ class SlackSchema(SchemaModel):
         description="An array of layout blocks in the same format as described in the building blocks guide.",
         max_items=50,
     )
-    attachments: List[SlackAttachmentSchema] = Field(
+    attachments: List[AttachmentSchema] = Field(
         None,
         description="An array of legacy secondary attachments. We recommend you use blocks instead.",
     )

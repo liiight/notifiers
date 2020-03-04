@@ -12,16 +12,16 @@ from typing_extensions import Literal
 from notifiers.models.provider import SchemaModel
 
 
-class SlackTextType(Enum):
+class TextType(Enum):
     plain_text = "plain_text"
     markdown = "mrkdwn"
 
 
-class SlackBlockTextObject(SchemaModel):
+class BlockTextObject(SchemaModel):
     """An object containing some text, formatted either as plain_text or using mrkdwn"""
 
-    type: SlackTextType = Field(
-        SlackTextType.markdown, description="The formatting to use for this text object"
+    type: TextType = Field(
+        TextType.markdown, description="The formatting to use for this text object"
     )
     text: constr(max_length=3000) = Field(
         ...,
@@ -43,37 +43,34 @@ class SlackBlockTextObject(SchemaModel):
 
     @root_validator
     def check_emoji(cls, values):
-        if (
-            values.get("emoji")
-            and SlackTextType(values["type"]) is not SlackTextType.plain_text
-        ):
+        if values.get("emoji") and TextType(values["type"]) is not TextType.plain_text:
             raise ValueError("Cannot use 'emoji' when type is not 'plain_text'")
         return values
 
     class Config:
-        json_encoders = {SlackTextType: lambda v: v.value}
+        json_encoders = {TextType: lambda v: v.value}
 
 
 def _text_object_factory(
-    model_name: str, max_length: int, type: SlackTextType = None
-) -> Type[SlackBlockTextObject]:
+    model_name: str, max_length: int, type: TextType = None
+) -> Type[BlockTextObject]:
     """Returns a custom text object schema. If a `type_` is passed,
     it's enforced as the only possible value (both the enum and its value) and set as the default"""
-    type_value = (Literal[type, type.value], type) if type else (SlackTextType, ...)
+    type_value = (Literal[type, type.value], type) if type else (TextType, ...)
     return create_model(
         model_name,
         type=type_value,
         text=(constr(max_length=max_length), ...),
-        __base__=SlackBlockTextObject,
+        __base__=BlockTextObject,
     )
 
 
-class SlackOption(SchemaModel):
+class Option(SchemaModel):
     """An object that represents a single selectable item in a select menu, multi-select menu, radio button group,
     or overflow menu."""
 
     text: _text_object_factory(
-        "OptionText", max_length=75, type=SlackTextType.plain_text
+        "OptionText", max_length=75, type=TextType.plain_text
     ) = Field(
         ...,
         description="A plain_text only text object that defines the text shown in the option on the menu."
@@ -84,7 +81,7 @@ class SlackOption(SchemaModel):
         description="The string value that will be passed to your app when this option is chosen",
     )
     description: _text_object_factory(
-        "DescriptionText", max_length=75, type=SlackTextType.plain_text
+        "DescriptionText", max_length=75, type=TextType.plain_text
     ) = Field(
         None,
         description="A plain_text only text object that defines a line of descriptive text shown below the "
@@ -99,37 +96,37 @@ class SlackOption(SchemaModel):
     )
 
 
-class SlackOptionGroup(SchemaModel):
+class OptionGroup(SchemaModel):
     """Provides a way to group options in a select menu or multi-select menu"""
 
     label: _text_object_factory(
-        "OptionGroupText", max_length=75, type=SlackTextType.plain_text
+        "OptionGroupText", max_length=75, type=TextType.plain_text
     ) = Field(
         ...,
         description="A plain_text only text object that defines the label shown above this group of options",
     )
-    options: List[SlackOption] = Field(
+    options: List[Option] = Field(
         ...,
         description="An array of option objects that belong to this specific group. Maximum of 100 items",
         max_items=100,
     )
 
 
-class SlackConfirmationDialog(SchemaModel):
+class ConfirmationDialog(SchemaModel):
     """An object that defines a dialog that provides a confirmation step to any interactive element.
      This dialog will ask the user to confirm their action by offering a confirm and deny buttons."""
 
     title: _text_object_factory(
-        "DialogTitleText", max_length=100, type=SlackTextType.plain_text
+        "DialogTitleText", max_length=100, type=TextType.plain_text
     )
     text: _text_object_factory("DialogTextText", max_length=300)
     confirm: _text_object_factory("DialogConfirmText", max_length=30)
     deny: _text_object_factory(
-        "DialogDenyText", max_length=30, type=SlackTextType.plain_text
+        "DialogDenyText", max_length=30, type=TextType.plain_text
     )
 
 
-class SlackColor(Enum):
+class Color(Enum):
     good = "good"
     warning = "warning"
     danger = "danger"

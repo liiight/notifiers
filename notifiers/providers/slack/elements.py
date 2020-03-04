@@ -7,17 +7,16 @@ from pydantic import Field
 from pydantic import HttpUrl
 from pydantic import PositiveInt
 from pydantic import root_validator
-from pydantic import validator
 
 from notifiers.models.provider import SchemaModel
 from notifiers.providers.slack.composition import _text_object_factory
-from notifiers.providers.slack.composition import SlackConfirmationDialog
-from notifiers.providers.slack.composition import SlackOption
-from notifiers.providers.slack.composition import SlackOptionGroup
-from notifiers.providers.slack.composition import SlackTextType
+from notifiers.providers.slack.composition import ConfirmationDialog
+from notifiers.providers.slack.composition import Option
+from notifiers.providers.slack.composition import OptionGroup
+from notifiers.providers.slack.composition import TextType
 
 
-class SlackElementType(Enum):
+class ElementType(Enum):
     button = "button"
     checkboxes = "checkboxes"
     date_picker = "datepicker"
@@ -39,8 +38,8 @@ class SlackElementType(Enum):
     channels_select = "channels_select"
 
 
-class SlackBaseElement(SchemaModel):
-    type: SlackElementType = Field(..., description="The type of element")
+class _BaseElement(SchemaModel):
+    type: ElementType = Field(..., description="The type of element")
     action_id: constr(max_length=255) = Field(
         None,
         description="An identifier for this action. You can use this when you receive an interaction payload to "
@@ -49,20 +48,20 @@ class SlackBaseElement(SchemaModel):
     )
 
     class Config:
-        json_encoders = {SlackElementType: lambda v: v.value}
+        json_encoders = {ElementType: lambda v: v.value}
 
 
-class SlackButtonElementStyle(Enum):
+class ButtonElementStyle(Enum):
     primary = "primary"
     danger = "danger"
     default = None
 
 
-class SlackButtonElement(SlackBaseElement):
+class ButtonElement(_BaseElement):
     """An interactive component that inserts a button.
      The button can be a trigger for anything from opening a simple link to starting a complex workflow."""
 
-    type = SlackElementType.button
+    type = ElementType.button
     text: _text_object_factory("ElementText", max_length=75) = Field(
         ..., description="A text object that defines the button's text"
     )
@@ -77,38 +76,44 @@ class SlackButtonElement(SlackBaseElement):
         description="The value to send along with the interaction payload. "
         "Maximum length for this field is 2000 characters",
     )
-    style: SlackButtonElementStyle = Field(
+    style: ButtonElementStyle = Field(
         None,
         description="Decorates buttons with alternative visual color schemes. Use this option with restraint",
     )
-    confirm: SlackConfirmationDialog = Field(
+    confirm: ConfirmationDialog = Field(
         None,
         description="A confirm object that defines an optional confirmation dialog after the button is clicked.",
     )
 
+    class Config:
+        json_encoders = {
+            ElementType: lambda v: v.value,
+            ButtonElementStyle: lambda v: v.value,
+        }
 
-class SlackCheckboxElement(SlackBaseElement):
+
+class CheckboxElement(_BaseElement):
     """A checkbox group that allows a user to choose multiple items from a list of possible options"""
 
-    type = SlackElementType.checkboxes
-    options: List[SlackOption] = Field(..., description="An array of option objects")
-    initial_options: List[SlackOption] = Field(
+    type = ElementType.checkboxes
+    options: List[Option] = Field(..., description="An array of option objects")
+    initial_options: List[Option] = Field(
         ...,
         description="An array of option objects that exactly matches one or more of the options within options."
         " These options will be selected when the checkbox group initially loads",
     )
-    confirm: SlackConfirmationDialog = Field(
+    confirm: ConfirmationDialog = Field(
         None,
         description="A confirm object that defines an optional confirmation dialog that appears after "
         "clicking one of the checkboxes in this element.",
     )
 
 
-class SlackDatePickerElement(SlackBaseElement):
+class DatePickerElement(_BaseElement):
     """An element which lets users easily select a date from a calendar style UI."""
 
     placeholder: _text_object_factory(
-        "DatePicketText", max_length=150, type=SlackTextType.plain_text
+        "DatePicketText", max_length=150, type=TextType.plain_text
     ) = Field(
         None,
         description="A plain_text only text object that defines the placeholder text shown on the datepicker."
@@ -117,21 +122,17 @@ class SlackDatePickerElement(SlackBaseElement):
     initial_date: date = Field(
         None, description="The initial date that is selected when the element is loaded"
     )
-    confirm: SlackConfirmationDialog = Field(
+    confirm: ConfirmationDialog = Field(
         None,
         description="A confirm object that defines an optional confirmation dialog that appears"
         " after a date is selected.",
     )
 
-    @validator("initial_date")
-    def format_date(cls, v: date):
-        return str(v)
 
-
-class SlackImageElement(SlackBaseElement):
+class ImageElement(_BaseElement):
     """A plain-text summary of the image. This should not contain any markup"""
 
-    type = SlackElementType.image
+    type = ElementType.image
     image_url: HttpUrl = Field(..., description="The URL of the image to be displayed")
     alt_text: str = Field(
         ...,
@@ -139,19 +140,19 @@ class SlackImageElement(SlackBaseElement):
     )
 
 
-class SlackMultiSelectBaseElement(SlackBaseElement):
+class MultiSelectBaseElement(_BaseElement):
     placeholder: _text_object_factory(
-        "MultiSelectText", max_length=150, type=SlackTextType.plain_text
+        "MultiSelectText", max_length=150, type=TextType.plain_text
     ) = Field(
         ...,
         description="A plain_text only text object that defines the placeholder text shown on the menu",
     )
-    initial_options: List[SlackOption] = Field(
+    initial_options: List[Option] = Field(
         None,
         description="An array of option objects that exactly match one or more of the options within options "
         "or option_groups. These options will be selected when the menu initially loads.",
     )
-    confirm: SlackConfirmationDialog = Field(
+    confirm: ConfirmationDialog = Field(
         None,
         description="A confirm object that defines an optional confirmation dialog that appears before "
         "the multi-select choices are submitted",
@@ -162,15 +163,15 @@ class SlackMultiSelectBaseElement(SlackBaseElement):
     )
 
 
-class SlackMultiStaticSelectMenuElement(SlackMultiSelectBaseElement):
+class MultiStaticSelectMenuElement(MultiSelectBaseElement):
     """This is the simplest form of select menu, with a static list of options passed in when defining the element."""
 
-    type = SlackElementType.multi_static_select
+    type = ElementType.multi_static_select
 
-    options: List[SlackOption] = Field(
+    options: List[Option] = Field(
         None, description="An array of option objects.", max_items=100
     )
-    option_groups: List[SlackOptionGroup] = Field(
+    option_groups: List[OptionGroup] = Field(
         None, description="An array of option group objects", max_items=100
     )
 
@@ -184,10 +185,10 @@ class SlackMultiStaticSelectMenuElement(SlackMultiSelectBaseElement):
         return values
 
 
-class SlackMultiSelectExternalMenuElement(SlackMultiSelectBaseElement):
+class MultiSelectExternalMenuElement(MultiSelectBaseElement):
     """This menu will load its options from an external data source, allowing for a dynamic list of options."""
 
-    type = SlackElementType.multi_external_select
+    type = ElementType.multi_external_select
     min_query_length: PositiveInt = Field(
         None,
         description="When the typeahead field is used, a request will be sent on every character change. "
@@ -196,103 +197,103 @@ class SlackMultiSelectExternalMenuElement(SlackMultiSelectBaseElement):
     )
 
 
-class SlackMultiSelectUserListElement(SlackMultiSelectBaseElement):
+class MultiSelectUserListElement(MultiSelectBaseElement):
     """This multi-select menu will populate its options with a list of Slack users visible to the
     current user in the active workspace."""
 
-    type = SlackElementType.multi_users_select
+    type = ElementType.multi_users_select
     initial_users: List[str] = Field(
         None,
         description="An array of user IDs of any valid users to be pre-selected when the menu loads.",
     )
 
 
-class SlackMultiSelectConversationsElement(SlackMultiSelectBaseElement):
+class MultiSelectConversationsElement(MultiSelectBaseElement):
     """This multi-select menu will populate its options with a list of public and private channels,
     DMs, and MPIMs visible to the current user in the active workspace"""
 
-    type = SlackElementType.multi_conversations_select
+    type = ElementType.multi_conversations_select
     initial_conversations: List[str] = Field(
         None,
         description="An array of one or more IDs of any valid conversations to be pre-selected when the menu loads",
     )
 
 
-class SlackMultiSelectChannelsElement(SlackMultiSelectBaseElement):
+class MultiSelectChannelsElement(MultiSelectBaseElement):
     """This multi-select menu will populate its options with a list of public channels visible to the current
      user in the active workspace"""
 
-    type = SlackElementType.multi_channels_select
+    type = ElementType.multi_channels_select
     initial_channels: List[str] = Field(
         None,
         description="An array of one or more IDs of any valid public channel to be pre-selected when the menu loads",
     )
 
 
-class SlackOverflowElement(SlackBaseElement):
+class OverflowElement(_BaseElement):
     """This is like a cross between a button and a select menu - when a user clicks on this overflow button,
     they will be presented with a list of options to choose from. Unlike the select menu,
      there is no typeahead field, and the button always appears with an ellipsis ("…") rather than customisable text."""
 
-    type = SlackElementType.overflow
-    options: List[SlackOption] = Field(
+    type = ElementType.overflow
+    options: List[Option] = Field(
         ...,
         description="An array of option objects to display in the menu",
         min_items=2,
         max_items=5,
     )
-    confirm: SlackConfirmationDialog = Field(
+    confirm: ConfirmationDialog = Field(
         None,
         description="A confirm object that defines an optional confirmation dialog that appears after a menu "
         "item is selected",
     )
 
 
-class SlackRadioButtonGroupElement(SlackBaseElement):
+class RadioButtonGroupElement(_BaseElement):
     """A radio button group that allows a user to choose one item from a list of possible options"""
 
-    type = SlackElementType.radio_buttons
-    options: List[SlackOption] = Field(..., description="An array of option objects")
-    initial_option: SlackOption = Field(
+    type = ElementType.radio_buttons
+    options: List[Option] = Field(..., description="An array of option objects")
+    initial_option: Option = Field(
         None,
         description="An option object that exactly matches one of the options within options."
         " This option will be selected when the radio button group initially loads.",
     )
-    confirm: SlackConfirmationDialog = Field(
+    confirm: ConfirmationDialog = Field(
         None,
         description="A confirm object that defines an optional confirmation dialog that appears after "
         "clicking one of the radio buttons in this element",
     )
 
 
-class SlackStaticSelectElement(SlackMultiStaticSelectMenuElement):
+class StaticSelectElement(MultiStaticSelectMenuElement):
     """This is the simplest form of select menu, with a static list of options passed in when defining the element"""
 
-    type = SlackElementType.static_select
+    type = ElementType.static_select
 
 
-class SlackExternalSelectElement(SlackMultiSelectExternalMenuElement):
+class ExternalSelectElement(MultiSelectExternalMenuElement):
     """This select menu will load its options from an external data source, allowing for a dynamic list of options"""
 
-    type = SlackElementType.external_select
+    type = ElementType.external_select
 
 
-class SlackSelectConversationsElement(SlackMultiSelectConversationsElement):
+class SelectConversationsElement(MultiSelectConversationsElement):
     """This select menu will populate its options with a list of public and private channels,
      DMs, and MPIMs visible to the current user in the active workspace."""
 
-    type = SlackElementType.conversations_select
+    type = ElementType.conversations_select
 
 
-class SlackSelectChannelsElement(SlackMultiSelectChannelsElement):
+class SelectChannelsElement(MultiSelectChannelsElement):
     """This select menu will populate its options with a list of public channels visible to the current user
      in the active workspace."""
 
-    type = SlackElementType.channels_select
+    type = ElementType.channels_select
 
 
-class SlackSelectUsersElement(SlackMultiSelectUserListElement):
+class SelectUsersElement(MultiSelectUserListElement):
     """This select menu will populate its options with a list of Slack users visible to the
      current user in the active workspace"""
 
-    type = SlackElementType.users_select
+    type = ElementType.users_select

@@ -8,60 +8,60 @@ from pydantic import HttpUrl
 from pydantic import root_validator
 from typing_extensions import Literal
 
-from .elements import SlackButtonElement
-from .elements import SlackCheckboxElement
-from .elements import SlackDatePickerElement
-from .elements import SlackExternalSelectElement
-from .elements import SlackImageElement
-from .elements import SlackMultiSelectChannelsElement
-from .elements import SlackMultiSelectConversationsElement
-from .elements import SlackMultiSelectExternalMenuElement
-from .elements import SlackMultiSelectUserListElement
-from .elements import SlackMultiStaticSelectMenuElement
-from .elements import SlackOverflowElement
-from .elements import SlackRadioButtonGroupElement
-from .elements import SlackSelectChannelsElement
-from .elements import SlackSelectUsersElement
-from .elements import SlackStaticSelectElement
+from .elements import ButtonElement
+from .elements import CheckboxElement
+from .elements import DatePickerElement
+from .elements import ExternalSelectElement
+from .elements import ImageElement
+from .elements import MultiSelectChannelsElement
+from .elements import MultiSelectConversationsElement
+from .elements import MultiSelectExternalMenuElement
+from .elements import MultiSelectUserListElement
+from .elements import MultiStaticSelectMenuElement
+from .elements import OverflowElement
+from .elements import RadioButtonGroupElement
+from .elements import SelectChannelsElement
+from .elements import SelectUsersElement
+from .elements import StaticSelectElement
 from notifiers.models.provider import SchemaModel
 from notifiers.providers.slack.composition import _text_object_factory
-from notifiers.providers.slack.composition import SlackBlockTextObject
-from notifiers.providers.slack.composition import SlackTextType
+from notifiers.providers.slack.composition import BlockTextObject
+from notifiers.providers.slack.composition import TextType
 
 SectionBlockElements = Union[
-    SlackButtonElement,
-    SlackCheckboxElement,
-    SlackDatePickerElement,
-    SlackImageElement,
-    SlackMultiStaticSelectMenuElement,
-    SlackMultiSelectExternalMenuElement,
-    SlackMultiSelectUserListElement,
-    SlackMultiSelectConversationsElement,
-    SlackMultiSelectChannelsElement,
-    SlackOverflowElement,
-    SlackRadioButtonGroupElement,
-    SlackStaticSelectElement,
-    SlackExternalSelectElement,
-    SlackSelectUsersElement,
-    SlackSelectChannelsElement,
+    ButtonElement,
+    CheckboxElement,
+    DatePickerElement,
+    ImageElement,
+    MultiStaticSelectMenuElement,
+    MultiSelectExternalMenuElement,
+    MultiSelectUserListElement,
+    MultiSelectConversationsElement,
+    MultiSelectChannelsElement,
+    OverflowElement,
+    RadioButtonGroupElement,
+    StaticSelectElement,
+    ExternalSelectElement,
+    SelectUsersElement,
+    SelectChannelsElement,
 ]
 
 ActionsBlockElements = Union[
-    SlackButtonElement,
-    SlackCheckboxElement,
-    SlackDatePickerElement,
-    SlackOverflowElement,
-    SlackRadioButtonGroupElement,
-    SlackStaticSelectElement,
-    SlackExternalSelectElement,
-    SlackSelectUsersElement,
-    SlackSelectChannelsElement,
+    ButtonElement,
+    CheckboxElement,
+    DatePickerElement,
+    OverflowElement,
+    RadioButtonGroupElement,
+    StaticSelectElement,
+    ExternalSelectElement,
+    SelectUsersElement,
+    SelectChannelsElement,
 ]
 
-ContextBlockElements = Union[SlackImageElement, SlackBlockTextObject]
+ContextBlockElements = Union[ImageElement, BlockTextObject]
 
 
-class SlackBlockType(Enum):
+class BlockType(Enum):
     section = "section"
     divider = "divider"
     image = "image"
@@ -70,7 +70,7 @@ class SlackBlockType(Enum):
     file = "file"
 
 
-class SlackBaseBlock(SchemaModel):
+class BaseBlock(SchemaModel):
     block_id: constr(max_length=255) = Field(
         None,
         description="A string acting as a unique identifier for a block. "
@@ -81,12 +81,12 @@ class SlackBaseBlock(SchemaModel):
     )
 
 
-class SlackSectionBlock(SlackBaseBlock):
+class SectionBlock(BaseBlock):
     """A section is one of the most flexible blocks available - it can be used as a simple text block,
     in combination with text fields, or side-by-side with any of the available block elements"""
 
-    type: Literal[SlackBlockType.section, SlackBlockType.section.value] = Field(
-        SlackBlockType.section,
+    type: Literal[BlockType.section, BlockType.section.value] = Field(
+        BlockType.section,
         description="The type of block. For a section block, type will always be section",
     )
     text: _text_object_factory("SectionBlockText", max_length=3000) = Field(
@@ -113,21 +113,21 @@ class SlackSectionBlock(SlackBaseBlock):
         return values
 
 
-class SlackDividerBlock(SlackBaseBlock):
+class DividerBlock(BaseBlock):
     """A content divider, like an <hr>, to split up different blocks inside of a message.
      The divider block is nice and neat, requiring only a type."""
 
-    type: Literal[SlackBlockType.divider, SlackBlockType.divider.value] = Field(
-        SlackBlockType.divider,
+    type: Literal[BlockType.divider, BlockType.divider.value] = Field(
+        BlockType.divider,
         description="The type of block. For a divider block, type will always be divider",
     )
 
 
-class SlackImageBlock(SlackBaseBlock):
+class ImageBlock(BaseBlock):
     """A simple image block, designed to make those cat photos really pop"""
 
-    type: Literal[SlackBlockType.image, SlackBlockType.image.value] = Field(
-        SlackBlockType.image,
+    type: Literal[BlockType.image, BlockType.image.value] = Field(
+        BlockType.image,
         description="The type of block. For a image block, type will always be image",
     )
     image_url: HttpUrl = Field(..., description="The URL of the image to be displayed")
@@ -136,15 +136,15 @@ class SlackImageBlock(SlackBaseBlock):
         description="A plain-text summary of the image. This should not contain any markup",
     )
     title: _text_object_factory(
-        "ImageText", max_length=2000, type=SlackTextType.plain_text
+        "ImageText", max_length=2000, type=TextType.plain_text
     ) = Field(None, description="An optional title for the image")
 
 
-class SlackActionsBlock(SlackBaseBlock):
+class ActionsBlock(BaseBlock):
     """A block that is used to hold interactive elements"""
 
-    type: Literal[SlackBlockType.actions, SlackBlockType.actions.value] = Field(
-        SlackBlockType.actions,
+    type: Literal[BlockType.actions, BlockType.actions.value] = Field(
+        BlockType.actions,
         description="The type of block. For an actions block, type will always be actions",
     )
     elements: List[ActionsBlockElements] = Field(
@@ -154,11 +154,11 @@ class SlackActionsBlock(SlackBaseBlock):
     )
 
 
-class SlackContextBlock(SlackBaseBlock):
+class ContextBlock(BaseBlock):
     """Displays message context, which can include both images and text"""
 
-    type: Literal[SlackBlockType.context, SlackBlockType.context.value] = Field(
-        SlackBlockType.context,
+    type: Literal[BlockType.context, BlockType.context.value] = Field(
+        BlockType.context,
         description="The type of block. For a context block, type will always be context",
     )
     elements: List[ContextBlockElements] = Field(
@@ -166,11 +166,11 @@ class SlackContextBlock(SlackBaseBlock):
     )
 
 
-class SlackFileBlock(SlackBaseBlock):
+class FileBlock(BaseBlock):
     """Displays a remote file"""
 
-    type: Literal[SlackBlockType.file, SlackBlockType.file.value] = Field(
-        SlackBlockType.file,
+    type: Literal[BlockType.file, BlockType.file.value] = Field(
+        BlockType.file,
         description="The type of block. For a file block, type will always be file",
     )
     external_id: str = Field(..., description="The external unique ID for this file")
@@ -181,10 +181,5 @@ class SlackFileBlock(SlackBaseBlock):
 
 
 Blocks = Union[
-    SlackSectionBlock,
-    SlackDividerBlock,
-    SlackImageBlock,
-    SlackActionsBlock,
-    SlackContextBlock,
-    SlackFileBlock,
+    SectionBlock, DividerBlock, ImageBlock, ActionsBlock, ContextBlock, FileBlock,
 ]
