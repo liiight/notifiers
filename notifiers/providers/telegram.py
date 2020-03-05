@@ -223,6 +223,11 @@ class TelegramSchema(TelegramBaseSchema):
         description="Text of the message to be sent, 1-4096 characters after entities parsing",
         alias="text",
     )
+    chat_id: Union[int, str] = Field(
+        ...,
+        description="Unique identifier for the target chat or username of the target"
+        " channel (in the format @channelusername",
+    )
     parse_mode: ParseMode = Field(
         None,
         description="Send Markdown or HTML, if you want Telegram apps to show bold, italic, "
@@ -250,7 +255,7 @@ class TelegramSchema(TelegramBaseSchema):
 class TelegramMixin:
     """Shared resources between :class:`TelegramUpdates` and :class:`Telegram`"""
 
-    base_url = "https://api.telegram.org/bot{token}"
+    base_url = "https://api.telegram.org/bot{token}/"
     name = "telegram"
     path_to_errors = ("description",)
 
@@ -262,7 +267,7 @@ class TelegramUpdates(TelegramMixin, ProviderResource):
     schema_model = TelegramBaseSchema
 
     def _get_resource(self, data: TelegramBaseSchema) -> list:
-        url = urljoin(self.base_url.format(token=data.token), "/getUpdates")
+        url = urljoin(self.base_url.format(token=data.token), "getUpdates")
         response, errors = requests.get(url, path_to_errors=self.path_to_errors)
         if errors:
             raise ResourceError(
@@ -283,7 +288,7 @@ class Telegram(TelegramMixin, Provider):
     schema_model = TelegramSchema
 
     def _send_notification(self, data: TelegramSchema) -> Response:
-        url = urljoin(self.base_url.format(token=data.token), "/sendMessage")
+        url = urljoin(self.base_url.format(token=data.token), "sendMessage")
         payload = data.to_dict(exclude={"token"})
         response, errors = requests.post(
             url, json=payload, path_to_errors=self.path_to_errors
