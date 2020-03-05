@@ -16,19 +16,19 @@ from . import zulip
 from .slack import Slack
 
 _all_providers = {
-    # "pushover": pushover.Pushover,
-    # "simplepush": simplepush.SimplePush,
+    "pushover": pushover.Pushover,
+    "simplepush": simplepush.SimplePush,
     "slack": Slack,
     "email": email.SMTP,
     "gmail": gmail.Gmail,
-    # "telegram": telegram.Telegram,
+    "telegram": telegram.Telegram,
     "gitter": gitter.Gitter,
     "pushbullet": pushbullet.Pushbullet,
-    # "join": join.Join,
-    # "zulip": zulip.Zulip,
-    # "twilio": twilio.Twilio,
-    # "pagerduty": pagerduty.PagerDuty,
+    "join": join.Join,
+    "zulip": zulip.Zulip,
+    "twilio": twilio.Twilio,
+    "pagerduty": pagerduty.PagerDuty,
     "mailgun": mailgun.MailGun,
-    # "popcornnotify": popcornnotify.PopcornNotify,
-    # "statuspage": statuspage.Statuspage,
+    "popcornnotify": popcornnotify.PopcornNotify,
+    "statuspage": statuspage.Statuspage,
 }

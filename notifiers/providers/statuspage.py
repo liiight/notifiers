@@ -193,25 +193,13 @@ class StatuspageMixin:
 class StatuspageComponents(StatuspageMixin, ProviderResource):
     """Return a list of Statuspage components for the page ID"""
 
-    resource_name = "components"
-    components_url = "components"
+    resource_name = components_url = "components"
 
-    _required = {"required": ["api_key", "page_id"]}
+    schema_model = StatuspageBaseSchema
 
-    _schema = {
-        "type": "object",
-        "properties": {
-            "api_key": {"type": "string", "title": "OAuth2 token"},
-            "page_id": {"type": "string", "title": "Page ID"},
-        },
-        "additionalProperties": False,
-    }
-
-    def _get_resource(self, data: dict) -> dict:
-        url = urljoin(
-            self.base_url.format(page_id=data["page_id"]), self.components_url
-        )
-        headers = self.request_headers(data.pop("api_key"))
+    def _get_resource(self, data: StatuspageBaseSchema) -> dict:
+        url = urljoin(self.base_url.format(page_id=data.page_id), self.components_url)
+        headers = self.request_headers(data.api_key)
         response, errors = requests.get(
             url, headers=headers, path_to_errors=self.path_to_errors
         )
@@ -236,12 +224,11 @@ class Statuspage(StatuspageMixin, Provider):
     schema_model = StatuspageSchema
 
     def _send_notification(self, data: StatuspageSchema) -> Response:
-        data = data.to_dict()
-        url = urljoin(
-            self.base_url.format(page_id=data.pop("page_id")), self.incidents_url
-        )
-        headers = self.request_headers(data.pop("api_key"))
+        url = urljoin(self.base_url.format(page_id=data.page_id), self.incidents_url)
+        headers = self.request_headers(data.api_key)
+        data_dict = data.to_dict(exclude={"page_id", "api_key"})
+        payload = {"incident": data_dict}
         response, errors = requests.post(
-            url, data=data, headers=headers, path_to_errors=self.path_to_errors
+            url, json=payload, headers=headers, path_to_errors=self.path_to_errors
         )
-        return self.create_response(data, response, errors)
+        return self.create_response(data_dict, response, errors)
