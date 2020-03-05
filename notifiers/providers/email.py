@@ -27,16 +27,16 @@ class SMTPSchema(SchemaModel):
     subject: str = Field(
         "New email from 'notifiers'!", description="The subject of the email message"
     )
-    to: SchemaModel.single_or_list(EmailStr) = Field(
+    to: SchemaModel.one_or_more_of(EmailStr) = Field(
         ..., description="One or more email addresses to use"
     )
-    from_: SchemaModel.single_or_list(EmailStr) = Field(
+    from_: SchemaModel.one_or_more_of(EmailStr) = Field(
         f"{getpass.getuser()}@{socket.getfqdn()}",
         description="One or more FROM addresses to use",
         alias="from",
         title="from",
     )
-    attachments: SchemaModel.single_or_list(FilePath) = Field(
+    attachments: SchemaModel.one_or_more_of(FilePath) = Field(
         None, description="One or more attachments to use in the email"
     )
     host: str = Field("localhost", description="The host of the SMTP server")

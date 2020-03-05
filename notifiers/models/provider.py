@@ -38,8 +38,8 @@ class SchemaModel(BaseModel):
         return ",".join(str(value) for value in values)
 
     @staticmethod
-    def single_or_list(type_: Any) -> Union[List[Any], Any]:
-        """A helper method that returns the relevant type to specify that one or more the given type can be used
+    def one_or_more_of(type_: Any) -> Union[List[Any], Any]:
+        """A helper method that returns the relevant type to specify that one or more of the given type can be used
          in a schema"""
         return Union[List[type_], type_]
 

@@ -46,12 +46,12 @@ class JoinSchema(JoinBaseSchema):
         description="The device ID or group ID of the device you want to send the message to",
         alias="deviceId",
     )
-    device_ids: SchemaModel.single_or_list(str) = Field(
+    device_ids: SchemaModel.one_or_more_of(str) = Field(
         None,
         description="A comma separated list of device IDs you want to send the push to",
         alias="deviceIds",
     )
-    device_names: SchemaModel.single_or_list(str) = Field(
+    device_names: SchemaModel.one_or_more_of(str) = Field(
         None,
         description="A comma separated list of device names you want to send the push to",
         alias="deviceNames",

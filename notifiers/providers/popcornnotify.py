@@ -14,7 +14,7 @@ class PopcornNotifySchema(SchemaModel):
         None,
         description="The subject of the email. It will not be included in text messages",
     )
-    recipients: SchemaModel.single_or_list(str) = Field(
+    recipients: SchemaModel.one_or_more_of(str) = Field(
         ...,
         description="The recipient email address or phone number.Or an array of email addresses and phone numbers",
     )

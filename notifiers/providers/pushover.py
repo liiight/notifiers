@@ -47,14 +47,14 @@ class PushoverBaseSchema(SchemaModel):
 
 
 class PushoverSchema(PushoverBaseSchema):
-    user: PushoverBaseSchema.single_or_list(str) = Field(
+    user: PushoverBaseSchema.one_or_more_of(str) = Field(
         ..., description="The user/group key (not e-mail address) of your user (or you)"
     )
     message: str = Field(..., description="Your message")
     attachment: FilePath = Field(
         None, description="An image attachment to send with the message"
     )
-    device: PushoverBaseSchema.single_or_list(str) = Field(
+    device: PushoverBaseSchema.one_or_more_of(str) = Field(
         None,
         description="Your user's device name to send the message directly to that device,"
         " rather than all of the user's devices",
@@ -102,7 +102,7 @@ class PushoverSchema(PushoverBaseSchema):
         description="A publicly-accessible URL that our servers will send a request to when the user has"
         " acknowledged your notification. requires setting priorty to 2",
     )
-    tags: PushoverBaseSchema.single_or_list(str) = Field(
+    tags: PushoverBaseSchema.one_or_more_of(str) = Field(
         None,
         description="Arbitrary tags which will be stored with the receipt on our servers",
     )

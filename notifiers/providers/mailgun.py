@@ -27,13 +27,13 @@ class MailGunSchema(SchemaModel):
     from_: NameEmail = Field(
         ..., description="Email address for 'From' header", alias="from"
     )
-    to: SchemaModel.single_or_list(Union[EmailStr, NameEmail]) = Field(
+    to: SchemaModel.one_or_more_of(Union[EmailStr, NameEmail]) = Field(
         ..., description="Email address of the recipient(s)"
     )
-    cc: SchemaModel.single_or_list(NameEmail) = Field(
+    cc: SchemaModel.one_or_more_of(NameEmail) = Field(
         None, description="Email address of the CC recipient(s)"
     )
-    bcc: SchemaModel.single_or_list(NameEmail) = Field(
+    bcc: SchemaModel.one_or_more_of(NameEmail) = Field(
         None, description="Email address of the BCC recipient(s)"
     )
     subject: str = Field(None, description="Message subject")
@@ -46,10 +46,10 @@ class MailGunSchema(SchemaModel):
         description="AMP part of the message. Please follow google guidelines to compose and send AMP emails.",
         alias="amp-html",
     )
-    attachment: SchemaModel.single_or_list(FilePath) = Field(
+    attachment: SchemaModel.one_or_more_of(FilePath) = Field(
         None, description="File attachment(s)"
     )
-    inline: SchemaModel.single_or_list(FilePath) = Field(
+    inline: SchemaModel.one_or_more_of(FilePath) = Field(
         None,
         description="Attachment with inline disposition. Can be used to send inline images",
     )
@@ -123,7 +123,7 @@ class MailGunSchema(SchemaModel):
         alias="o:skip-verification",
     )
 
-    headers: SchemaModel.single_or_list(Dict[str, str]) = Field(
+    headers: SchemaModel.one_or_more_of(Dict[str, str]) = Field(
         None,
         description="Add arbitrary value(s) to append a custom MIME header to the message",
     )
