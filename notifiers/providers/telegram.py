@@ -81,10 +81,11 @@ class InlineKeyboardButton(SchemaModel):
 
     @root_validator
     def only_one_optional(cls, values):
-        values_items = set(values.keys())
-        values_items.remove("text")
+        values_items = [v for v in values if values.get(v) and v != "text"]
         if len(values_items) > 1:
-            raise ValueError("You must use exactly one of the optional fields")
+            raise ValueError(
+                f"You must use exactly one of the optional fields, more than one were passed: {','.join(values_items)}"
+            )
         return values
 
 
@@ -218,6 +219,8 @@ class TelegramBaseSchema(SchemaModel):
 
 
 class TelegramSchema(TelegramBaseSchema):
+    """Telegram message sending schema"""
+
     message: str = Field(
         ...,
         description="Text of the message to be sent, 1-4096 characters after entities parsing",
@@ -250,6 +253,9 @@ class TelegramSchema(TelegramBaseSchema):
         description="Additional interface options. A JSON-serialized object for an inline keyboard,"
         " custom reply keyboard, instructions to remove reply keyboard or to force a reply from the user",
     )
+
+    class Config:
+        json_encoders = {ParseMode: lambda v: v.value}
 
 
 class TelegramMixin:
