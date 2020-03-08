@@ -39,23 +39,6 @@ class BadArguments(NotifierException):
         return f"<BadArguments: {self.message}>"
 
 
-class SchemaError(NotifierException):
-    """
-    Raised on schema issues, relevant probably when creating or changing a provider schema
-
-    :param schema_error: The schema error that was raised
-    :param args: Exception arguments
-    :param kwargs: Exception kwargs
-    """
-
-    def __init__(self, schema_error: str, *args, **kwargs):
-        kwargs["message"] = f"Schema error: {schema_error}"
-        super().__init__(*args, **kwargs)
-
-    def __repr__(self):
-        return f"<SchemaError: {self.message}>"
-
-
 class NotificationError(NotifierException):
     """
     A notification error. Raised after an issue with the sent notification.

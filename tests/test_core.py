@@ -6,7 +6,6 @@ from notifiers.core import SUCCESS_STATUS
 from notifiers.exceptions import BadArguments
 from notifiers.exceptions import NoSuchNotifierError
 from notifiers.exceptions import NotificationError
-from notifiers.exceptions import SchemaError
 from notifiers.models.provider import Provider
 from notifiers.models.response import Response
 
@@ -66,11 +65,6 @@ class TestCore:
         """Test correct schema validations"""
         with pytest.raises(BadArguments):
             mock_provider.notify(**data)
-
-    def test_bad_schema(self, bad_schema):
-        """Test illegal JSON schema"""
-        with pytest.raises(SchemaError):
-            bad_schema()
 
     def test_prepare_data(self, mock_provider):
         """Test ``prepare_data()`` method"""

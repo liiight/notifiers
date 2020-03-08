@@ -6,7 +6,6 @@ from .models.response import Response
 
 log = logging.getLogger("notifiers")
 
-FAILURE_STATUS = "Failure"
 SUCCESS_STATUS = "Success"
 
 # Avoid premature import

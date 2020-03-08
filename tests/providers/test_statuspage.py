@@ -6,9 +6,9 @@ from time import sleep
 import pytest
 import requests
 
-from notifiers.core import FAILURE_STATUS
 from notifiers.exceptions import BadArguments
 from notifiers.exceptions import ResourceError
+from notifiers.models.response import ResponseStatus
 
 provider = "statuspage"
 
@@ -93,7 +93,7 @@ class TestStatusPage:
     def test_errors(self, provider):
         data = {"api_key": "foo", "page_id": "foo", "message": "foo"}
         rsp = provider.notify(**data)
-        assert rsp.status == FAILURE_STATUS
+        assert rsp.status is ResponseStatus.FAILURE
         assert "Could not authenticate" in rsp.errors
 
     @pytest.mark.online
