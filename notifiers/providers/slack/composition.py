@@ -9,7 +9,7 @@ from pydantic import HttpUrl
 from pydantic import root_validator
 from typing_extensions import Literal
 
-from notifiers.models.provider import SchemaModel
+from notifiers.models.provider import ResourceSchema
 
 
 class TextType(Enum):
@@ -17,7 +17,7 @@ class TextType(Enum):
     markdown = "mrkdwn"
 
 
-class Text(SchemaModel):
+class Text(ResourceSchema):
     """An object containing some text, formatted either as plain_text or using mrkdwn,
      our proprietary textual markup that's just different enough from Markdown to frustrate you"""
 
@@ -66,7 +66,7 @@ def _text_object_factory(
     )
 
 
-class Option(SchemaModel):
+class Option(ResourceSchema):
     """An object that represents a single selectable item in a select menu, multi-select menu, radio button group,
     or overflow menu."""
 
@@ -97,7 +97,7 @@ class Option(SchemaModel):
     )
 
 
-class OptionGroup(SchemaModel):
+class OptionGroup(ResourceSchema):
     """Provides a way to group options in a select menu or multi-select menu"""
 
     label: _text_object_factory(
@@ -113,7 +113,7 @@ class OptionGroup(SchemaModel):
     )
 
 
-class ConfirmationDialog(SchemaModel):
+class ConfirmationDialog(ResourceSchema):
     """An object that defines a dialog that provides a confirmation step to any interactive element.
      This dialog will ask the user to confirm their action by offering a confirm and deny buttons."""
 

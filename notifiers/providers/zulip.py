@@ -11,7 +11,7 @@ from pydantic import ValidationError
 from pydantic import validator
 
 from ..models.provider import Provider
-from ..models.provider import SchemaModel
+from ..models.provider import ResourceSchema
 from ..models.response import Response
 from ..utils import requests
 
@@ -35,7 +35,7 @@ class MessageType(Enum):
     stream = "stream"
 
 
-class ZulipSchema(SchemaModel):
+class ZulipSchema(ResourceSchema):
     """Send a stream or a private message"""
 
     api_key: str = Field(..., description="User API Key")
@@ -51,7 +51,7 @@ class ZulipSchema(SchemaModel):
     message: constr(max_length=10000) = Field(
         ..., description="The content of the message", alias="content"
     )
-    to: SchemaModel.one_or_more_of(Union[EmailStr, str]) = Field(
+    to: ResourceSchema.one_or_more_of(Union[EmailStr, str]) = Field(
         ...,
         description="The destination stream, or a CSV/JSON-encoded list containing the usernames "
         "(emails) of the recipients",
@@ -63,7 +63,7 @@ class ZulipSchema(SchemaModel):
 
     @validator("to", whole=True)
     def csv(cls, v):
-        return SchemaModel.to_comma_separated(v)
+        return ResourceSchema.to_comma_separated(v)
 
     _values_to_exclude = "email", "api_key", "url_or_domain"
 

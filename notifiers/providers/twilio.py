@@ -10,7 +10,7 @@ from pydantic import HttpUrl
 from pydantic import root_validator
 
 from ..models.provider import Provider
-from ..models.provider import SchemaModel
+from ..models.provider import ResourceSchema
 from ..models.response import Response
 from ..utils import requests
 from ..utils.helpers import snake_to_camel_case
@@ -30,7 +30,7 @@ class E164(str):
         return cls(v)
 
 
-class TwilioSchema(SchemaModel):
+class TwilioSchema(ResourceSchema):
     """To send a new outgoing message, make an HTTP POST to this Messages list resource URI"""
 
     account_sid: str = Field(
@@ -104,7 +104,7 @@ class TwilioSchema(SchemaModel):
     message: constr(min_length=1, max_length=1600) = Field(
         None, description="The text of the message you want to send", alias="body"
     )
-    media_url: SchemaModel.one_or_more_of(HttpUrl) = Field(
+    media_url: ResourceSchema.one_or_more_of(HttpUrl) = Field(
         None,
         description="The URL of the media to send with the message. The media can be of type gif, png, and jpeg and "
         "will be formatted correctly on the recipient's device. The media size limit is 5MB for "

@@ -16,7 +16,7 @@ from pydantic import validator
 from typing_extensions import Literal
 
 from ..models.provider import Provider
-from ..models.provider import SchemaModel
+from ..models.provider import ResourceSchema
 from ..models.response import Response
 from ..utils import requests
 
@@ -36,7 +36,7 @@ class Ascii(str):
             raise ValueError("Value must be valid ascii")
 
 
-class MailGunSchema(SchemaModel):
+class MailGunSchema(ResourceSchema):
     """Send a mailgun email"""
 
     api_key: str = Field(..., description="User's API key")
@@ -44,13 +44,13 @@ class MailGunSchema(SchemaModel):
     from_: NameEmail = Field(
         ..., description="Email address for 'From' header", alias="from"
     )
-    to: SchemaModel.one_or_more_of(Union[EmailStr, NameEmail]) = Field(
+    to: ResourceSchema.one_or_more_of(Union[EmailStr, NameEmail]) = Field(
         ..., description="Email address of the recipient(s)"
     )
-    cc: SchemaModel.one_or_more_of(NameEmail) = Field(
+    cc: ResourceSchema.one_or_more_of(NameEmail) = Field(
         None, description="Email address of the CC recipient(s)"
     )
-    bcc: SchemaModel.one_or_more_of(NameEmail) = Field(
+    bcc: ResourceSchema.one_or_more_of(NameEmail) = Field(
         None, description="Email address of the BCC recipient(s)"
     )
     subject: str = Field(None, description="Message subject")
@@ -63,10 +63,10 @@ class MailGunSchema(SchemaModel):
         description="AMP part of the message. Please follow google guidelines to compose and send AMP emails.",
         alias="amp-html",
     )
-    attachment: SchemaModel.one_or_more_of(FilePath) = Field(
+    attachment: ResourceSchema.one_or_more_of(FilePath) = Field(
         None, description="File attachment(s)"
     )
-    inline: SchemaModel.one_or_more_of(FilePath) = Field(
+    inline: ResourceSchema.one_or_more_of(FilePath) = Field(
         None,
         description="Attachment with inline disposition. Can be used to send inline images",
     )
@@ -140,7 +140,7 @@ class MailGunSchema(SchemaModel):
         alias="o:skip-verification",
     )
 
-    headers: SchemaModel.one_or_more_of(Dict[str, str]) = Field(
+    headers: ResourceSchema.one_or_more_of(Dict[str, str]) = Field(
         None,
         description="Add arbitrary value(s) to append a custom MIME header to the message",
     )

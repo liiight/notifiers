@@ -1,12 +1,12 @@
 from pydantic import Field
 
 from ..models.provider import Provider
-from ..models.provider import SchemaModel
+from ..models.provider import ResourceSchema
 from ..models.response import Response
 from ..utils import requests
 
 
-class SimplePushSchema(SchemaModel):
+class SimplePushSchema(ResourceSchema):
     key: str = Field(..., description="Your user key")
     message: str = Field(..., description="Your message", alias="msg")
     title: str = Field(None, description="Message title")

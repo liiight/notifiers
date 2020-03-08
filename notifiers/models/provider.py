@@ -21,7 +21,7 @@ from notifiers.utils.helpers import merge_dicts
 DEFAULT_ENVIRON_PREFIX = "NOTIFIERS_"
 
 
-class SchemaModel(BaseModel):
+class ResourceSchema(BaseModel):
     """The base class for Schemas"""
 
     _values_to_exclude: Tuple[str, ...]
@@ -78,7 +78,7 @@ class SchemaModel(BaseModel):
 class SchemaResource(ABC):
     """Base class that represent an object schema and its utility methods"""
 
-    schema_model: SchemaModel
+    schema_model: ResourceSchema
 
     @property
     @abstractmethod
@@ -100,7 +100,7 @@ class SchemaResource(ABC):
         """Resource's required arguments. Note that additional validation may not be represented here"""
         return self.schema.get("required")
 
-    def validate_data(self, data: dict) -> SchemaModel:
+    def validate_data(self, data: dict) -> ResourceSchema:
         try:
             return self.schema_model.parse_obj(data)
         except ValidationError as e:
@@ -136,7 +136,7 @@ class SchemaResource(ABC):
         """
         return dict_from_environs(prefix, self.name, list(self.arguments.keys()))
 
-    def _process_data(self, data: dict) -> SchemaModel:
+    def _process_data(self, data: dict) -> ResourceSchema:
         """
         The main method that process all resources data. Validates schema, gets environs, validates data, prepares
          it via provider requirements, merges defaults and check for data dependencies
@@ -187,7 +187,7 @@ class Provider(SchemaResource, ABC):
         return list(self._resources.keys())
 
     @abstractmethod
-    def _send_notification(self, data: SchemaModel) -> Response:
+    def _send_notification(self, data: ResourceSchema) -> Response:
         """
         The core method to trigger the provider notification. Must be overridden.
 
@@ -222,7 +222,7 @@ class ProviderResource(SchemaResource, ABC):
         pass
 
     @abstractmethod
-    def _get_resource(self, data: dict):
+    def _get_resource(self, data: ResourceSchema):
         pass
 
     def __call__(self, **kwargs):

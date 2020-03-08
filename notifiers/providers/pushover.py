@@ -12,7 +12,7 @@ from pydantic import validator
 from ..exceptions import ResourceError
 from ..models.provider import Provider
 from ..models.provider import ProviderResource
-from ..models.provider import SchemaModel
+from ..models.provider import ResourceSchema
 from ..models.response import Response
 from ..utils import requests
 
@@ -42,7 +42,7 @@ class PushoverSound(Enum):
     none = None
 
 
-class PushoverBaseSchema(SchemaModel):
+class PushoverBaseSchema(ResourceSchema):
     token: str = Field(..., description="Your application's API token ")
 
 

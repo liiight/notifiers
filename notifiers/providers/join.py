@@ -13,7 +13,7 @@ from pydantic import validator
 from ..exceptions import ResourceError
 from ..models.provider import Provider
 from ..models.provider import ProviderResource
-from ..models.provider import SchemaModel
+from ..models.provider import ResourceSchema
 from ..models.response import Response
 
 
@@ -26,7 +26,7 @@ class JoinGroup(Enum):
     pc = "group.pc"
 
 
-class JoinBaseSchema(SchemaModel):
+class JoinBaseSchema(ResourceSchema):
     api_key: str = Field(..., description="User API key", alias="apikey")
 
     class Config:
@@ -46,12 +46,12 @@ class JoinSchema(JoinBaseSchema):
         description="The device ID or group ID of the device you want to send the message to",
         alias="deviceId",
     )
-    device_ids: SchemaModel.one_or_more_of(str) = Field(
+    device_ids: ResourceSchema.one_or_more_of(str) = Field(
         None,
         description="A comma separated list of device IDs you want to send the push to",
         alias="deviceIds",
     )
-    device_names: SchemaModel.one_or_more_of(str) = Field(
+    device_names: ResourceSchema.one_or_more_of(str) = Field(
         None,
         description="A comma separated list of device names you want to send the push to",
         alias="deviceNames",

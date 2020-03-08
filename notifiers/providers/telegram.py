@@ -10,7 +10,7 @@ from pydantic import root_validator
 from ..exceptions import ResourceError
 from ..models.provider import Provider
 from ..models.provider import ProviderResource
-from ..models.provider import SchemaModel
+from ..models.provider import ResourceSchema
 from ..models.response import Response
 from ..utils import requests
 
@@ -19,7 +19,7 @@ class TelegramURL(HttpUrl):
     allowed_schemes = "http", "https", "tg"
 
 
-class LoginUrl(SchemaModel):
+class LoginUrl(ResourceSchema):
     """This object represents a parameter of the inline keyboard button used to automatically authorize a user.
     Serves as a great replacement for the Telegram Login Widget when the user is coming from Telegram.
      All the user needs to do is tap/click a button and confirm that they want to log in"""
@@ -46,7 +46,7 @@ class LoginUrl(SchemaModel):
     )
 
 
-class InlineKeyboardButton(SchemaModel):
+class InlineKeyboardButton(ResourceSchema):
     """This object represents one button of an inline keyboard. You must use exactly one of the optional fields"""
 
     text: str = Field(..., description="Label text on the button")
@@ -89,7 +89,7 @@ class InlineKeyboardButton(SchemaModel):
         return values
 
 
-class KeyboardButtonPollType(SchemaModel):
+class KeyboardButtonPollType(ResourceSchema):
     type: str = Field(
         None,
         description="If quiz is passed, the user will be allowed to create only polls in the quiz mode."
@@ -98,7 +98,7 @@ class KeyboardButtonPollType(SchemaModel):
     )
 
 
-class KeyboardButton(SchemaModel):
+class KeyboardButton(ResourceSchema):
     """This object represents one button of the reply keyboard. For simple text buttons String can be
     used instead of this object to specify text of the button. Optional fields request_contact,
     request_location, and request_poll are mutually exclusive"""
@@ -125,7 +125,7 @@ class KeyboardButton(SchemaModel):
     )
 
 
-class InlineKeyboardMarkup(SchemaModel):
+class InlineKeyboardMarkup(ResourceSchema):
     """This object represents an inline keyboard that appears right next to the message it belongs to"""
 
     inline_keyboard: List[List[InlineKeyboardButton]] = Field(
@@ -134,7 +134,7 @@ class InlineKeyboardMarkup(SchemaModel):
     )
 
 
-class ReplyKeyboardMarkup(SchemaModel):
+class ReplyKeyboardMarkup(ResourceSchema):
     """This object represents a custom keyboard with reply options
      (see Introduction to bots for details and examples)"""
 
@@ -166,7 +166,7 @@ class ReplyKeyboardMarkup(SchemaModel):
     )
 
 
-class ReplyKeyboardRemove(SchemaModel):
+class ReplyKeyboardRemove(ResourceSchema):
     """Upon receiving a message with this object, Telegram clients will remove the current custom keyboard and
      display the default letter-keyboard. By default, custom keyboards are displayed until a new keyboard is sent by
      a bot. An exception is made for one-time keyboards that are hidden immediately after the user presses a button
@@ -189,7 +189,7 @@ class ReplyKeyboardRemove(SchemaModel):
     )
 
 
-class ForceReply(SchemaModel):
+class ForceReply(ResourceSchema):
     """Upon receiving a message with this object, Telegram clients will display a reply interface to the user
      (act as if the user has selected the bot‘s message and tapped ’Reply').
       This can be extremely useful if you want to create user-friendly step-by-step interfaces without having
@@ -214,7 +214,7 @@ class ParseMode(Enum):
     markdown_v2 = "MarkdownV2"
 
 
-class TelegramBaseSchema(SchemaModel):
+class TelegramBaseSchema(ResourceSchema):
     token: str = Field(..., description="Bot token")
 
 

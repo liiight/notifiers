@@ -10,14 +10,14 @@ from pydantic import validator
 from pydantic.color import Color as ColorType
 
 from notifiers.models.provider import Provider
-from notifiers.models.provider import SchemaModel
+from notifiers.models.provider import ResourceSchema
 from notifiers.models.response import Response
 from notifiers.providers.slack.blocks import Blocks
 from notifiers.providers.slack.composition import Color
 from notifiers.utils import requests
 
 
-class FieldObject(SchemaModel):
+class FieldObject(ResourceSchema):
     title: str = Field(
         None,
         description="Shown as a bold heading displayed in the field object."
@@ -35,7 +35,7 @@ class FieldObject(SchemaModel):
     )
 
 
-class AttachmentSchema(SchemaModel):
+class AttachmentSchema(ResourceSchema):
     """Secondary content can be attached to messages to include lower priority content - content that
      doesn't necessarily need to be seen to appreciate the intent of the message,
       but perhaps adds further context or additional information."""
@@ -150,7 +150,7 @@ class AttachmentSchema(SchemaModel):
         return values
 
 
-class SlackSchema(SchemaModel):
+class SlackSchema(ResourceSchema):
     """Slack's webhook schema"""
 
     webhook_url: HttpUrl = Field(

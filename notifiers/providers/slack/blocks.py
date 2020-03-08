@@ -23,7 +23,7 @@ from .elements import RadioButtonGroupElement
 from .elements import SelectChannelsElement
 from .elements import SelectUsersElement
 from .elements import StaticSelectElement
-from notifiers.models.provider import SchemaModel
+from notifiers.models.provider import ResourceSchema
 from notifiers.providers.slack.composition import _text_object_factory
 from notifiers.providers.slack.composition import Text
 from notifiers.providers.slack.composition import TextType
@@ -70,7 +70,7 @@ class BlockType(Enum):
     file = "file"
 
 
-class BaseBlock(SchemaModel):
+class BaseBlock(ResourceSchema):
     block_id: constr(max_length=255) = Field(
         None,
         description="A string acting as a unique identifier for a block. "

@@ -11,7 +11,7 @@ from pydantic.json import isoformat
 from ..exceptions import ResourceError
 from ..models.provider import Provider
 from ..models.provider import ProviderResource
-from ..models.provider import SchemaModel
+from ..models.provider import ResourceSchema
 from ..models.response import Response
 from ..utils import requests
 
@@ -46,7 +46,7 @@ class ComponentStatus(Enum):
     empty = ""
 
 
-class StatuspageBaseSchema(SchemaModel):
+class StatuspageBaseSchema(ResourceSchema):
     api_key: str = Field(..., description="Authentication token")
     page_id: str = Field(..., description="Paged ID")
 

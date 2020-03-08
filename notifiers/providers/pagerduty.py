@@ -8,12 +8,16 @@ from pydantic import HttpUrl
 from pydantic import validator
 
 from ..models.provider import Provider
-from ..models.provider import SchemaModel
+from ..models.provider import ResourceSchema
 from ..models.response import Response
 from ..utils import requests
 
 
-class PagerDutyLink(SchemaModel):
+class HttpsUrl(HttpUrl):
+    allowed_schemes = ("https",)
+
+
+class PagerDutyLink(ResourceSchema):
     href: HttpUrl = Field(..., description="URL of the link to be attached.")
     text: str = Field(
         ...,
@@ -21,8 +25,8 @@ class PagerDutyLink(SchemaModel):
     )
 
 
-class PagerDutyImage(SchemaModel):
-    src: HttpUrl = Field(
+class PagerDutyImage(ResourceSchema):
+    src: HttpsUrl = Field(
         ...,
         description="The source of the image being attached to the incident. This image must be served via HTTPS.",
     )
@@ -45,7 +49,7 @@ class PagerDutyEventAction(Enum):
     resolve = "resolve"
 
 
-class PagerDutyPayload(SchemaModel):
+class PagerDutyPayload(ResourceSchema):
     message: constr(max_length=1024) = Field(
         ...,
         description="A brief text summary of the event,"
@@ -90,7 +94,7 @@ class PagerDutyPayload(SchemaModel):
         allow_population_by_field_name = True
 
 
-class PagerDutySchema(SchemaModel):
+class PagerDutySchema(ResourceSchema):
     routing_key: constr(min_length=32, max_length=32) = Field(
         ...,
         description="This is the 32 character Integration Key for an integration on a service or on a global ruleset",

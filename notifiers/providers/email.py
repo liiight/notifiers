@@ -18,27 +18,27 @@ from pydantic import root_validator
 from pydantic import validator
 
 from ..models.provider import Provider
-from ..models.provider import SchemaModel
+from ..models.provider import ResourceSchema
 from ..models.response import Response
 
 
-class SMTPSchema(SchemaModel):
+class SMTPSchema(ResourceSchema):
     """SMTP email schema"""
 
     message: str = Field(..., description="The content of the email message")
     subject: str = Field(
         "New email from 'notifiers'!", description="The subject of the email message"
     )
-    to: SchemaModel.one_or_more_of(EmailStr) = Field(
+    to: ResourceSchema.one_or_more_of(EmailStr) = Field(
         ..., description="One or more email addresses to use"
     )
-    from_: SchemaModel.one_or_more_of(EmailStr) = Field(
+    from_: ResourceSchema.one_or_more_of(EmailStr) = Field(
         f"{getpass.getuser()}@{socket.getfqdn()}",
         description="One or more FROM addresses to use",
         alias="from",
         title="from",
     )
-    attachments: SchemaModel.one_or_more_of(FilePath) = Field(
+    attachments: ResourceSchema.one_or_more_of(FilePath) = Field(
         [], description="One or more attachments to use in the email"
     )
     host: str = Field("localhost", description="The host of the SMTP server")
