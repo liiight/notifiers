@@ -13,7 +13,7 @@ from notifiers.models.response import ResponseStatus
 class TestCore:
     """Test core classes"""
 
-    valid_data = {"required": "foo", "not_required": ["foo", "bar"]}
+    valid_data = {"required": "foo", "not_required": ["foo", "bar"], "message": "foo"}
 
     def test_sanity(self, mock_provider):
         """Test basic notification flow"""
@@ -24,25 +24,23 @@ class TestCore:
         }
         assert mock_provider.arguments == {
             "not_required": {
-                "oneOf": [
-                    {
-                        "type": "array",
-                        "items": {
-                            "type": "string",
-                            "title": "example for not required arg",
-                        },
-                        "minItems": 1,
-                        "uniqueItems": True,
-                    },
-                    {"type": "string", "title": "example for not required arg"},
-                ]
+                "title": "Not Required",
+                "description": "example for not required arg",
+                "anyOf": [
+                    {"type": "array", "items": {"type": "string"}},
+                    {"type": "string"},
+                ],
             },
-            "required": {"type": "string"},
-            "option_with_default": {"type": "string"},
-            "message": {"type": "string"},
+            "required": {"title": "Required", "type": "string"},
+            "message": {"title": "Message", "type": "string"},
+            "option_with_default": {
+                "title": "Option With Default",
+                "default": "foo",
+                "type": "string",
+            },
         }
 
-        assert mock_provider.required == {"required": ["required"]}
+        assert mock_provider.required == ["required", "message"]
         rsp = mock_provider.notify(**self.valid_data)
         assert isinstance(rsp, Response)
         assert not rsp.errors
