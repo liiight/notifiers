@@ -21,7 +21,24 @@ from ..models.response import Response
 from ..utils import requests
 
 
+class Ascii(str):
+    @classmethod
+    def __get_validators__(cls):
+        yield cls.validate
+
+    @classmethod
+    def validate(cls, v):
+        if not isinstance(v, str):
+            raise TypeError("string required")
+        try:
+            return cls(v.encode("ascii").decode("ascii"))
+        except UnicodeEncodeError:
+            raise ValueError("Value must be valid ascii")
+
+
 class MailGunSchema(SchemaModel):
+    """Send a mailgun email"""
+
     api_key: str = Field(..., description="User's API key")
     domain: str = Field(..., description="The domain to use")
     from_: NameEmail = Field(
@@ -67,7 +84,7 @@ class MailGunSchema(SchemaModel):
         " in case of template sending",
         alias="t:text",
     )
-    tag: List[str] = Field(
+    tag: List[Ascii] = Field(
         None,
         description="Tag string. See Tagging for more information",
         alias="o:tag",
@@ -137,14 +154,6 @@ class MailGunSchema(SchemaModel):
         alias="recipient-variables",
     )
 
-    @validator("tag", pre=True, each_item=True)
-    def validate_tag(cls, v):
-        try:
-            v.encode("ascii")
-        except UnicodeEncodeError:
-            raise ValueError("Value must be valid ascii")
-        return v
-
     @root_validator()
     def headers_and_data(cls, values):
         def transform(key_name, prefix, json_dump):
@@ -206,20 +215,18 @@ class MailGun(Provider):
     schema_model = MailGunSchema
 
     def _send_notification(self, data: MailGunSchema) -> Response:
-        data = data.dict(by_alias=True, exclude_none=True)
-        url = self.base_url.format(domain=data.pop("domain"))
-        auth = "api", data.pop("api_key")
+        url = self.base_url.format(domain=data.domain)
         files = []
-        if data.get("attachment"):
-            files += requests.file_list_for_request(data["attachment"], "attachment")
-        if data.get("inline"):
-            files += requests.file_list_for_request(data["inline"], "inline")
-
+        if data.attachment:
+            files += requests.file_list_for_request(data.attachment, "attachment")
+        if data.inline:
+            files += requests.file_list_for_request(data.inline, "inline")
+        payload = data.to_dict(exclude={"domain", "api_key"})
         response, errors = requests.post(
             url=url,
-            data=data,
-            auth=auth,
+            data=payload,
+            auth=("api", data.api_key),
             files=files,
             path_to_errors=self.path_to_errors,
         )
-        return self.create_response(data, response, errors)
+        return self.create_response(payload, response, errors)
