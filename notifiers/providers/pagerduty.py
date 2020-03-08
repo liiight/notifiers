@@ -36,14 +36,14 @@ class PagerDutyImage(ResourceSchema):
     alt: str = Field(None, description="Optional alternative text for the image.")
 
 
-class PagerDutyPayloadSeverity(Enum):
+class PagerDutyPayloadSeverity(str, Enum):
     info = "info"
     warning = "warning"
     error = "error"
     critical = "critical"
 
 
-class PagerDutyEventAction(Enum):
+class PagerDutyEventAction(str, Enum):
     trigger = "trigger"
     acknowledge = "acknowledge"
     resolve = "resolve"

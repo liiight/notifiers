@@ -16,7 +16,7 @@ from ..models.response import Response
 from ..utils import requests
 
 
-class Impact(Enum):
+class Impact(str, Enum):
     critical = "critical"
     major = "major"
     minor = "minor"
@@ -24,7 +24,7 @@ class Impact(Enum):
     none = "none"
 
 
-class IncidentStatus(Enum):
+class IncidentStatus(str, Enum):
     postmortem = "postmortem"
     investigating = "investigating"
     identified = "identified"
@@ -37,7 +37,7 @@ class IncidentStatus(Enum):
     completed = "completed"
 
 
-class ComponentStatus(Enum):
+class ComponentStatus(str, Enum):
     operational = "operational"
     under_maintenance = "under_maintenance"
     degraded_performance = "degraded_performance"
@@ -49,6 +49,10 @@ class ComponentStatus(Enum):
 class StatuspageBaseSchema(ResourceSchema):
     api_key: str = Field(..., description="Authentication token")
     page_id: str = Field(..., description="Paged ID")
+
+    @property
+    def auth_headers(self) -> Dict[str, str]:
+        return {"Authorization": f"OAuth {self.api_key}"}
 
 
 class StatuspageSchema(StatuspageBaseSchema):
@@ -186,10 +190,6 @@ class StatuspageMixin:
     path_to_errors = ("error",)
     site_url = "https://statuspage.io"
 
-    @staticmethod
-    def request_headers(api_key: str) -> dict:
-        return {"Authorization": f"OAuth {api_key}"}
-
 
 class StatuspageComponents(StatuspageMixin, ProviderResource):
     """Return a list of Statuspage components for the page ID"""
@@ -200,9 +200,8 @@ class StatuspageComponents(StatuspageMixin, ProviderResource):
 
     def _get_resource(self, data: StatuspageBaseSchema) -> dict:
         url = urljoin(self.base_url.format(page_id=data.page_id), self.components_url)
-        headers = self.request_headers(data.api_key)
         response, errors = requests.get(
-            url, headers=headers, path_to_errors=self.path_to_errors
+            url, headers=data.auth_headers, path_to_errors=self.path_to_errors
         )
         if errors:
             raise ResourceError(
@@ -219,17 +218,17 @@ class Statuspage(StatuspageMixin, Provider):
     """Create Statuspage incidents"""
 
     incidents_url = "incidents"
-
     _resources = {"components": StatuspageComponents()}
-
     schema_model = StatuspageSchema
 
     def _send_notification(self, data: StatuspageSchema) -> Response:
         url = urljoin(self.base_url.format(page_id=data.page_id), self.incidents_url)
-        headers = self.request_headers(data.api_key)
         data_dict = data.to_dict()
         payload = {"incident": data_dict}
         response, errors = requests.post(
-            url, json=payload, headers=headers, path_to_errors=self.path_to_errors
+            url,
+            json=payload,
+            headers=data.auth_headers,
+            path_to_errors=self.path_to_errors,
         )
         return self.create_response(data_dict, response, errors)

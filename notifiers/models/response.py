@@ -5,7 +5,7 @@ import requests
 from ..exceptions import NotificationError
 
 
-class ResponseStatus(Enum):
+class ResponseStatus(str, Enum):
     SUCCESS = "success"
     FAILURE = "failure"
 

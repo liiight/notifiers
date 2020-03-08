@@ -17,7 +17,7 @@ from ..models.response import Response
 from ..utils import requests
 
 
-class PushoverSound(Enum):
+class PushoverSound(str, Enum):
     pushover = "pushover"
     bike = "bike"
     bugle = "bugle"

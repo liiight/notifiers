@@ -30,7 +30,7 @@ class ZulipUrl(str):
         return urljoin(url, "/api/v1/messages")
 
 
-class MessageType(Enum):
+class MessageType(str, Enum):
     private = "private"
     stream = "stream"
 

@@ -208,7 +208,7 @@ class ForceReply(ResourceSchema):
     )
 
 
-class ParseMode(Enum):
+class ParseMode(str, Enum):
     markdown = "Markdown"
     html = "HTML"
     markdown_v2 = "MarkdownV2"

@@ -17,7 +17,7 @@ from ..models.provider import ResourceSchema
 from ..models.response import Response
 
 
-class JoinGroup(Enum):
+class JoinGroup(str, Enum):
     all_ = "group.all"
     android = "group.android"
     windows_10 = "group.windows10"

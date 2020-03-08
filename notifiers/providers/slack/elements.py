@@ -16,7 +16,7 @@ from notifiers.providers.slack.composition import OptionGroup
 from notifiers.providers.slack.composition import TextType
 
 
-class ElementType(Enum):
+class ElementType(str, Enum):
     button = "button"
     checkboxes = "checkboxes"
     date_picker = "datepicker"
@@ -51,7 +51,7 @@ class _BaseElement(ResourceSchema):
         json_encoders = {ElementType: lambda v: v.value}
 
 
-class ButtonElementStyle(Enum):
+class ButtonElementStyle(str, Enum):
     primary = "primary"
     danger = "danger"
     default = None

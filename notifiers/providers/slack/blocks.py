@@ -61,7 +61,7 @@ ActionsBlockElements = Union[
 ContextBlockElements = Union[ImageElement, Text]
 
 
-class BlockType(Enum):
+class BlockType(str, Enum):
     section = "section"
     divider = "divider"
     image = "image"

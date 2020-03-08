@@ -127,7 +127,7 @@ class ConfirmationDialog(ResourceSchema):
     )
 
 
-class Color(Enum):
+class Color(str, Enum):
     good = "good"
     warning = "warning"
     danger = "danger"

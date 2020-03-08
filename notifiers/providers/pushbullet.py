@@ -16,7 +16,7 @@ from ..models.response import Response
 from ..utils import requests
 
 
-class PushbulletType(Enum):
+class PushbulletType(str, Enum):
     note = "note"
     file = "file"
     link = "link"
