@@ -2,12 +2,12 @@ import pytest
 
 import notifiers
 from notifiers import notify
-from notifiers.core import SUCCESS_STATUS
 from notifiers.exceptions import BadArguments
 from notifiers.exceptions import NoSuchNotifierError
 from notifiers.exceptions import NotificationError
 from notifiers.models.provider import Provider
 from notifiers.models.response import Response
+from notifiers.models.response import ResponseStatus
 
 
 class TestCore:
@@ -49,7 +49,7 @@ class TestCore:
         assert rsp.raise_on_errors() is None
         assert (
             repr(rsp)
-            == f"<Response,provider=Mock_provider,status={SUCCESS_STATUS}, errors=None>"
+            == f"<Response,provider=Mock_provider,status={ResponseStatus.SUCCESS}, errors=None>"
         )
         assert repr(mock_provider) == "<Provider:[Mock_provider]>"
 
@@ -126,7 +126,7 @@ class TestCore:
         prefix = f"mock_"
         monkeypatch.setenv(f"{prefix}{mock_provider.name}_required".upper(), "foo")
         rsp = mock_provider.notify(env_prefix=prefix)
-        assert rsp.status == SUCCESS_STATUS
+        assert rsp.status is ResponseStatus.SUCCESS
         assert rsp.data["required"] == "foo"
 
     def test_provided_data_takes_precedence_over_environ(
@@ -136,7 +136,7 @@ class TestCore:
         prefix = f"mock_"
         monkeypatch.setenv(f"{prefix}{mock_provider.name}_required".upper(), "foo")
         rsp = mock_provider.notify(required="bar", env_prefix=prefix)
-        assert rsp.status == SUCCESS_STATUS
+        assert rsp.status is ResponseStatus.SUCCESS
         assert rsp.data["required"] == "bar"
 
     def test_resources(self, mock_provider):
@@ -170,12 +170,12 @@ class TestCore:
             resource()
 
         rsp = resource(key="fpp")
-        assert rsp == {"status": SUCCESS_STATUS}
+        assert rsp == {"status": ResponseStatus.SUCCESS}
 
     def test_direct_notify_positive(self, mock_provider):
         rsp = notify(mock_provider.name, required="foo", message="foo")
         assert not rsp.errors
-        assert rsp.status == SUCCESS_STATUS
+        assert rsp.status is ResponseStatus.SUCCESS
         assert rsp.data == {
             "required": "foo",
             "message": "foo",

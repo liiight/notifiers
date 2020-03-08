@@ -6,8 +6,6 @@ from .models.response import Response
 
 log = logging.getLogger("notifiers")
 
-SUCCESS_STATUS = "Success"
-
 # Avoid premature import
 from .providers import _all_providers  # noqa: E402
 
