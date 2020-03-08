@@ -23,6 +23,8 @@ from ..models.response import Response
 
 
 class SMTPSchema(SchemaModel):
+    """SMTP email schema"""
+
     message: str = Field(..., description="The content of the email message")
     subject: str = Field(
         "New email from 'notifiers'!", description="The subject of the email message"
@@ -37,7 +39,7 @@ class SMTPSchema(SchemaModel):
         title="from",
     )
     attachments: SchemaModel.one_or_more_of(FilePath) = Field(
-        None, description="One or more attachments to use in the email"
+        [], description="One or more attachments to use in the email"
     )
     host: str = Field("localhost", description="The host of the SMTP server")
     port: int = Field(25, gt=0, lte=65535, description="The port number to use")
@@ -99,7 +101,7 @@ class SMTP(Provider):
         email.add_alternative(data.message, subtype=content_type)
         return email
 
-    def _add_attachments(self, attachments: List[Path], email: EmailMessage):
+    def add_attachments_to_email(self, attachments: List[Path], email: EmailMessage):
         for attachment in attachments:
             maintype, subtype = self._get_mimetype(attachment)
             email.add_attachment(
@@ -110,9 +112,9 @@ class SMTP(Provider):
             )
 
     def _connect_to_server(self, data: SMTPSchema):
-        self.smtp_server = smtplib.SMTP_SSL if data.ssl else smtplib.SMTP
-        self.smtp_server = self.smtp_server(data.host, data.port)
-        self.configuration = self._get_configuration(data)
+        smtp_server_type = smtplib.SMTP_SSL if data.ssl else smtplib.SMTP
+        self.smtp_server = smtp_server_type(data.host, data.port)
+        self.configuration_hash = self.configuration_hash(data)
         if data.tls and not data.ssl:
             self.smtp_server.ehlo()
             self.smtp_server.starttls()
@@ -121,22 +123,21 @@ class SMTP(Provider):
             self.smtp_server.login(data.username, data.password)
 
     @staticmethod
-    def _get_configuration(data: SMTPSchema) -> tuple:
-        return data.host, data.port, data.username
+    def configuration_hash(data: SMTPSchema) -> int:
+        return hash((data.host, data.port, data.username))
 
     def _send_notification(self, data: SMTPSchema) -> Response:
         errors = None
         try:
-            configuration = self._get_configuration(data)
+            configuration_hash = self.configuration_hash(data)
             if (
-                not self.configuration
+                not self.configuration_hash
                 or not self.smtp_server
-                or self.configuration != configuration
+                or self.configuration_hash != configuration_hash
             ):
                 self._connect_to_server(data)
             email = self._build_email(data)
-            if data.attachments:
-                self._add_attachments(data.attachments, email)
+            self.add_attachments_to_email(data.attachments, email)
             self.smtp_server.send_message(email)
         except (
             SMTPServerDisconnected,
