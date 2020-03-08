@@ -64,6 +64,11 @@ class SMTPSchema(SchemaModel):
     def comma_separated(cls, v):
         return cls.to_comma_separated(v)
 
+    @property
+    def hash(self):
+        """Returns a hash value of host, port and username to check if configuration changed"""
+        return hash((self.host, self.port, self.username))
+
 
 class SMTP(Provider):
     """Send emails via SMTP"""
@@ -88,7 +93,7 @@ class SMTP(Provider):
     def __init__(self):
         super().__init__()
         self.smtp_server = None
-        self.configuration = None
+        self.configuration_hash = None
 
     @staticmethod
     def _build_email(data: SMTPSchema) -> EmailMessage:
@@ -114,7 +119,7 @@ class SMTP(Provider):
     def _connect_to_server(self, data: SMTPSchema):
         smtp_server_type = smtplib.SMTP_SSL if data.ssl else smtplib.SMTP
         self.smtp_server = smtp_server_type(data.host, data.port)
-        self.configuration_hash = self.configuration_hash(data)
+        self.configuration_hash = data.hash
         if data.tls and not data.ssl:
             self.smtp_server.ehlo()
             self.smtp_server.starttls()
@@ -122,19 +127,15 @@ class SMTP(Provider):
         if data.login and data.username:
             self.smtp_server.login(data.username, data.password)
 
-    @staticmethod
-    def configuration_hash(data: SMTPSchema) -> int:
-        return hash((data.host, data.port, data.username))
-
     def _send_notification(self, data: SMTPSchema) -> Response:
         errors = None
+        connection_conditions = (
+            not self.smtp_server,
+            not self.configuration_hash,
+            self.configuration_hash != data.hash,
+        )
         try:
-            configuration_hash = self.configuration_hash(data)
-            if (
-                not self.configuration_hash
-                or not self.smtp_server
-                or self.configuration_hash != configuration_hash
-            ):
+            if any(connection_conditions):
                 self._connect_to_server(data)
             email = self._build_email(data)
             self.add_attachments_to_email(data.attachments, email)
