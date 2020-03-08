@@ -1,7 +1,79 @@
-from ..exceptions import NotifierException
+from enum import Enum
+from typing import Union
+from urllib.parse import urljoin
+
+from pydantic import constr
+from pydantic import EmailStr
+from pydantic import Field
+from pydantic import HttpUrl
+from pydantic import root_validator
+from pydantic import ValidationError
+from pydantic import validator
+
 from ..models.provider import Provider
+from ..models.provider import SchemaModel
 from ..models.response import Response
 from ..utils import requests
+
+
+class ZulipUrl(str):
+    @classmethod
+    def __get_validators__(cls):
+        yield cls.validate
+
+    @classmethod
+    def validate(cls, v):
+        try:
+            url = HttpUrl(v)
+        except ValidationError:
+            url = f"https://{v}.zulipchat.com"
+        return urljoin(url, "/api/v1/messages")
+
+
+class MessageType(Enum):
+    private = "private"
+    stream = "stream"
+
+
+class ZulipSchema(SchemaModel):
+    """Send a stream or a private message"""
+
+    api_key: str = Field(..., description="User API Key")
+    url_or_domain: ZulipUrl = Field(
+        ...,
+        description="Either a full server URL or subdomain to be used with zulipchat.com",
+    )
+    email: EmailStr = Field(..., description='"User email')
+    type: MessageType = Field(
+        MessageType.stream,
+        description="The type of message to be sent. private for a private message and stream for a stream message",
+    )
+    message: constr(max_length=10000) = Field(
+        ..., description="The content of the message", alias="content"
+    )
+    to: SchemaModel.one_or_more_of(Union[EmailStr, str]) = Field(
+        ...,
+        description="The destination stream, or a CSV/JSON-encoded list containing the usernames "
+        "(emails) of the recipients",
+    )
+    topic: constr(max_length=60) = Field(
+        None,
+        description="The topic of the message. Only required if type is stream, ignored otherwise",
+    )
+
+    @validator("to", whole=True)
+    def csv(cls, v):
+        return SchemaModel.to_comma_separated(v)
+
+    @root_validator
+    def root(cls, values):
+        if values["type"] is MessageType.stream and not values.get("topic"):
+            raise ValueError("'topic' is required when 'type' is 'stream'")
+
+        return values
+
+    class Config:
+        json_encoders = {MessageType: lambda v: v.value}
 
 
 class Zulip(Provider):
@@ -9,78 +81,15 @@ class Zulip(Provider):
 
     name = "zulip"
     site_url = "https://zulipchat.com/api/"
-    api_endpoint = "/api/v1/messages"
-    base_url = "https://{domain}.zulipchat.com"
     path_to_errors = ("msg",)
 
-    __type = {
-        "type": "string",
-        "enum": ["stream", "private"],
-        "title": "Type of message to send",
-    }
-    _required = {
-        "allOf": [
-            {"required": ["message", "email", "api_key", "to"]},
-            {
-                "oneOf": [{"required": ["domain"]}, {"required": ["server"]}],
-                "error_oneOf": "Only one of 'domain' or 'server' is allowed",
-            },
-        ]
-    }
-
-    _schema = {
-        "type": "object",
-        "properties": {
-            "message": {"type": "string", "title": "Message content"},
-            "email": {"type": "string", "format": "email", "title": "User email"},
-            "api_key": {"type": "string", "title": "User API Key"},
-            "type": __type,
-            "type_": __type,
-            "to": {"type": "string", "title": "Target of the message"},
-            "subject": {
-                "type": "string",
-                "title": "Title of the stream message. Required when using stream.",
-            },
-            "domain": {"type": "string", "minLength": 1, "title": "Zulip cloud domain"},
-            "server": {
-                "type": "string",
-                "format": "uri",
-                "title": "Zulip server URL. Example: https://myzulip.server.com",
-            },
-        },
-        "additionalProperties": False,
-    }
-
-    @property
-    def defaults(self) -> dict:
-        return {"type": "stream"}
-
-    def _prepare_data(self, data: dict) -> dict:
-        base_url = (
-            self.base_url.format(domain=data.pop("domain"))
-            if data.get("domain")
-            else data.pop("server")
-        )
-        data["url"] = base_url + self.api_endpoint
-        data["content"] = data.pop("message")
-        # A workaround since `type` is a reserved word
-        if data.get("type_"):
-            data["type"] = data.pop("type_")
-        return data
-
-    def _validate_data_dependencies(self, data: dict) -> dict:
-        if data["type"] == "stream" and not data.get("subject"):
-            raise NotifierException(
-                provider=self.name,
-                message="'subject' is required when 'type' is 'stream'",
-                data=data,
-            )
-        return data
-
-    def _send_notification(self, data: dict) -> Response:
-        url = data.pop("url")
-        auth = (data.pop("email"), data.pop("api_key"))
+    def _send_notification(self, data: ZulipSchema) -> Response:
+        auth = data.email, data.api_key
+        payload = data.to_dict(exclude={"email", "api_key", "url_or_domain"})
         response, errors = requests.post(
-            url, data=data, auth=auth, path_to_errors=self.path_to_errors
+            data.url_or_domain,
+            data=payload,
+            auth=auth,
+            path_to_errors=self.path_to_errors,
         )
-        return self.create_response(data, response, errors)
+        return self.create_response(payload, response, errors)
