@@ -13,14 +13,25 @@ from ..utils import requests
 class GitterSchemaBase(SchemaModel):
     token: str = Field(..., description="Access token")
 
+    @property
+    def auth_header(self) -> dict:
+        return {"Authorization": f"Bearer {self.token}"}
+
 
 class GitterRoomSchema(GitterSchemaBase):
+    """List rooms the current user is in"""
+
     filter: str = Field(None, description="Filter results")
 
 
 class GitterSchema(GitterSchemaBase):
-    text: str = Field(..., description="Body of the message", alias="message")
+    """Send a message to a room"""
+
+    message: str = Field(..., description="Body of the message", alias="text")
     room_id: str = Field(..., description="ID of the room to send the notification to")
+    status: bool = Field(
+        None, description="set to true to indicate that the message is a status update"
+    )
 
 
 class GitterMixin:
@@ -31,16 +42,6 @@ class GitterMixin:
     path_to_errors = "errors", "error"
     base_url = "https://api.gitter.im/v1/rooms"
 
-    @staticmethod
-    def _get_headers(token: str) -> dict:
-        """
-        Builds Gitter requests header bases on the token provided
-
-        :param token: App token
-        :return: Authentication header dict
-        """
-        return {"Authorization": f"Bearer {token}"}
-
 
 class GitterRooms(GitterMixin, ProviderResource):
     """Returns a list of Gitter rooms via token"""
@@ -49,14 +50,13 @@ class GitterRooms(GitterMixin, ProviderResource):
     schema_model = GitterRoomSchema
 
     def _get_resource(self, data: GitterRoomSchema) -> list:
-        headers = self._get_headers(data.token)
         params = {}
         if data.filter:
             params["q"] = data.filter
 
         response, errors = requests.get(
             self.base_url,
-            headers=headers,
+            headers=data.auth_header,
             params=params,
             path_to_errors=self.path_to_errors,
         )
@@ -75,25 +75,19 @@ class GitterRooms(GitterMixin, ProviderResource):
 class Gitter(GitterMixin, Provider):
     """Send Gitter notifications"""
 
-    message_url = "/{room_id}/chatMessages"
     site_url = "https://gitter.im"
     schema_model = GitterSchema
 
     _resources = {"rooms": GitterRooms()}
 
-    @property
-    def metadata(self) -> dict:
-        metadata = super().metadata
-        metadata["message_url"] = self.message_url
-        return metadata
-
     def _send_notification(self, data: GitterSchema) -> Response:
-        data = data.to_dict()
-        room_id = data.pop("room_id")
-        url = urljoin(self.base_url, self.message_url.format(room_id=room_id))
+        url = urljoin(self.base_url, f"/{data.room_id}/chatMessages")
 
-        headers = self._get_headers(data.pop("token"))
+        payload = data.to_dict(include={"message", "status"})
         response, errors = requests.post(
-            url, json=data, headers=headers, path_to_errors=self.path_to_errors
+            url,
+            json=payload,
+            headers=data.auth_header,
+            path_to_errors=self.path_to_errors,
         )
-        return self.create_response(data, response, errors)
+        return self.create_response(payload, response, errors)
