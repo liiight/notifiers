@@ -7,6 +7,7 @@ from unittest.mock import MagicMock
 import pytest
 from click.testing import CliRunner
 from pydantic import Field
+from pydantic import StrictStr
 from pydantic import validator
 
 from notifiers.core import get_notifier
@@ -35,13 +36,13 @@ class MockProviderSchema(ResourceSchema):
     not_required: ResourceSchema.one_or_more_of(str) = Field(
         None, description="example for not required arg"
     )
-    required: str
+    required: StrictStr
     option_with_default = "foo"
-    message: str
+    message: str = None
 
     @validator("not_required", whole=True)
     def csv(cls, v):
-        return cls.to_list(v)
+        return cls.to_comma_separated(v)
 
 
 class MockResource(MockProxy, ProviderResource):
@@ -57,11 +58,13 @@ class MockProvider(MockProxy, Provider):
     """Mock Provider"""
 
     base_url = "https://api.mock.com"
-    schema_model = MockProviderSchema
     site_url = "https://www.mock.com"
+    schema_model = MockProviderSchema
 
-    def _send_notification(self, data: dict):
-        return Response(status=ResponseStatus.SUCCESS, provider=self.name, data=data)
+    def _send_notification(self, data: MockProviderSchema):
+        return Response(
+            status=ResponseStatus.SUCCESS, provider=self.name, data=data.to_dict()
+        )
 
     @property
     def resources(self):
@@ -77,16 +80,6 @@ def mock_provider():
     """Return a generic :class:`notifiers.core.Provider` class"""
     _all_providers.update({MockProvider.name: MockProvider})
     return MockProvider()
-
-
-@pytest.fixture
-def bad_provider():
-    """Returns an unimplemented :class:`notifiers.core.Provider` class for testing"""
-
-    class BadProvider(Provider):
-        pass
-
-    return BadProvider
 
 
 @pytest.fixture(scope="class")

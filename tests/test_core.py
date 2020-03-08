@@ -40,7 +40,7 @@ class TestCore:
             },
         }
 
-        assert mock_provider.required == ["required", "message"]
+        assert mock_provider.required == ["required"]
         rsp = mock_provider.notify(**self.valid_data)
         assert isinstance(rsp, Response)
         assert not rsp.errors
@@ -71,6 +71,7 @@ class TestCore:
             "not_required": "foo,bar",
             "required": "foo",
             "option_with_default": "foo",
+            "message": "foo",
         }
 
     def test_get_notifier(self, mock_provider):
@@ -106,18 +107,10 @@ class TestCore:
             "not_required": "foo,bar",
             "required": "foo",
             "option_with_default": "foo",
+            "message": "foo",
         }
         assert e.value.message == "Notification errors: an error"
         assert e.value.provider == mock_provider.name
-
-    def test_bad_integration(self, bad_provider):
-        """Test bad provider inheritance"""
-        with pytest.raises(TypeError) as e:
-            bad_provider()
-        assert (
-            "Can't instantiate abstract class BadProvider with abstract methods _required,"
-            " _schema, _send_notification, base_url, name, site_url"
-        ) in str(e.value)
 
     def test_environs(self, mock_provider, monkeypatch):
         """Test environs usage"""
@@ -153,16 +146,26 @@ class TestCore:
         assert resource.resource_name == "mock_resource"
         assert resource.name == mock_provider.name
         assert resource.schema == {
+            "title": "MockResourceSchema",
+            "description": "The base class for Schemas",
             "type": "object",
             "properties": {
-                "key": {"type": "string", "title": "required key"},
-                "another_key": {"type": "integer", "title": "non-required key"},
+                "key": {
+                    "title": "Key",
+                    "description": "required key",
+                    "type": "string",
+                },
+                "another_key": {
+                    "title": "Another Key",
+                    "description": "non-required key",
+                    "type": "integer",
+                },
             },
             "required": ["key"],
             "additionalProperties": False,
         }
 
-        assert resource.required == {"required": ["key"]}
+        assert resource.required == ["key"]
 
         with pytest.raises(BadArguments):
             resource()

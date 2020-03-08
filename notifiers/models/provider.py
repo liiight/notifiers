@@ -24,7 +24,7 @@ DEFAULT_ENVIRON_PREFIX = "NOTIFIERS_"
 class ResourceSchema(BaseModel):
     """The base class for Schemas"""
 
-    _values_to_exclude: Tuple[str, ...]
+    _values_to_exclude: Tuple[str, ...] = ()
 
     @staticmethod
     def to_list(value: Union[Any, List[Any]]) -> List[Any]:
