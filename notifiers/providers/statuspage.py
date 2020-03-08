@@ -139,6 +139,7 @@ class StatuspageSchema(StatuspageBaseSchema):
         description="Same as 'scheduled_auto_transition_in_progress'. Controls whether the incident is "
         "scheduled to automatically change to in progress",
     )
+    _values_to_exclude = "page_id", "api_key"
 
     @root_validator
     def values_dependencies(cls, values):
@@ -226,7 +227,7 @@ class Statuspage(StatuspageMixin, Provider):
     def _send_notification(self, data: StatuspageSchema) -> Response:
         url = urljoin(self.base_url.format(page_id=data.page_id), self.incidents_url)
         headers = self.request_headers(data.api_key)
-        data_dict = data.to_dict(exclude={"page_id", "api_key"})
+        data_dict = data.to_dict()
         payload = {"incident": data_dict}
         response, errors = requests.post(
             url, json=payload, headers=headers, path_to_errors=self.path_to_errors

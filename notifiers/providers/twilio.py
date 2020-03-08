@@ -116,6 +116,8 @@ class TwilioSchema(SchemaModel):
     class Config:
         alias_generator = snake_to_camel_case
 
+    _values_to_exclude = "account_sid", "auth_token"
+
     @root_validator
     def check_values(cls, values):
         if not any(value in values for value in ("message", "media_url")):
@@ -144,7 +146,7 @@ class Twilio(Provider):
         account_sid = data.account_sid
         url = self.base_url.format(account_sid)
         auth = account_sid, data.auth_token
-        payload = data.to_dict(exclude={"account_sid", "auth_token"})
+        payload = data.to_dict()
         response, errors = requests.post(
             url, data=payload, auth=auth, path_to_errors=self.path_to_errors
         )

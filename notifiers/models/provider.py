@@ -4,6 +4,7 @@ from abc import abstractmethod
 from typing import Any
 from typing import List
 from typing import Optional
+from typing import Tuple
 from typing import Union
 
 import requests
@@ -22,6 +23,8 @@ DEFAULT_ENVIRON_PREFIX = "NOTIFIERS_"
 
 class SchemaModel(BaseModel):
     """The base class for Schemas"""
+
+    _values_to_exclude: Tuple[str, ...]
 
     @staticmethod
     def to_list(value: Union[Any, List[Any]]) -> List[Any]:
@@ -59,7 +62,12 @@ class SchemaModel(BaseModel):
         :return: dict payload of the schema
         """
         return json.loads(
-            self.json(exclude_none=exclude_none, by_alias=by_alias, **kwargs)
+            self.json(
+                exclude_none=exclude_none,
+                by_alias=by_alias,
+                exclude=set(self._values_to_exclude),
+                **kwargs,
+            )
         )
 
     class Config:
@@ -158,9 +166,8 @@ class Provider(SchemaResource, ABC):
         raise AttributeError(f"{self} does not have a property {item}")
 
     @property
-    @abstractmethod
     def base_url(self):
-        pass
+        return
 
     @property
     @abstractmethod

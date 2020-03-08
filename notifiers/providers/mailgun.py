@@ -153,6 +153,7 @@ class MailGunSchema(SchemaModel):
         "dictionary with variables that can be referenced in the message body.",
         alias="recipient-variables",
     )
+    _values_to_exclude = "domain", "api_key"
 
     @root_validator()
     def headers_and_data(cls, values):
@@ -221,7 +222,7 @@ class MailGun(Provider):
             files += requests.file_list_for_request(data.attachment, "attachment")
         if data.inline:
             files += requests.file_list_for_request(data.inline, "inline")
-        payload = data.to_dict(exclude={"domain", "api_key"})
+        payload = data.to_dict()
         response, errors = requests.post(
             url=url,
             data=payload,

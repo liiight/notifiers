@@ -254,6 +254,8 @@ class TelegramSchema(TelegramBaseSchema):
         " custom reply keyboard, instructions to remove reply keyboard or to force a reply from the user",
     )
 
+    _values_to_exclude = ("token",)
+
     class Config:
         json_encoders = {ParseMode: lambda v: v.value}
 
@@ -295,7 +297,7 @@ class Telegram(TelegramMixin, Provider):
 
     def _send_notification(self, data: TelegramSchema) -> Response:
         url = urljoin(self.base_url.format(token=data.token), "sendMessage")
-        payload = data.to_dict(exclude={"token"})
+        payload = data.to_dict()
         response, errors = requests.post(
             url, json=payload, path_to_errors=self.path_to_errors
         )

@@ -65,6 +65,8 @@ class ZulipSchema(SchemaModel):
     def csv(cls, v):
         return SchemaModel.to_comma_separated(v)
 
+    _values_to_exclude = "email", "api_key", "url_or_domain"
+
     @root_validator
     def root(cls, values):
         if values["type"] is MessageType.stream and not values.get("topic"):
@@ -85,7 +87,7 @@ class Zulip(Provider):
 
     def _send_notification(self, data: ZulipSchema) -> Response:
         auth = data.email, data.api_key
-        payload = data.to_dict(exclude={"email", "api_key", "url_or_domain"})
+        payload = data.to_dict()
         response, errors = requests.post(
             data.url_or_domain,
             data=payload,
