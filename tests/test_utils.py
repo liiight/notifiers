@@ -71,12 +71,12 @@ class TestHelpers:
         assert not valid_file(dir_)
         assert not valid_file(no_file)
 
-    def test_file_list_for_request(self, tmpdir):
-        file_1 = tmpdir.join("file_1")
-        file_2 = tmpdir.join("file_2")
+    def test_file_list_for_request(self, tmp_path):
+        file_1 = tmp_path / "file_1"
+        file_2 = tmp_path / "file_2"
 
-        file_1.write("foo")
-        file_2.write("foo")
+        file_1.write_text("foo")
+        file_2.write_text("foo")
 
         file_list = file_list_for_request([file_1, file_2], "foo")
         assert len(file_list) == 2
