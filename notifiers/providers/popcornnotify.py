@@ -35,8 +35,8 @@ class PopcornNotify(Provider):
     schema_model = PopcornNotifySchema
 
     def _send_notification(self, data: PopcornNotifySchema) -> Response:
-        data = data.to_dict()
+        payload = data.to_dict()
         response, errors = requests.post(
-            url=self.base_url, json=data, path_to_errors=self.path_to_errors
+            url=self.base_url, json=payload, path_to_errors=self.path_to_errors
         )
-        return self.create_response(data, response, errors)
+        return self.create_response(payload, response, errors)

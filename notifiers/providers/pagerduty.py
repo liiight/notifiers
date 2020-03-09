@@ -122,8 +122,8 @@ class PagerDuty(Provider):
     schema_model = PagerDutySchema
 
     def _send_notification(self, data: PagerDutySchema) -> Response:
-        url = self.base_url
+        payload = data.to_dict()
         response, errors = requests.post(
-            url, json=data.to_dict(), path_to_errors=self.path_to_errors
+            self.base_url, json=payload, path_to_errors=self.path_to_errors
         )
-        return self.create_response(data, response, errors)
+        return self.create_response(payload, response, errors)

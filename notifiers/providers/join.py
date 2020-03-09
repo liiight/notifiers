@@ -180,9 +180,9 @@ class JoinMixin:
     base_url = "https://joinjoaomgcd.appspot.com/_ah/api/messaging/v1"
 
     @staticmethod
-    def _join_request(url: str, data: JoinBaseSchema) -> tuple:
+    def _join_request(url: str, data: dict) -> tuple:
         # Can 't use generic requests util since API doesn't always return error status
-        params = data.to_dict()
+        params = data
         errors = None
         try:
             response = requests.get(url, params=params)
@@ -213,7 +213,7 @@ class JoinDevices(JoinMixin, ProviderResource):
 
     def _get_resource(self, data: JoinBaseSchema):
         url = urljoin(self.base_url, self.devices_url)
-        response, errors = self._join_request(url, data)
+        response, errors = self._join_request(url, data.to_dict())
         if errors:
             raise ResourceError(
                 errors=errors,
@@ -237,5 +237,6 @@ class Join(JoinMixin, Provider):
     def _send_notification(self, data: JoinSchema) -> Response:
         # Can 't use generic requests util since API doesn't always return error status
         url = urljoin(self.base_url, self.push_url)
-        response, errors = self._join_request(url, data)
-        return self.create_response(data.dict(), response, errors)
+        payload = data.to_dict()
+        response, errors = self._join_request(url, payload)
+        return self.create_response(payload, response, errors)

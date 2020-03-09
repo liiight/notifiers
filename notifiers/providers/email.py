@@ -149,4 +149,4 @@ class SMTP(Provider):
             SMTPAuthenticationError,
         ) as e:
             errors = [str(e)]
-        return self.create_response(data.dict(), errors=errors)
+        return self.create_response(data.to_dict(), errors=errors)

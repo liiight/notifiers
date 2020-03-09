@@ -25,6 +25,10 @@ class PushbulletType(str, Enum):
 class PushbulletBaseSchema(ResourceSchema):
     token: str = Field(..., description="API access token")
 
+    @property
+    def auth_headers(self):
+        return {"Access-Token": self.token}
+
 
 class PushbulletSchema(PushbulletBaseSchema):
     type: PushbulletType = Field(PushbulletType.note, description="Type of the push")
@@ -85,23 +89,19 @@ class PushbulletMixin:
     name = "pushbullet"
     path_to_errors = "error", "message"
 
-    def _get_headers(self, token: str) -> dict:
-        return {"Access-Token": token}
-
 
 class PushbulletDevices(PushbulletMixin, ProviderResource):
     """Return a list of Pushbullet devices associated to a token"""
 
     resource_name = "devices"
     devices_url = "https://api.pushbullet.com/v2/devices"
-
-    _required = {"required": ["token"]}
     schema_model = PushbulletBaseSchema
 
     def _get_resource(self, data: PushbulletBaseSchema) -> list:
-        headers = self._get_headers(data.token)
         response, errors = requests.get(
-            self.devices_url, headers=headers, path_to_errors=self.path_to_errors
+            self.devices_url,
+            headers=data.auth_headers,
+            path_to_errors=self.path_to_errors,
         )
         if errors:
             raise ResourceError(
@@ -159,14 +159,13 @@ class Pushbullet(PushbulletMixin, Provider):
         return file_data
 
     def _send_notification(self, data: PushbulletSchema) -> Response:
-        request_data = data.to_dict()
-        headers = self._get_headers(request_data.pop("token"))
+        payload = data.to_dict()
         if data.file:
-            request_data.update(self._upload_file(data.file, headers))
+            payload.update(self._upload_file(data.file, data.auth_headers))
         response, errors = requests.post(
             self.base_url,
-            json=request_data,
-            headers=headers,
+            json=payload,
+            headers=data.auth_headers,
             path_to_errors=self.path_to_errors,
         )
-        return self.create_response(request_data, response, errors)
+        return self.create_response(payload, response, errors)

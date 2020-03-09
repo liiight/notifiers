@@ -47,6 +47,7 @@ class PushoverBaseSchema(ResourceSchema):
 
 
 class PushoverSchema(PushoverBaseSchema):
+    _values_to_exclude = ("attachment",)
     user: PushoverBaseSchema.one_or_more_of(str) = Field(
         ..., description="The user/group key (not e-mail address) of your user (or you)"
     )
@@ -187,15 +188,16 @@ class Pushover(PushoverMixin, Provider):
 
     schema_model = PushoverSchema
 
-    def _send_notification(self, data: dict) -> Response:
+    def _send_notification(self, data: PushoverSchema) -> Response:
         url = urljoin(self.base_url, self.message_url)
         files = []
-        if data.get("attachment"):
-            files = requests.file_list_for_request(data["attachment"], "attachment")
+        if data.attachment:
+            files = requests.file_list_for_request(data.attachment, "attachment")
+        payload = data.to_dict()
         response, errors = requests.post(
-            url, data=data, files=files, path_to_errors=self.path_to_errors
+            url, data=payload, files=files, path_to_errors=self.path_to_errors
         )
-        return self.create_response(data, response, errors)
+        return self.create_response(payload, response, errors)
 
     @property
     def metadata(self) -> dict:
