@@ -24,9 +24,6 @@ class TestJoin:
             provider.notify(**data)
         assert f"'{message}' is a required property" in e.value.message
 
-    def test_defaults(self, provider):
-        assert provider.defaults == {"deviceId": "group.all"}
-
     @pytest.mark.skip("tests fail due to no device connected")
     @pytest.mark.online
     def test_sanity(self, provider):
