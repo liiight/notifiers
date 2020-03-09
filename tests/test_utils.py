@@ -4,7 +4,6 @@ from notifiers.utils.helpers import dict_from_environs
 from notifiers.utils.helpers import merge_dicts
 from notifiers.utils.helpers import snake_to_camel_case
 from notifiers.utils.helpers import text_to_bool
-from notifiers.utils.helpers import valid_file
 from notifiers.utils.requests import file_list_for_request
 
 
@@ -57,19 +56,6 @@ class TestHelpers:
     )
     def test_snake_to_camel_case(self, snake_value, cc_value):
         assert snake_to_camel_case(snake_value) == cc_value
-
-    def test_valid_file(self, tmpdir):
-        dir_ = str(tmpdir)
-
-        file = tmpdir.join("foo.txt")
-        file.write("foo")
-        file = str(file)
-
-        no_file = "foo"
-
-        assert valid_file(file)
-        assert not valid_file(dir_)
-        assert not valid_file(no_file)
 
     def test_file_list_for_request(self, tmp_path):
         file_1 = tmp_path / "file_1"
