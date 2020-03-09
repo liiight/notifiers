@@ -1,7 +1,6 @@
 import logging
 import os
 from distutils.util import strtobool
-from pathlib import Path
 
 log = logging.getLogger("notifiers")
 
@@ -62,15 +61,3 @@ def snake_to_camel_case(value: str) -> str:
     """
     log.debug("trying to convert %s to camel case", value)
     return "".join(word.capitalize() for word in value.split("_"))
-
-
-def valid_file(path: str) -> bool:
-    """
-    Verifies that a string path actually exists and is a file
-
-    :param path: The path to verify
-    :return: **True** if path exist and is a file
-    """
-    path = Path(path).expanduser()
-    log.debug("checking if %s is a valid file", path)
-    return path.exists() and path.is_file()
