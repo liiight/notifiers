@@ -28,8 +28,7 @@ def merge_dicts(target_dict: dict, merge_dict: dict) -> dict:
     """
     log.debug("merging dict %s into %s", merge_dict, target_dict)
     for key, value in merge_dict.items():
-        if key not in target_dict:
-            target_dict[key] = value
+        target_dict.setdefault(key, value)
     return target_dict
 
 
@@ -43,13 +42,12 @@ def dict_from_environs(prefix: str, name: str, args: list) -> dict:
     :param args: List of args to iterate over
     :return: A dict of found environ values
     """
-    environs = {}
     log.debug("starting to collect environs using prefix: '%s'", prefix)
-    for arg in args:
-        environ = f"{prefix}{name}_{arg}".upper()
-        if os.environ.get(environ):
-            environs[arg] = os.environ[environ]
-    return environs
+    return {
+        arg: os.environ.get(f"{prefix}{name}_{arg}".upper())
+        for arg in args
+        if os.environ.get(f"{prefix}{name}_{arg}".upper())
+    }
 
 
 def snake_to_camel_case(value: str) -> str:
@@ -59,5 +57,5 @@ def snake_to_camel_case(value: str) -> str:
     :param value: The value to convert
     :return: A CamelCase value
     """
-    log.debug("trying to convert %s to camel case", value)
+    log.debug("converting %s to camel case", value)
     return "".join(word.capitalize() for word in value.split("_"))
