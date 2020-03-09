@@ -197,7 +197,6 @@ class Slack(Provider):
     schema_model = SlackSchema
 
     def _send_notification(self, data: SlackSchema) -> Response:
-        data = data.to_dict()
-        url = data.pop("webhook_url")
-        response, errors = requests.post(url, json=data)
-        return self.create_response(data, response, errors)
+        payload = data.to_dict()
+        response, errors = requests.post(data.webhook_url, json=payload)
+        return self.create_response(payload, response, errors)
