@@ -9,9 +9,9 @@ from pydantic import root_validator
 from pydantic import validator
 from pydantic.color import Color as ColorType
 
-from notifiers.models.provider import Provider
-from notifiers.models.provider import ResourceSchema
+from notifiers.models.resource import Provider
 from notifiers.models.response import Response
+from notifiers.models.schema import ResourceSchema
 from notifiers.providers.slack.blocks import Blocks
 from notifiers.providers.slack.composition import Color
 from notifiers.utils import requests

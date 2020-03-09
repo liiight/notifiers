@@ -15,9 +15,9 @@ from pydantic import root_validator
 from pydantic import validator
 from typing_extensions import Literal
 
-from ..models.provider import Provider
-from ..models.provider import ResourceSchema
+from ..models.resource import Provider
 from ..models.response import Response
+from ..models.schema import ResourceSchema
 from ..utils import requests
 
 

@@ -5,7 +5,7 @@ from notifiers import notify
 from notifiers.exceptions import BadArguments
 from notifiers.exceptions import NoSuchNotifierError
 from notifiers.exceptions import NotificationError
-from notifiers.models.provider import Provider
+from notifiers.models.resource import Provider
 from notifiers.models.response import Response
 from notifiers.models.response import ResponseStatus
 

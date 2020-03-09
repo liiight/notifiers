@@ -8,6 +8,7 @@ from pydantic import HttpUrl
 from pydantic import root_validator
 from typing_extensions import Literal
 
+from ...models.schema import ResourceSchema
 from .elements import ButtonElement
 from .elements import CheckboxElement
 from .elements import DatePickerElement
@@ -23,7 +24,6 @@ from .elements import RadioButtonGroupElement
 from .elements import SelectChannelsElement
 from .elements import SelectUsersElement
 from .elements import StaticSelectElement
-from notifiers.models.provider import ResourceSchema
 from notifiers.providers.slack.composition import _text_object_factory
 from notifiers.providers.slack.composition import Text
 from notifiers.providers.slack.composition import TextType

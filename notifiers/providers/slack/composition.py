@@ -9,7 +9,7 @@ from pydantic import HttpUrl
 from pydantic import root_validator
 from typing_extensions import Literal
 
-from notifiers.models.provider import ResourceSchema
+from notifiers.models.schema import ResourceSchema
 
 
 class TextType(Enum):

@@ -8,7 +8,7 @@ from pydantic import HttpUrl
 from pydantic import PositiveInt
 from pydantic import root_validator
 
-from notifiers.models.provider import ResourceSchema
+from notifiers.models.schema import ResourceSchema
 from notifiers.providers.slack.composition import _text_object_factory
 from notifiers.providers.slack.composition import ConfirmationDialog
 from notifiers.providers.slack.composition import Option

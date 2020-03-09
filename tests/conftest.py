@@ -12,11 +12,11 @@ from pydantic import validator
 
 from notifiers.core import get_notifier
 from notifiers.logging import NotificationHandler
-from notifiers.models.provider import Provider
-from notifiers.models.provider import ProviderResource
-from notifiers.models.provider import ResourceSchema
+from notifiers.models.resource import Provider
+from notifiers.models.resource import ProviderResource
 from notifiers.models.response import Response
 from notifiers.models.response import ResponseStatus
+from notifiers.models.schema import ResourceSchema
 from notifiers.providers import _all_providers
 from notifiers.utils.helpers import text_to_bool
 

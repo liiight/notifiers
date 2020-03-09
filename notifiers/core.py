@@ -1,7 +1,7 @@
 import logging
 
 from .exceptions import NoSuchNotifierError
-from .models.provider import Provider
+from .models.resource import Provider
 from .models.response import Response
 
 log = logging.getLogger("notifiers")
