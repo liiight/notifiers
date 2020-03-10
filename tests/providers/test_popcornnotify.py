@@ -18,9 +18,8 @@ class TestPopcornNotify:
     )
     def test_popcornnotify_missing_required(self, data, message, provider):
         data["env_prefix"] = "test"
-        with pytest.raises(BadArguments) as e:
+        with pytest.raises(BadArguments, match=f"{message}\n  field required"):
             provider.notify(**data)
-        assert f"'{message}' is a required property" in e.value.message
 
     @pytest.mark.online
     @pytest.mark.skip("Seems like service is down?")
