@@ -198,9 +198,3 @@ class Pushover(PushoverMixin, Provider):
             url, data=payload, files=files, path_to_errors=self.path_to_errors
         )
         return self.create_response(payload, response, errors)
-
-    @property
-    def metadata(self) -> dict:
-        m = super().metadata
-        m["message_url"] = self.message_url
-        return m
