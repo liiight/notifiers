@@ -102,7 +102,7 @@ class Provider(Resource, ABC):
     _resources = {}
 
     def __repr__(self):
-        return f"<Provider:[{self.name.capitalize()}]>"
+        return f"<Provider({self.name.capitalize()})>"
 
     def __getattr__(self, item):
         if item in self._resources:
