@@ -19,7 +19,10 @@ DEFAULT_ENVIRON_PREFIX = "NOTIFIERS_"
 class Resource(ABC):
     """Base class that represent an object holding a schema and its utility methods"""
 
-    schema_model: ResourceSchema
+    @property
+    @abstractmethod
+    def schema_model(self) -> ResourceSchema:
+        pass
 
     @property
     @abstractmethod

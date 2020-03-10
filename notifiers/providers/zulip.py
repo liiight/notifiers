@@ -85,6 +85,8 @@ class Zulip(Provider):
     site_url = "https://zulipchat.com/api/"
     path_to_errors = ("msg",)
 
+    schema_model = ZulipSchema
+
     def _send_notification(self, data: ZulipSchema) -> Response:
         auth = data.email, data.api_key
         payload = data.to_dict()
