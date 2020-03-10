@@ -12,14 +12,6 @@ class TestPushover:
     Note: These tests assume correct environs set for NOTIFIERS_PUSHOVER_TOKEN and NOTIFIERS_PUSHOVER_USER
     """
 
-    def test_pushover_metadata(self, provider):
-        assert provider.metadata == {
-            "base_url": "https://api.pushover.net/1/",
-            "site_url": "https://pushover.net/",
-            "name": "pushover",
-            "message_url": "messages.json",
-        }
-
     @pytest.mark.parametrize(
         "data, message",
         [

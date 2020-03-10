@@ -9,13 +9,6 @@ provider = "pushbullet"
 
 @pytest.mark.skip(reason="Re-enable once account is activated again")
 class TestPushbullet:
-    def test_metadata(self, provider):
-        assert provider.metadata == {
-            "base_url": "https://api.pushbullet.com/v2/pushes",
-            "name": "pushbullet",
-            "site_url": "https://www.pushbullet.com",
-        }
-
     @pytest.mark.parametrize(
         "data, message", [({}, "message"), ({"message": "foo"}, "token")]
     )

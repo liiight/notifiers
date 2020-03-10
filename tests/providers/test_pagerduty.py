@@ -8,13 +8,6 @@ provider = "pagerduty"
 
 
 class TestPagerDuty:
-    def test_pagerduty_metadata(self, provider):
-        assert provider.metadata == {
-            "base_url": "https://events.pagerduty.com/v2/enqueue",
-            "name": "pagerduty",
-            "site_url": "https://v2.developer.pagerduty.com/",
-        }
-
     @pytest.mark.parametrize(
         "data, message",
         [

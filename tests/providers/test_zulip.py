@@ -9,13 +9,6 @@ provider = "zulip"
 
 
 class TestZulip:
-    def test_metadata(self, provider):
-        assert provider.metadata == {
-            "base_url": "https://{domain}.zulipchat.com",
-            "site_url": "https://zulipchat.com/api/",
-            "name": "zulip",
-        }
-
     @pytest.mark.parametrize(
         "data, message",
         [

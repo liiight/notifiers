@@ -9,13 +9,6 @@ provider = "gmail"
 class TestGmail:
     """Gmail tests"""
 
-    def test_gmail_metadata(self, provider):
-        assert provider.metadata == {
-            "base_url": "smtp.gmail.com",
-            "name": "gmail",
-            "site_url": "https://www.google.com/gmail/about/",
-        }
-
     @pytest.mark.parametrize(
         "data, message",
         [

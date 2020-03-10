@@ -11,13 +11,6 @@ provider = "email"
 class TestSMTP(object):
     """SMTP tests"""
 
-    def test_smtp_metadata(self, provider):
-        assert provider.metadata == {
-            "base_url": None,
-            "name": "email",
-            "site_url": "https://en.wikipedia.org/wiki/Email",
-        }
-
     @pytest.mark.parametrize(
         "data, message", [({}, "message"), ({"message": "foo"}, "to")]
     )

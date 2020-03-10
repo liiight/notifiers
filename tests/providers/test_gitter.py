@@ -8,14 +8,6 @@ provider = "gitter"
 
 
 class TestGitter:
-    def test_metadata(self, provider):
-        assert provider.metadata == {
-            "base_url": "https://api.gitter.im/v1/rooms",
-            "message_url": "/{room_id}/chatMessages",
-            "name": "gitter",
-            "site_url": "https://gitter.im",
-        }
-
     @pytest.mark.parametrize(
         "data, message",
         [

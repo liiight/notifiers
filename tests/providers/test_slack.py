@@ -10,13 +10,6 @@ class TestSlack:
     Online test rely on setting the env variable NOTIFIERS_SLACK_WEBHOOK_URL
     """
 
-    def test_slack_metadata(self, provider):
-        assert provider.metadata == {
-            "base_url": "https://hooks.slack.com/services/",
-            "name": "slack",
-            "site_url": "https://api.slack.com/incoming-webhooks",
-        }
-
     @pytest.mark.online
     def test_sanity(self, provider, test_message):
         data = {"message": test_message}

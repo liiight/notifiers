@@ -9,13 +9,6 @@ provider = "mailgun"
 
 
 class TestMailgun:
-    def test_mailgun_metadata(self, provider):
-        assert provider.metadata == {
-            "base_url": "https://api.mailgun.net/v3/{domain}/messages",
-            "name": "mailgun",
-            "site_url": "https://documentation.mailgun.com/",
-        }
-
     @pytest.mark.parametrize(
         "data, message",
         [

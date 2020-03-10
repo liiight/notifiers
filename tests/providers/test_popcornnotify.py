@@ -8,13 +8,6 @@ provider = "popcornnotify"
 
 
 class TestPopcornNotify:
-    def test_popcornnotify_metadata(self, provider):
-        assert provider.metadata == {
-            "base_url": "https://popcornnotify.com/notify",
-            "name": "popcornnotify",
-            "site_url": "https://popcornnotify.com/",
-        }
-
     @pytest.mark.parametrize(
         "data, message",
         [

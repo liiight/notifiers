@@ -12,13 +12,6 @@ provider = "telegram"
 class TestTelegram:
     """Telegram related tests"""
 
-    def test_metadata(self, provider):
-        assert provider.metadata == {
-            "base_url": "https://api.telegram.org/bot{token}",
-            "name": "telegram",
-            "site_url": "https://core.telegram.org/",
-        }
-
     @pytest.mark.parametrize(
         "data, message",
         [
