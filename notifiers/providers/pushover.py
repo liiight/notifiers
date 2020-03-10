@@ -122,7 +122,7 @@ class PushoverSchema(PushoverBaseSchema):
 
     @root_validator
     def html_or_monospace(cls, values):
-        if all(value in values for value in ("html", "monospace")):
+        if all(values.get(value) for value in ("html", "monospace")):
             raise ValueError("Cannot use both 'html' and 'monospace'")
         return values
 
