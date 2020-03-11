@@ -49,7 +49,7 @@ class TestCore:
             repr(rsp)
             == f"<Response,provider=Mock_provider,status={ResponseStatus.SUCCESS}, errors=None>"
         )
-        assert repr(mock_provider) == "<Provider:[Mock_provider]>"
+        assert repr(mock_provider) == "<Provider(Mock_provider)>"
 
     @pytest.mark.parametrize(
         "data",

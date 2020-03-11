@@ -11,7 +11,7 @@ class TestGitter:
     @pytest.mark.parametrize(
         "data, message",
         [
-            ({}, "message\n  field required"),
+            ({}, "text\n  field required"),
             ({"message": "foo"}, "token\n  field required"),
             ({"message": "foo", "token": "bar"}, "room_id\n  field required"),
         ],
