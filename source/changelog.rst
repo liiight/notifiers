@@ -6,6 +6,8 @@ Changelog
 (Unreleased)
 ------------
 
+- Adds a default timeout of (5, 20) seconds for all HTTP requests. (`#388 <https://github.com/liiight/notifiers/pull/388>`_)
+
 1.2.0
 -----
 
