@@ -44,7 +44,7 @@ The first is to construct data via a dict and unpack it into the :meth:`~notifie
    ... }
    >>> provider.notify(**data)
 
-The other is to use an alternate key word, which would always be the reservred key word followed by an underscore:
+The other is to use an alternate key word, which would always be the reserved key word followed by an underscore:
 
 .. code:: python
 
