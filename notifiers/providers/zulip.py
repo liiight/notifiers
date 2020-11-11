@@ -42,9 +42,6 @@ class ZulipSchema(ResourceSchema):
         None,
         description="The topic of the message. Only required if type is stream, ignored otherwise",
     )
-    subject: str = Field(
-        None, description="Message subject. Relevant only for stream messages"
-    )
 
     @validator("to", whole=True)
     def csv(cls, v):

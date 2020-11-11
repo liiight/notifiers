@@ -14,7 +14,7 @@ class TestZulip:
             "to": "general",
             "message": test_message,
             "domain": "notifiers",
-            "subject": "test",
+            "topic": "test",
         }
         rsp = provider.notify(**data)
         rsp.raise_on_errors()
@@ -35,9 +35,9 @@ class TestZulip:
             api_key="bar",
             to="baz",
             domain="bla",
-            type_="private",
+            type="private",
             message="foo",
-            subject="foo",
+            topic="foo",
         )
         rsp_data = rsp.data
         assert not rsp_data.get("type_")
@@ -50,7 +50,7 @@ class TestZulip:
                 api_key="bar",
                 to="baz@foo.com",
                 domain="bla",
-                type_="stream",
+                type="stream",
                 message="foo",
             )
-        assert "'subject' is required when 'type' is 'stream'" in e.value.message
+        assert "'topic' is required when 'type' is 'stream'" in e.value.message
