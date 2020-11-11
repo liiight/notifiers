@@ -1,7 +1,6 @@
 import json
 from enum import Enum
 from typing import Union
-from urllib.parse import urljoin
 
 import requests
 from pydantic import Extra
@@ -208,11 +207,11 @@ class JoinDevices(JoinMixin, ProviderResource):
     """Return a list of Join devices IDs"""
 
     resource_name = "devices"
-    devices_url = "/listDevices"
+    devices_url = "listDevices"
     schema_model = JoinBaseSchema
 
     def _get_resource(self, data: JoinBaseSchema):
-        url = urljoin(self.base_url, self.devices_url)
+        url = f"{self.base_url}/{self.devices_url}"
         response, errors = self._join_request(url, data.to_dict())
         if errors:
             raise ResourceError(
@@ -228,7 +227,7 @@ class JoinDevices(JoinMixin, ProviderResource):
 class Join(JoinMixin, Provider):
     """Send Join notifications"""
 
-    push_url = "/sendPush"
+    push_url = "sendPush"
     site_url = "https://joaoapps.com/join/api/"
 
     _resources = {"devices": JoinDevices()}
@@ -236,7 +235,7 @@ class Join(JoinMixin, Provider):
 
     def _send_notification(self, data: JoinSchema) -> Response:
         # Can 't use generic requests util since API doesn't always return error status
-        url = urljoin(self.base_url, self.push_url)
+        url = f"{self.base_url}/{self.push_url}"
         payload = data.to_dict()
         response, errors = self._join_request(url, payload)
         return self.create_response(payload, response, errors)
