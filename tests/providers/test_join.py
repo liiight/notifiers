@@ -9,13 +9,13 @@ provider = "join"
 
 class TestJoin:
     @pytest.mark.parametrize(
-        "data, message", [({}, "apikey"), ({"apikey": "foo"}, "message")]
+        "data, field", [({}, "apikey"), ({"apikey": "foo"}, "text")]
     )
-    def test_missing_required(self, data, message, provider):
+    def test_missing_required(self, data, field, provider):
         data["env_prefix"] = "test"
         with pytest.raises(BadArguments) as e:
             provider.notify(**data)
-        assert f"'{message}' is a required property" in e.value.message
+        assert f"{field}\n  field required" in e.value.message
 
     @pytest.mark.skip("tests fail due to no device connected")
     @pytest.mark.online
