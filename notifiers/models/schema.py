@@ -6,6 +6,7 @@ from typing import Union
 
 from pydantic import BaseModel
 from pydantic import Extra
+from pydantic import NameEmail
 
 
 class ResourceSchema(BaseModel):
@@ -60,3 +61,4 @@ class ResourceSchema(BaseModel):
     class Config:
         allow_population_by_field_name = True
         extra = Extra.forbid
+        json_encoders = {NameEmail: lambda e: str(e)}

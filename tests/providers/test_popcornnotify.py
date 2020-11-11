@@ -1,6 +1,5 @@
 import pytest
 
-from notifiers.exceptions import BadArguments
 from notifiers.exceptions import NotificationError
 from notifiers.models.response import ResponseStatus
 
@@ -8,19 +7,6 @@ provider = "popcornnotify"
 
 
 class TestPopcornNotify:
-    @pytest.mark.parametrize(
-        "data, message",
-        [
-            ({}, "message"),
-            ({"message": "foo"}, "api_key"),
-            ({"message": "foo", "api_key": "foo"}, "recipients"),
-        ],
-    )
-    def test_popcornnotify_missing_required(self, data, message, provider):
-        data["env_prefix"] = "test"
-        with pytest.raises(BadArguments, match=f"{message}\n  field required"):
-            provider.notify(**data)
-
     @pytest.mark.online
     @pytest.mark.skip("Seems like service is down?")
     def test_popcornnotify_sanity(self, provider, test_message):

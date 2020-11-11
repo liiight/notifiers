@@ -12,20 +12,6 @@ provider = "telegram"
 class TestTelegram:
     """Telegram related tests"""
 
-    @pytest.mark.parametrize(
-        "data, message",
-        [
-            ({}, "message"),
-            ({"message": "foo"}, "chat_id"),
-            ({"message": "foo", "chat_id": 1}, "token"),
-        ],
-    )
-    def test_missing_required(self, data, message, provider):
-        data["env_prefix"] = "test"
-        with pytest.raises(BadArguments) as e:
-            provider.notify(**data)
-        assert f"'{message}' is a required property" in e.value.message
-
     def test_bad_token(self, provider):
         data = {"token": "foo", "chat_id": 1, "message": "foo"}
         with pytest.raises(NotificationError) as e:

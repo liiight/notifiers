@@ -5,7 +5,6 @@ from typing import List
 from pydantic import constr
 from pydantic import Field
 from pydantic import HttpUrl
-from pydantic import validator
 
 from ..models.resource import Provider
 from ..models.response import Response
@@ -84,10 +83,6 @@ class PagerDutyPayload(ResourceSchema):
     custom_details: dict = Field(
         None, description="Additional details about the event and affected system"
     )
-
-    @validator("timestamp")
-    def to_timestamp(cls, v: datetime):
-        return v.timestamp()
 
     class Config:
         json_encoders = {PagerDutyPayloadSeverity: lambda v: v.value}

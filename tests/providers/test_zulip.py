@@ -2,39 +2,12 @@ import datetime
 
 import pytest
 
-from notifiers.exceptions import BadArguments
 from notifiers.exceptions import NotifierException
 
 provider = "zulip"
 
 
 class TestZulip:
-    @pytest.mark.parametrize(
-        "data, message",
-        [
-            (
-                {"email": "foo", "api_key": "bar", "message": "boo", "to": "bla"},
-                "domain",
-            ),
-            (
-                {
-                    "email": "foo",
-                    "api_key": "bar",
-                    "message": "boo",
-                    "to": "bla",
-                    "domain": "bla",
-                    "server": "fop",
-                },
-                "Only one of 'domain' or 'server' is allowed",
-            ),
-        ],
-    )
-    def test_missing_required(self, data, message, provider):
-        data["env_prefix"] = "test"
-        with pytest.raises(BadArguments) as e:
-            provider.notify(**data)
-        assert message in e.value.message
-
     @pytest.mark.online
     def test_sanity(self, provider, test_message):
         data = {

@@ -8,19 +8,6 @@ provider = "gitter"
 
 
 class TestGitter:
-    @pytest.mark.parametrize(
-        "data, message",
-        [
-            ({}, "text\n  field required"),
-            ({"message": "foo"}, "token\n  field required"),
-            ({"message": "foo", "token": "bar"}, "room_id\n  field required"),
-        ],
-    )
-    def test_missing_required(self, provider, data, message):
-        data["env_prefix"] = "test"
-        with pytest.raises(BadArguments, match=message):
-            provider.notify(**data)
-
     def test_bad_request(self, provider):
         data = {"token": "foo", "message": "bar"}
         with pytest.raises(NotificationError) as e:

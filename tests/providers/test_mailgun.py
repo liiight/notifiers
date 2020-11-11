@@ -2,37 +2,12 @@ import datetime
 
 import pytest
 
-from notifiers.exceptions import BadArguments
 from notifiers.models.response import ResponseStatus
 
 provider = "mailgun"
 
 
 class TestMailgun:
-    @pytest.mark.parametrize(
-        "data, message",
-        [
-            ({}, "Either 'text' or 'html' are required"),
-            ({"message": "foo"}, "api_key\n  field required"),
-            (
-                {"message": "foo", "to": "non-email"},
-                "to\n  value is not a valid email address",
-            ),
-            (
-                {"message": "foo", "to": "1@1.com", "api_key": "foo"},
-                "domain\n  field required",
-            ),
-            (
-                {"message": "foo", "to": "1@1.com", "api_key": "foo", "domain": "foo"},
-                "from\n  field required",
-            ),
-        ],
-    )
-    def test_mailgun_missing_required(self, data, message, provider):
-        data["env_prefix"] = "test"
-        with pytest.raises(BadArguments, match=message):
-            provider.notify(**data)
-
     @pytest.mark.online
     def test_mailgun_sanity(self, provider, test_message):
         provider.notify(message=test_message, raise_on_errors=True)

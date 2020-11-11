@@ -2,22 +2,11 @@ import os
 
 import pytest
 
-from notifiers.exceptions import BadArguments
-
 provider = "pushbullet"
 
 
 @pytest.mark.skip(reason="Re-enable once account is activated again")
 class TestPushbullet:
-    @pytest.mark.parametrize(
-        "data, message", [({}, "message"), ({"message": "foo"}, "token")]
-    )
-    def test_missing_required(self, data, message, provider):
-        data["env_prefix"] = "test"
-        with pytest.raises(BadArguments) as e:
-            provider.notify(**data)
-        assert f"'{message}' is a required property" in e.value.message
-
     @pytest.mark.online
     def test_sanity(self, provider, test_message):
         data = {"message": test_message}

@@ -13,20 +13,6 @@ class TestPushover:
     """
 
     @pytest.mark.parametrize(
-        "data, message",
-        [
-            ({}, "user"),
-            ({"user": "foo"}, "message"),
-            ({"user": "foo", "message": "bla"}, "token"),
-        ],
-    )
-    def test_missing_required(self, data, message, provider):
-        data["env_prefix"] = "test"
-        with pytest.raises(BadArguments) as e:
-            provider.notify(**data)
-        assert f"'{message}' is a required property" in e.value.message
-
-    @pytest.mark.parametrize(
         "data, message", [({}, "expire"), ({"expire": 30}, "retry")]
     )
     @pytest.mark.online

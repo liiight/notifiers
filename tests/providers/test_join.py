@@ -8,15 +8,6 @@ provider = "join"
 
 
 class TestJoin:
-    @pytest.mark.parametrize(
-        "data, field", [({}, "apikey"), ({"apikey": "foo"}, "text")]
-    )
-    def test_missing_required(self, data, field, provider):
-        data["env_prefix"] = "test"
-        with pytest.raises(BadArguments) as e:
-            provider.notify(**data)
-        assert f"{field}\n  field required" in e.value.message
-
     @pytest.mark.skip("tests fail due to no device connected")
     @pytest.mark.online
     def test_sanity(self, provider):
@@ -38,10 +29,18 @@ class TestJoinDevices:
 
     def test_join_devices_attribs(self, resource):
         assert resource.schema == {
-            "type": "object",
-            "properties": {"apikey": {"type": "string", "title": "user API key"}},
             "additionalProperties": False,
+            "description": "The base class for Schemas",
+            "properties": {
+                "apikey": {
+                    "description": "User API key",
+                    "title": "Apikey",
+                    "type": "string",
+                }
+            },
             "required": ["apikey"],
+            "title": "JoinBaseSchema",
+            "type": "object",
         }
 
     def test_join_devices_negative(self, resource):

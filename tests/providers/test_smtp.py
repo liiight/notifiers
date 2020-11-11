@@ -2,7 +2,6 @@ from email.message import EmailMessage
 
 import pytest
 
-from notifiers.exceptions import BadArguments
 from notifiers.exceptions import NotificationError
 
 provider = "email"
@@ -10,15 +9,6 @@ provider = "email"
 
 class TestSMTP(object):
     """SMTP tests"""
-
-    @pytest.mark.parametrize(
-        "data, message", [({}, "message"), ({"message": "foo"}, "to")]
-    )
-    def test_smtp_missing_required(self, data, message, provider):
-        data["env_prefix"] = "test"
-        with pytest.raises(BadArguments) as e:
-            provider.notify(**data)
-        assert f"'{message}' is a required property" in e.value.message
 
     def test_smtp_no_host(self, provider):
         data = {
