@@ -77,11 +77,18 @@ class TestPushoverSoundsResource:
 
     def test_pushover_sounds_attribs(self, resource):
         assert resource.schema == {
-            "type": "object",
+            "additionalProperties": False,
+            "description": "Pushover base schema",
             "properties": {
-                "token": {"type": "string", "title": "your application's API token"}
+                "token": {
+                    "description": "Your application's API token ",
+                    "title": "Token",
+                    "type": "string",
+                }
             },
             "required": ["token"],
+            "title": "PushoverBaseSchema",
+            "type": "object",
         }
 
         assert resource.name == provider
@@ -100,11 +107,18 @@ class TestPushoverLimitsResource:
 
     def test_pushover_limits_attribs(self, resource):
         assert resource.schema == {
-            "type": "object",
+            "additionalProperties": False,
+            "description": "Pushover base schema",
             "properties": {
-                "token": {"type": "string", "title": "your application's API token"}
+                "token": {
+                    "description": "Your application's API token ",
+                    "title": "Token",
+                    "type": "string",
+                }
             },
             "required": ["token"],
+            "title": "PushoverBaseSchema",
+            "type": "object",
         }
 
         assert resource.name == provider

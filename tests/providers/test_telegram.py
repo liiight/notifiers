@@ -63,7 +63,7 @@ class TestTelegramResources:
             "type": "object",
         }
         assert resource.name == provider
-        assert resource.required == {"required": ["token"]}
+        assert resource.required == ["token"]
 
     def test_telegram_updates_negative(self, resource):
         with pytest.raises(BadArguments):

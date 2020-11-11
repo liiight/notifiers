@@ -28,7 +28,7 @@ class ZulipSchema(ResourceSchema):
     email: EmailStr = Field(..., description='"User email')
     type: MessageType = Field(
         MessageType.stream,
-        description="The type of message to be sent. private for a private message and stream for a stream message",
+        description="The type of message to be sent. 'private' for a private message and 'stream' for a stream message",
     )
     message: constr(max_length=10000) = Field(
         ..., description="The content of the message", alias="content"
@@ -41,6 +41,9 @@ class ZulipSchema(ResourceSchema):
     topic: constr(max_length=60) = Field(
         None,
         description="The topic of the message. Only required if type is stream, ignored otherwise",
+    )
+    subject: str = Field(
+        None, description="Message subject. Relevant only for stream messages"
     )
 
     @validator("to", whole=True)
@@ -62,7 +65,7 @@ class ZulipSchema(ResourceSchema):
         if "domain" not in values and "url" not in values:
             raise ValueError("Either 'url' or 'domain' are required")
 
-        base_url = values.get("url", f"https://{values['domain']}.zulipchat.com")
+        base_url = values["url"] or f"https://{values['domain']}.zulipchat.com"
         url = f"{base_url}/api/v1/messages"
         values["server_url"] = url
 

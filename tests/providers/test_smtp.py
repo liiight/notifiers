@@ -72,12 +72,15 @@ class TestSMTP(object):
     def test_attachment_mimetypes(self, provider, tmp_path):
         smtp_base: Path = tmp_path / "smtp_base"
         file_1 = smtp_base / "foo.txt"
+        file_1.touch()
         file_1.write_text("foo")
 
         file_2 = smtp_base / "bar.jpg"
+        file_2.touch()
         file_2.write_text("foo")
 
         file_3 = smtp_base / "baz.pdf"
+        file_3.touch()
         file_3.write_text("foo")
 
         attachments = [file_1, file_2, file_3]
