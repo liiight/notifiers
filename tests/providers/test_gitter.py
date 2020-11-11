@@ -22,10 +22,9 @@ class TestGitter:
             provider.notify(**data)
 
     def test_bad_request(self, provider):
-        data = {"token": "foo", "room_id": "baz", "message": "bar"}
+        data = {"token": "foo", "message": "bar"}
         with pytest.raises(NotificationError) as e:
-            rsp = provider.notify(**data)
-            rsp.raise_on_errors()
+            provider.notify(**data, raise_on_errors=True)
         assert "Unauthorized" in e.value.message
 
     @pytest.mark.online

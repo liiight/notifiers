@@ -1,5 +1,3 @@
-from urllib.parse import urljoin
-
 from pydantic import Field
 
 from ..exceptions import ResourceError
@@ -81,7 +79,7 @@ class Gitter(GitterMixin, Provider):
     _resources = {"rooms": GitterRooms()}
 
     def _send_notification(self, data: GitterSchema) -> Response:
-        url = urljoin(self.base_url, f"/{data.room_id}/chatMessages")
+        url = f"{self.base_url}/{data.room_id}/chatMessages"
 
         payload = data.to_dict(include={"message", "status"})
         response, errors = requests.post(

@@ -96,12 +96,12 @@ class PushoverSchema(PushoverBaseSchema):
     expire: conint(le=10800) = Field(
         None,
         description="Specifies how many seconds your notification will continue to be retried for "
-        "(every retry seconds). requires setting priorty to 2",
+        "(every retry seconds). requires setting priority to 2",
     )
     callback: HttpUrl = Field(
         None,
         description="A publicly-accessible URL that our servers will send a request to when the user has"
-        " acknowledged your notification. requires setting priorty to 2",
+        " acknowledged your notification. requires setting priority to 2",
     )
     tags: PushoverBaseSchema.one_or_more_of(str) = Field(
         None,

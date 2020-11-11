@@ -42,6 +42,7 @@ def dict_from_environs(prefix: str, name: str, args: list) -> dict:
     :param args: List of args to iterate over
     :return: A dict of found environ values
     """
+    # todo consider changing via the environs lib
     log.debug("starting to collect environs using prefix: '%s'", prefix)
     return {
         arg: os.environ.get(f"{prefix}{name}_{arg}".upper())
