@@ -82,7 +82,7 @@ def mock_provider():
     return MockProvider()
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def provider(request):
     name = getattr(request.module, "provider", None)
     if not name:
