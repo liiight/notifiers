@@ -35,7 +35,7 @@ class TestTelegram:
     @pytest.mark.online
     def test_all_options(self, provider, test_message):
         data = {
-            "parse_mode": "markdown",
+            "parse_mode": "Markdown",
             "disable_web_page_preview": True,
             "disable_notification": True,
             "message": test_message,
@@ -50,8 +50,16 @@ class TestTelegramResources:
     def test_telegram_updates_attribs(self, resource):
         assert resource.schema == {
             "additionalProperties": False,
-            "properties": {"token": {"title": "Bot token", "type": "string"}},
+            "description": "The base class for Schemas",
+            "properties": {
+                "token": {
+                    "description": "Bot token",
+                    "title": "Token",
+                    "type": "string",
+                }
+            },
             "required": ["token"],
+            "title": "TelegramBaseSchema",
             "type": "object",
         }
         assert resource.name == provider

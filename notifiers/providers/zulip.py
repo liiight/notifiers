@@ -1,33 +1,17 @@
 from enum import Enum
 from typing import Union
-from urllib.parse import urljoin
 
 from pydantic import constr
 from pydantic import EmailStr
 from pydantic import Field
 from pydantic import HttpUrl
 from pydantic import root_validator
-from pydantic import ValidationError
 from pydantic import validator
 
 from ..models.resource import Provider
 from ..models.response import Response
 from ..models.schema import ResourceSchema
 from ..utils import requests
-
-
-class ZulipUrl(str):
-    @classmethod
-    def __get_validators__(cls):
-        yield cls.validate
-
-    @classmethod
-    def validate(cls, v):
-        try:
-            url = HttpUrl(v)
-        except ValidationError:
-            url = f"https://{v}.zulipchat.com"
-        return urljoin(url, "/api/v1/messages")
 
 
 class MessageType(str, Enum):
@@ -39,10 +23,8 @@ class ZulipSchema(ResourceSchema):
     """Send a stream or a private message"""
 
     api_key: str = Field(..., description="User API Key")
-    url_or_domain: ZulipUrl = Field(
-        ...,
-        description="Either a full server URL or subdomain to be used with zulipchat.com",
-    )
+    url: HttpUrl = Field(None, description="Server URL")
+    domain: str = Field(None, description="Subdomain to use with zulipchat.com")
     email: EmailStr = Field(..., description='"User email')
     type: MessageType = Field(
         MessageType.stream,
@@ -65,12 +47,24 @@ class ZulipSchema(ResourceSchema):
     def csv(cls, v):
         return ResourceSchema.to_comma_separated(v)
 
-    _values_to_exclude = "email", "api_key", "url_or_domain"
+    _values_to_exclude = (
+        "email",
+        "api_key",
+        "domain",
+        "url",
+    )
 
     @root_validator
     def root(cls, values):
         if values["type"] is MessageType.stream and not values.get("topic"):
             raise ValueError("'topic' is required when 'type' is 'stream'")
+
+        if "domain" not in values and "url" not in values:
+            raise ValueError("Either 'url' or 'domain' are required")
+
+        base_url = values.get("url", f"https://{values['domain']}.zulipchat.com")
+        url = f"{base_url}/api/v1/messages"
+        values["server_url"] = url
 
         return values
 
@@ -91,7 +85,7 @@ class Zulip(Provider):
         auth = data.email, data.api_key
         payload = data.to_dict()
         response, errors = requests.post(
-            data.url_or_domain,
+            data.server_url,
             data=payload,
             auth=auth,
             path_to_errors=self.path_to_errors,

@@ -35,19 +35,6 @@ def close_all_open_incidents(request):
 
 class TestStatusPage:
     @pytest.mark.parametrize(
-        "data, message",
-        [
-            ({}, "message"),
-            ({"message": "foo"}, "api_key"),
-            ({"message": "foo", "api_key": 1}, "page_id"),
-        ],
-    )
-    def test_missing_required(self, data, message, provider):
-        data["env_prefix"] = "test"
-        with pytest.raises(BadArguments, match=f"'{message}' is a required property"):
-            provider.notify(**data)
-
-    @pytest.mark.parametrize(
         "added_data, message",
         [
             (

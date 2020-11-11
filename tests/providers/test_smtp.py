@@ -1,4 +1,5 @@
 from email.message import EmailMessage
+from pathlib import Path
 
 import pytest
 
@@ -68,15 +69,18 @@ class TestSMTP(object):
         )
         assert rsp.data["attachments"] == attachments
 
-    def test_attachment_mimetypes(self, provider, tmpdir):
-        dir_ = tmpdir.mkdir("sub")
-        file_1 = dir_.join("foo.txt")
-        file_1.write("foo")
-        file_2 = dir_.join("bar.jpg")
-        file_2.write("foo")
-        file_3 = dir_.join("baz.pdf")
-        file_3.write("foo")
-        attachments = [str(file_1), str(file_2), str(file_3)]
+    def test_attachment_mimetypes(self, provider, tmp_path):
+        smtp_base: Path = tmp_path / "smtp_base"
+        file_1 = smtp_base / "foo.txt"
+        file_1.write_text("foo")
+
+        file_2 = smtp_base / "bar.jpg"
+        file_2.write_text("foo")
+
+        file_3 = smtp_base / "baz.pdf"
+        file_3.write_text("foo")
+
+        attachments = [file_1, file_2, file_3]
         email = EmailMessage()
         provider.add_attachments_to_email(attachments=attachments, email=email)
         attach1, attach2, attach3 = email.iter_attachments()

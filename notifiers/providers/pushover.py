@@ -43,10 +43,14 @@ class PushoverSound(str, Enum):
 
 
 class PushoverBaseSchema(ResourceSchema):
+    """Pushover base schema"""
+
     token: str = Field(..., description="Your application's API token ")
 
 
 class PushoverSchema(PushoverBaseSchema):
+    """Pushover schema"""
+
     _values_to_exclude = ("attachment",)
     user: PushoverBaseSchema.one_or_more_of(str) = Field(
         ..., description="The user/group key (not e-mail address) of your user (or you)"
@@ -115,10 +119,6 @@ class PushoverSchema(PushoverBaseSchema):
     @validator("user", "device", "tags")
     def to_csv(cls, v):
         return cls.to_comma_separated(v)
-
-    @validator("timestamp")
-    def to_timestamp(cls, v: datetime):
-        return v.timestamp()
 
     @root_validator
     def html_or_monospace(cls, values):
