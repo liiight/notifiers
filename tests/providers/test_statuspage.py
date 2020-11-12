@@ -34,42 +34,6 @@ def close_all_open_incidents(request):
 
 
 class TestStatusPage:
-    @pytest.mark.parametrize(
-        "added_data, message",
-        [
-            (
-                {
-                    "scheduled_for": datetime.datetime.now().isoformat(),
-                    "scheduled_until": datetime.datetime.now().isoformat(),
-                    "backfill_date": str(datetime.datetime.now().date()),
-                    "backfilled": True,
-                },
-                "Cannot set both 'backfill' and 'scheduled' incident properties in the same notification!",
-            ),
-            (
-                {
-                    "scheduled_for": datetime.datetime.now().isoformat(),
-                    "scheduled_until": datetime.datetime.now().isoformat(),
-                    "status": "investigating",
-                },
-                "is a realtime incident status! Please choose one of",
-            ),
-            (
-                {
-                    "backfill_date": str(datetime.datetime.now().date()),
-                    "backfilled": True,
-                    "status": "investigating",
-                },
-                "Cannot set 'status' when setting 'backfill'!",
-            ),
-        ],
-    )
-    def test_data_dependencies(self, added_data, message, provider):
-        data = {"api_key": "foo", "message": "foo", "page_id": "foo"}
-        data.update(added_data)
-        with pytest.raises(BadArguments, match=message):
-            provider.notify(**data)
-
     def test_errors(self, provider):
         data = {"api_key": "foo", "page_id": "foo", "message": "foo"}
         rsp = provider.notify(**data)
@@ -86,7 +50,6 @@ class TestStatusPage:
                     "message": "Test realitme",
                     "status": "investigating",
                     "body": "Incident body",
-                    "wants_twitter_update": False,
                     "impact_override": "minor",
                     "deliver_notifications": False,
                 }
@@ -96,7 +59,6 @@ class TestStatusPage:
                     "message": "Test scheduled",
                     "status": "scheduled",
                     "body": "Incident body",
-                    "wants_twitter_update": False,
                     "impact_override": "minor",
                     "deliver_notifications": False,
                     "scheduled_for": (
@@ -116,9 +78,7 @@ class TestStatusPage:
                     "body": "Incident body",
                     "impact_override": "minor",
                     "backfilled": True,
-                    "backfill_date": (
-                        datetime.date.today() - datetime.timedelta(days=1)
-                    ).isoformat(),
+                    "backfill_date": datetime.datetime.now(),
                 }
             ),
         ],
@@ -133,16 +93,26 @@ class TestStatuspageComponents:
     def test_statuspage_components_attribs(self, resource):
         assert resource.schema == {
             "additionalProperties": False,
+            "description": "The base class for Schemas",
             "properties": {
-                "api_key": {"title": "OAuth2 token", "type": "string"},
-                "page_id": {"title": "Page ID", "type": "string"},
+                "api_key": {
+                    "description": "Authentication token",
+                    "title": "Api Key",
+                    "type": "string",
+                },
+                "page_id": {
+                    "description": "Paged ID",
+                    "title": "Page Id",
+                    "type": "string",
+                },
             },
             "required": ["api_key", "page_id"],
+            "title": "StatuspageBaseSchema",
             "type": "object",
         }
 
         assert resource.name == provider
-        assert resource.required == {"required": ["api_key", "page_id"]}
+        assert resource.required == ["api_key", "page_id"]
 
     def test_statuspage_components_negative(self, resource):
         with pytest.raises(BadArguments):
