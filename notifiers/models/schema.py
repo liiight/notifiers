@@ -16,18 +16,15 @@ class ResourceSchema(BaseModel):
 
     @staticmethod
     def to_list(value: Union[Any, List[Any]]) -> List[Any]:
-        # todo convert this to a custom type instead of a helper method
         """Helper method to make sure a return value is a list"""
         if not isinstance(value, list):
             return [value]
         return value
 
-    @staticmethod
-    def to_comma_separated(values: Union[Any, List[Any]]) -> str:
-        # todo convert this to a custom type instead of a helper method
+    @classmethod
+    def to_comma_separated(cls, values: Union[Any, List[Any]]) -> str:
         """Helper method that return a comma separates string from a value"""
-        if not isinstance(values, list):
-            values = [values]
+        values = cls.to_list(values)
         return ",".join(str(value) for value in values)
 
     @staticmethod
