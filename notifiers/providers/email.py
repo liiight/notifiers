@@ -82,12 +82,12 @@ class SMTP(Provider):
     @staticmethod
     def _get_mimetype(attachment: Path) -> Tuple[str, str]:
         """Taken from https://docs.python.org/3/library/email.examples.html"""
-        ctype, encoding = mimetypes.guess_type(str(attachment))
-        if ctype is None or encoding is not None:
+        content_type, encoding = mimetypes.guess_type(str(attachment))
+        if content_type is None or encoding is not None:
             # No guess could be made, or the file is encoded (compressed), so
             # use a generic bag-of-bits type.
-            ctype = "application/octet-stream"
-        maintype, subtype = ctype.split("/", 1)
+            content_type = "application/octet-stream"
+        maintype, subtype = content_type.split("/", 1)
         return maintype, subtype
 
     def __init__(self):
