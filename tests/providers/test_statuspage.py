@@ -12,7 +12,7 @@ from notifiers.models.response import ResponseStatus
 
 provider = "statuspage"
 
-log = logging.getLogger("statuspage")
+log = logging.getLogger("notifiers")
 
 
 @pytest.fixture(autouse=True, scope="module")
