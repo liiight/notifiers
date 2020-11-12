@@ -1,7 +1,9 @@
 from abc import ABC
 from abc import abstractmethod
+from typing import Dict
 from typing import List
 from typing import Optional
+from typing import TypeVar
 
 import requests
 from pydantic import ValidationError
@@ -10,6 +12,7 @@ from notifiers.exceptions import BadArguments
 from notifiers.models.response import Response
 from notifiers.models.response import ResponseStatus
 from notifiers.models.schema import ResourceSchema
+from notifiers.models.schema import T_ResourceSchema
 from notifiers.utils.helpers import dict_from_environs
 from notifiers.utils.helpers import merge_dicts
 
@@ -21,7 +24,7 @@ class Resource(ABC):
 
     @property
     @abstractmethod
-    def schema_model(self) -> ResourceSchema:
+    def schema_model(self) -> T_ResourceSchema:
         pass
 
     @property
@@ -44,7 +47,7 @@ class Resource(ABC):
         """Resource's required arguments. Note that additional validation may not be represented here"""
         return self.schema.get("required")
 
-    def validate_data(self, data: dict) -> ResourceSchema:
+    def validate_data(self, data: dict) -> T_ResourceSchema:
         try:
             return self.schema_model.parse_obj(data)
         except ValidationError as e:
@@ -80,7 +83,7 @@ class Resource(ABC):
         """
         return dict_from_environs(prefix, self.name, list(self.arguments.keys()))
 
-    def _process_data(self, data: dict) -> ResourceSchema:
+    def _process_data(self, data: dict) -> T_ResourceSchema:
         """
         The main method that process all resources data. Validates schema, gets environs, validates data, prepares
          it via provider requirements, merges defaults and check for data dependencies
@@ -96,10 +99,33 @@ class Resource(ABC):
         return data
 
 
+class ProviderResource(Resource, ABC):
+    """The base class that is used to fetch provider related resources like rooms, channels, users etc."""
+
+    @property
+    @abstractmethod
+    def resource_name(self) -> str:
+        pass
+
+    @abstractmethod
+    def _get_resource(self, data: ResourceSchema) -> dict:
+        pass
+
+    def __call__(self, **kwargs) -> dict:
+        data = self._process_data(kwargs)
+        return self._get_resource(data)
+
+    def __repr__(self) -> str:
+        return f"<ProviderResource,provider={self.name},resource={self.resource_name}>"
+
+
+T_ProviderResource = TypeVar("T_ProviderResource", bound=ProviderResource)
+
+
 class Provider(Resource, ABC):
     """The Base class all notification providers inherit from."""
 
-    _resources = {}
+    _resources: Dict[str, T_ProviderResource] = {}
 
     def __repr__(self):
         return f"<Provider({self.name.capitalize()})>"
@@ -110,12 +136,12 @@ class Provider(Resource, ABC):
         raise AttributeError(f"{self} does not have a property {item}")
 
     @property
-    def base_url(self):
-        return
+    def base_url(self) -> str:
+        return ""
 
     @property
     @abstractmethod
-    def site_url(self):
+    def site_url(self) -> str:
         pass
 
     @property
@@ -126,7 +152,7 @@ class Provider(Resource, ABC):
         return {"base_url": self.base_url, "site_url": self.site_url, "name": self.name}
 
     @property
-    def resources(self) -> list:
+    def resources(self) -> List[str]:
         """Return a list of names of relevant :class:`~notifiers.core.ProviderResource` objects"""
         return list(self._resources.keys())
 
@@ -157,21 +183,4 @@ class Provider(Resource, ABC):
         return rsp
 
 
-class ProviderResource(Resource, ABC):
-    """The base class that is used to fetch provider related resources like rooms, channels, users etc."""
-
-    @property
-    @abstractmethod
-    def resource_name(self):
-        pass
-
-    @abstractmethod
-    def _get_resource(self, data: ResourceSchema):
-        pass
-
-    def __call__(self, **kwargs):
-        data = self._process_data(kwargs)
-        return self._get_resource(data)
-
-    def __repr__(self):
-        return f"<ProviderResource,provider={self.name},resource={self.resource_name}>"
+T_Provider = TypeVar("T_Provider", bound=Provider)

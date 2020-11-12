@@ -1,7 +1,8 @@
 import logging
+from typing import List
 
 from .exceptions import NoSuchNotifierError
-from .models.resource import Provider
+from .models.resource import T_Provider
 from .models.response import Response
 
 log = logging.getLogger("notifiers")
@@ -10,7 +11,7 @@ log = logging.getLogger("notifiers")
 from .providers import _all_providers  # noqa: E402
 
 
-def get_notifier(provider_name: str, strict: bool = False) -> Provider:
+def get_notifier(provider_name: str, strict: bool = False) -> T_Provider:
     """
     Convenience method to return an instantiated :class:`~notifiers.core.Provider` object according to it ``name``
 
@@ -26,7 +27,7 @@ def get_notifier(provider_name: str, strict: bool = False) -> Provider:
         raise NoSuchNotifierError(name=provider_name)
 
 
-def all_providers() -> list:
+def all_providers() -> List[str]:
     """Returns a list of all :class:`~notifiers.core.Provider` names"""
     return list(_all_providers.keys())
 

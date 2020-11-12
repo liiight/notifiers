@@ -1,4 +1,7 @@
 # flake8: noqa
+from typing import Dict
+from typing import Type
+
 from . import email
 from . import gitter
 from . import gmail
@@ -13,9 +16,10 @@ from . import statuspage
 from . import telegram
 from . import twilio
 from . import zulip
+from ..models.resource import T_Provider
 from .slack import Slack
 
-_all_providers = {
+_all_providers: Dict[str, Type[T_Provider]] = {
     "pushover": pushover.Pushover,
     "simplepush": simplepush.SimplePush,
     "slack": Slack,
