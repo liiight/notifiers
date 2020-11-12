@@ -93,6 +93,7 @@ class TwilioSchema(ResourceSchema):
         "that is enabled for the type of message you want to send. Phone numbers or short codes purchased "
         "from Twilio also work here. You cannot, for example, spoof messages from a private cell phone "
         "number. If you are using messaging_service_sid, this parameter must be empty",
+        alias="from",
     )
     messaging_service_sid: str = Field(
         None,
