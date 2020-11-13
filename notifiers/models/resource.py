@@ -3,6 +3,7 @@ from abc import abstractmethod
 from typing import Dict
 from typing import List
 from typing import Optional
+from typing import Type
 from typing import TypeVar
 
 import requests
@@ -22,15 +23,8 @@ DEFAULT_ENVIRON_PREFIX = "NOTIFIERS_"
 class Resource(ABC):
     """Base class that represent an object holding a schema and its utility methods"""
 
-    @property
-    @abstractmethod
-    def schema_model(self) -> T_ResourceSchema:
-        pass
-
-    @property
-    @abstractmethod
-    def name(self) -> str:
-        """Resource provider name"""
+    name: str
+    schema_model: T_ResourceSchema
 
     @property
     def schema(self) -> dict:
@@ -127,6 +121,10 @@ class Provider(Resource, ABC):
 
     _resources: Dict[str, T_ProviderResource] = {}
 
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        provider_registry[cls.name] = cls
+
     def __repr__(self):
         return f"<Provider({self.name.capitalize()})>"
 
@@ -184,3 +182,6 @@ class Provider(Resource, ABC):
 
 
 T_Provider = TypeVar("T_Provider", bound=Provider)
+
+
+provider_registry: Dict[str, Type[T_Provider]] = {}

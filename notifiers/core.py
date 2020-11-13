@@ -2,13 +2,11 @@ import logging
 from typing import List
 
 from .exceptions import NoSuchNotifierError
+from .models.resource import provider_registry
 from .models.resource import T_Provider
 from .models.response import Response
 
 log = logging.getLogger("notifiers")
-
-# Avoid premature import
-from .providers import _all_providers  # noqa: E402
 
 
 def get_notifier(provider_name: str, strict: bool = False) -> T_Provider:
@@ -20,16 +18,16 @@ def get_notifier(provider_name: str, strict: bool = False) -> T_Provider:
     :return: :class:`Provider` or None
     :raises ValueError: In case ``strict`` is True and provider not found
     """
-    if provider_name in _all_providers:
+    if provider_name in provider_registry:
         log.debug("found a match for '%s', returning", provider_name)
-        return _all_providers[provider_name]()
+        return provider_registry[provider_name]()
     elif strict:
         raise NoSuchNotifierError(name=provider_name)
 
 
 def all_providers() -> List[str]:
     """Returns a list of all :class:`~notifiers.core.Provider` names"""
-    return list(_all_providers.keys())
+    return list(provider_registry.keys())
 
 
 def notify(provider_name: str, **kwargs) -> Response:

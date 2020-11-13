@@ -32,7 +32,7 @@ class TestHelpers:
     )
     def test_dict_from_environs(self, prefix, name, args, result, monkeypatch):
         for arg in args:
-            environ = f"{prefix}{name}_{arg}".upper()
+            environ = f"{prefix}_{name}_{arg}".upper()
             monkeypatch.setenv(environ, "baz")
         assert dict_from_environs(prefix, name, args) == result
 

@@ -13,11 +13,11 @@ from pydantic import validator
 from notifiers.core import get_notifier
 from notifiers.logging import NotificationHandler
 from notifiers.models.resource import Provider
+from notifiers.models.resource import provider_registry
 from notifiers.models.resource import ProviderResource
 from notifiers.models.response import Response
 from notifiers.models.response import ResponseStatus
 from notifiers.models.schema import ResourceSchema
-from notifiers.providers import _all_providers
 
 log = logging.getLogger("notifiers")
 
@@ -77,7 +77,6 @@ class MockProvider(MockProxy, Provider):
 @pytest.fixture(scope="session")
 def mock_provider():
     """Return a generic :class:`notifiers.core.Provider` class"""
-    _all_providers.update({MockProvider.name: MockProvider})
     return MockProvider()
 
 
@@ -119,7 +118,7 @@ def cli_runner(monkeypatch):
 def magic_mock_provider(monkeypatch):
     MockProvider.notify = MagicMock()
     MockProxy.name = "magic_mock"
-    monkeypatch.setitem(_all_providers, MockProvider.name, MockProvider)
+    monkeypatch.setitem(provider_registry, MockProvider.name, MockProvider)
     return MockProvider()
 
 

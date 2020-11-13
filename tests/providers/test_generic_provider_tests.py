@@ -1,9 +1,9 @@
 import pytest
 
-from notifiers.core import _all_providers
+from notifiers.models.resource import provider_registry
 
 
-@pytest.mark.parametrize("provider", _all_providers.values())
+@pytest.mark.parametrize("provider", provider_registry.values())
 class TestProviders:
     def test_provider_metadata(self, provider):
         provider = provider()
