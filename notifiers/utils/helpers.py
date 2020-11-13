@@ -1,6 +1,7 @@
 import logging
 import os
 from distutils.util import strtobool
+from typing import Sequence
 
 log = logging.getLogger("notifiers")
 
@@ -32,7 +33,7 @@ def merge_dicts(target_dict: dict, merge_dict: dict) -> dict:
     return target_dict
 
 
-def dict_from_environs(prefix: str, name: str, args: list) -> dict:
+def dict_from_environs(prefix: str, name: str, args: Sequence[str]) -> dict:
     """
     Return a dict of environment variables correlating to the arguments list, main name and prefix like so:
     [prefix]_[name]_[arg]
@@ -42,15 +43,18 @@ def dict_from_environs(prefix: str, name: str, args: list) -> dict:
     :param args: List of args to iterate over
     :return: A dict of found environ values
     """
-    # todo consider changing via the environs lib
     log.debug("starting to collect environs using prefix: '%s'", prefix)
     prefix = f'{prefix.rstrip("_")}_'.upper()
     name = f'{name.rstrip("_")}_'.upper()
-    return {
-        arg: os.environ.get(f"{prefix}{name}{arg}".upper())
-        for arg in args
-        if os.environ.get(f"{prefix}{name}{arg}".upper())
-    }
+    data = {}
+    for arg in args:
+        env_key = f"{prefix}{name}{arg}".upper()
+        log.debug("Looking for environment variable %s", env_key)
+        value = os.environ.get(env_key)
+        if value:
+            log.debug("Found environment variable %s, adding", env_key)
+            data[arg] = value
+    return data
 
 
 def snake_to_camel_case(value: str) -> str:
