@@ -13,7 +13,11 @@ from pydantic import FilePath
 from pydantic import NameEmail
 from pydantic import root_validator
 from pydantic import validator
-from typing_extensions import Literal
+
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
 
 from ..models.resource import Provider
 from ..models.response import Response
