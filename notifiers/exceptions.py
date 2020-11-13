@@ -1,3 +1,6 @@
+from pydantic import ValidationError
+
+
 class NotifierException(Exception):
     """Base notifier exception. Catch this to catch all of :mod:`notifiers` errors"""
 
@@ -17,7 +20,7 @@ class NotifierException(Exception):
         return f"<NotificationError: {self.message}>"
 
 
-class BadArguments(NotifierException):
+class SchemaValidationError(NotifierException):
     """
     Raised on schema data validation issues
 
@@ -26,29 +29,14 @@ class BadArguments(NotifierException):
     :param kwargs: Exception kwargs
     """
 
-    def __init__(self, validation_error: str, *args, **kwargs):
+    def __init__(
+        self, validation_error: str, orig_excp: ValidationError, *args, **kwargs
+    ):
         kwargs["message"] = f"Error with sent data: {validation_error}"
         super().__init__(*args, **kwargs)
 
     def __repr__(self):
         return f"<BadArguments: {self.message}>"
-
-
-class SchemaError(NotifierException):
-    """
-    Raised on schema issues, relevant probably when creating or changing a provider schema
-
-    :param schema_error: The schema error that was raised
-    :param args: Exception arguments
-    :param kwargs: Exception kwargs
-    """
-
-    def __init__(self, schema_error: str, *args, **kwargs):
-        kwargs["message"] = f"Schema error: {schema_error}"
-        super().__init__(*args, **kwargs)
-
-    def __repr__(self):
-        return f"<SchemaError: {self.message}>"
 
 
 class NotificationError(NotifierException):
@@ -61,6 +49,7 @@ class NotificationError(NotifierException):
     """
 
     def __init__(self, *args, **kwargs):
+        # todo improve visibility of original exception
         self.errors = kwargs.pop("errors", None)
         kwargs["message"] = f'Notification errors: {",".join(self.errors)}'
         super().__init__(*args, **kwargs)

@@ -1,7 +1,7 @@
 import pytest
 
-from notifiers.exceptions import BadArguments
 from notifiers.exceptions import NotificationError
+from notifiers.exceptions import SchemaValidationError
 
 provider = "pushover"
 
@@ -11,28 +11,6 @@ class TestPushover:
 
     Note: These tests assume correct environs set for NOTIFIERS_PUSHOVER_TOKEN and NOTIFIERS_PUSHOVER_USER
     """
-
-    def test_pushover_metadata(self, provider):
-        assert provider.metadata == {
-            "base_url": "https://api.pushover.net/1/",
-            "site_url": "https://pushover.net/",
-            "name": "pushover",
-            "message_url": "messages.json",
-        }
-
-    @pytest.mark.parametrize(
-        "data, message",
-        [
-            ({}, "user"),
-            ({"user": "foo"}, "message"),
-            ({"user": "foo", "message": "bla"}, "token"),
-        ],
-    )
-    def test_missing_required(self, data, message, provider):
-        data["env_prefix"] = "test"
-        with pytest.raises(BadArguments) as e:
-            provider.notify(**data)
-        assert f"'{message}' is a required property" in e.value.message
 
     @pytest.mark.parametrize(
         "data, message", [({}, "expire"), ({"expire": 30}, "retry")]
@@ -82,7 +60,7 @@ class TestPushover:
             "message": "baz",
             "attachment": "/foo/bar.jpg",
         }
-        with pytest.raises(BadArguments):
+        with pytest.raises(SchemaValidationError):
             provider.notify(**data)
 
     @pytest.mark.online
@@ -98,18 +76,25 @@ class TestPushoverSoundsResource:
     resource = "sounds"
 
     def test_pushover_sounds_attribs(self, resource):
-        assert resource.schema == {
-            "type": "object",
+        assert resource.schema() == {
+            "additionalProperties": False,
+            "description": "Pushover base schema",
             "properties": {
-                "token": {"type": "string", "title": "your application's API token"}
+                "token": {
+                    "description": "Your application's API token ",
+                    "title": "Token",
+                    "type": "string",
+                }
             },
             "required": ["token"],
+            "title": "PushoverBaseSchema",
+            "type": "object",
         }
 
         assert resource.name == provider
 
     def test_pushover_sounds_negative(self, resource):
-        with pytest.raises(BadArguments):
+        with pytest.raises(SchemaValidationError):
             resource(env_prefix="foo")
 
     @pytest.mark.online
@@ -121,18 +106,25 @@ class TestPushoverLimitsResource:
     resource = "limits"
 
     def test_pushover_limits_attribs(self, resource):
-        assert resource.schema == {
-            "type": "object",
+        assert resource.schema() == {
+            "additionalProperties": False,
+            "description": "Pushover base schema",
             "properties": {
-                "token": {"type": "string", "title": "your application's API token"}
+                "token": {
+                    "description": "Your application's API token ",
+                    "title": "Token",
+                    "type": "string",
+                }
             },
             "required": ["token"],
+            "title": "PushoverBaseSchema",
+            "type": "object",
         }
 
         assert resource.name == provider
 
     def test_pushover_limits_negative(self, resource):
-        with pytest.raises(BadArguments):
+        with pytest.raises(SchemaValidationError):
             resource(env_prefix="foo")
 
     @pytest.mark.online

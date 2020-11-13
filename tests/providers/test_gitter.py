@@ -1,40 +1,17 @@
 import pytest
 
-from notifiers.exceptions import BadArguments
 from notifiers.exceptions import NotificationError
 from notifiers.exceptions import ResourceError
+from notifiers.exceptions import SchemaValidationError
 
 provider = "gitter"
 
 
 class TestGitter:
-    def test_metadata(self, provider):
-        assert provider.metadata == {
-            "base_url": "https://api.gitter.im/v1/rooms",
-            "message_url": "/{room_id}/chatMessages",
-            "name": "gitter",
-            "site_url": "https://gitter.im",
-        }
-
-    @pytest.mark.parametrize(
-        "data, message",
-        [
-            ({}, "message"),
-            ({"message": "foo"}, "token"),
-            ({"message": "foo", "token": "bar"}, "room_id"),
-        ],
-    )
-    def test_missing_required(self, provider, data, message):
-        data["env_prefix"] = "test"
-        with pytest.raises(BadArguments) as e:
-            provider.notify(**data)
-        assert f"'{message}' is a required property" in e.value.message
-
     def test_bad_request(self, provider):
-        data = {"token": "foo", "room_id": "baz", "message": "bar"}
+        data = {"token": "foo", "message": "bar"}
         with pytest.raises(NotificationError) as e:
-            rsp = provider.notify(**data)
-            rsp.raise_on_errors()
+            provider.notify(**data, raise_on_errors=True)
         assert "Unauthorized" in e.value.message
 
     @pytest.mark.online
@@ -48,8 +25,7 @@ class TestGitter:
     @pytest.mark.online
     def test_sanity(self, provider, test_message):
         data = {"message": test_message}
-        rsp = provider.notify(**data)
-        rsp.raise_on_errors()
+        provider.notify(**data, raise_on_errors=True)
 
     def test_gitter_resources(self, provider):
         assert provider.resources
@@ -62,20 +38,11 @@ class TestGitterResources:
     resource = "rooms"
 
     def test_gitter_rooms_attribs(self, resource):
-        assert resource.schema == {
-            "type": "object",
-            "properties": {
-                "token": {"type": "string", "title": "access token"},
-                "filter": {"type": "string", "title": "Filter results"},
-            },
-            "required": ["token"],
-            "additionalProperties": False,
-        }
         assert resource.name == provider
-        assert resource.required == {"required": ["token"]}
+        assert resource.required == ["token"]
 
     def test_gitter_rooms_negative(self, resource):
-        with pytest.raises(BadArguments):
+        with pytest.raises(SchemaValidationError):
             resource(env_prefix="foo")
 
     def test_gitter_rooms_negative_2(self, resource):
@@ -112,7 +79,7 @@ class TestGitterCLI:
 
     @pytest.mark.online
     def test_gitter_rooms_with_query(self, cli_runner):
-        cmd = f"gitter rooms --filter notifiers/testing".split()
+        cmd = "gitter rooms --filter notifiers/testing".split()
         result = cli_runner(cmd)
         assert not result.exit_code
         assert "notifiers/testing" in result.output

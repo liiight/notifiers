@@ -86,7 +86,7 @@ def entry_point():
         provider_group_factory()
         notifiers_cli(obj={})
     except NotifierException as e:
-        click.secho(f"ERROR: {e.message}", bold=True, fg="red")
+        click.secho(f"ERROR: {e}", bold=True, fg="red")
         exit(1)
 
 

@@ -1,32 +1,13 @@
 import pytest
 
-from notifiers.exceptions import BadArguments
 from notifiers.exceptions import NotificationError
 from notifiers.exceptions import ResourceError
+from notifiers.exceptions import SchemaValidationError
 
 provider = "join"
 
 
 class TestJoin:
-    def test_metadata(self, provider):
-        assert provider.metadata == {
-            "base_url": "https://joinjoaomgcd.appspot.com/_ah/api/messaging/v1",
-            "name": "join",
-            "site_url": "https://joaoapps.com/join/api/",
-        }
-
-    @pytest.mark.parametrize(
-        "data, message", [({}, "apikey"), ({"apikey": "foo"}, "message")]
-    )
-    def test_missing_required(self, data, message, provider):
-        data["env_prefix"] = "test"
-        with pytest.raises(BadArguments) as e:
-            provider.notify(**data)
-        assert f"'{message}' is a required property" in e.value.message
-
-    def test_defaults(self, provider):
-        assert provider.defaults == {"deviceId": "group.all"}
-
     @pytest.mark.skip("tests fail due to no device connected")
     @pytest.mark.online
     def test_sanity(self, provider):
@@ -47,15 +28,23 @@ class TestJoinDevices:
     resource = "devices"
 
     def test_join_devices_attribs(self, resource):
-        assert resource.schema == {
-            "type": "object",
-            "properties": {"apikey": {"type": "string", "title": "user API key"}},
+        assert resource.schema() == {
             "additionalProperties": False,
+            "description": "The base class for Schemas",
+            "properties": {
+                "apikey": {
+                    "description": "User API key",
+                    "title": "Apikey",
+                    "type": "string",
+                }
+            },
             "required": ["apikey"],
+            "title": "JoinBaseSchema",
+            "type": "object",
         }
 
     def test_join_devices_negative(self, resource):
-        with pytest.raises(BadArguments):
+        with pytest.raises(SchemaValidationError):
             resource(env_prefix="foo")
 
     def test_join_devices_negative_online(self, resource):
@@ -77,7 +66,7 @@ class TestJoinCLI:
     @pytest.mark.skip("tests fail due to no device connected")
     @pytest.mark.online
     def test_join_updates_positive(self, cli_runner):
-        cmd = f"join devices".split()
+        cmd = "join devices".split()
         result = cli_runner(cmd)
         assert not result.exit_code
         replies = ["You have no devices associated with this apikey", "Device name: "]

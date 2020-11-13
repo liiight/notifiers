@@ -2,53 +2,19 @@ import datetime
 
 import pytest
 
-from notifiers.exceptions import BadArguments
 from notifiers.exceptions import NotifierException
 
 provider = "zulip"
 
 
 class TestZulip:
-    def test_metadata(self, provider):
-        assert provider.metadata == {
-            "base_url": "https://{domain}.zulipchat.com",
-            "site_url": "https://zulipchat.com/api/",
-            "name": "zulip",
-        }
-
-    @pytest.mark.parametrize(
-        "data, message",
-        [
-            (
-                {"email": "foo", "api_key": "bar", "message": "boo", "to": "bla"},
-                "domain",
-            ),
-            (
-                {
-                    "email": "foo",
-                    "api_key": "bar",
-                    "message": "boo",
-                    "to": "bla",
-                    "domain": "bla",
-                    "server": "fop",
-                },
-                "Only one of 'domain' or 'server' is allowed",
-            ),
-        ],
-    )
-    def test_missing_required(self, data, message, provider):
-        data["env_prefix"] = "test"
-        with pytest.raises(BadArguments) as e:
-            provider.notify(**data)
-        assert message in e.value.message
-
     @pytest.mark.online
     def test_sanity(self, provider, test_message):
         data = {
             "to": "general",
             "message": test_message,
             "domain": "notifiers",
-            "subject": "test",
+            "topic": "test",
         }
         rsp = provider.notify(**data)
         rsp.raise_on_errors()
@@ -69,9 +35,9 @@ class TestZulip:
             api_key="bar",
             to="baz",
             domain="bla",
-            type_="private",
+            type="private",
             message="foo",
-            subject="foo",
+            topic="foo",
         )
         rsp_data = rsp.data
         assert not rsp_data.get("type_")
@@ -84,7 +50,7 @@ class TestZulip:
                 api_key="bar",
                 to="baz@foo.com",
                 domain="bla",
-                type_="stream",
+                type="stream",
                 message="foo",
             )
-        assert "'subject' is required when 'type' is 'stream'" in e.value.message
+        assert "'topic' is required when 'type' is 'stream'" in e.value.message

@@ -10,13 +10,6 @@ class TestSlack:
     Online test rely on setting the env variable NOTIFIERS_SLACK_WEBHOOK_URL
     """
 
-    def test_slack_metadata(self, provider):
-        assert provider.metadata == {
-            "base_url": "https://hooks.slack.com/services/",
-            "name": "slack",
-            "site_url": "https://api.slack.com/incoming-webhooks",
-        }
-
     @pytest.mark.online
     def test_sanity(self, provider, test_message):
         data = {"message": test_message}
@@ -25,11 +18,9 @@ class TestSlack:
 
     @pytest.mark.online
     def test_all_options(self, provider):
+        # todo add all blocks tests
         data = {
             "message": "http://foo.com",
-            "icon_emoji": "poop",
-            "username": "test",
-            "channel": "test",
             "attachments": [
                 {
                     "title": "attachment 1",
@@ -75,5 +66,4 @@ class TestSlack:
                 },
             ],
         }
-        rsp = provider.notify(**data)
-        rsp.raise_on_errors()
+        provider.notify(**data, raise_on_errors=True)

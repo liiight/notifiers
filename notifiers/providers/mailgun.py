@@ -1,9 +1,208 @@
 import json
+import time
+from datetime import datetime
+from email import utils as email_utils
+from typing import Dict
+from typing import List
+from typing import Union
 
-from ..core import Provider
-from ..core import Response
+from pydantic import conint
+from pydantic import EmailStr
+from pydantic import Field
+from pydantic import FilePath
+from pydantic import NameEmail
+from pydantic import root_validator
+from pydantic import validator
+from typing_extensions import Literal
+
+from ..models.resource import Provider
+from ..models.response import Response
+from ..models.schema import ResourceSchema
 from ..utils import requests
-from ..utils.schema.helpers import one_or_more
+
+
+class Ascii(str):
+    @classmethod
+    def __get_validators__(cls):
+        yield cls.validate
+
+    @classmethod
+    def validate(cls, v):
+        if not isinstance(v, str):
+            raise TypeError("string required")
+        try:
+            return cls(v.encode("ascii").decode("ascii"))
+        except UnicodeEncodeError:
+            raise ValueError("Value must be valid ascii")
+
+
+class MailGunSchema(ResourceSchema):
+    """Send a mailgun email"""
+
+    api_key: str = Field(..., description="User's API key")
+    domain: str = Field(..., description="The domain to use")
+    from_: NameEmail = Field(
+        ..., description="Email address for 'From' header", alias="from"
+    )
+    to: ResourceSchema.one_or_more_of(Union[EmailStr, NameEmail]) = Field(
+        ..., description="Email address of the recipient(s)"
+    )
+    cc: ResourceSchema.one_or_more_of(NameEmail) = Field(
+        None, description="Email address of the CC recipient(s)"
+    )
+    bcc: ResourceSchema.one_or_more_of(NameEmail) = Field(
+        None, description="Email address of the BCC recipient(s)"
+    )
+    subject: str = Field(None, description="Message subject")
+    message: str = Field(
+        None, description="Body of the message. (text version)", alias="text"
+    )
+    html: str = Field(None, description="Body of the message. (HTML version)")
+    amp_html: str = Field(
+        None,
+        description="AMP part of the message. Please follow google guidelines to compose and send AMP emails.",
+        alias="amp-html",
+    )
+    attachment: ResourceSchema.one_or_more_of(FilePath) = Field(
+        None, description="File attachment(s)"
+    )
+    inline: ResourceSchema.one_or_more_of(FilePath) = Field(
+        None,
+        description="Attachment with inline disposition. Can be used to send inline images",
+    )
+    template: str = Field(
+        None, description="Name of a template stored via template API"
+    )
+    version: str = Field(
+        None,
+        description="Use this parameter to send a message to specific version of a template",
+        alias="t:version",
+    )
+    t_text: bool = Field(
+        None,
+        description="Pass yes if you want to have rendered template in the text part of the message"
+        " in case of template sending",
+        alias="t:text",
+    )
+    tag: List[Ascii] = Field(
+        None,
+        description="Tag string. See Tagging for more information",
+        alias="o:tag",
+        max_items=3,
+        max_length=128,
+    )
+    dkim: bool = Field(
+        None,
+        description="Enables/disables DKIM signatures on per-message basis. Pass yes, no, true or false",
+        alias="o:dkim",
+    )
+    delivery_time: datetime = Field(
+        None,
+        description="Desired time of delivery. Note: Messages can be scheduled for a maximum of 3 days in the future.",
+        alias="o:deliverytime",
+    )
+    delivery_time_optimize_period: conint(gt=23, lt=73) = Field(
+        None,
+        description="This value defines the time window (in hours) in which Mailgun will run the optimization "
+        "algorithm based on prior engagement data of a given recipient",
+        alias="o:deliverytime-optimize-period",
+    )
+    test_mode: bool = Field(
+        None, description="Enables sending in test mode", alias="o:testmode"
+    )
+    tracking: bool = Field(
+        None, description="Toggles tracking on a per-message basis", alias="o:tracking"
+    )
+    tracking_clicks: Union[bool, Literal["htmlonly"]] = Field(
+        None,
+        description="Toggles clicks tracking on a per-message basis. Has higher priority than domain-level setting",
+        alias="o:tracking-clicks",
+    )
+    tracking_opens: bool = Field(
+        None,
+        description="Toggles opens tracking on a per-message basis.",
+        alias="o:tracking-opens",
+    )
+    require_tls: bool = Field(
+        None,
+        description="If set to True or yes this requires the message only be sent over a TLS connection."
+        " If a TLS connection can not be established, Mailgun will not deliver the message."
+        " If set to False or no, Mailgun will still try and upgrade the connection, "
+        "but if Mailgun can not, the message will be delivered over a plaintext SMTP connection",
+        alias="o:require-tls",
+    )
+    skip_verification: bool = Field(
+        None,
+        description="If set to True or yes, the certificate and hostname will not be verified when trying to establish "
+        "a TLS connection and Mailgun will accept any certificate during delivery."
+        " If set to False or no, Mailgun will verify the certificate and hostname."
+        " If either one can not be verified, a TLS connection will not be established.",
+        alias="o:skip-verification",
+    )
+
+    headers: ResourceSchema.one_or_more_of(Dict[str, str]) = Field(
+        None,
+        description="Add arbitrary value(s) to append a custom MIME header to the message",
+    )
+    data: Dict[str, dict] = Field(
+        None, description="Attach a custom JSON data to the message"
+    )
+    recipient_variables: Dict[EmailStr, Dict[str, str]] = Field(
+        None,
+        description="A valid JSON-encoded dictionary, where key is a plain recipient address and value is a "
+        "dictionary with variables that can be referenced in the message body.",
+        alias="recipient-variables",
+    )
+    _values_to_exclude = "domain", "api_key"
+
+    @root_validator()
+    def headers_and_data(cls, values):
+        def transform(key_name, prefix, json_dump):
+            data_to_transform = values.pop(key_name, None)
+            if data_to_transform:
+                if not isinstance(data_to_transform, list):
+                    data_to_transform = [data_to_transform]
+                for data_ in data_to_transform:
+                    for name, value in data_.items():
+                        if json_dump:
+                            value = json.dumps(value)
+                        values[f"{prefix}:{name}"] = value
+
+        transform("headers", "h", False)
+        transform("data", "v", True)
+        return values
+
+    @root_validator(pre=True)
+    def validate_body(cls, values):
+        if not any(value in values for value in ("message", "html")):
+            raise ValueError("Either 'text' or 'html' are required")
+        return values
+
+    @validator("delivery_time_optimize_period")
+    def hours_to_str(cls, v):
+        return f"{v}h"
+
+    @validator("delivery_time")
+    def valid_delivery_time(cls, v: datetime):
+        now = datetime.now()
+        delta = now - v
+        if delta.days > 3:
+            raise ValueError(
+                "Messages can be scheduled for a maximum of 3 days in the future"
+            )
+        return email_utils.formatdate(time.mktime(v.timetuple()))
+
+    @validator("t_text", "test_mode")
+    def true_to_yes(cls, v):
+        return "yes" if v else "no"
+
+    @validator("dkim", "tracking", "tracking_clicks", "tracking_opens")
+    def text_bool(cls, v):
+        return str(v).lower() if isinstance(v, bool) else v
+
+    @validator("to", "cc", "bcc")
+    def comma(cls, v):
+        return cls.to_comma_separated(v)
 
 
 class MailGun(Provider):
@@ -14,193 +213,21 @@ class MailGun(Provider):
     name = "mailgun"
     path_to_errors = ("message",)
 
-    __properties_to_change = [
-        "tag",
-        "dkim",
-        "deliverytime",
-        "testmode",
-        "tracking",
-        "tracking_clicks",
-        "tracking_opens",
-        "require_tls",
-        "skip_verification",
-    ]
+    schema_model = MailGunSchema
 
-    __email_list = one_or_more(
-        {
-            "type": "string",
-            "title": 'Email address of the recipient(s). Example: "Bob <bob@host.com>".',
-        }
-    )
-
-    _required = {
-        "allOf": [
-            {"required": ["to", "domain", "api_key"]},
-            {"anyOf": [{"required": ["from"]}, {"required": ["from_"]}]},
-            {
-                "anyOf": [{"required": ["message"]}, {"required": ["html"]}],
-                "error_anyOf": 'Need either "message" or "html"',
-            },
-        ]
-    }
-
-    _schema = {
-        "type": "object",
-        "properties": {
-            "api_key": {"type": "string", "title": "User's API key"},
-            "message": {
-                "type": "string",
-                "title": "Body of the message. (text version)",
-            },
-            "html": {"type": "string", "title": "Body of the message. (HTML version)"},
-            "to": __email_list,
-            "from": {
-                "type": "string",
-                "format": "email",
-                "title": "Email address for From header",
-            },
-            "from_": {
-                "type": "string",
-                "format": "email",
-                "title": "Email address for From header",
-                "duplicate": True,
-            },
-            "domain": {"type": "string", "title": "MailGun's domain to use"},
-            "cc": __email_list,
-            "bcc": __email_list,
-            "subject": {"type": "string", "title": "Message subject"},
-            "attachment": one_or_more(
-                {"type": "string", "format": "valid_file", "title": "File attachment"}
-            ),
-            "inline": one_or_more(
-                {
-                    "type": "string",
-                    "format": "valid_file",
-                    "title": "Attachment with inline disposition. Can be used to send inline images",
-                }
-            ),
-            "tag": one_or_more(
-                schema={
-                    "type": "string",
-                    "format": "ascii",
-                    "title": "Tag string",
-                    "maxLength": 128,
-                },
-                max=3,
-            ),
-            "dkim": {
-                "type": "boolean",
-                "title": "Enables/disables DKIM signatures on per-message basis",
-            },
-            "deliverytime": {
-                "type": "string",
-                "format": "rfc2822",
-                "title": "Desired time of delivery. Note: Messages can be scheduled for a maximum of 3 days in "
-                "the future.",
-            },
-            "testmode": {"type": "boolean", "title": "Enables sending in test mode."},
-            "tracking": {
-                "type": "boolean",
-                "title": "Toggles tracking on a per-message basis",
-            },
-            "tracking_clicks": {
-                "type": ["string", "boolean"],
-                "title": "Toggles clicks tracking on a per-message basis. Has higher priority than domain-level"
-                " setting. Pass yes, no or htmlonly.",
-                "enum": [True, False, "htmlonly"],
-            },
-            "tracking_opens": {
-                "type": "boolean",
-                "title": "Toggles opens tracking on a per-message basis. Has higher priority than domain-level setting",
-            },
-            "require_tls": {
-                "type": "boolean",
-                "title": "If set to True this requires the message only be sent over a TLS connection."
-                " If a TLS connection can not be established, Mailgun will not deliver the message."
-                "If set to False, Mailgun will still try and upgrade the connection, but if Mailgun can not,"
-                " the message will be delivered over a plaintext SMTP connection.",
-            },
-            "skip_verification": {
-                "type": "boolean",
-                "title": "If set to True, the certificate and hostname will not be verified when trying to establish "
-                "a TLS connection and Mailgun will accept any certificate during delivery. If set to False,"
-                " Mailgun will verify the certificate and hostname. If either one can not be verified, "
-                "a TLS connection will not be established.",
-            },
-            "headers": {
-                "type": "object",
-                "additionalProperties": {"type": "string"},
-                "title": "Any other header to add",
-            },
-            "data": {
-                "type": "object",
-                "additionalProperties": {"type": "object"},
-                "title": "attach a custom JSON data to the message",
-            },
-        },
-        "additionalProperties": False,
-    }
-
-    def _prepare_data(self, data: dict) -> dict:
-        if data.get("from_"):
-            data["from"] = data.pop("from_")
-
-        new_data = {
-            "to": data.pop("to"),
-            "from": data.pop("from"),
-            "domain": data.pop("domain"),
-            "api_key": data.pop("api_key"),
-        }
-
-        if data.get("message"):
-            new_data["text"] = data.pop("message")
-
-        if data.get("attachment"):
-            attachment = data.pop("attachment")
-            if isinstance(attachment, str):
-                attachment = [attachment]
-            new_data["attachment"] = attachment
-
-        if data.get("inline"):
-            inline = data.pop("inline")
-            if isinstance(inline, str):
-                inline = [inline]
-            new_data["inline"] = inline
-
-        for property_ in self.__properties_to_change:
-            if data.get(property_):
-                new_property = f"o:{property_}".replace("_", "-")
-                new_data[new_property] = data.pop(property_)
-
-        if data.get("headers"):
-            for key, value in data["headers"].items():
-                new_data[f"h:{key}"] = value
-            del data["headers"]
-
-        if data.get("data"):
-            for key, value in data["data"].items():
-                new_data[f"v:{key}"] = json.dumps(value)
-            del data["data"]
-
-        for key, value in data.items():
-            new_data[key] = value
-
-        return new_data
-
-    def _send_notification(self, data: dict) -> Response:
-        url = self.base_url.format(domain=data.pop("domain"))
-        auth = "api", data.pop("api_key")
+    def _send_notification(self, data: MailGunSchema) -> Response:
+        url = self.base_url.format(domain=data.domain)
         files = []
-        if data.get("attachment"):
-            files += requests.file_list_for_request(data["attachment"], "attachment")
-        if data.get("inline"):
-            files += requests.file_list_for_request(data["inline"], "inline")
-
+        if data.attachment:
+            files += requests.file_list_for_request(data.attachment, "attachment")
+        if data.inline:
+            files += requests.file_list_for_request(data.inline, "inline")
+        payload = data.to_dict()
         response, errors = requests.post(
             url=url,
-            data=data,
-            auth=auth,
+            data=payload,
+            auth=("api", data.api_key),
             files=files,
             path_to_errors=self.path_to_errors,
         )
-        return self.create_response(data, response, errors)
+        return self.create_response(payload, response, errors)

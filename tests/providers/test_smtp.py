@@ -1,8 +1,8 @@
 from email.message import EmailMessage
+from pathlib import Path
 
 import pytest
 
-from notifiers.exceptions import BadArguments
 from notifiers.exceptions import NotificationError
 
 provider = "email"
@@ -10,22 +10,6 @@ provider = "email"
 
 class TestSMTP(object):
     """SMTP tests"""
-
-    def test_smtp_metadata(self, provider):
-        assert provider.metadata == {
-            "base_url": None,
-            "name": "email",
-            "site_url": "https://en.wikipedia.org/wiki/Email",
-        }
-
-    @pytest.mark.parametrize(
-        "data, message", [({}, "message"), ({"message": "foo"}, "to")]
-    )
-    def test_smtp_missing_required(self, data, message, provider):
-        data["env_prefix"] = "test"
-        with pytest.raises(BadArguments) as e:
-            provider.notify(**data)
-        assert f"'{message}' is a required property" in e.value.message
 
     def test_smtp_no_host(self, provider):
         data = {
@@ -85,17 +69,22 @@ class TestSMTP(object):
         )
         assert rsp.data["attachments"] == attachments
 
-    def test_attachment_mimetypes(self, provider, tmpdir):
-        dir_ = tmpdir.mkdir("sub")
-        file_1 = dir_.join("foo.txt")
-        file_1.write("foo")
-        file_2 = dir_.join("bar.jpg")
-        file_2.write("foo")
-        file_3 = dir_.join("baz.pdf")
-        file_3.write("foo")
-        attachments = [str(file_1), str(file_2), str(file_3)]
+    def test_attachment_mimetypes(self, provider, tmp_path):
+        smtp_base: Path = tmp_path / "smtp_base"
+        smtp_base.mkdir()
+
+        file_1 = smtp_base / "foo.txt"
+        file_1.write_text("foo")
+
+        file_2 = smtp_base / "bar.jpg"
+        file_2.write_text("foo")
+
+        file_3 = smtp_base / "baz.pdf"
+        file_3.write_text("foo")
+
+        attachments = [file_1, file_2, file_3]
         email = EmailMessage()
-        provider._add_attachments(attachments=attachments, email=email)
+        provider.add_attachments_to_email(attachments=attachments, email=email)
         attach1, attach2, attach3 = email.iter_attachments()
         assert attach1.get_content_type() == "text/plain"
         assert attach2.get_content_type() == "image/jpeg"

@@ -6,73 +6,64 @@ from unittest.mock import MagicMock
 
 import pytest
 from click.testing import CliRunner
+from pydantic import Field
+from pydantic import StrictStr
+from pydantic import validator
 
 from notifiers.core import get_notifier
-from notifiers.core import Provider
-from notifiers.core import ProviderResource
-from notifiers.core import Response
-from notifiers.core import SUCCESS_STATUS
 from notifiers.logging import NotificationHandler
-from notifiers.providers import _all_providers
-from notifiers.utils.helpers import text_to_bool
-from notifiers.utils.schema.helpers import list_to_commas
-from notifiers.utils.schema.helpers import one_or_more
+from notifiers.models.resource import Provider
+from notifiers.models.resource import provider_registry
+from notifiers.models.resource import ProviderResource
+from notifiers.models.response import Response
+from notifiers.models.response import ResponseStatus
+from notifiers.models.schema import ResourceSchema
 
-log = logging.getLogger(__name__)
+log = logging.getLogger("notifiers")
 
 
 class MockProxy:
     name = "mock_provider"
 
 
+class MockResourceSchema(ResourceSchema):
+    key: str = Field(..., description="required key")
+    another_key: int = Field(None, description="non-required key")
+
+
+class MockProviderSchema(ResourceSchema):
+    not_required: ResourceSchema.one_or_more_of(str) = Field(
+        None, description="example for not required arg"
+    )
+    required: StrictStr
+    option_with_default = "foo"
+    message: str = None
+
+    @validator("not_required", whole=True)
+    def csv(cls, v):
+        return cls.to_comma_separated(v)
+
+
 class MockResource(MockProxy, ProviderResource):
     resource_name = "mock_resource"
 
-    _required = {"required": ["key"]}
-    _schema = {
-        "type": "object",
-        "properties": {
-            "key": {"type": "string", "title": "required key"},
-            "another_key": {"type": "integer", "title": "non-required key"},
-        },
-        "additionalProperties": False,
-    }
+    schema_model = MockResourceSchema
 
     def _get_resource(self, data: dict):
-        return {"status": SUCCESS_STATUS}
+        return {"status": ResponseStatus.SUCCESS}
 
 
 class MockProvider(MockProxy, Provider):
     """Mock Provider"""
 
     base_url = "https://api.mock.com"
-    _required = {"required": ["required"]}
-    _schema = {
-        "type": "object",
-        "properties": {
-            "not_required": one_or_more(
-                {"type": "string", "title": "example for not required arg"}
-            ),
-            "required": {"type": "string"},
-            "option_with_default": {"type": "string"},
-            "message": {"type": "string"},
-        },
-        "additionalProperties": False,
-    }
     site_url = "https://www.mock.com"
+    schema_model = MockProviderSchema
 
-    @property
-    def defaults(self):
-        return {"option_with_default": "foo"}
-
-    def _send_notification(self, data: dict):
-        return Response(status=SUCCESS_STATUS, provider=self.name, data=data)
-
-    def _prepare_data(self, data: dict):
-        if data.get("not_required"):
-            data["not_required"] = list_to_commas(data["not_required"])
-        data["required"] = list_to_commas(data["required"])
-        return data
+    def _send_notification(self, data: MockProviderSchema):
+        return Response(
+            status=ResponseStatus.SUCCESS, provider=self.name, data=data.to_dict()
+        )
 
     @property
     def resources(self):
@@ -86,39 +77,10 @@ class MockProvider(MockProxy, Provider):
 @pytest.fixture(scope="session")
 def mock_provider():
     """Return a generic :class:`notifiers.core.Provider` class"""
-    _all_providers.update({MockProvider.name: MockProvider})
     return MockProvider()
 
 
-@pytest.fixture
-def bad_provider():
-    """Returns an unimplemented :class:`notifiers.core.Provider` class for testing"""
-
-    class BadProvider(Provider):
-        pass
-
-    return BadProvider
-
-
-@pytest.fixture
-def bad_schema():
-    """Return a provider with an invalid JSON schema"""
-
-    class BadSchema(Provider):
-        _required = {"required": ["fpp"]}
-        _schema = {"type": "banana"}
-
-        name = "bad_schmea"
-        base_url = ""
-        site_url = ""
-
-        def _send_notification(self, data: dict):
-            pass
-
-    return BadSchema
-
-
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def provider(request):
     name = getattr(request.module, "provider", None)
     if not name:
@@ -142,6 +104,7 @@ def resource(request, provider):
 
 @pytest.fixture
 def cli_runner(monkeypatch):
+    pytest.skip("Need to fix CLI")
     from notifiers_cli.core import notifiers_cli, provider_group_factory
 
     monkeypatch.setenv("LC_ALL", "en_US.utf-8")
@@ -155,7 +118,7 @@ def cli_runner(monkeypatch):
 def magic_mock_provider(monkeypatch):
     MockProvider.notify = MagicMock()
     MockProxy.name = "magic_mock"
-    monkeypatch.setitem(_all_providers, MockProvider.name, MockProvider)
+    monkeypatch.setitem(provider_registry, MockProvider.name, MockProvider)
     return MockProvider()
 
 
@@ -168,15 +131,6 @@ def handler(caplog):
         return hdlr
 
     return return_handler
-
-
-def pytest_runtest_setup(item):
-    """Skips PRs if secure env vars are set and test is marked as online"""
-    pull_request = text_to_bool(os.environ.get("TRAVIS_PULL_REQUEST"))
-    secure_env_vars = text_to_bool(os.environ.get("TRAVIS_SECURE_ENV_VARS"))
-    online = item.get_closest_marker("online")
-    if online and pull_request and not secure_env_vars:
-        pytest.skip("skipping online tests via PRs")
 
 
 @pytest.fixture

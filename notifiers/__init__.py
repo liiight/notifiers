@@ -1,5 +1,6 @@
 import logging
 
+from . import providers  # noqa: F401
 from ._version import __version__
 from .core import all_providers
 from .core import get_notifier

@@ -3,35 +3,14 @@ import json
 import pytest
 from retry import retry
 
-from notifiers.exceptions import BadArguments
 from notifiers.exceptions import NotificationError
+from notifiers.exceptions import SchemaValidationError
 
 provider = "telegram"
 
 
 class TestTelegram:
     """Telegram related tests"""
-
-    def test_metadata(self, provider):
-        assert provider.metadata == {
-            "base_url": "https://api.telegram.org/bot{token}",
-            "name": "telegram",
-            "site_url": "https://core.telegram.org/",
-        }
-
-    @pytest.mark.parametrize(
-        "data, message",
-        [
-            ({}, "message"),
-            ({"message": "foo"}, "chat_id"),
-            ({"message": "foo", "chat_id": 1}, "token"),
-        ],
-    )
-    def test_missing_required(self, data, message, provider):
-        data["env_prefix"] = "test"
-        with pytest.raises(BadArguments) as e:
-            provider.notify(**data)
-        assert f"'{message}' is a required property" in e.value.message
 
     def test_bad_token(self, provider):
         data = {"token": "foo", "chat_id": 1, "message": "foo"}
@@ -56,7 +35,7 @@ class TestTelegram:
     @pytest.mark.online
     def test_all_options(self, provider, test_message):
         data = {
-            "parse_mode": "markdown",
+            "parse_mode": "Markdown",
             "disable_web_page_preview": True,
             "disable_notification": True,
             "message": test_message,
@@ -69,17 +48,25 @@ class TestTelegramResources:
     resource = "updates"
 
     def test_telegram_updates_attribs(self, resource):
-        assert resource.schema == {
+        assert resource.schema() == {
             "additionalProperties": False,
-            "properties": {"token": {"title": "Bot token", "type": "string"}},
+            "description": "The base class for Schemas",
+            "properties": {
+                "token": {
+                    "description": "Bot token",
+                    "title": "Token",
+                    "type": "string",
+                }
+            },
             "required": ["token"],
+            "title": "TelegramBaseSchema",
             "type": "object",
         }
         assert resource.name == provider
-        assert resource.required == {"required": ["token"]}
+        assert resource.required == ["token"]
 
     def test_telegram_updates_negative(self, resource):
-        with pytest.raises(BadArguments):
+        with pytest.raises(SchemaValidationError):
             resource(env_prefix="foo")
 
     @pytest.mark.online
@@ -100,7 +87,7 @@ class TestTelegramCLI:
     @pytest.mark.online
     @retry(AssertionError, tries=3, delay=10)
     def test_telegram_updates_positive(self, cli_runner):
-        cmd = f"telegram updates".split()
+        cmd = "telegram updates".split()
         result = cli_runner(cmd)
         assert not result.exit_code
         reply = json.loads(result.output)

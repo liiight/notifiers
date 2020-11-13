@@ -53,7 +53,12 @@ class TestLogger:
         log.info("test")
 
         magic_mock_provider.notify.assert_called_with(
-            message="Could not log msg to provider 'pushover'!\nError with sent data: 'user' is a required property"
+            message="Could not log msg to provider 'pushover'!\n"
+            "Error with sent data: 2 validation errors for PushoverSchema\n"
+            "token\n"
+            "  field required (type=value_error.missing)\n"
+            "user\n"
+            "  field required (type=value_error.missing)"
         )
 
     def test_with_fallback_with_defaults(self, magic_mock_provider, handler):
@@ -71,5 +76,10 @@ class TestLogger:
 
         magic_mock_provider.notify.assert_called_with(
             foo="bar",
-            message="Could not log msg to provider 'pushover'!\nError with sent data: 'user' is a required property",
+            message="Could not log msg to provider 'pushover'!\n"
+            "Error with sent data: 2 validation errors for PushoverSchema\n"
+            "token\n"
+            "  field required (type=value_error.missing)\n"
+            "user\n"
+            "  field required (type=value_error.missing)",
         )

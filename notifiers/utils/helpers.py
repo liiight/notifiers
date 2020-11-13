@@ -1,21 +1,8 @@
 import logging
 import os
-from distutils.util import strtobool
-from pathlib import Path
+from typing import Sequence
 
 log = logging.getLogger("notifiers")
-
-
-def text_to_bool(value: str) -> bool:
-    """
-    Tries to convert a text value to a bool. If unsuccessful returns if value is None or not
-
-    :param value: Value to check
-    """
-    try:
-        return bool(strtobool(value))
-    except (ValueError, AttributeError):
-        return value is not None
 
 
 def merge_dicts(target_dict: dict, merge_dict: dict) -> dict:
@@ -29,12 +16,11 @@ def merge_dicts(target_dict: dict, merge_dict: dict) -> dict:
     """
     log.debug("merging dict %s into %s", merge_dict, target_dict)
     for key, value in merge_dict.items():
-        if key not in target_dict:
-            target_dict[key] = value
+        target_dict.setdefault(key, value)
     return target_dict
 
 
-def dict_from_environs(prefix: str, name: str, args: list) -> dict:
+def dict_from_environs(prefix: str, name: str, args: Sequence[str]) -> dict:
     """
     Return a dict of environment variables correlating to the arguments list, main name and prefix like so:
     [prefix]_[name]_[arg]
@@ -44,13 +30,27 @@ def dict_from_environs(prefix: str, name: str, args: list) -> dict:
     :param args: List of args to iterate over
     :return: A dict of found environ values
     """
-    environs = {}
-    log.debug("starting to collect environs using prefix: '%s'", prefix)
+    log.debug(
+        "starting to collect environs using prefix: '%s' and name '%s'", prefix, name
+    )
+    # Make sure prefix and name end with '_'
+    prefix = f'{prefix.rstrip("_")}_'
+    name = f'{name.rstrip("_")}_'
+
+    data = {}
+
+    # In order to dedupe fields that are equal to their alias, build a dict matching desired environment variable to arg
+    env_to_arg_dict = {}
     for arg in args:
-        environ = f"{prefix}{name}_{arg}".upper()
-        if os.environ.get(environ):
-            environs[arg] = os.environ[environ]
-    return environs
+        env_to_arg_dict.setdefault(f"{prefix}{name}{arg}".upper(), arg)
+
+    for env_key, arg in env_to_arg_dict.items():
+        log.debug("Looking for environment variable %s", env_key)
+        value = os.environ.get(env_key)
+        if value:
+            data[arg] = value
+    log.debug("Returning data %s from environment variables", data)
+    return data
 
 
 def snake_to_camel_case(value: str) -> str:
@@ -60,17 +60,5 @@ def snake_to_camel_case(value: str) -> str:
     :param value: The value to convert
     :return: A CamelCase value
     """
-    log.debug("trying to convert %s to camel case", value)
+    log.debug("converting %s to camel case", value)
     return "".join(word.capitalize() for word in value.split("_"))
-
-
-def valid_file(path: str) -> bool:
-    """
-    Verifies that a string path actually exists and is a file
-
-    :param path: The path to verify
-    :return: **True** if path exist and is a file
-    """
-    path = Path(path).expanduser()
-    log.debug("checking if %s is a valid file", path)
-    return path.exists() and path.is_file()

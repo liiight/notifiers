@@ -1,41 +1,13 @@
 import datetime
-import time
-from email import utils
 
 import pytest
 
-from notifiers.core import FAILURE_STATUS
-from notifiers.exceptions import BadArguments
+from notifiers.models.response import ResponseStatus
 
 provider = "mailgun"
 
 
 class TestMailgun:
-    def test_mailgun_metadata(self, provider):
-        assert provider.metadata == {
-            "base_url": "https://api.mailgun.net/v3/{domain}/messages",
-            "name": "mailgun",
-            "site_url": "https://documentation.mailgun.com/",
-        }
-
-    @pytest.mark.parametrize(
-        "data, message",
-        [
-            ({}, "to"),
-            ({"to": "foo"}, "domain"),
-            ({"to": "foo", "domain": "bla"}, "api_key"),
-            ({"to": "foo", "domain": "bla", "api_key": "bla"}, "from"),
-            (
-                {"to": "foo", "domain": "bla", "api_key": "bla", "from": "bbb"},
-                "message",
-            ),
-        ],
-    )
-    def test_mailgun_missing_required(self, data, message, provider):
-        data["env_prefix"] = "test"
-        with pytest.raises(BadArguments, match=f"'{message}' is a required property"):
-            provider.notify(**data)
-
     @pytest.mark.online
     def test_mailgun_sanity(self, provider, test_message):
         provider.notify(message=test_message, raise_on_errors=True)
@@ -50,7 +22,6 @@ class TestMailgun:
         file_2.write("content")
 
         now = datetime.datetime.now() + datetime.timedelta(minutes=3)
-        rfc_2822 = utils.formatdate(time.mktime(now.timetuple()))
         data = {
             "message": test_message,
             "html": f"<b>{now}</b>",
@@ -59,8 +30,8 @@ class TestMailgun:
             "inline": [file_1.strpath, file_2.strpath],
             "tag": ["foo", "bar"],
             "dkim": True,
-            "deliverytime": rfc_2822,
-            "testmode": False,
+            "delivery_time": now,
+            "test_mode": False,
             "tracking": True,
             "tracking_clicks": "htmlonly",
             "tracking_opens": True,
@@ -80,5 +51,5 @@ class TestMailgun:
             "from": "foo@foo.com",
         }
         rsp = provider.notify(**data)
-        assert rsp.status == FAILURE_STATUS
+        assert rsp.status is ResponseStatus.FAILURE
         assert "Forbidden" in rsp.errors

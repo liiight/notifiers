@@ -1,5 +1,8 @@
 import json
 import logging
+from pathlib import Path
+from typing import List
+from typing import Union
 
 import requests
 
@@ -11,7 +14,7 @@ class RequestsHelper:
 
     @classmethod
     def request(
-        self,
+        cls,
         url: str,
         method: str,
         raise_for_status: bool = True,
@@ -30,8 +33,8 @@ class RequestsHelper:
         :return: Dict of response body or original :class:`requests.Response`
         """
         session = kwargs.get("session", requests.Session())
-        if 'timeout' not in kwargs:
-            kwargs['timeout'] = (5, 20)
+        if "timeout" not in kwargs:
+            kwargs["timeout"] = (5, 20)
         log.debug(
             "sending a %s request to %s with args: %s kwargs: %s",
             method.upper(),
@@ -80,19 +83,18 @@ def post(url: str, *args, **kwargs) -> tuple:
 
 
 def file_list_for_request(
-    list_of_paths: list, key_name: str, mimetype: str = None
+    paths: Union[List[Path], Path], key_name: str, mimetype: str = None
 ) -> list:
     """
     Convenience function to construct a list of files for multiple files upload by :mod:`requests`
 
-    :param list_of_paths: Lists of strings to include in files. Should be pre validated for correctness
+    :param paths: Lists of strings to include in files. Should be pre validated for correctness
     :param key_name: The key name to use for the file list in the request
     :param mimetype: If specified, will be included in the requests
     :return: List of open files ready to be used in a request
     """
+    if not isinstance(paths, list):
+        paths = [paths]
     if mimetype:
-        return [
-            (key_name, (file, open(file, mode="rb"), mimetype))
-            for file in list_of_paths
-        ]
-    return [(key_name, (file, open(file, mode="rb"))) for file in list_of_paths]
+        return [(key_name, (file.name, file.read_bytes(), mimetype)) for file in paths]
+    return [(key_name, (file.name, file.read_bytes())) for file in paths]

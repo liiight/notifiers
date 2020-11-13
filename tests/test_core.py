@@ -2,19 +2,18 @@ import pytest
 
 import notifiers
 from notifiers import notify
-from notifiers.core import Provider
-from notifiers.core import Response
-from notifiers.core import SUCCESS_STATUS
-from notifiers.exceptions import BadArguments
 from notifiers.exceptions import NoSuchNotifierError
 from notifiers.exceptions import NotificationError
-from notifiers.exceptions import SchemaError
+from notifiers.exceptions import SchemaValidationError
+from notifiers.models.resource import Provider
+from notifiers.models.response import Response
+from notifiers.models.response import ResponseStatus
 
 
 class TestCore:
     """Test core classes"""
 
-    valid_data = {"required": "foo", "not_required": ["foo", "bar"]}
+    valid_data = {"required": "foo", "not_required": ["foo", "bar"], "message": "foo"}
 
     def test_sanity(self, mock_provider):
         """Test basic notification flow"""
@@ -23,36 +22,34 @@ class TestCore:
             "name": "mock_provider",
             "site_url": "https://www.mock.com",
         }
-        assert mock_provider.arguments == {
+        assert mock_provider.arguments() == {
             "not_required": {
-                "oneOf": [
-                    {
-                        "type": "array",
-                        "items": {
-                            "type": "string",
-                            "title": "example for not required arg",
-                        },
-                        "minItems": 1,
-                        "uniqueItems": True,
-                    },
-                    {"type": "string", "title": "example for not required arg"},
-                ]
+                "title": "Not Required",
+                "description": "example for not required arg",
+                "anyOf": [
+                    {"type": "array", "items": {"type": "string"}},
+                    {"type": "string"},
+                ],
             },
-            "required": {"type": "string"},
-            "option_with_default": {"type": "string"},
-            "message": {"type": "string"},
+            "required": {"title": "Required", "type": "string"},
+            "message": {"title": "Message", "type": "string"},
+            "option_with_default": {
+                "title": "Option With Default",
+                "default": "foo",
+                "type": "string",
+            },
         }
 
-        assert mock_provider.required == {"required": ["required"]}
+        assert mock_provider.required == ["required"]
         rsp = mock_provider.notify(**self.valid_data)
         assert isinstance(rsp, Response)
         assert not rsp.errors
         assert rsp.raise_on_errors() is None
         assert (
             repr(rsp)
-            == f"<Response,provider=Mock_provider,status={SUCCESS_STATUS}, errors=None>"
+            == f"<Response,provider=Mock_provider,status={ResponseStatus.SUCCESS}, errors=None>"
         )
-        assert repr(mock_provider) == "<Provider:[Mock_provider]>"
+        assert repr(mock_provider) == "<Provider(Mock_provider)>"
 
     @pytest.mark.parametrize(
         "data",
@@ -64,13 +61,8 @@ class TestCore:
     )
     def test_schema_validation(self, data, mock_provider):
         """Test correct schema validations"""
-        with pytest.raises(BadArguments):
+        with pytest.raises(SchemaValidationError):
             mock_provider.notify(**data)
-
-    def test_bad_schema(self, bad_schema):
-        """Test illegal JSON schema"""
-        with pytest.raises(SchemaError):
-            bad_schema()
 
     def test_prepare_data(self, mock_provider):
         """Test ``prepare_data()`` method"""
@@ -79,6 +71,7 @@ class TestCore:
             "not_required": "foo,bar",
             "required": "foo",
             "option_with_default": "foo",
+            "message": "foo",
         }
 
     def test_get_notifier(self, mock_provider):
@@ -114,35 +107,27 @@ class TestCore:
             "not_required": "foo,bar",
             "required": "foo",
             "option_with_default": "foo",
+            "message": "foo",
         }
         assert e.value.message == "Notification errors: an error"
         assert e.value.provider == mock_provider.name
 
-    def test_bad_integration(self, bad_provider):
-        """Test bad provider inheritance"""
-        with pytest.raises(TypeError) as e:
-            bad_provider()
-        assert (
-            "Can't instantiate abstract class BadProvider with abstract methods _required,"
-            " _schema, _send_notification, base_url, name, site_url"
-        ) in str(e.value)
-
     def test_environs(self, mock_provider, monkeypatch):
         """Test environs usage"""
-        prefix = f"mock_"
+        prefix = "mock_"
         monkeypatch.setenv(f"{prefix}{mock_provider.name}_required".upper(), "foo")
         rsp = mock_provider.notify(env_prefix=prefix)
-        assert rsp.status == SUCCESS_STATUS
+        assert rsp.status is ResponseStatus.SUCCESS
         assert rsp.data["required"] == "foo"
 
     def test_provided_data_takes_precedence_over_environ(
         self, mock_provider, monkeypatch
     ):
         """Verify that given data overrides environ"""
-        prefix = f"mock_"
+        prefix = "mock_"
         monkeypatch.setenv(f"{prefix}{mock_provider.name}_required".upper(), "foo")
         rsp = mock_provider.notify(required="bar", env_prefix=prefix)
-        assert rsp.status == SUCCESS_STATUS
+        assert rsp.status is ResponseStatus.SUCCESS
         assert rsp.data["required"] == "bar"
 
     def test_resources(self, mock_provider):
@@ -160,28 +145,38 @@ class TestCore:
         )
         assert resource.resource_name == "mock_resource"
         assert resource.name == mock_provider.name
-        assert resource.schema == {
+        assert resource.schema() == {
+            "title": "MockResourceSchema",
+            "description": "The base class for Schemas",
             "type": "object",
             "properties": {
-                "key": {"type": "string", "title": "required key"},
-                "another_key": {"type": "integer", "title": "non-required key"},
+                "key": {
+                    "title": "Key",
+                    "description": "required key",
+                    "type": "string",
+                },
+                "another_key": {
+                    "title": "Another Key",
+                    "description": "non-required key",
+                    "type": "integer",
+                },
             },
             "required": ["key"],
             "additionalProperties": False,
         }
 
-        assert resource.required == {"required": ["key"]}
+        assert resource.required == ["key"]
 
-        with pytest.raises(BadArguments):
+        with pytest.raises(SchemaValidationError):
             resource()
 
         rsp = resource(key="fpp")
-        assert rsp == {"status": SUCCESS_STATUS}
+        assert rsp == {"status": ResponseStatus.SUCCESS}
 
     def test_direct_notify_positive(self, mock_provider):
         rsp = notify(mock_provider.name, required="foo", message="foo")
         assert not rsp.errors
-        assert rsp.status == SUCCESS_STATUS
+        assert rsp.status is ResponseStatus.SUCCESS
         assert rsp.data == {
             "required": "foo",
             "message": "foo",

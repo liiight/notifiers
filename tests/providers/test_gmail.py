@@ -1,6 +1,5 @@
 import pytest
 
-from notifiers.exceptions import BadArguments
 from notifiers.exceptions import NotificationError
 
 provider = "gmail"
@@ -8,22 +7,6 @@ provider = "gmail"
 
 class TestGmail:
     """Gmail tests"""
-
-    def test_gmail_metadata(self, provider):
-        assert provider.metadata == {
-            "base_url": "smtp.gmail.com",
-            "name": "gmail",
-            "site_url": "https://www.google.com/gmail/about/",
-        }
-
-    @pytest.mark.parametrize(
-        "data, message", [({}, "message"), ({"message": "foo"}, "to")]
-    )
-    def test_gmail_missing_required(self, data, message, provider):
-        data["env_prefix"] = "test"
-        with pytest.raises(BadArguments) as e:
-            provider.notify(**data)
-        assert f"'{message}' is a required property" in e.value.message
 
     @pytest.mark.online
     def test_smtp_sanity(self, provider, test_message):
@@ -36,19 +19,6 @@ class TestGmail:
         }
         rsp = provider.notify(**data)
         rsp.raise_on_errors()
-
-    def test_email_from_key(self, provider):
-        rsp = provider.notify(
-            to="foo@foo.com",
-            from_="bla@foo.com",
-            message="foo",
-            host="goo",
-            username="ding",
-            password="dong",
-        )
-        rsp_data = rsp.data
-        assert not rsp_data.get("from_")
-        assert rsp_data["from"] == "bla@foo.com"
 
     def test_multiple_to(self, provider):
         to = ["foo@foo.com", "bar@foo.com"]
