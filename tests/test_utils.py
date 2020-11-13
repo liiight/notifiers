@@ -4,7 +4,6 @@ from notifiers.models.schema import ResourceSchema
 from notifiers.utils.helpers import dict_from_environs
 from notifiers.utils.helpers import merge_dicts
 from notifiers.utils.helpers import snake_to_camel_case
-from notifiers.utils.helpers import text_to_bool
 from notifiers.utils.requests import file_list_for_request
 
 
@@ -17,24 +16,6 @@ class TypeTest(ResourceSchema):
 
 
 class TestHelpers:
-    @pytest.mark.parametrize(
-        "text, result",
-        [
-            ("y", True),
-            ("yes", True),
-            ("true", True),
-            ("on", True),
-            ("no", False),
-            ("off", False),
-            ("false", False),
-            ("0", False),
-            ("foo", True),
-            ("bla", True),
-        ],
-    )
-    def test_text_to_bool(self, text, result):
-        assert text_to_bool(text) is result
-
     @pytest.mark.parametrize(
         "target_dict, merge_dict, result",
         [

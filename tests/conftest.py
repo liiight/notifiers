@@ -18,7 +18,6 @@ from notifiers.models.response import Response
 from notifiers.models.response import ResponseStatus
 from notifiers.models.schema import ResourceSchema
 from notifiers.providers import _all_providers
-from notifiers.utils.helpers import text_to_bool
 
 log = logging.getLogger("notifiers")
 
@@ -133,15 +132,6 @@ def handler(caplog):
         return hdlr
 
     return return_handler
-
-
-def pytest_runtest_setup(item):
-    """Skips PRs if secure env vars are set and test is marked as online"""
-    pull_request = text_to_bool(os.environ.get("TRAVIS_PULL_REQUEST"))
-    secure_env_vars = text_to_bool(os.environ.get("TRAVIS_SECURE_ENV_VARS"))
-    online = item.get_closest_marker("online")
-    if online and pull_request and not secure_env_vars:
-        pytest.skip("skipping online tests via PRs")
 
 
 @pytest.fixture
