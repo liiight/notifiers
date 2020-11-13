@@ -16,7 +16,7 @@ class TestCLI:
         cmd = f"{mock_name} notify".split()
         result = cli_runner(cmd)
         assert result.exit_code
-        assert getattr(result, "exception")
+        assert result.exception
 
     def test_notify_sanity(self, cli_runner):
         """Test valid notification usage"""

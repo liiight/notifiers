@@ -79,7 +79,7 @@ class TestGitterCLI:
 
     @pytest.mark.online
     def test_gitter_rooms_with_query(self, cli_runner):
-        cmd = f"gitter rooms --filter notifiers/testing".split()
+        cmd = "gitter rooms --filter notifiers/testing".split()
         result = cli_runner(cmd)
         assert not result.exit_code
         assert "notifiers/testing" in result.output

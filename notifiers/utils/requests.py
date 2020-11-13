@@ -33,8 +33,8 @@ class RequestsHelper:
         :return: Dict of response body or original :class:`requests.Response`
         """
         session = kwargs.get("session", requests.Session())
-        if 'timeout' not in kwargs:
-            kwargs['timeout'] = (5, 20)
+        if "timeout" not in kwargs:
+            kwargs["timeout"] = (5, 20)
         log.debug(
             "sending a %s request to %s with args: %s kwargs: %s",
             method.upper(),

@@ -144,8 +144,6 @@ class SMTP(Provider):
             SMTPServerDisconnected,
             SMTPSenderRefused,
             socket.error,
-            OSError,
-            IOError,
             SMTPAuthenticationError,
         ) as e:
             errors = [str(e)]
