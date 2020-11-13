@@ -1,4 +1,5 @@
 import pytest
+from pydantic import Field
 
 from notifiers.models.schema import ResourceSchema
 from notifiers.utils.helpers import dict_from_environs
@@ -10,8 +11,8 @@ from notifiers.utils.requests import file_list_for_request
 class TypeTest(ResourceSchema):
     string = ""
     integer = 0
-    float_ = 0.1
-    bool_ = True
+    float_ = Field(0.1, alias="floatAlias")
+    bool_ = Field(True, alias="boolAlias")
     bytes = b""
 
 
@@ -79,3 +80,16 @@ class TestHelpers:
         assert TypeTest.parse_obj(data) == TypeTest(
             string="foo", integer=8, float_=1.1, bool_=True, bytes=b"baz"
         )
+
+    def test_schema_aliases_from_environs(self, monkeypatch):
+        prefix = "NOTIFIERS"
+        name = "ENV_TEST"
+        env_data = {
+            "floatAlias": "1.1",
+            "boolAlias": "true",
+        }
+        for key, value in env_data.items():
+            monkeypatch.setenv(f"{prefix}_{name}_{key}".upper(), value)
+
+        data = dict_from_environs(prefix, name, list(env_data))
+        assert TypeTest.parse_obj(data) == TypeTest(float_=1.1, bool_=True)
