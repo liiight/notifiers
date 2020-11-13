@@ -30,7 +30,9 @@ def dict_from_environs(prefix: str, name: str, args: Sequence[str]) -> dict:
     :param args: List of args to iterate over
     :return: A dict of found environ values
     """
-    log.debug("starting to collect environs using prefix: '%s'", prefix)
+    log.debug(
+        "starting to collect environs using prefix: '%s' and name '%s'", prefix, name
+    )
     prefix = f'{prefix.rstrip("_")}_'.upper()
     name = f'{name.rstrip("_")}_'.upper()
     data = {}
@@ -39,8 +41,8 @@ def dict_from_environs(prefix: str, name: str, args: Sequence[str]) -> dict:
         log.debug("Looking for environment variable %s", env_key)
         value = os.environ.get(env_key)
         if value:
-            log.debug("Found environment variable %s, adding", env_key)
             data[arg] = value
+    log.debug("Returning data %s from environment variables", data)
     return data
 
 
