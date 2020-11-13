@@ -1,8 +1,8 @@
 import pytest
 
-from notifiers.exceptions import BadArguments
 from notifiers.exceptions import NotificationError
 from notifiers.exceptions import ResourceError
+from notifiers.exceptions import SchemaValidationError
 
 provider = "join"
 
@@ -44,7 +44,7 @@ class TestJoinDevices:
         }
 
     def test_join_devices_negative(self, resource):
-        with pytest.raises(BadArguments):
+        with pytest.raises(SchemaValidationError):
             resource(env_prefix="foo")
 
     def test_join_devices_negative_online(self, resource):

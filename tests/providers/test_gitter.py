@@ -1,8 +1,8 @@
 import pytest
 
-from notifiers.exceptions import BadArguments
 from notifiers.exceptions import NotificationError
 from notifiers.exceptions import ResourceError
+from notifiers.exceptions import SchemaValidationError
 
 provider = "gitter"
 
@@ -42,7 +42,7 @@ class TestGitterResources:
         assert resource.required == ["token"]
 
     def test_gitter_rooms_negative(self, resource):
-        with pytest.raises(BadArguments):
+        with pytest.raises(SchemaValidationError):
             resource(env_prefix="foo")
 
     def test_gitter_rooms_negative_2(self, resource):

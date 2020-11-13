@@ -1,7 +1,7 @@
 import pytest
 
-from notifiers.exceptions import BadArguments
 from notifiers.exceptions import NotificationError
+from notifiers.exceptions import SchemaValidationError
 
 provider = "pushover"
 
@@ -60,7 +60,7 @@ class TestPushover:
             "message": "baz",
             "attachment": "/foo/bar.jpg",
         }
-        with pytest.raises(BadArguments):
+        with pytest.raises(SchemaValidationError):
             provider.notify(**data)
 
     @pytest.mark.online
@@ -94,7 +94,7 @@ class TestPushoverSoundsResource:
         assert resource.name == provider
 
     def test_pushover_sounds_negative(self, resource):
-        with pytest.raises(BadArguments):
+        with pytest.raises(SchemaValidationError):
             resource(env_prefix="foo")
 
     @pytest.mark.online
@@ -124,7 +124,7 @@ class TestPushoverLimitsResource:
         assert resource.name == provider
 
     def test_pushover_limits_negative(self, resource):
-        with pytest.raises(BadArguments):
+        with pytest.raises(SchemaValidationError):
             resource(env_prefix="foo")
 
     @pytest.mark.online

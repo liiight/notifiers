@@ -6,8 +6,8 @@ from time import sleep
 import pytest
 import requests
 
-from notifiers.exceptions import BadArguments
 from notifiers.exceptions import ResourceError
+from notifiers.exceptions import SchemaValidationError
 from notifiers.models.response import ResponseStatus
 
 provider = "statuspage"
@@ -115,7 +115,7 @@ class TestStatuspageComponents:
         assert resource.required == ["api_key", "page_id"]
 
     def test_statuspage_components_negative(self, resource):
-        with pytest.raises(BadArguments):
+        with pytest.raises(SchemaValidationError):
             resource(env_prefix="foo")
 
         with pytest.raises(ResourceError, match="Could not authenticate"):

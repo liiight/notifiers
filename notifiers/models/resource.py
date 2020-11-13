@@ -10,7 +10,7 @@ from typing import TypeVar
 import requests
 from pydantic import ValidationError
 
-from notifiers.exceptions import BadArguments
+from notifiers.exceptions import SchemaValidationError
 from notifiers.models.response import Response
 from notifiers.models.response import ResponseStatus
 from notifiers.models.schema import ResourceSchema
@@ -51,7 +51,7 @@ class Resource(ABC):
         try:
             return self.schema_model.parse_obj(data)
         except ValidationError as e:
-            raise BadArguments(validation_error=(str(e)), orig_excp=e)
+            raise SchemaValidationError(validation_error=(str(e)), orig_excp=e) from e
 
     def create_response(
         self, data: dict = None, response: requests.Response = None, errors: list = None

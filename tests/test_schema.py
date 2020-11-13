@@ -1,6 +1,8 @@
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 
+from notifiers.exceptions import SchemaValidationError
 from notifiers.models.schema import ResourceSchema
 
 simple_type = st.one_of(st.text(), st.dates(), st.booleans())
@@ -33,3 +35,7 @@ class TestResourceSchema:
         data = {"required": "foo"}
         mock = mock_provider.validate_data(data)
         assert mock.to_dict() == {"option_with_default": "foo", "required": "foo"}
+
+    def test_validation_error(self, mock_provider):
+        with pytest.raises(SchemaValidationError):
+            mock_provider.validate_data({})

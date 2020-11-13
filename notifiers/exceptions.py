@@ -20,7 +20,7 @@ class NotifierException(Exception):
         return f"<NotificationError: {self.message}>"
 
 
-class BadArguments(NotifierException):
+class SchemaValidationError(NotifierException):
     """
     Raised on schema data validation issues
 

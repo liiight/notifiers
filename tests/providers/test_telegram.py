@@ -3,8 +3,8 @@ import json
 import pytest
 from retry import retry
 
-from notifiers.exceptions import BadArguments
 from notifiers.exceptions import NotificationError
+from notifiers.exceptions import SchemaValidationError
 
 provider = "telegram"
 
@@ -66,7 +66,7 @@ class TestTelegramResources:
         assert resource.required == ["token"]
 
     def test_telegram_updates_negative(self, resource):
-        with pytest.raises(BadArguments):
+        with pytest.raises(SchemaValidationError):
             resource(env_prefix="foo")
 
     @pytest.mark.online

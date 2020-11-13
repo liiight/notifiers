@@ -2,9 +2,9 @@ import pytest
 
 import notifiers
 from notifiers import notify
-from notifiers.exceptions import BadArguments
 from notifiers.exceptions import NoSuchNotifierError
 from notifiers.exceptions import NotificationError
+from notifiers.exceptions import SchemaValidationError
 from notifiers.models.resource import Provider
 from notifiers.models.response import Response
 from notifiers.models.response import ResponseStatus
@@ -61,7 +61,7 @@ class TestCore:
     )
     def test_schema_validation(self, data, mock_provider):
         """Test correct schema validations"""
-        with pytest.raises(BadArguments):
+        with pytest.raises(SchemaValidationError):
             mock_provider.notify(**data)
 
     def test_prepare_data(self, mock_provider):
@@ -167,7 +167,7 @@ class TestCore:
 
         assert resource.required == ["key"]
 
-        with pytest.raises(BadArguments):
+        with pytest.raises(SchemaValidationError):
             resource()
 
         rsp = resource(key="fpp")
