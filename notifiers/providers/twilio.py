@@ -93,7 +93,7 @@ class TwilioSchema(ResourceSchema):
         "that is enabled for the type of message you want to send. Phone numbers or short codes purchased "
         "from Twilio also work here. You cannot, for example, spoof messages from a private cell phone "
         "number. If you are using messaging_service_sid, this parameter must be empty",
-        alias="from",
+        alias="From",
     )
     messaging_service_sid: str = Field(
         None,
@@ -103,7 +103,7 @@ class TwilioSchema(ResourceSchema):
         "Twilio will use your enabled Copilot Features to select the from phone number for delivery",
     )
     message: constr(min_length=1, max_length=1600) = Field(
-        None, description="The text of the message you want to send", alias="body"
+        None, description="The text of the message you want to send", alias="Body"
     )
     media_url: ResourceSchema.one_or_more_of(HttpUrl) = Field(
         None,

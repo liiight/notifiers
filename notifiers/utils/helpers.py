@@ -33,11 +33,12 @@ def dict_from_environs(prefix: str, name: str, args: Sequence[str]) -> dict:
     log.debug(
         "starting to collect environs using prefix: '%s' and name '%s'", prefix, name
     )
-    prefix = f'{prefix.rstrip("_")}_'.upper()
-    name = f'{name.rstrip("_")}_'.upper()
+    prefix = f'{prefix.rstrip("_")}_'
+    name = f'{name.rstrip("_")}_'
     data = {}
-    for arg in args:
-        env_key = f"{prefix}{name}{arg}".upper()
+
+    env_to_arg_dict = {f"{prefix}{name}{arg}".upper(): arg for arg in args}
+    for env_key, arg in env_to_arg_dict.items():
         log.debug("Looking for environment variable %s", env_key)
         value = os.environ.get(env_key)
         if value:

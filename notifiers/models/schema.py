@@ -15,6 +15,15 @@ class ResourceSchema(BaseModel):
 
     _values_to_exclude: Tuple[str, ...] = ()
 
+    @property
+    def field_names(self) -> List[str]:
+        names = []
+        for field, model in self.__fields__.items():
+            names.append(field)
+            if model.alias:
+                names.append(model.alias)
+        return names
+
     @staticmethod
     def to_list(value: Union[Any, List[Any]]) -> List[Any]:
         """Helper method to make sure a return value is a list"""

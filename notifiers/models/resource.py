@@ -1,5 +1,6 @@
 from abc import ABC
 from abc import abstractmethod
+from itertools import chain
 from typing import Dict
 from typing import List
 from typing import Optional
@@ -26,20 +27,25 @@ class Resource(ABC):
     name: str
     schema_model: T_ResourceSchema
 
-    @property
-    def schema(self) -> dict:
+    def schema(self, by_alias: bool = True) -> dict:
         """Resource's JSON schema as a dict"""
-        return self.schema_model.schema()
+        return self.schema_model.schema(by_alias=by_alias)
+
+    def arguments(self, by_alias: bool = True) -> dict:
+        """Resource's arguments"""
+        return self.schema(by_alias=by_alias)["properties"]
 
     @property
-    def arguments(self) -> dict:
-        """Resource's arguments"""
-        return self.schema["properties"]
+    def all_fields(self) -> List[str]:
+        """All schema field, including by alias and by attribute name"""
+        return list(
+            chain(self.arguments().keys(), self.arguments(by_alias=False).keys())
+        )
 
     @property
     def required(self) -> Optional[List[str]]:
         """Resource's required arguments. Note that additional validation may not be represented here"""
-        return self.schema.get("required")
+        return self.schema().get("required")
 
     def validate_data(self, data: dict) -> T_ResourceSchema:
         try:
@@ -75,7 +81,7 @@ class Resource(ABC):
         :param prefix: The environ prefix to use. If not supplied, uses the default
         :return: A dict of arguments and value retrieved from environs
         """
-        return dict_from_environs(prefix, self.name, list(self.arguments.keys()))
+        return dict_from_environs(prefix, self.name, self.all_fields)
 
     def _process_data(self, data: dict) -> T_ResourceSchema:
         """
