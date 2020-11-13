@@ -33,11 +33,17 @@ def dict_from_environs(prefix: str, name: str, args: Sequence[str]) -> dict:
     log.debug(
         "starting to collect environs using prefix: '%s' and name '%s'", prefix, name
     )
+    # Make sure prefix and name end with '_'
     prefix = f'{prefix.rstrip("_")}_'
     name = f'{name.rstrip("_")}_'
+
     data = {}
 
-    env_to_arg_dict = {f"{prefix}{name}{arg}".upper(): arg for arg in args}
+    # In order to dedupe fields that are equal to their alias, build a dict matching desired environment variable to arg
+    env_to_arg_dict = {}
+    for arg in args:
+        env_to_arg_dict.setdefault(f"{prefix}{name}{arg}".upper(), arg)
+
     for env_key, arg in env_to_arg_dict.items():
         log.debug("Looking for environment variable %s", env_key)
         value = os.environ.get(env_key)
