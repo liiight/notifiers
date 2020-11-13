@@ -44,10 +44,12 @@ def dict_from_environs(prefix: str, name: str, args: list) -> dict:
     """
     # todo consider changing via the environs lib
     log.debug("starting to collect environs using prefix: '%s'", prefix)
+    prefix = f'{prefix.rstrip("_")}_'.upper()
+    name = f'{name.rstrip("_")}_'.upper()
     return {
-        arg: os.environ.get(f"{prefix}{name}_{arg}".upper())
+        arg: os.environ.get(f"{prefix}{name}{arg}".upper())
         for arg in args
-        if os.environ.get(f"{prefix}{name}_{arg}".upper())
+        if os.environ.get(f"{prefix}{name}{arg}".upper())
     }
 
 

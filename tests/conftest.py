@@ -20,7 +20,7 @@ from notifiers.models.schema import ResourceSchema
 from notifiers.providers import _all_providers
 from notifiers.utils.helpers import text_to_bool
 
-log = logging.getLogger(__name__)
+log = logging.getLogger("notifiers")
 
 
 class MockProxy:
