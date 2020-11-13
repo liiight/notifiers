@@ -91,7 +91,7 @@ class TestStatuspageComponents:
     resource = "components"
 
     def test_statuspage_components_attribs(self, resource):
-        assert resource.schema == {
+        assert resource.schema() == {
             "additionalProperties": False,
             "description": "The base class for Schemas",
             "properties": {

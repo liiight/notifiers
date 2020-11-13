@@ -76,7 +76,7 @@ class TestPushoverSoundsResource:
     resource = "sounds"
 
     def test_pushover_sounds_attribs(self, resource):
-        assert resource.schema == {
+        assert resource.schema() == {
             "additionalProperties": False,
             "description": "Pushover base schema",
             "properties": {
@@ -106,7 +106,7 @@ class TestPushoverLimitsResource:
     resource = "limits"
 
     def test_pushover_limits_attribs(self, resource):
-        assert resource.schema == {
+        assert resource.schema() == {
             "additionalProperties": False,
             "description": "Pushover base schema",
             "properties": {

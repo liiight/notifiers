@@ -22,7 +22,7 @@ class TestCore:
             "name": "mock_provider",
             "site_url": "https://www.mock.com",
         }
-        assert mock_provider.arguments == {
+        assert mock_provider.arguments() == {
             "not_required": {
                 "title": "Not Required",
                 "description": "example for not required arg",
@@ -114,7 +114,7 @@ class TestCore:
 
     def test_environs(self, mock_provider, monkeypatch):
         """Test environs usage"""
-        prefix = f"mock_"
+        prefix = "mock_"
         monkeypatch.setenv(f"{prefix}{mock_provider.name}_required".upper(), "foo")
         rsp = mock_provider.notify(env_prefix=prefix)
         assert rsp.status is ResponseStatus.SUCCESS
@@ -124,7 +124,7 @@ class TestCore:
         self, mock_provider, monkeypatch
     ):
         """Verify that given data overrides environ"""
-        prefix = f"mock_"
+        prefix = "mock_"
         monkeypatch.setenv(f"{prefix}{mock_provider.name}_required".upper(), "foo")
         rsp = mock_provider.notify(required="bar", env_prefix=prefix)
         assert rsp.status is ResponseStatus.SUCCESS
@@ -145,7 +145,7 @@ class TestCore:
         )
         assert resource.resource_name == "mock_resource"
         assert resource.name == mock_provider.name
-        assert resource.schema == {
+        assert resource.schema() == {
             "title": "MockResourceSchema",
             "description": "The base class for Schemas",
             "type": "object",

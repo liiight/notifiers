@@ -28,7 +28,7 @@ class TestJoinDevices:
     resource = "devices"
 
     def test_join_devices_attribs(self, resource):
-        assert resource.schema == {
+        assert resource.schema() == {
             "additionalProperties": False,
             "description": "The base class for Schemas",
             "properties": {
@@ -66,7 +66,7 @@ class TestJoinCLI:
     @pytest.mark.skip("tests fail due to no device connected")
     @pytest.mark.online
     def test_join_updates_positive(self, cli_runner):
-        cmd = f"join devices".split()
+        cmd = "join devices".split()
         result = cli_runner(cmd)
         assert not result.exit_code
         replies = ["You have no devices associated with this apikey", "Device name: "]

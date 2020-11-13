@@ -48,7 +48,7 @@ class TestTelegramResources:
     resource = "updates"
 
     def test_telegram_updates_attribs(self, resource):
-        assert resource.schema == {
+        assert resource.schema() == {
             "additionalProperties": False,
             "description": "The base class for Schemas",
             "properties": {
@@ -87,7 +87,7 @@ class TestTelegramCLI:
     @pytest.mark.online
     @retry(AssertionError, tries=3, delay=10)
     def test_telegram_updates_positive(self, cli_runner):
-        cmd = f"telegram updates".split()
+        cmd = "telegram updates".split()
         result = cli_runner(cmd)
         assert not result.exit_code
         reply = json.loads(result.output)
