@@ -23,7 +23,7 @@ jobs:
         pip install -e .
         pip install -r dev-requirements.txt
     - name: Test with pytest
-      run: pytest --cov=./
+      run: pytest --cov=./ --cov-report=xml
       env:
         NOTIFIERS_EMAIL_PASSWORD: ${{secrets.NOTIFIERS_EMAIL_PASSWORD}}
         NOTIFIERS_EMAIL_TO: ${{secrets.NOTIFIERS_EMAIL_TO}}
@@ -59,6 +59,6 @@ jobs:
         NOTIFIERS_ZULIP_TO: ${{secrets.NOTIFIERS_ZULIP_TO}}
     - name: Upload coverage to Codecov
       if: success()
-      uses: codecov/codecov-action@v1.0.2
+      uses: codecov/codecov-action@v1.0.14
       with:
-        token: ${{secrets.CODECOV_TOKEN}}
+        file: ./coverage.xml
