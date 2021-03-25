@@ -30,7 +30,7 @@ packaging==17.1           # via pytest, sphinx
 pluggy==0.12.0            # via pytest
 pre-commit==2.0.1
 py==1.5.4                 # via pytest, retry
-pygments==2.2.0           # via sphinx
+pygments==2.7.4           # via sphinx
 pyparsing==2.2.0          # via packaging
 pytest-cov==2.7.1
 pytest==5.0.1
