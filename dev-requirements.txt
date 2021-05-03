@@ -8,7 +8,7 @@ alabaster==0.7.11         # via sphinx
 aspy.yaml==1.1.1          # via pre-commit
 atomicwrites==1.1.5       # via pytest
 attrs==19.3.0             # via hypothesis, pytest
-babel==2.6.0              # via sphinx
+babel==2.9.1              # via sphinx
 bumpversion==0.5.3
 certifi==2018.4.16        # via requests
 cfgv==2.0.0               # via pre-commit
