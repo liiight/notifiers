@@ -66,3 +66,8 @@ API documentation for the different providers.
    :members:
    :undoc-members:
 
+.. automodule:: notifiers.providers.victorops
+   :members:
+   :undoc-members:
+
+

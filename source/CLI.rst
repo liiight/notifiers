@@ -34,6 +34,7 @@ To view the main help just enter ``notifiers`` or ``notifiers --help``:
       slack       Options for 'slack'
       telegram    Options for 'telegram'
       zulip       Options for 'zulip'
+      victorops       Options for 'victorops'
 
 
 To view all providers use the ``providers`` command like so:
@@ -41,7 +42,7 @@ To view all providers use the ``providers`` command like so:
 .. code-block:: console
 
      $ notifiers providers
-     pushover, simplepush, slack, email, gmail, telegram, gitter, pushbullet, join, hipchat, zulip
+     pushover, simplepush, slack, email, gmail, telegram, gitter, pushbullet, join, hipchat, zulip, victorops
 
 This will return all available provider names
 
