@@ -8,6 +8,7 @@ from . import pagerduty
 from . import popcornnotify
 from . import pushbullet
 from . import pushover
+from . import victorops
 from . import simplepush
 from . import slack
 from . import statuspage
@@ -32,4 +33,5 @@ _all_providers = {
     "mailgun": mailgun.MailGun,
     "popcornnotify": popcornnotify.PopcornNotify,
     "statuspage": statuspage.Statuspage,
+    "victorops": victorops.VictorOps,
 }
