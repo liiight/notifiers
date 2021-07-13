@@ -56,6 +56,10 @@ Full schema:
 
       additional_keys:
           type: object
+          format:
+              key: value
+              key: value
+              key: value
           title: any additional keys that ca be passed in the body
 
     required:
