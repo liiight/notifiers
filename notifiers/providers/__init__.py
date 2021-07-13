@@ -8,12 +8,12 @@ from . import pagerduty
 from . import popcornnotify
 from . import pushbullet
 from . import pushover
-from . import victorops
 from . import simplepush
 from . import slack
 from . import statuspage
 from . import telegram
 from . import twilio
+from . import victorops
 from . import zulip
 
 _all_providers = {

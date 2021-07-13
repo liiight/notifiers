@@ -10,7 +10,15 @@ class VictorOps(Provider):
     site_url = "https://portal.victorops.com/dash/{ORGANIZATION_ID}#/advanced/rest"
     name = "victorops"
 
-    _required = {"required": ["rest_url", "message_type", "entity_id", "entity_display_name", "state_message"]}
+    _required = {
+        "required": [
+            "rest_url",
+            "message_type",
+            "entity_id",
+            "entity_display_name",
+            "state_message",
+        ]
+    }
     _schema = {
         "type": "object",
         "properties": {
@@ -22,10 +30,10 @@ class VictorOps(Provider):
             "message_type": {
                 "type": "string",
                 "title": "severity level can be: "
-                         "- CRITICAL or WARNING: Triggers an incident "
-                         "- ACKNOWLEDGEMENT: Acks an incident "
-                         "- INFO: Creates a timeline event but doesn't trigger an incident "
-                         "- RECOVERY: Resolves an incident",
+                "- CRITICAL or WARNING: Triggers an incident "
+                "- ACKNOWLEDGEMENT: Acks an incident "
+                "- INFO: Creates a timeline event but doesn't trigger an incident "
+                "- RECOVERY: Resolves an incident",
             },
             "entity_id": {
                 "type": "string",
@@ -43,12 +51,12 @@ class VictorOps(Provider):
                 "type": "object",
                 "format": "{'annotation_type': 'annotation'}",
                 "title": "annotations can be of three types vo_annotate.u.Runbook, vo_annotate.s.Note, "
-                         "vo_annotate.i.image.",
+                "vo_annotate.i.image.",
             },
             "additional_keys": {
                 "type": "object",
                 "title": "any additional keys that ca be passed in the body",
-            }
+            },
         },
         "additionalProperties": False,
     }
