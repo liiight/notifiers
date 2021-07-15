@@ -31,13 +31,13 @@ class VictorOps(Provider):
                 "type": "string",
                 "title": "severity level can be: "
                 "- CRITICAL or WARNING: Triggers an incident "
-                "- ACKNOWLEDGEMENT: Acks an incident "
+                "- ACKNOWLEDGEMENT: sends Acknowledgment to an incident "
                 "- INFO: Creates a timeline event but doesn't trigger an incident "
                 "- RECOVERY: Resolves an incident",
             },
             "entity_id": {
                 "type": "string",
-                "title": "Unique id for the incident for aggregation ,acking, or resolving.",
+                "title": "Unique id for the incident for aggregation ,Acknowledging, or resolving.",
             },
             "entity_display_name": {
                 "type": "string",
