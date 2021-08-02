@@ -16,7 +16,7 @@ class VictorOps(Provider):
             "message_type",
             "entity_id",
             "entity_display_name",
-            "state_message",
+            "message",
         ]
     }
     _schema = {
@@ -34,6 +34,7 @@ class VictorOps(Provider):
                 "- ACKNOWLEDGEMENT: sends Acknowledgment to an incident "
                 "- INFO: Creates a timeline event but doesn't trigger an incident "
                 "- RECOVERY: Resolves an incident",
+                "enum": ["CRITICAL", "WARNING", "ACKNOWLEDGEMENT", "INFO", "RECOVERY"],
             },
             "entity_id": {
                 "type": "string",
@@ -43,7 +44,7 @@ class VictorOps(Provider):
                 "type": "string",
                 "title": "Display Name in the UI and Notifications.",
             },
-            "state_message": {
+            "message": {
                 "type": "string",
                 "title": "This is the description that will be posted in the incident.",
             },
@@ -62,15 +63,13 @@ class VictorOps(Provider):
     }
 
     def _prepare_data(self, data: dict) -> dict:
-        if data.get("annotations"):
-            annotations = data.pop("annotations")
-            for annotation in annotations:
-                data[annotation] = annotations[annotation]
+        annotations = data.pop("annotations", {})
+        for annotation in annotations:
+            data[annotation] = annotations[annotation]
 
-            if data.get("additional_keys"):
-                additional_keys = data.pop("additional_keys")
-                for additional_key in additional_keys:
-                    data[additional_key] = additional_keys[additional_key]
+        additional_keys = data.pop("additional_keys", {})
+        for additional_key in additional_keys:
+            data[additional_key] = additional_keys[additional_key]
         return data
 
     def _send_notification(self, data: dict) -> Response:

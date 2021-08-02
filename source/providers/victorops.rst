@@ -9,11 +9,11 @@ Minimal example:
 
     >>> from notifiers import get_notifier
     >>> victorops = get_notifier('victorops')
-    >>> victorops.notify(rest_url='https://alert.victorops.com/integrations/generic/20131114/alert/f7dc2eeb-26dd-43b8-9ed2-0f08879f4ec2/cost_alerts',
+    >>> victorops.notify(rest_url='https://alert.victorops.com/integrations/generic/20104876/alert/f7dc2eeb-ms9k-43b8-kd89-0f00000f4ec2/$routing_key',
                          message_type='CRITICAL',
                          entity_id='foo testing',
                          entity_display_name="bla test title text",
-                         state_message="bla message description")
+                         message="bla message description")
 
 Full schema:
 
@@ -42,7 +42,7 @@ Full schema:
           type: string
           title: Display Name in the UI and Notifications.
 
-      state_message:
+      message:
           type: string
           title: This is the description that will be posted in the incident.
 
@@ -67,6 +67,6 @@ Full schema:
       - message_type
       - entity_id
       - entity_display_name
-      - state_message
+      - message
     type: object
 
