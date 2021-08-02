@@ -19,7 +19,7 @@ class TestVicrotops:
                 "entity_display_name": "messege test header",
                 "message": "text in body",
                 "annotations": {
-                    "vo_annotate.i.Graph": "http://img.picturequotes.com/2/708/707644/funny-success-quote-1-picture-quote-1.jpg",
+                    "vo_annotate.i.Graph": "https://shorturl.at/dAQ28",
                     "vo_annotate.s.Note": "'You can't have everything. Where would you put it?' Steven Wright",
                     "vo_annotate.u.Runbook": "https://giphy.com/gifs/win-xNBcChLQt7s9a/fullscreen"},
                 "additional_keys": {
