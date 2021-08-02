@@ -21,12 +21,14 @@ class TestVicrotops:
                 "annotations": {
                     "vo_annotate.i.Graph": "https://shorturl.at/dAQ28",
                     "vo_annotate.s.Note": "'You can't have everything. Where would you put it?' Steven Wright",
-                    "vo_annotate.u.Runbook": "https://giphy.com/gifs/win-xNBcChLQt7s9a/fullscreen"},
+                    "vo_annotate.u.Runbook": "https://giphy.com/gifs/win-xNBcChLQt7s9a/fullscreen"
+                    },
                 "additional_keys": {
                     "foo": "custom fields",
-                    "monitoring_tool": "official victorops fields"}
+                    "monitoring_tool": "official victorops fields"
+                    }
                 }
         rsp = provider.notify(**data)
         assert rsp.ok
-        assert rsp.status == 'Success'
+        assert rsp.status == "Success"
         assert rsp.errors is None
