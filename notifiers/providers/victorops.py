@@ -56,7 +56,7 @@ class VictorOps(Provider):
             },
             "additional_keys": {
                 "type": "object",
-                "title": "any additional keys that ca be passed in the body",
+                "title": "any additional keys that can be passed in the body",
             },
         },
         "additionalProperties": False,
