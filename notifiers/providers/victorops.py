@@ -80,7 +80,7 @@ class VictorOps(Provider):
             data[annotation] = value
 
         additional_keys = data.pop("additional_keys", {})
-        for additional_key, value in additional_keys:
+        for additional_key, value in additional_keys.items():
             data[additional_key] = value
         return data
 
