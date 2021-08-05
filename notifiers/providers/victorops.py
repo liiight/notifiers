@@ -34,7 +34,14 @@ class VictorOps(Provider):
                 "- acknowledgement: sends Acknowledgment to an incident "
                 "- info: Creates a timeline event but doesn't trigger an incident "
                 "- recovery or ok: Resolves an incident",
-                "enum": ["critical", "warning", "acknowledgement", "info", "recovery", "ok"],
+                "enum": [
+                    "critical",
+                    "warning",
+                    "acknowledgement",
+                    "info",
+                    "recovery",
+                    "ok",
+                ],
             },
             "entity_id": {
                 "type": "string",
