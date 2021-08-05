@@ -30,11 +30,11 @@ class VictorOps(Provider):
             "message_type": {
                 "type": "string",
                 "title": "severity level can be: "
-                "- CRITICAL or WARNING: Triggers an incident "
-                "- ACKNOWLEDGEMENT: sends Acknowledgment to an incident "
-                "- INFO: Creates a timeline event but doesn't trigger an incident "
-                "- RECOVERY: Resolves an incident",
-                "enum": ["CRITICAL", "WARNING", "ACKNOWLEDGEMENT", "INFO", "RECOVERY"],
+                "- critical or warning: Triggers an incident "
+                "- acknowledgement: sends Acknowledgment to an incident "
+                "- info: Creates a timeline event but doesn't trigger an incident "
+                "- recovery or ok: Resolves an incident",
+                "enum": ["critical", "warning", "acknowledgement", "info", "recovery", "ok"],
             },
             "entity_id": {
                 "type": "string",
@@ -50,7 +50,12 @@ class VictorOps(Provider):
             },
             "annotations": {
                 "type": "object",
-                "format": "{'annotation_type': 'annotation'}",
+                "patternProperties": {
+                    "vo_annotate.u.": {"type": "string"},
+                    "vo_annotate.s.": {"type": "string"},
+                    "vo_annotate.i.": {"type": "string"},
+                },
+                "minProperties": 1,
                 "title": "annotations can be of three types vo_annotate.u.Runbook, vo_annotate.s.Note, "
                 "vo_annotate.i.image.",
             },
@@ -64,12 +69,12 @@ class VictorOps(Provider):
 
     def _prepare_data(self, data: dict) -> dict:
         annotations = data.pop("annotations", {})
-        for annotation in annotations:
-            data[annotation] = annotations[annotation]
+        for annotation, value in annotations.items():
+            data[annotation] = value
 
         additional_keys = data.pop("additional_keys", {})
-        for additional_key in additional_keys:
-            data[additional_key] = additional_keys[additional_key]
+        for additional_key in value:
+            data[additional_key] = value
         return data
 
     def _send_notification(self, data: dict) -> Response:

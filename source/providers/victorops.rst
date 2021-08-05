@@ -29,10 +29,10 @@ Full schema:
       message_type:
           type: string
           title: severity level can be:
-                   - CRITICAL or WARNING: Triggers an incident
-                   - ACKNOWLEDGEMENT: Acks an incident
-                   - INFO: Creates a timeline event but doesn't trigger an incident
-                   - RECOVERY: Resolves an incident
+                   - critical or warning: Triggers an incident
+                   - acknowledgement: Acks an incident
+                   - info: Creates a timeline event but doesn't trigger an incident
+                   - recovery or ok: Resolves an incident
 
       entity_id:
           type: string
