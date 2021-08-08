@@ -1,8 +1,9 @@
+import re
+
 from ..core import Provider
 from ..core import Response
-from ..utils import requests
 from ..exceptions import SchemaError
-import re
+from ..utils import requests
 
 
 class VictorOps(Provider):
@@ -82,9 +83,11 @@ class VictorOps(Provider):
             if re.match(r"vo_annotate.[usi].", annotation):
                 data[annotation] = value
             else:
-                error_message = "Validates provider schema for syntax issues. " \
-                                "annotations must be one of the following " \
-                                "vo_annotate.u.{custom_name}, vo_annotate.s.{custom_name}, vo_annotate.i.{custom_name}"
+                error_message = (
+                    "Validates provider schema for syntax issues. "
+                    "annotations must be one of the following "
+                    "vo_annotate.u.{custom_name}, vo_annotate.s.{custom_name}, vo_annotate.i.{custom_name}"
+                )
                 raise SchemaError(
                     schema_error=error_message, provider=self.name, data=self.schema
                 )
