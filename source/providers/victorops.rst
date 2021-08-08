@@ -49,10 +49,10 @@ Full schema:
       annotations:
           type: object
           format:
-              vo_annotate.s.Note: annotation
-              vo_annotate.u.Runbook: annotation
-              vo_annotate.i.Graph: annotation
-          title: annotations can be of three types vo_annotate.u.Runbook vo_annotate.s.Note vo_annotate.i.image.
+              vo_annotate.s.{custom_name}: annotation
+              vo_annotate.u.{custom_name}: annotation
+              vo_annotate.i.{custom_name}: annotation
+          title: annotations can be of three types vo_annotate.u.{custom_name} vo_annotate.s.{custom_name} vo_annotate.i.{custom_name}.
 
       additional_keys:
           type: object

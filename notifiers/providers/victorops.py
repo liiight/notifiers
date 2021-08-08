@@ -1,6 +1,8 @@
 from ..core import Provider
 from ..core import Response
 from ..utils import requests
+from ..exceptions import SchemaError
+import re
 
 
 class VictorOps(Provider):
@@ -58,13 +60,13 @@ class VictorOps(Provider):
             "annotations": {
                 "type": "object",
                 "patternProperties": {
-                    "vo_annotate.u.": {"type": "string"},
-                    "vo_annotate.s.": {"type": "string"},
-                    "vo_annotate.i.": {"type": "string"},
+                    "^vo_annotate.u.": {"type": "string"},
+                    "^vo_annotate.s.": {"type": "string"},
+                    "^vo_annotate.i.": {"type": "string"},
                 },
                 "minProperties": 1,
-                "title": "annotations can be of three types vo_annotate.u.Runbook, vo_annotate.s.Note, "
-                "vo_annotate.i.image.",
+                "title": "annotations can be of three types vo_annotate.u.{custom_name}, vo_annotate.s.{custom_name}, "
+                "vo_annotate.i.{custom_name} .",
             },
             "additional_keys": {
                 "type": "object",
@@ -77,7 +79,15 @@ class VictorOps(Provider):
     def _prepare_data(self, data: dict) -> dict:
         annotations = data.pop("annotations", {})
         for annotation, value in annotations.items():
-            data[annotation] = value
+            if re.match(r"vo_annotate.[usi].", annotation):
+                data[annotation] = value
+            else:
+                error_message = "Validates provider schema for syntax issues. " \
+                                "annotations must be one of the following " \
+                                "vo_annotate.u.{custom_name}, vo_annotate.s.{custom_name}, vo_annotate.i.{custom_name}"
+                raise SchemaError(
+                    schema_error=error_message, provider=self.name, data=self.schema
+                )
 
         additional_keys = data.pop("additional_keys", {})
         for additional_key, value in additional_keys.items():
