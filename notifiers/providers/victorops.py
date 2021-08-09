@@ -67,6 +67,7 @@ class VictorOps(Provider):
                 "minProperties": 1,
                 "title": "annotations can be of three types vo_annotate.u.{custom_name}, vo_annotate.s.{custom_name}, "
                 "vo_annotate.i.{custom_name} .",
+                "additionalProperties": False,
             },
             "additional_keys": {
                 "type": "object",
@@ -79,15 +80,7 @@ class VictorOps(Provider):
     def _prepare_data(self, data: dict) -> dict:
         annotations = data.pop("annotations", {})
         for annotation, value in annotations.items():
-            if re.match(r"vo_annotate.[usi].", annotation):
-                data[annotation] = value
-            else:
-                error_message = "Validates provider schema for syntax issues. " \
-                                "annotations must be one of the following " \
-                                "vo_annotate.u.{custom_name}, vo_annotate.s.{custom_name}, vo_annotate.i.{custom_name}"
-                raise SchemaError(
-                    schema_error=error_message, provider=self.name, data=self.schema
-                )
+            data[annotation] = value
 
         additional_keys = data.pop("additional_keys", {})
         for additional_key, value in additional_keys.items():
