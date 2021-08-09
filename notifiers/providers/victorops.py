@@ -1,8 +1,8 @@
+import re
+
 from ..core import Provider
 from ..core import Response
 from ..utils import requests
-from ..exceptions import SchemaError
-import re
 
 
 class VictorOps(Provider):
