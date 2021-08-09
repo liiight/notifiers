@@ -1,5 +1,3 @@
-import re
-
 from ..core import Provider
 from ..core import Response
 from ..utils import requests
