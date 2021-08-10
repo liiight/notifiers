@@ -63,8 +63,10 @@ class VictorOps(Provider):
                     "^vo_annotate.i.": {"type": "string"},
                 },
                 "minProperties": 1,
-                "title": "annotations can be of three types vo_annotate.u.{custom_name}, vo_annotate.s.{custom_name}, "
-                "vo_annotate.i.{custom_name} .",
+                "title": "annotations can be of three types: "
+                         "vo_annotate.u.{custom_name}, "
+                         "vo_annotate.s.{custom_name}, "
+                         "vo_annotate.i.{custom_name} .",
                 "additionalProperties": False,
             },
             "additional_keys": {
