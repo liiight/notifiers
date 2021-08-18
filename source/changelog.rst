@@ -7,7 +7,7 @@ Changelog
 ------------
 
 - Adds a default timeout of (5, 20) seconds for all HTTP requests. (`#388 <https://github.com/liiight/notifiers/pull/388>`_)
-- Removed HipChat ()
+- Removed HipChat (`#404 <https://github.com/liiight/notifiers/pull/404>`_)
 
 1.2.0
 -----
