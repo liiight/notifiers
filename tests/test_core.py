@@ -129,7 +129,7 @@ class TestCore:
 
     def test_environs(self, mock_provider, monkeypatch):
         """Test environs usage"""
-        prefix = f"mock_"
+        prefix = "mock_"
         monkeypatch.setenv(f"{prefix}{mock_provider.name}_required".upper(), "foo")
         rsp = mock_provider.notify(env_prefix=prefix)
         assert rsp.status == SUCCESS_STATUS
@@ -139,7 +139,7 @@ class TestCore:
         self, mock_provider, monkeypatch
     ):
         """Verify that given data overrides environ"""
-        prefix = f"mock_"
+        prefix = "mock_"
         monkeypatch.setenv(f"{prefix}{mock_provider.name}_required".upper(), "foo")
         rsp = mock_provider.notify(required="bar", env_prefix=prefix)
         assert rsp.status == SUCCESS_STATUS
