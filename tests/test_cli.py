@@ -93,7 +93,7 @@ class TestCLI:
         ],
     )
     def test_environ(self, prefix, command, monkeypatch, cli_runner):
-        """Test provider environ usage """
+        """Test provider environ usage"""
         prefix = prefix if prefix else "NOTIFIERS_"
         monkeypatch.setenv(f"{prefix}MOCK_PROVIDER_REQUIRED", "foo")
         monkeypatch.setenv(f"{prefix}MOCK_PROVIDER_MESSAGE", "foo")
