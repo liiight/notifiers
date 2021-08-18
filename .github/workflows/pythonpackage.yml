@@ -20,7 +20,7 @@ jobs:
     - name: Install dependencies
       run: |
         pip install -e .
-        pip install pytest codecov pytest-cov
+        pip install pytest codecov pytest-cov retry
     - name: Test with pytest
       run: pytest --cov=./
       env:
