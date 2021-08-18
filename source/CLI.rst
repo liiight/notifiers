@@ -25,7 +25,6 @@ To view the main help just enter ``notifiers`` or ``notifiers --help``:
       email       Options for 'email'
       gitter      Options for 'gitter'
       gmail       Options for 'gmail'
-      hipchat     Options for 'hipchat'
       join        Options for 'join'
       providers   Shows all available providers
       pushbullet  Options for 'pushbullet'
