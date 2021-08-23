@@ -1,5 +1,3 @@
-import os
-
 import pytest
 
 provider = "victorops"
@@ -13,9 +11,7 @@ class TestVicrotops:
 
     @pytest.mark.online
     def test_all_options(self, provider):
-        VICTOROPS_REST_URL = os.getenv("VICTOROPS_REST_URL")
         data = {
-            "rest_url": VICTOROPS_REST_URL,
             "message_type": "info",
             "entity_id": "BA tesing",
             "entity_display_name": "message test header",

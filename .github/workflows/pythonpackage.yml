@@ -55,6 +55,7 @@ jobs:
         NOTIFIERS_ZULIP_API_KEY: ${{secrets.NOTIFIERS_ZULIP_API_KEY}}
         NOTIFIERS_ZULIP_EMAIL: ${{secrets.NOTIFIERS_ZULIP_EMAIL}}
         NOTIFIERS_ZULIP_TO: ${{secrets.NOTIFIERS_ZULIP_TO}}
+        NOTIFIERS_VICTOROPS_REST_URL: ${{secrets.NOTIFIERS_VICTOROPS_REST_URL}}
     - name: Upload coverage to Codecov
       if: success()
       uses: codecov/codecov-action@v1.0.2
