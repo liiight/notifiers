@@ -12,6 +12,7 @@ from . import slack
 from . import statuspage
 from . import telegram
 from . import twilio
+from . import victorops
 from . import zulip
 
 _all_providers = {
@@ -30,4 +31,5 @@ _all_providers = {
     "mailgun": mailgun.MailGun,
     "popcornnotify": popcornnotify.PopcornNotify,
     "statuspage": statuspage.Statuspage,
+    "victorops": victorops.VictorOps,
 }
