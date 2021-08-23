@@ -4,12 +4,11 @@ on: [push]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     strategy:
-      max-parallel: 2
+      max-parallel: 1
       matrix:
-        python-version: [3.6, 3.7]
+        python-version: [3.6, 3.7, 3.8, 3.9]
 
     steps:
     - uses: actions/checkout@v1
@@ -19,10 +18,8 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        pip install --upgrade pip setuptools
         pip install -e .
-        pip install -r requirements.txt
-        pip install -r dev-requirements.txt
+        pip install pytest codecov pytest-cov retry hypothesis
     - name: Test with pytest
       run: pytest --cov=./
       env:

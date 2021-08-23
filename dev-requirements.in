@@ -1,3 +1,4 @@
+-c requirements.txt
 pytest
 codecov
 pytest-cov
