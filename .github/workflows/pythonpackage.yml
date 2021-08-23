@@ -1,10 +1,10 @@
 name: Tests and coverage
 
 on: [push]
-concurrency: default_group
+
 jobs:
   build:
-
+    concurrency: default_group
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 2
