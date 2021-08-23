@@ -4,10 +4,9 @@ on: [push]
 
 jobs:
   build:
-    concurrency: default_group
     runs-on: ubuntu-latest
     strategy:
-      max-parallel: 2
+      max-parallel: 1
       matrix:
         python-version: [3.6, 3.7, 3.8, 3.9]
 
