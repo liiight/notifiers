@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.4.0
+    rev: v4.0.1
     hooks:
       - id: check-yaml
       - id: check-json
@@ -8,12 +8,12 @@ repos:
         args: ['--autofix']
         additional_dependencies: ['flake8-mutable', 'flake8-comprehensions']
   - repo: https://github.com/psf/black
-    rev: 21.7b0
+    rev: 21.9b0
     hooks:
       - id: black
         language_version: python3.6
   - repo: https://github.com/asottile/reorder_python_imports
-    rev: v2.5.0
+    rev: v2.6.0
     hooks:
       - id: reorder-python-imports
   - repo: https://github.com/pycqa/flake8
