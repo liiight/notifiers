@@ -29,7 +29,7 @@ charset-normalizer==2.0.4
     # via
     #   -c requirements.txt
     #   requests
-codecov==2.0.15
+codecov==2.0.17
     # via -r dev-requirements.in
 coverage==4.5.1
     # via
@@ -57,7 +57,7 @@ importlib-metadata==4.6.4
     #   pytest
 importlib-resources==5.2.2
     # via pre-commit
-jinja2==2.10.1
+jinja2==2.11.3
     # via sphinx
 markupsafe==1.0
     # via jinja2
@@ -73,7 +73,7 @@ pluggy==0.12.0
     # via pytest
 pre-commit==2.0.1
     # via -r dev-requirements.in
-py==1.5.4
+py==1.10.0
     # via
     #   pytest
     #   retry
@@ -89,7 +89,7 @@ pytest-cov==2.7.1
     # via -r dev-requirements.in
 pytz==2018.5
     # via babel
-pyyaml==5.1
+pyyaml==5.4
     # via
     #   aspy.yaml
     #   pre-commit
@@ -110,7 +110,7 @@ snowballstemmer==1.2.1
     # via sphinx
 sortedcontainers==2.1.0
     # via hypothesis
-sphinx==2.2.1
+sphinx==3.0.4
     # via
     #   -r dev-requirements.in
     #   sphinx-autodoc-annotation
