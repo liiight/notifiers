@@ -11,7 +11,7 @@ This is a private use case of the :class:`~notifiers.providers.email.SMTP` provi
     >>> icloud.defaults
     {'subject': "New email from 'notifiers'!", 'from': '<USERNAME@HOST>', 'host': 'smtp.mail.me.com', 'port': 587, 'tls': True, 'ssl': False, 'html': True}
 
-    >>> icloud.notify(to='email@addrees.foo', message='hi!', username = 'username@icloud.com', password = 'my-icloud-app-password', from_ = 'username@icloud.com')
+    >>> icloud.notify(to='email@addrees.foo', message='hi!', username='username@icloud.com', password='my-icloud-app-password', from_='username@icloud.com')
 
 
 .. code-block:: yaml
