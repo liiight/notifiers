@@ -13,7 +13,6 @@ This is a private use case of the :class:`~notifiers.providers.email.SMTP` provi
 
     >>> icloud.notify(to='email@addrees.foo', message='hi!', username = 'username@icloud.com', password = 'my-icloud-app-password', from_ = 'username@icloud.com')
 
-Full schema:
 
 .. code-block:: yaml
     required:
