@@ -9,6 +9,7 @@ class TestVicrotops:
     Online test rely on setting the env variable VICTOROPS_REST_URL
     """
 
+    @pytest.mark.skip("Skipping until obtaining a permanent key")
     @pytest.mark.online
     def test_all_options(self, provider):
         data = {
