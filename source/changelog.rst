@@ -8,6 +8,7 @@ Changelog
 
 - Removed HipChat (`#404 <https://github.com/liiight/notifiers/pull/404>`_)
 - Added VictorOps (`#401 <https://github.com/liiight/notifiers/pull/401>`_)
+- Added iCloud (`#412 <https://github.com/liiight/notifiers/pull/412>`_)
 
 1.2.1
 ------------
