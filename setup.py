@@ -40,7 +40,6 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
@@ -52,5 +51,5 @@ setup(
         [console_scripts]
         notifiers=notifiers_cli.core:entry_point
     """,
-    python_requires=">=3.6",
+    python_requires=">=3.7",
 )
