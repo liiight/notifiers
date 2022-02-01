@@ -1,6 +1,7 @@
 from . import email
 from . import gitter
 from . import gmail
+from . import icloud
 from . import join
 from . import mailgun
 from . import pagerduty
@@ -21,6 +22,7 @@ _all_providers = {
     "slack": slack.Slack,
     "email": email.SMTP,
     "gmail": gmail.Gmail,
+    "icloud": icloud.iCloud,
     "telegram": telegram.Telegram,
     "gitter": gitter.Gitter,
     "pushbullet": pushbullet.Pushbullet,
