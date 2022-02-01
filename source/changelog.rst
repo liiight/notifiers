@@ -3,11 +3,18 @@
 Changelog
 =========
 
+1.3.0
+------
+
+- Removed HipChat (`#404 <https://github.com/liiight/notifiers/pull/404>`_)
+- Added VictorOps (`#401 <https://github.com/liiight/notifiers/pull/401>`_)
+- Added iCloud (`#412 <https://github.com/liiight/notifiers/pull/412>`_)
+- Drop Python 3.6 support
+
 1.2.1
 ------------
 
 - Adds a default timeout of (5, 20) seconds for all HTTP requests. (`#388 <https://github.com/liiight/notifiers/pull/388>`_)
-- Removed HipChat (`#404 <https://github.com/liiight/notifiers/pull/404>`_)
 
 1.2.0
 -----
