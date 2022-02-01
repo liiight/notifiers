@@ -14,6 +14,10 @@ API documentation for the different providers.
    :members:
    :undoc-members:
 
+.. automodule:: notifiers.providers.icloud
+   :members:
+   :undoc-members:
+
 .. automodule:: notifiers.providers.hipchat
    :members:
    :undoc-members:
