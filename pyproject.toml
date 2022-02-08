@@ -19,7 +19,7 @@ classifiers = [
 readme = "README.MD"
 documentation = "https://notifiers.readthedocs.io/en/latest/"
 repository = "https://github.com/liiight/notifiers"
-exclude = "notifiers.tests"
+exclude = ["notifiers.tests"]
 
 
 [tool.poetry.dependencies]
