@@ -19,6 +19,9 @@ jobs:
     - name: Install Poetry
       shell: bash
       run: curl -sSL https://install.python-poetry.org | python3 - --version 1.1.12
+    - name: Update PATH
+      shell: bash
+      run: echo "$HOME/.local/bin" >> $GITHUB_PATH
     - name: Install package
       shell: bash
       run: poetry install
