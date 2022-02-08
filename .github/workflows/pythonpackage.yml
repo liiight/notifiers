@@ -27,7 +27,7 @@ jobs:
       run: poetry install
     - name: Test with pytest
       shell: bash
-      run: potery run pytest --cov=./
+      run: poetry run pytest --cov=./
       env:
         NOTIFIERS_EMAIL_PASSWORD: ${{secrets.NOTIFIERS_EMAIL_PASSWORD}}
         NOTIFIERS_EMAIL_TO: ${{secrets.NOTIFIERS_EMAIL_TO}}
