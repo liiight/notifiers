@@ -259,11 +259,6 @@ class Provider(SchemaResource, ABC):
 
     @property
     @abstractmethod
-    def base_url(self):
-        pass
-
-    @property
-    @abstractmethod
     def site_url(self):
         pass
 

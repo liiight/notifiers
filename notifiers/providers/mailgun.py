@@ -9,7 +9,6 @@ from ..utils.schema.helpers import one_or_more
 class MailGun(Provider):
     """Send emails via MailGun"""
 
-    base_url = "https://api.mailgun.net/v3/{domain}/messages"
     site_url = "https://documentation.mailgun.com/"
     name = "mailgun"
     path_to_errors = ("message",)
@@ -44,9 +43,15 @@ class MailGun(Provider):
         ]
     }
 
+    __defaults = {"base_url": "https://api.mailgun.net"}
+
     _schema = {
         "type": "object",
         "properties": {
+            "base_url": {
+                "type": "string",
+                "enum": ["https://api.mailgun.net", "https://api.mailgun.net"],
+            },
             "api_key": {"type": "string", "title": "User's API key"},
             "message": {
                 "type": "string",
@@ -188,7 +193,9 @@ class MailGun(Provider):
         return new_data
 
     def _send_notification(self, data: dict) -> Response:
-        url = self.base_url.format(domain=data.pop("domain"))
+        base_url = data.pop("base_url")
+        domain = data.pop("domain")
+        url = f"{base_url}/v3/{domain}/messages"
         auth = "api", data.pop("api_key")
         files = []
         if data.get("attachment"):
