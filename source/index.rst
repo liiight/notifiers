@@ -101,7 +101,12 @@ API documentation
 
 Development documentation
 -------------------------
-TBD
+
+Notifiers uses `poetry <https://python-poetry.org>`_
+
+.. code-block:: bash
+
+   $ poetry install && poetry run pytest
 
 Donations
 ---------
