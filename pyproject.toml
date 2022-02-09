@@ -16,10 +16,13 @@ classifiers = [
     "Intended Audience :: Developers",
     "Intended Audience :: End Users/Desktop",
 ]
-readme = "README.MD"
+readme = "README.md"
 documentation = "https://notifiers.readthedocs.io/en/latest/"
 repository = "https://github.com/liiight/notifiers"
 exclude = ["notifiers.tests"]
+include = [
+    "LICENSE"
+]
 
 
 [tool.poetry.dependencies]
