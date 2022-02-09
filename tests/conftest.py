@@ -108,7 +108,7 @@ def bad_schema():
         _required = {"required": ["fpp"]}
         _schema = {"type": "banana"}
 
-        name = "bad_schmea"
+        name = "bad_schema"
         base_url = ""
         site_url = ""
 

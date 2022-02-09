@@ -1,4 +1,3 @@
-import getpass
 import mimetypes
 import smtplib
 import socket
@@ -17,7 +16,7 @@ from ..utils.schema.helpers import list_to_commas
 from ..utils.schema.helpers import one_or_more
 
 DEFAULT_SUBJECT = "New email from 'notifiers'!"
-DEFAULT_FROM = f"{getpass.getuser()}@{socket.getfqdn()}"
+DEFAULT_FROM = f"notifiers@{socket.getfqdn()}"
 DEFAULT_SMTP_HOST = "localhost"
 
 
@@ -28,7 +27,7 @@ class SMTP(Provider):
     site_url = "https://en.wikipedia.org/wiki/Email"
     name = "email"
 
-    _required = {"required": ["message", "to", "username", "password"]}
+    _required = {"required": ["message", "to"]}
 
     _schema = {
         "type": "object",

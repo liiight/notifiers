@@ -53,7 +53,11 @@ class Telegram(TelegramMixin, Provider):
     _schema = {
         "type": "object",
         "properties": {
-            "message": {"type": "string", "title": "Text of the message to be sent"},
+            "message": {
+                "type": "string",
+                "title": "Text of the message to be sent",
+                "maxLength": 4096,
+            },
             "token": {"type": "string", "title": "Bot token"},
             "chat_id": {
                 "oneOf": [{"type": "string"}, {"type": "integer"}],

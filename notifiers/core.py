@@ -108,7 +108,7 @@ class SchemaResource(ABC):
 
     @property
     def arguments(self) -> dict:
-        """Returns all of the provider argument as declared in the JSON schema"""
+        """Returns all the provider argument as declared in the JSON schema"""
         return dict(self.schema["properties"].items())
 
     @property
