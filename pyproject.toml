@@ -27,8 +27,8 @@ keywords = ["notifications", "messaging", "email", "push"]
 [tool.poetry.dependencies]
 python = "^3.7"
 click = "^8.0.3"
-requestes = "^0.0.1"
 jsonschema = "^4.4.0"
+requests = "^2.27.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.0.0"
