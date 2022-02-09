@@ -108,7 +108,7 @@ class SchemaResource(ABC):
 
     @property
     def arguments(self) -> dict:
-        """Returns all of the provider argument as declared in the JSON schema"""
+        """Returns all the provider argument as declared in the JSON schema"""
         return dict(self.schema["properties"].items())
 
     @property
@@ -256,6 +256,11 @@ class Provider(SchemaResource, ABC):
         if item in self._resources:
             return self._resources[item]
         raise AttributeError(f"{self} does not have a property {item}")
+
+    @property
+    @abstractmethod
+    def base_url(self):
+        pass
 
     @property
     @abstractmethod

@@ -1,73 +1,74 @@
 name: Tests and coverage
 
-on: [push]
+on: [ push ]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 1
       matrix:
-        python-version: [3.7, 3.8, 3.9, "3.10"]
+        python-version: [ 3.7, 3.8, 3.9, "3.10" ]
+        poetry-version: [ 1.1.12 ]
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install Poetry
-      shell: bash
-      run: curl -sSL https://install.python-poetry.org | python3 - --version 1.1.12
-    - name: Update PATH
-      shell: bash
-      run: echo "$HOME/.local/bin" >> $GITHUB_PATH
-    - name: Install package
-      shell: bash
-      run: poetry install
-    - name: Test with pytest
-      shell: bash
-      run: poetry run pytest --cov=./
-      env:
-        NOTIFIERS_EMAIL_PASSWORD: ${{secrets.NOTIFIERS_EMAIL_PASSWORD}}
-        NOTIFIERS_EMAIL_TO: ${{secrets.NOTIFIERS_EMAIL_TO}}
-        NOTIFIERS_EMAIL_USERNAME: ${{secrets.NOTIFIERS_EMAIL_USERNAME}}
-        NOTIFIERS_GITTER_ROOM_ID: ${{secrets.NOTIFIERS_GITTER_ROOM_ID}}
-        NOTIFIERS_GITTER_TOKEN: ${{secrets.NOTIFIERS_GITTER_TOKEN}}
-        NOTIFIERS_GMAIL_PASSWORD: ${{secrets.NOTIFIERS_GMAIL_PASSWORD}}
-        NOTIFIERS_GMAIL_TO: ${{secrets.NOTIFIERS_GMAIL_TO}}
-        NOTIFIERS_GMAIL_USERNAME: ${{secrets.NOTIFIERS_GMAIL_USERNAME}}
-        NOTIFIERS_ICLOUD_TO: ${{secrets.NOTIFIERS_ICLOUD_TO}}
-        NOTIFIERS_ICLOUD_FROM: ${{secrets.NOTIFIERS_ICLOUD_FROM}}
-        NOTIFIERS_ICLOUD_USERNAME: ${{secrets.NOTIFIERS_ICLOUD_USERNAME}}
-        NOTIFIERS_ICLOUD_PASSWORD: ${{secrets.NOTIFIERS_ICLOUD_PASSWORD}}
-        NOTIFIERS_JOIN_APIKEY: ${{secrets.NOTIFIERS_JOIN_APIKEY}}
-        NOTIFIERS_MAILGUN_API_KEY: ${{secrets.NOTIFIERS_MAILGUN_API_KEY}}
-        NOTIFIERS_MAILGUN_DOMAIN: ${{secrets.NOTIFIERS_MAILGUN_DOMAIN}}
-        NOTIFIERS_MAILGUN_FROM: ${{secrets.NOTIFIERS_MAILGUN_FROM}}
-        NOTIFIERS_MAILGUN_TO: ${{secrets.NOTIFIERS_MAILGUN_TO}}
-        NOTIFIERS_PAGERDUTY_ROUTING_KEY: ${{secrets.NOTIFIERS_PAGERDUTY_ROUTING_KEY}}
-        NOTIFIERS_POPCORNNOTIFY_API_KEY: ${{secrets.NOTIFIERS_POPCORNNOTIFY_API_KEY}}
-        NOTIFIERS_POPCORNNOTIFY_RECIPIENTS: ${{secrets.NOTIFIERS_POPCORNNOTIFY_RECIPIENTS}}
-        NOTIFIERS_PUSHBULLET_TOKEN: ${{secrets.NOTIFIERS_PUSHBULLET_TOKEN}}
-        NOTIFIERS_PUSHOVER_TOKEN: ${{secrets.NOTIFIERS_PUSHOVER_TOKEN}}
-        NOTIFIERS_PUSHOVER_USER: ${{secrets.NOTIFIERS_PUSHOVER_USER}}
-        NOTIFIERS_SIMPLEPUSH_KEY: ${{secrets.NOTIFIERS_SIMPLEPUSH_KEY}}
-        NOTIFIERS_SLACK_WEBHOOK_URL: ${{secrets.NOTIFIERS_SLACK_WEBHOOK_URL}}
-        NOTIFIERS_STATUSPAGE_API_KEY: ${{secrets.NOTIFIERS_STATUSPAGE_API_KEY}}
-        NOTIFIERS_STATUSPAGE_PAGE_ID: ${{secrets.NOTIFIERS_STATUSPAGE_PAGE_ID}}
-        NOTIFIERS_TELEGRAM_CHAT_ID: ${{secrets.NOTIFIERS_TELEGRAM_CHAT_ID}}
-        NOTIFIERS_TELEGRAM_TOKEN: ${{secrets.NOTIFIERS_TELEGRAM_TOKEN}}
-        NOTIFIERS_TWILIO_ACCOUNT_SID: ${{secrets.NOTIFIERS_TWILIO_ACCOUNT_SID}}
-        NOTIFIERS_TWILIO_AUTH_TOKEN: ${{secrets.NOTIFIERS_TWILIO_AUTH_TOKEN}}
-        NOTIFIERS_TWILIO_FROM: ${{secrets.NOTIFIERS_TWILIO_FROM}}
-        NOTIFIERS_TWILIO_TO: ${{secrets.NOTIFIERS_TWILIO_TO}}
-        NOTIFIERS_ZULIP_API_KEY: ${{secrets.NOTIFIERS_ZULIP_API_KEY}}
-        NOTIFIERS_ZULIP_EMAIL: ${{secrets.NOTIFIERS_ZULIP_EMAIL}}
-        NOTIFIERS_ZULIP_TO: ${{secrets.NOTIFIERS_ZULIP_TO}}
-        NOTIFIERS_VICTOROPS_REST_URL: ${{secrets.NOTIFIERS_VICTOROPS_REST_URL}}
-    - name: Upload coverage to Codecov
-      if: success()
-      uses: codecov/codecov-action@v2
-      with:
-        token: ${{secrets.CODECOV_TOKEN}}
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install Poetry
+        shell: bash
+        run: curl -sSL https://install.python-poetry.org | python3 - --version ${{ matrix.poetry-version }}
+      - name: Update PATH
+        shell: bash
+        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+      - name: Install package
+        shell: bash
+        run: poetry install
+      - name: Test with pytest
+        shell: bash
+        run: poetry run pytest --cov=./
+        env:
+          NOTIFIERS_EMAIL_PASSWORD: ${{secrets.NOTIFIERS_EMAIL_PASSWORD}}
+          NOTIFIERS_EMAIL_TO: ${{secrets.NOTIFIERS_EMAIL_TO}}
+          NOTIFIERS_EMAIL_USERNAME: ${{secrets.NOTIFIERS_EMAIL_USERNAME}}
+          NOTIFIERS_GITTER_ROOM_ID: ${{secrets.NOTIFIERS_GITTER_ROOM_ID}}
+          NOTIFIERS_GITTER_TOKEN: ${{secrets.NOTIFIERS_GITTER_TOKEN}}
+          NOTIFIERS_GMAIL_PASSWORD: ${{secrets.NOTIFIERS_GMAIL_PASSWORD}}
+          NOTIFIERS_GMAIL_TO: ${{secrets.NOTIFIERS_GMAIL_TO}}
+          NOTIFIERS_GMAIL_USERNAME: ${{secrets.NOTIFIERS_GMAIL_USERNAME}}
+          NOTIFIERS_ICLOUD_TO: ${{secrets.NOTIFIERS_ICLOUD_TO}}
+          NOTIFIERS_ICLOUD_FROM: ${{secrets.NOTIFIERS_ICLOUD_FROM}}
+          NOTIFIERS_ICLOUD_USERNAME: ${{secrets.NOTIFIERS_ICLOUD_USERNAME}}
+          NOTIFIERS_ICLOUD_PASSWORD: ${{secrets.NOTIFIERS_ICLOUD_PASSWORD}}
+          NOTIFIERS_JOIN_APIKEY: ${{secrets.NOTIFIERS_JOIN_APIKEY}}
+          NOTIFIERS_MAILGUN_API_KEY: ${{secrets.NOTIFIERS_MAILGUN_API_KEY}}
+          NOTIFIERS_MAILGUN_DOMAIN: ${{secrets.NOTIFIERS_MAILGUN_DOMAIN}}
+          NOTIFIERS_MAILGUN_FROM: ${{secrets.NOTIFIERS_MAILGUN_FROM}}
+          NOTIFIERS_MAILGUN_TO: ${{secrets.NOTIFIERS_MAILGUN_TO}}
+          NOTIFIERS_PAGERDUTY_ROUTING_KEY: ${{secrets.NOTIFIERS_PAGERDUTY_ROUTING_KEY}}
+          NOTIFIERS_POPCORNNOTIFY_API_KEY: ${{secrets.NOTIFIERS_POPCORNNOTIFY_API_KEY}}
+          NOTIFIERS_POPCORNNOTIFY_RECIPIENTS: ${{secrets.NOTIFIERS_POPCORNNOTIFY_RECIPIENTS}}
+          NOTIFIERS_PUSHBULLET_TOKEN: ${{secrets.NOTIFIERS_PUSHBULLET_TOKEN}}
+          NOTIFIERS_PUSHOVER_TOKEN: ${{secrets.NOTIFIERS_PUSHOVER_TOKEN}}
+          NOTIFIERS_PUSHOVER_USER: ${{secrets.NOTIFIERS_PUSHOVER_USER}}
+          NOTIFIERS_SIMPLEPUSH_KEY: ${{secrets.NOTIFIERS_SIMPLEPUSH_KEY}}
+          NOTIFIERS_SLACK_WEBHOOK_URL: ${{secrets.NOTIFIERS_SLACK_WEBHOOK_URL}}
+          NOTIFIERS_STATUSPAGE_API_KEY: ${{secrets.NOTIFIERS_STATUSPAGE_API_KEY}}
+          NOTIFIERS_STATUSPAGE_PAGE_ID: ${{secrets.NOTIFIERS_STATUSPAGE_PAGE_ID}}
+          NOTIFIERS_TELEGRAM_CHAT_ID: ${{secrets.NOTIFIERS_TELEGRAM_CHAT_ID}}
+          NOTIFIERS_TELEGRAM_TOKEN: ${{secrets.NOTIFIERS_TELEGRAM_TOKEN}}
+          NOTIFIERS_TWILIO_ACCOUNT_SID: ${{secrets.NOTIFIERS_TWILIO_ACCOUNT_SID}}
+          NOTIFIERS_TWILIO_AUTH_TOKEN: ${{secrets.NOTIFIERS_TWILIO_AUTH_TOKEN}}
+          NOTIFIERS_TWILIO_FROM: ${{secrets.NOTIFIERS_TWILIO_FROM}}
+          NOTIFIERS_TWILIO_TO: ${{secrets.NOTIFIERS_TWILIO_TO}}
+          NOTIFIERS_ZULIP_API_KEY: ${{secrets.NOTIFIERS_ZULIP_API_KEY}}
+          NOTIFIERS_ZULIP_EMAIL: ${{secrets.NOTIFIERS_ZULIP_EMAIL}}
+          NOTIFIERS_ZULIP_TO: ${{secrets.NOTIFIERS_ZULIP_TO}}
+          NOTIFIERS_VICTOROPS_REST_URL: ${{secrets.NOTIFIERS_VICTOROPS_REST_URL}}
+      - name: Upload coverage to Codecov
+        if: success()
+        uses: codecov/codecov-action@v2
+        with:
+          token: ${{secrets.CODECOV_TOKEN}}

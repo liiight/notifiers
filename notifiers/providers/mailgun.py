@@ -9,6 +9,7 @@ from ..utils.schema.helpers import one_or_more
 class MailGun(Provider):
     """Send emails via MailGun"""
 
+    base_url = "https://api.mailgun.net/v3/{domain}/messages"
     site_url = "https://documentation.mailgun.com/"
     name = "mailgun"
     path_to_errors = ("message",)
@@ -43,14 +44,14 @@ class MailGun(Provider):
         ]
     }
 
-    __defaults = {"base_url": "https://api.mailgun.net"}
+    defaults = {"base_url": "https://api.mailgun.net"}
 
     _schema = {
         "type": "object",
         "properties": {
             "base_url": {
                 "type": "string",
-                "enum": ["https://api.mailgun.net", "https://api.mailgun.net"],
+                "enum": ["https://api.mailgun.net", "https://api.eu.mailgun.net"],
             },
             "api_key": {"type": "string", "title": "User's API key"},
             "message": {
