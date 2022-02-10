@@ -20,9 +20,13 @@ readme = "README.md"
 documentation = "https://notifiers.readthedocs.io/en/latest/"
 homepage = "https://github.com/liiight/notifiers"
 repository = "https://github.com/liiight/notifiers"
-exclude = ["notifiers/tests"]
+exclude = ["tests"]
 include = ["LICENSE"]
 keywords = ["notifications", "messaging", "email", "push"]
+packages = [
+    { include = 'notifiers' },
+    { include = "notifiers_cli" },
+]
 
 [tool.poetry.dependencies]
 python = "^3.7"
