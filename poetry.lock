@@ -150,7 +150,7 @@ testing = ["covdefaults (>=1.2.0)", "coverage (>=4)", "pytest (>=4)", "pytest-co
 
 [[package]]
 name = "hypothesis"
-version = "6.36.1"
+version = "6.36.2"
 description = "A library for property-based testing"
 category = "dev"
 optional = false
@@ -689,7 +689,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "4dbd88cedb35aa41c1e4039d4c02b890d70a4e9b1920a3a95f17cd89b5759372"
+content-hash = "1a9619aa9ecc4f950d93224409c6b911cf72e4cd614cc86bb3343f213bf98d58"
 
 [metadata.files]
 alabaster = [
@@ -793,8 +793,8 @@ filelock = [
     {file = "filelock-3.4.2.tar.gz", hash = "sha256:38b4f4c989f9d06d44524df1b24bd19e167d851f19b50bf3e3559952dddc5b80"},
 ]
 hypothesis = [
-    {file = "hypothesis-6.36.1-py3-none-any.whl", hash = "sha256:886342c291e3e592f26889f25b33aac78c6af62c736451f7cdad0a06ffa27325"},
-    {file = "hypothesis-6.36.1.tar.gz", hash = "sha256:46cbee9d7aed822149af75ec63d5f86cd1042df69b2e8eae17b26a56a4dda781"},
+    {file = "hypothesis-6.36.2-py3-none-any.whl", hash = "sha256:7789664e0b487f6553492500738d6ed29ee1af143857d605b296d112154a4057"},
+    {file = "hypothesis-6.36.2.tar.gz", hash = "sha256:7202ea05759f591adf6c1887edbd4d53c049821284f630c5ec8ec3f3f57fd46b"},
 ]
 identify = [
     {file = "identify-2.4.9-py2.py3-none-any.whl", hash = "sha256:bff7c4959d68510bc28b99d664b6a623e36c6eadc933f89a4e0a9ddff9b4fee4"},
