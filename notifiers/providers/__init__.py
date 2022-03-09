@@ -1,3 +1,4 @@
+from . import dingtalk
 from . import email
 from . import gitter
 from . import gmail
@@ -21,6 +22,7 @@ _all_providers = {
     "simplepush": simplepush.SimplePush,
     "slack": slack.Slack,
     "email": email.SMTP,
+    "dingtalk": dingtalk.DingTalk,
     "gmail": gmail.Gmail,
     "icloud": icloud.iCloud,
     "telegram": telegram.Telegram,
