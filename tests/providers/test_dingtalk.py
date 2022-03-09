@@ -13,11 +13,6 @@ class TestDingTalk:
 
     @pytest.mark.online
     def test_sanity(self, provider, test_message):
-        msg_data = {
-            "msgtype": "text",
-            "text": {
-                "content": test_message
-            }
-        }
+        msg_data = {"msgtype": "text", "text": {"content": test_message}}
         data = {"access_token": "token", "msg_data": msg_data}
         provider.notify(**data, raise_on_errors=True)
