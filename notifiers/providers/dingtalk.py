@@ -34,6 +34,6 @@ class DingTalk(Provider):
         access_token = data.pop("access_token")
         url = self.base_url.format(access_token)
         response, errors = requests.post(
-            url, json=data.pop('msg_data'), path_to_errors=self.path_to_errors
+            url, json=data.pop("msg_data"), path_to_errors=self.path_to_errors
         )
         return self.create_response(data, response, errors)
