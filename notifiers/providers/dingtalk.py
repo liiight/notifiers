@@ -2,89 +2,173 @@ from ..core import Provider
 from ..core import Response
 from ..utils import requests
 
-
 class DingTalk(Provider):
-    """Send DingTalk notifications"""
-
-    base_url = "https://oapi.dingtalk.com/robot/send?access_token={}"
-    site_url = "https://oapi.dingtalk.com/"
-    path_to_errors = ("message",)
+    """Send DingTalk notifications via Robot Webhook"""
+    base_url = "https://oapi.dingtalk.com/robot/send"
+    site_url = "https://open.dingtalk.com/document/"
     name = "dingtalk"
+    path_to_errors = ("errmsg",)
 
-    _required = {"required": ["access_token", "message"]}
+    _required = {
+        "required": ["access_token", "msg_data"],
+        "oneOf": [
+            {"required": ["msg_data.text"]},
+            {"required": ["msg_data.markdown"]},
+            {"required": ["msg_data.link"]},
+            {"required": ["msg_data.actionCard"]}
+        ]
+    }
+
     _schema = {
         "type": "object",
         "properties": {
             "access_token": {
                 "type": "string",
-                "title": "access token to pair a channel to receive notification",
+                "title": "Webhook access token",
+                "description": "Obtain from DingTalk Robot settings"
             },
-            "msg_type": {
-                "type": "string",
-                "title": "choose a message type, these type are supported: text, markdown, link, action_card",
-                "enum": ["text", "markdown", "link", "action_card"]
+            "msg_data": {
+                "type": "object",
+                "properties": {
+                    "msgtype": {
+                        "type": "string",
+                        "enum": ["text", "markdown", "link", "actionCard"],
+                        "default": "text"
+                    },
+                    "text": {
+                        "type": "object",
+                        "properties": {
+                            "content": {
+                                "type": "string",
+                                "maxLength": 20000
+                            }
+                        },
+                        "required": ["content"]
+                    },
+                    "markdown": {
+                        "type": "object",
+                        "properties": {
+                            "title": {
+                                "type": "string",
+                                "maxLength": 100
+                            },
+                            "text": {
+                                "type": "string",
+                                "maxLength": 20000
+                            }
+                        },
+                        "required": ["title", "text"]
+                    },
+                    "link": {
+                        "type": "object",
+                        "properties": {
+                            "title": {
+                                "type": "string",
+                                "maxLength": 100
+                            },
+                            "text": {
+                                "type": "string",
+                                "maxLength": 500
+                            },
+                            "messageUrl": {
+                                "type": "string",
+                                "format": "uri"
+                            },
+                            "picUrl": {
+                                "type": "string",
+                                "format": "uri",
+                                "default": ""
+                            }
+                        },
+                        "required": ["title", "text", "messageUrl"]
+                    },
+                    "actionCard": {
+                        "type": "object",
+                        "properties": {
+                            "title": {
+                                "type": "string",
+                                "maxLength": 100
+                            },
+                            "text": {
+                                "type": "string",
+                                "maxLength": 20000
+                            },
+                            "singleTitle": {
+                                "type": "string",
+                                "maxLength": 50
+                            },
+                            "singleURL": {
+                                "type": "string",
+                                "format": "uri"
+                            },
+                            "btnOrientation": {
+                                "type": "string",
+                                "enum": ["0", "1"],
+                                "default": "0"
+                            }
+                        },
+                        "required": ["title", "text", "singleTitle", "singleURL"]
+                    }
+                },
+                "required": ["msgtype"],
+                "additionalProperties": False
             },
-            "message": {
-                "type": "string",
-                "title": "This is the text that will be posted to the dingtalk",
-                "maxLength": 4096,
-            },
-            "msg_title": {
-                "type": "string",
-                "title": "title for markdown message and card message"
-            },
-            "msg_url": {
-                "type": "string",
-                "format": "uri",
-                "title": "url for markdown message"
-            },
-            "msg_btn_title": {
-                "type": "string",
-                "title": "title for card message button, like 'Read more.'"
-            },
-            "msg_btn_url": {
-                "type": "string",
-                "format": "uri",
-                "title": "url for card message button"
+            "at": {
+                "type": "object",
+                "properties": {
+                    "atMobiles": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "pattern": "^1[3-9]\\d{9}$"
+                        }
+                    },
+                    "atUserIds": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "minLength": 1
+                        }
+                    },
+                    "isAtAll": {
+                        "type": "boolean",
+                        "default": False
+                    }
+                },
+                "additionalProperties": False
             }
         },
-        "additionalProperties": False,
+        "additionalProperties": False
     }
 
-    @property
-    def defaults(self) -> dict:
-        return {"msg_type": "text"}
+    def _prepare_url(self, access_token: str) -> str:
+        return f"{self.base_url}?access_token={access_token}"
 
     def _prepare_data(self, data: dict) -> dict:
-        text = data.pop("message")
-        mapping_key = {
-            "msg_title": "title",
-            "msg_url": "messageUrl",
-            "msg_btn_title": "singleTitle",
-            "msg_btn_url": "singleURL"
-        }
-
-        new_data = {
-            "access_token": data.pop("access_token"),
-            "msgtype": data.pop("msg_type")
-        }
-
-        if new_data["msgtype"] != "text":
-            camel_case_str = "".join(word.capitalize() for word in new_data["msgtype"].split("_"))
-            new_data["msgtype"] = camel_case_str[0].lower() + camel_case_str[1:]
-
-            new_data[new_data["msgtype"]] = {"text": text}
-            for key in data:
-                new_data[new_data["msgtype"]][mapping_key[key]] = data[key]
-        else:
-            new_data["text"] = {"content": text}
-
-        return new_data
+        """
+        Construct payload according to:
+        https://open.dingtalk.com/document/orgapp-server/custom-robot-access
+        """
+        payload = {"msgtype": data["msg_data"]["msgtype"]}
+        
+        # Handle different message types
+        msg_type = data["msg_data"]["msgtype"]
+        payload[msg_type] = data["msg_data"].get(msg_type, {})
+        
+        # Handle @ mentions
+        if "at" in data:
+            payload["at"] = data["at"]
+            
+        return payload
 
     def _send_notification(self, data: dict) -> Response:
-        access_token = data.pop("access_token")
-        url = self.base_url.format(access_token)
-        response, errors = requests.post(
-            url, json=data, path_to_errors=self.path_to_errors
+        url = self._prepare_url(data["access_token"])
+        payload = self._prepare_data(data)
+        
+        response = requests.post(
+            url,
+            json=payload,
+            headers={"Content-Type": "application/json"}
         )
-        return self.create_response(data, response, errors)
+        
+        return self._create_response(response)
