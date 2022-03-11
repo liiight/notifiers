@@ -23,7 +23,7 @@ class DingTalk(Provider):
             "msg_type": {
                 "type": "string",
                 "title": "choose a message type, these type are supported: text, markdown, link, action_card",
-                "enum": ["text", "markdown", "link", "action_card"]
+                "enum": ["text", "markdown", "link", "action_card"],
             },
             "message": {
                 "type": "string",
@@ -32,22 +32,22 @@ class DingTalk(Provider):
             },
             "msg_title": {
                 "type": "string",
-                "title": "title for markdown message and card message"
+                "title": "title for markdown message and card message",
             },
             "msg_url": {
                 "type": "string",
                 "format": "uri",
-                "title": "url for markdown message"
+                "title": "url for markdown message",
             },
             "msg_btn_title": {
                 "type": "string",
-                "title": "title for card message button, like 'Read more.'"
+                "title": "title for card message button, like 'Read more.'",
             },
             "msg_btn_url": {
                 "type": "string",
                 "format": "uri",
-                "title": "url for card message button"
-            }
+                "title": "url for card message button",
+            },
         },
         "additionalProperties": False,
     }
@@ -62,12 +62,12 @@ class DingTalk(Provider):
             "msg_title": "title",
             "msg_url": "messageUrl",
             "msg_btn_title": "singleTitle",
-            "msg_btn_url": "singleURL"
+            "msg_btn_url": "singleURL",
         }
 
         new_data = {
             "access_token": data.pop("access_token"),
-            "msgtype": data.pop("msg_type")
+            "msgtype": data.pop("msg_type"),
         }
 
         if new_data["msgtype"] != "text":
