@@ -1,6 +1,7 @@
 from ..core import Provider
 from ..core import Response
 from ..utils import requests
+from ..utils.helpers import snake_to_camel_case
 
 
 class DingTalk(Provider):
@@ -70,8 +71,8 @@ class DingTalk(Provider):
         }
 
         if new_data["msgtype"] != "text":
-            camel_case_str = "".join(word.capitalize() for word in new_data["msgtype"].split("_"))
-            new_data["msgtype"] = camel_case_str[0].lower() + camel_case_str[1:]
+            camel_case_key = snake_to_camel_case(new_data["msgtype"])
+            new_data["msgtype"] = camel_case_key[0].lower() + camel_case_key[1:]
 
             new_data[new_data["msgtype"]] = {"text": text}
             for key in data:
