@@ -7,7 +7,7 @@ from ..utils.helpers import snake_to_camel_case
 class DingTalk(Provider):
     """Send DingTalk notifications"""
 
-    base_url = "https://oapi.dingtalk.com/robot/send?access_token={}"
+    base_url = "https://oapi.dingtalk.com/robot/send"
     site_url = "https://oapi.dingtalk.com/"
     path_to_errors = ("message",)
     name = "dingtalk"
@@ -83,9 +83,8 @@ class DingTalk(Provider):
         return new_data
 
     def _send_notification(self, data: dict) -> Response:
-        access_token = data.pop("access_token")
-        url = self.base_url.format(access_token)
+        params = {"access_token": data.pop("access_token")}
         response, errors = requests.post(
-            url, json=data, path_to_errors=self.path_to_errors
+            self.base_url, params=params, json=data, path_to_errors=self.path_to_errors
         )
         return self.create_response(data, response, errors)
