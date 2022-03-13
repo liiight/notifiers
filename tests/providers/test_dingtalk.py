@@ -13,5 +13,5 @@ class TestDingTalk:
 
     @pytest.mark.online
     def test_sanity(self, provider, test_message):
-        data = {"access_token": "token",  "message": test_message}
+        data = {"access_token": "token", "message": test_message}
         provider.notify(**data, raise_on_errors=True)
