@@ -8,7 +8,7 @@ Minimal example:
 
     >>> from notifiers import get_notifier
     >>> dingtalk = get_notifier('dingtalk')
-    >>> dingtalk.notify(access_token='token', msg_data={'msgtype': 'text', 'text':{'content': 'Hi there!'}})
+    >>> dingtalk.notify(access_token='token', message='Hi there!')
 
 Full schema:
 
@@ -19,11 +19,11 @@ Full schema:
       access_token:
         title: your access token
         type: string
-      msg_data:
-        title: your message definition
-        type: object
+      message:
+        title: message content
+        type: string
     required:
     - access_token
-    - msg_data
+    - message
     type: object
 
