@@ -41,6 +41,20 @@ class SMTP(Provider):
                     "title": "one or more email addresses to use",
                 }
             ),
+            "CC": one_or_more(
+                {
+                    "type": "string",
+                    "format": "email",
+                    "title": "one or more email addresses to use",
+                }
+            ),
+            "Bcc": one_or_more(
+                {
+                    "type": "string",
+                    "format": "email",
+                    "title": "one or more email addresses to use",
+                }
+            ),
             "from": {
                 "type": "string",
                 "format": "email",
@@ -128,6 +142,8 @@ class SMTP(Provider):
     def _build_email(data: dict) -> EmailMessage:
         email = EmailMessage()
         email["To"] = data["to"]
+        email["CC"] = data.get("CC", [])
+        email["Bcc"] = data.get("Bcc", [])
         email["From"] = data["from"]
         email["Subject"] = data["subject"]
         email["Date"] = formatdate(localtime=True)
