@@ -259,7 +259,7 @@ i18n = ["Babel (>=2.7)"]
 
 [[package]]
 name = "jsonschema"
-version = "4.4.0"
+version = "4.7.2"
 description = "An implementation of JSON Schema validation for Python"
 category = "main"
 optional = false
@@ -274,7 +274,7 @@ typing-extensions = {version = "*", markers = "python_version < \"3.8\""}
 
 [package.extras]
 format = ["fqdn", "idna", "isoduration", "jsonpointer (>1.13)", "rfc3339-validator", "rfc3987", "uri-template", "webcolors (>=1.11)"]
-format_nongpl = ["fqdn", "idna", "isoduration", "jsonpointer (>1.13)", "rfc3339-validator", "rfc3986-validator (>0.1.0)", "uri-template", "webcolors (>=1.11)"]
+format-nongpl = ["fqdn", "idna", "isoduration", "jsonpointer (>1.13)", "rfc3339-validator", "rfc3986-validator (>0.1.0)", "uri-template", "webcolors (>=1.11)"]
 
 [[package]]
 name = "markupsafe"
@@ -689,7 +689,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "f234b88fea80a3da054c532b8c5fe38d6f31872e2011bb1b1001404826cf5538"
+content-hash = "0194679cd362bf13bc50d3ce5db449366574f4fde12afe7f56bb3683c17a43bc"
 
 [metadata.files]
 alabaster = [
@@ -825,8 +825,8 @@ jinja2 = [
     {file = "Jinja2-3.0.3.tar.gz", hash = "sha256:611bb273cd68f3b993fabdc4064fc858c5b47a973cb5aa7999ec1ba405c87cd7"},
 ]
 jsonschema = [
-    {file = "jsonschema-4.4.0-py3-none-any.whl", hash = "sha256:77281a1f71684953ee8b3d488371b162419767973789272434bbc3f29d9c8823"},
-    {file = "jsonschema-4.4.0.tar.gz", hash = "sha256:636694eb41b3535ed608fe04129f26542b59ed99808b4f688aa32dcf55317a83"},
+    {file = "jsonschema-4.7.2-py3-none-any.whl", hash = "sha256:c7448a421b25e424fccfceea86b4e3a8672b4436e1988ccbde92c80828d4f085"},
+    {file = "jsonschema-4.7.2.tar.gz", hash = "sha256:73764f461d61eb97a057c929368610a134d1d1fffd858acfe88864ee94f1f1d3"},
 ]
 markupsafe = [
     {file = "MarkupSafe-2.0.1-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:d8446c54dc28c01e5a2dbac5a25f071f6653e6e40f3a8818e8b45d790fe6ef53"},
