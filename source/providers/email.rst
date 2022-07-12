@@ -94,6 +94,30 @@ Full schema:
         - format: email
           title: one or more email addresses to use
           type: string
+      cc:
+        oneOf:
+        - items:
+            format: email
+            title: one or more email addresses to use
+            type: string
+          minItems: 0
+          type: array
+          uniqueItems: true
+        - format: email
+          title: one or more email addresses to use
+          type: string
+      bcc:
+        oneOf:
+        - items:
+            format: email
+            title: one or more email addresses to use
+            type: string
+          minItems: 0
+          type: array
+          uniqueItems: true
+        - format: email
+          title: one or more email addresses to use
+          type: string
       username:
         title: username if relevant
         type: string
