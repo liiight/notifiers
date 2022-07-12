@@ -94,7 +94,7 @@ Full schema:
         - format: email
           title: one or more email addresses to use
           type: string
-      CC:
+      cc:
         oneOf:
         - items:
             format: email
@@ -106,7 +106,7 @@ Full schema:
         - format: email
           title: one or more email addresses to use
           type: string
-      Bcc:
+      bcc:
         oneOf:
         - items:
             format: email
