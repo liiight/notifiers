@@ -15,6 +15,7 @@ This is a private use case of the :class:`~notifiers.providers.email.SMTP` provi
 
 
 .. code-block:: yaml
+
     required:
     - username
     - password
@@ -22,5 +23,5 @@ This is a private use case of the :class:`~notifiers.providers.email.SMTP` provi
     - to
     type: object
 
-from_ can be an iCloud alias
+``from_`` can be an iCloud alias
 username must be your primary iCloud username

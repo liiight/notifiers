@@ -41,7 +41,7 @@ To view all providers use the ``providers`` command like so:
 .. code-block:: console
 
      $ notifiers providers
-     pushover, simplepush, slack, email, gmail, telegram, gitter, pushbullet, join, hipchat, zulip, victorops
+     pushover, simplepush, slack, email, gmail, telegram, gitter, pushbullet, join, zulip, victorops
 
 This will return all available provider names
 

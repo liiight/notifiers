@@ -9,7 +9,6 @@ Providers
    email
    gitter
    gmail
-   hipchat
    join
    mailgun
    pagerduty
