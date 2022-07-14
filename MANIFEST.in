@@ -1,5 +1,0 @@
-include LICENSE
-include README.MD
-include requirements.txt
-include dev-requirements.txt
-recursive-exclude tests *
