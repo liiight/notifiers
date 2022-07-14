@@ -6,7 +6,7 @@
 
 See [changelog](http://notifiers.readthedocs.io/en/latest/changelog.html) for recent changes
 
-Got an app or service, and you want to enable your users to use notifications with their provider of choice? Working on a script and you want to receive notification based on its output? You don't need to implement a solution yourself, or use individual provider libs. A one stop shop for all notification providers with a unified and simple interface.
+Got an app or service, and you want to enable your users to use notifications with their provider of choice? Working on a script, and you want to receive notification based on its output? You don't need to implement a solution yourself, or use individual provider libs. A one-stop shop for all notification providers with a unified and simple interface.
 
 # Supported providers
 
@@ -72,10 +72,10 @@ Directly add to your existing stdlib logging:
         'token': 'foo',
         'user': 'bar'
     }
->>> hdlr = NotificationHandler('pushover', defaults=defaults)
->>> hdlr.setLevel(logging.ERROR)
+>>> handler = NotificationHandler('pushover', defaults=defaults)
+>>> hdhandlerlr.setLevel(logging.ERROR)
 
->>> log.addHandler(hdlr)
+>>> log.addHandler(handler)
 >>> log.error('And just like that, you get notified about all your errors!')
 ```
 
@@ -96,4 +96,4 @@ If you like this and want to buy me a cup of coffee, please click the donation b
 
 # Code of Conduct
 
-Everyone interacting in the Notifiers project's codebases, issue trackers and chat rooms is expected to follow the [PyPA Code of Conduct.](https://www.pypa.io/en/latest/code-of-conduct/)
+Everyone who is interacting in the Notifiers project's codebase, issue trackers and chat rooms is expected to follow the [PyPA Code of Conduct.](https://www.pypa.io/en/latest/code-of-conduct/)
