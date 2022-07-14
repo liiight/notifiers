@@ -69,6 +69,5 @@ jobs:
           NOTIFIERS_VICTOROPS_REST_URL: ${{secrets.NOTIFIERS_VICTOROPS_REST_URL}}
       - name: Upload coverage to Codecov
         if: success()
-        uses: codecov/codecov-action@v2
-        with:
-          token: ${{secrets.CODECOV_TOKEN}}
+        uses: codecov/codecov-action@v3.1.0
+
