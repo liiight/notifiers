@@ -36,7 +36,7 @@ $ docker pull liiight/notifiers
 ```
 # Basic Usage
 
-```python
+```pycon
 >>> from notifiers import get_notifier
 >>> p = get_notifier('pushover')
 >>> p.required
@@ -46,7 +46,7 @@ $ docker pull liiight/notifiers
 ```
 
 Or:
-```python
+```pycon
 >>> from notifiers import notify
 >>> notify('pushover', user='foo', token='bar', message='test')
 <NotificationResponse,provider=Pushover,status=Success>
@@ -62,7 +62,7 @@ $ notifiers pushover notify --user foo --token baz "This is so easy!"
 
 Directly add to your existing stdlib logging:
 
-```python
+```pycon
 >>> import logging
 >>> from notifiers.logging import NotificationHandler
 
