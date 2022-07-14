@@ -23,15 +23,15 @@ Got an app or service, and you want to enable your users to use notifications wi
 # Installation
 
 Via pip:
-```
+```bash
 $ pip install notifiers
 ```
 Via homebrew:
-```
+```bash
 $ brew install notifiers
 ```
 Or Dockerhub:
-```
+```bash
 $ docker pull liiight/notifiers
 ```
 # Basic Usage
@@ -54,7 +54,7 @@ Or:
 
 # From CLI
 
-```text
+```bash
 $ notifiers pushover notify --user foo --token baz "This is so easy!"
 ```
 
