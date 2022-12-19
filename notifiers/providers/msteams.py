@@ -20,7 +20,7 @@ class MSTeams(Provider):
             "message": {"type": "string", "title": "body of the notification"},
             "title": {"type": "string", "title": "title of notification"},
         },
-        "additionalProperties": True
+        "additionalProperties": True,
     }
 
     _required = {"required": ["message", "webhook_url"]}
