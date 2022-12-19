@@ -5,7 +5,8 @@ from notifiers.exceptions import BadArguments
 provider = "msteams"
 connector_message_example = {
     "message": "Example of advanced Teams Card, "
-               "source: https://learn.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/how-to/connectors-using?tabs=cURL",
+               "source: https://learn.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/how-to/"
+               "connectors-using?tabs=cURL",
     "@type": "MessageCard",
     "@context": "http://schema.org/extensions",
     "themeColor": "0076D7",

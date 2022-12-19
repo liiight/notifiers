@@ -6,7 +6,7 @@ from ..utils import requests
 class MSTeams(Provider):
     """Send MS Teams notification with title and message."""
 
-    base_url = "https://learn.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/how-to/add-incoming-webhook"
+    base_url = ""
     site_url = "https://www.microsoft.com/en-en/microsoft-teams"
     name = "msteams"
 
