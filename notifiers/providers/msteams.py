@@ -23,9 +23,9 @@ class MSTeams(Provider):
                 "type": "object",
                 "properties": {
                     "name": {"type": "string", "title": "Name of the button"},
-                    "target": {"type": "string", "title": "URL address of the target"}
-                }
-            }
+                    "target": {"type": "string", "title": "URL address of the target"},
+                },
+            },
         },
         "additionalProperties": True,
     }
@@ -45,7 +45,7 @@ class MSTeams(Provider):
                 "@context": "http://schema.org",
                 "@type": "ViewAction",
                 "name": data["button"]["name"],
-                "target": [data["button"]["target"]]
+                "target": [data["button"]["target"]],
             }
             data["potentialAction"].append(button)
             data.pop("button")
@@ -55,4 +55,3 @@ class MSTeams(Provider):
         url = data.pop("webhook_url")
         response, errors = requests.post(url, json=data)
         return self.create_response(data, response, errors)
-
