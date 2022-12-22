@@ -19,13 +19,16 @@ class MSTeams(Provider):
             },
             "message": {"type": "string", "title": "body of the notification"},
             "title": {"type": "string", "title": "title of notification"},
+            "color": {"type": "string", "title": "color of the card",
+                      "pattern": "^#?([A-Fa-f0-9]{6})$"},
             "button": {
                 "type": "object",
                 "properties": {
                     "name": {"type": "string", "title": "Name of the button"},
-                    "target": {"type": "string", "title": "URL address of the target"},
-                },
-            },
+                    "target": {"type": "string", "title": "URL address of the target",
+                               "pattern": "^https?://"},
+                }
+            }
         },
         "additionalProperties": True,
     }
@@ -36,6 +39,11 @@ class MSTeams(Provider):
         # process text/message
         text = data.pop("message")
         data["text"] = text
+
+        # process color
+        if "color" in data.keys():
+            clr = data.pop("color")
+            data["themeColor"] = f"#{clr}" if not clr.startswith("#") else clr
 
         # process button
         if "button" in data.keys():
@@ -53,5 +61,6 @@ class MSTeams(Provider):
 
     def _send_notification(self, data: dict) -> Response:
         url = data.pop("webhook_url")
+        print(data)
         response, errors = requests.post(url, json=data)
         return self.create_response(data, response, errors)
