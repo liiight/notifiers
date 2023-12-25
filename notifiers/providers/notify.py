@@ -1,4 +1,3 @@
-from typing import Optional
 from ..core import Provider
 from ..core import Response
 from ..utils import requests
@@ -10,18 +9,19 @@ class NotifyMixin:
     base_url = "{base_url}/api/notify"
     path_to_errors = ("message",)
 
-    def _get_headers(self, token: Optional[str]) -> dict:
+    def _get_headers(self, token: str) -> dict:
         """
         Builds Notify's requests header bases on the token provided
 
         :param token: Send token
         :return: Authentication header dict
         """
-        return {"Authorization": f"Bearer {token}"} if token else {}
+        return {"Authorization": f"Bearer {token}"}
 
 
 class Notify(NotifyMixin, Provider):
     """Send Notify notifications"""
+
     site_url = "https://github.com/K0IN/Notify"
     name = "notify"
 
@@ -34,7 +34,7 @@ class Notify(NotifyMixin, Provider):
             "title": {"type": "string", "title": "your message's title"},
             "token": {
                 "type": "string",
-                "title": "your application's send key, see https://github.com/K0IN/Notify/blob/main/doc/docker.md"
+                "title": "your application's send key, see https://github.com/K0IN/Notify/blob/main/doc/docker.md",
             },
             "tags": {
                 "type": "array",
@@ -50,7 +50,8 @@ class Notify(NotifyMixin, Provider):
 
     def _send_notification(self, data: dict) -> Response:
         url = self.base_url.format(base_url=data.pop("base_url"))
-        headers = self._get_headers(data.pop("token", None))
+        token = data.pop("token", None)
+        headers = self._get_headers(token) if token else {}
         response, errors = requests.post(
             url,
             json={

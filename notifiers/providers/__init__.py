@@ -4,6 +4,7 @@ from . import gmail
 from . import icloud
 from . import join
 from . import mailgun
+from . import notify
 from . import pagerduty
 from . import popcornnotify
 from . import pushbullet
@@ -15,7 +16,6 @@ from . import telegram
 from . import twilio
 from . import victorops
 from . import zulip
-from . import notify
 
 _all_providers = {
     "pushover": pushover.Pushover,
