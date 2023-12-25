@@ -15,6 +15,7 @@ from . import telegram
 from . import twilio
 from . import victorops
 from . import zulip
+from . import notify
 
 _all_providers = {
     "pushover": pushover.Pushover,
@@ -34,4 +35,5 @@ _all_providers = {
     "popcornnotify": popcornnotify.PopcornNotify,
     "statuspage": statuspage.Statuspage,
     "victorops": victorops.VictorOps,
+    "notify": notify.Notify,
 }
