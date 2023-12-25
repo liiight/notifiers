@@ -1,11 +1,7 @@
 from typing import Optional
 from ..core import Provider
-from ..core import ProviderResource
 from ..core import Response
-from ..exceptions import ResourceError
 from ..utils import requests
-from ..utils.schema.helpers import list_to_commas
-from ..utils.schema.helpers import one_or_more
 
 
 class NotifyMixin:
@@ -33,10 +29,13 @@ class Notify(NotifyMixin, Provider):
     _schema = {
         "type": "object",
         "properties": {
-            "base_url": { "type": "string" },
-            "message": { "type": "string", "title": "your message"},
-            "title": { "type": "string", "title": "your message's title" },
-            "token": {"type": "string", "title": "your application's send key, see https://github.com/K0IN/Notify/blob/main/doc/docker.md"},
+            "base_url": {"type": "string"},
+            "message": {"type": "string", "title": "your message"},
+            "title": {"type": "string", "title": "your message's title"},
+            "token": {
+                "type": "string",
+                "title": "your application's send key, see https://github.com/K0IN/Notify/blob/main/doc/docker.md"
+            },
             "tags": {
                 "type": "array",
                 "title": "your message's tags",
