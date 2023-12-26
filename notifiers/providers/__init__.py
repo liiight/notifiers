@@ -4,6 +4,7 @@ from . import gmail
 from . import icloud
 from . import join
 from . import mailgun
+from . import notify
 from . import pagerduty
 from . import popcornnotify
 from . import pushbullet
@@ -34,4 +35,5 @@ _all_providers = {
     "popcornnotify": popcornnotify.PopcornNotify,
     "statuspage": statuspage.Statuspage,
     "victorops": victorops.VictorOps,
+    "notify": notify.Notify,
 }

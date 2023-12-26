@@ -11,7 +11,7 @@ Got an app or service, and you want to enable your users to use notifications wi
 # Supported providers
 
 
-[Pushover](https://pushover.net/), [SimplePush](https://simplepush.io/), [Slack](https://api.slack.com/), [Gmail](https://www.google.com/gmail/about/), Email (SMTP), [Telegram](https://telegram.org/), [Gitter](https://gitter.im), [Pushbullet](https://www.pushbullet.com), [Join](https://joaoapps.com/join/), [Zulip](https://zulipchat.com/), [Twilio](https://www.twilio.com/), [Pagerduty](https://www.pagerduty.com), [Mailgun](https://www.mailgun.com/), [PopcornNotify](https://popcornnotify.com), [StatusPage.io](https://statuspage.io), [iCloud](https://www.icloud.com/mail), [VictorOps (Splunk)](https://www.splunk.com/en_us/investor-relations/acquisitions/splunk-on-call.html)
+[Pushover](https://pushover.net/), [SimplePush](https://simplepush.io/), [Slack](https://api.slack.com/), [Gmail](https://www.google.com/gmail/about/), Email (SMTP), [Telegram](https://telegram.org/), [Gitter](https://gitter.im), [Pushbullet](https://www.pushbullet.com), [Join](https://joaoapps.com/join/), [Zulip](https://zulipchat.com/), [Twilio](https://www.twilio.com/), [Pagerduty](https://www.pagerduty.com), [Mailgun](https://www.mailgun.com/), [PopcornNotify](https://popcornnotify.com), [StatusPage.io](https://statuspage.io), [iCloud](https://www.icloud.com/mail), [VictorOps (Splunk)](https://www.splunk.com/en_us/investor-relations/acquisitions/splunk-on-call.html), [Notify](https://github.com/K0IN/Notify)
 
 # Advantages
 
