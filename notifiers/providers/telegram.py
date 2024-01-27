@@ -64,6 +64,11 @@ class Telegram(TelegramMixin, Provider):
                 "title": "Unique identifier for the target chat or username of the target channel "
                 "(in the format @channelusername)",
             },
+            "message_thread_id": {
+                "type": "string",
+                "title": "Use in case routing message into specific topic inside a supergroup",
+            },
+            
             "parse_mode": {
                 "type": "string",
                 "title": "Send Markdown or HTML, if you want Telegram apps to show bold, italic,"
