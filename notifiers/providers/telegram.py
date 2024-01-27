@@ -68,7 +68,6 @@ class Telegram(TelegramMixin, Provider):
                 "type": "string",
                 "title": "Use in case routing message into specific topic inside a supergroup",
             },
-            
             "parse_mode": {
                 "type": "string",
                 "title": "Send Markdown or HTML, if you want Telegram apps to show bold, italic,"
