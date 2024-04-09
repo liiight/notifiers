@@ -59,7 +59,10 @@ class Telegram(TelegramMixin, Provider):
                 "maxLength": 4096,
             },
             "token": {"type": "string", "title": "Bot token"},
-            "message_thread_id": {"oneOf": [{"type": "string"}, {"type": "integer"}], "title":"Thread ID"},
+            "message_thread_id": {
+                "oneOf": [{"type": "string"}, {"type": "integer"}],
+                "title": "Thread ID",
+            },
             "chat_id": {
                 "oneOf": [{"type": "string"}, {"type": "integer"}],
                 "title": "Unique identifier for the target chat or username of the target channel "
