@@ -1,9 +1,9 @@
+import importlib.machinery
+import importlib.util
 import logging
 from abc import ABC
 from abc import abstractmethod
 from importlib.metadata import entry_points
-import importlib.machinery
-import importlib.util
 
 import jsonschema
 import requests
