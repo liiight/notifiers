@@ -2,6 +2,8 @@ import logging
 from abc import ABC
 from abc import abstractmethod
 from importlib.metadata import entry_points
+import importlib.machinery
+import importlib.util
 
 import jsonschema
 import requests
@@ -349,6 +351,29 @@ def get_notifier(provider_name: str, strict: bool = False) -> Provider:
         raise NoSuchNotifierError(name=provider_name)
 
 
+def load_provider_from_points(entry_points: str):
+    """Load a Provider class from a given entry point string.
+
+    This function takes an entry point string in the format
+    'module_path:class_name', imports the module dynamically using
+    importlib, and returns the specified class from the module.
+
+    :param entry_points: A string specifying the module path and class name, separated by a colon.
+    :return: :class:`Provider` or None
+    :raises ImportError: If the specified module cannot be imported.
+    :raises AttributeError: If the specified class cannot be found in the module.
+
+    Example:
+        >>> entry_points = "xxx.provider:Provider"
+        >>> plugin_class = load_provider_from_points(entry_points)
+        >>> plugin_instance = plugin_class()
+    """
+    instance_path, instance = entry_points.split(":")
+    module = importlib.import_module(instance_path)
+    provider = getattr(module, instance)
+    return provider
+
+
 def get_providers_from_entry_points(group_name: str = "notifiers") -> dict:
     """
     Get a dictionary of plugins from the entry points based on the given group name.
@@ -368,7 +393,7 @@ def get_providers_from_entry_points(group_name: str = "notifiers") -> dict:
     points = entry_points()
     for item in points.get(group_name, []):
         if item.group == group_name:
-            result[item.name] = item.value
+            result[item.name] = load_provider_from_points(item.value)
     return result
 
 
