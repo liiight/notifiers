@@ -24,6 +24,8 @@ Core API reference
 
 .. autofunction:: notifiers.core.get_all_providers
 
+.. autofunction:: notifiers.core.load_provider_from_points
+
 .. autofunction:: notifiers.core.get_providers_from_entry_points
 
 .. autofunction:: notifiers.core.notify
