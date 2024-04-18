@@ -11,13 +11,12 @@ import jsonschema
 import requests
 from jsonschema.exceptions import best_match
 
-from .exceptions import (
-    BadArguments,
-    NoSuchNotifierError,
-    NotificationError,
-    SchemaError,
-)
-from .utils.helpers import dict_from_environs, merge_dicts
+from .exceptions import BadArguments
+from .exceptions import NoSuchNotifierError
+from .exceptions import NotificationError
+from .exceptions import SchemaError
+from .utils.helpers import dict_from_environs
+from .utils.helpers import merge_dicts
 from .utils.schema.formats import format_checker
 
 DEFAULT_ENVIRON_PREFIX = "NOTIFIERS_"
