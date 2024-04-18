@@ -22,6 +22,10 @@ Core API reference
 
 .. autofunction:: notifiers.core.all_providers
 
+.. autofunction:: notifiers.core.get_all_providers
+
+.. autofunction:: notifiers.core.get_providers_from_entry_points
+
 .. autofunction:: notifiers.core.notify
 
 Logging
