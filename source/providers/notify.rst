@@ -43,4 +43,4 @@ Full schema:
     - title
     - message
     - base_url
-type: object
+    type: object
