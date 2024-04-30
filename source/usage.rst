@@ -207,3 +207,32 @@ You can also use the ``ok`` property:
     ['application token is invalid']
 
 
+Writing your own providers
+-----------------
+Making your provider installable by others
+If you want to make your provider externally available,
+you may define a so-called entry point for your distribution so that notifiers finds your provider module.
+Entry points are a feature that is provided by Documentation.
+notifiers looks up the `notifiers` entrypoint to discover its providers and you can thus make your provider available
+by defining it in your setuptools-invocation:
+
+.. code:: python
+
+    >>> # sample ./setup.py file
+    >>> from setuptools import setup
+
+    >>> setup(
+    >>>    name="myproject",
+    >>>    packages=["myproject"],
+    >>>    # the following makes a plugin available to notifiers
+    >>>    entry_points={"notifiers": ["name_of_provider = myproject.provider"]},
+    >>> )
+
+If a package is installed this way, `notifiers` will load `myproject.provider` as a provider for notifiers.
+
+.. code:: python
+
+    >>> from notifiers import get_notifier
+    >>> notifier = get_notifier('name_of_provider')
+    >>> notifier.notify(msgtype='text', api_key='1234', message='test')
+
