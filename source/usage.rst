@@ -103,6 +103,306 @@ You can also change the default prefix of ``NOTIFIERS_`` by pass the ``env_prefi
 
     >>> p.notify(message='test', env_prefix='MY_OWN_PREFIX_')
 
+Writing Your Own Providers
+-------------------------
+
+The notifiers package is designed to be extensible, allowing you to create and integrate your own notification providers.
+This guide will walk you through the process of creating a custom provider and making it available to others.
+
+Creating a Custom Provider
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To create a custom provider, you need to:
+
+1. Create a new class that inherits from ``Provider``
+2. Implement the required methods and schema
+3. Register your provider
+
+Here's a basic example:
+
+.. code:: python
+
+    from notifiers.core import Provider, Response
+    from notifiers.utils.schema import one_of
+    
+    class MyCustomProvider(Provider):
+        name = "my_provider"
+        site_url = "https://my-provider.com"
+        
+        # Define your provider's schema
+        _required = {"required": ["message", "api_key"]}
+        _schema = {
+            "type": "object",
+            "properties": {
+                "message": {"type": "string"},
+                "api_key": {"type": "string"},
+                "msgtype": one_of(["text", "html"], default="text")
+            },
+            "additionalProperties": False
+        }
+        
+        def _notify(self, data: dict) -> Response:
+            # Implement your notification logic here
+            return Response(status="Success", provider=self.name, data=data)
+
+Making Your Provider Installable
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To make your provider available to others, you need to:
+
+1. Create a proper Python package structure
+2. Define an entry point in your ``setup.py``
+
+Here's the recommended package structure:
+
+.. code::
+
+    myproject/
+    ├── myproject/
+    │   ├── __init__.py
+    │   └── provider.py    # Contains your provider implementation
+    ├── setup.py
+    ├── README.md
+    └── requirements.txt
+
+Configure your ``setup.py`` to register the provider:
+
+.. code:: python
+
+    from setuptools import setup, find_packages
+
+    setup(
+        name="myproject",
+        version="0.1.0",
+        packages=find_packages(),
+        install_requires=[
+            "notifiers>=1.0.0"
+        ],
+        # Register your provider as an entry point
+        entry_points={
+            "notifiers": [
+                "my_provider = myproject.provider:MyCustomProvider"
+            ]
+        },
+        author="Your Name",
+        author_email="your.email@example.com",
+        description="A custom notification provider for notifiers",
+        long_description=open("README.md").read(),
+        long_description_content_type="text/markdown",
+        url="https://github.com/yourusername/myproject",
+        classifiers=[
+            "Programming Language :: Python :: 3",
+            "License :: OSI Approved :: MIT License",
+            "Operating System :: OS Independent",
+        ],
+        python_requires=">=3.6",
+    )
+
+Using Your Custom Provider
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Once installed, your provider can be used like any built-in provider:
+
+.. code:: python
+
+    >>> from notifiers import get_notifier
+    >>> notifier = get_notifier('my_provider')
+    >>> notifier.notify(
+    ...     message='Hello from my custom provider!',
+    ...     api_key='your-api-key'
+    ... )
+
+Testing Your Provider
+~~~~~~~~~~~~~~~~~~~
+
+It's crucial to thoroughly test your provider. Here's how to set up tests:
+
+.. code:: python
+
+    import pytest
+    from notifiers.core import Provider
+    from notifiers.exceptions import BadArguments
+
+    def test_provider_arguments():
+        provider = MyCustomProvider()
+        data = {
+            "message": "test message",
+            "api_key": "test_key"
+        }
+        rsp = provider.notify(**data)
+        assert rsp.status == "Success"
+
+        # Test invalid arguments
+        with pytest.raises(BadArguments):
+            provider.notify(message="test")  # Missing api_key
+
+Schema Validation
+~~~~~~~~~~~~~~~
+
+The schema is crucial for validating input parameters. Here's a detailed example:
+
+.. code:: python
+
+    class MyCustomProvider(Provider):
+        _required = {
+            "required": ["message", "api_key"],
+            "dependencies": {
+                "username": ["password"]  # If username is provided, password is required
+            }
+        }
+        _schema = {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "title": "Message",
+                    "description": "The notification message"
+                },
+                "api_key": {
+                    "type": "string",
+                    "title": "API Key",
+                    "description": "Your API authentication key"
+                },
+                "username": {
+                    "type": "string",
+                    "title": "Username",
+                },
+                "password": {
+                    "type": "string",
+                    "title": "Password",
+                },
+                "timeout": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "default": 10,
+                    "title": "Timeout",
+                    "description": "Request timeout in seconds"
+                }
+            },
+            "additionalProperties": False
+        }
+
+Troubleshooting Guide
+~~~~~~~~~~~~~~~~~~~
+
+Common issues and solutions when developing providers:
+
+1. **Entry Point Not Found**
+
+   - Ensure your ``setup.py`` entry point exactly matches your provider class
+   - Verify the package is installed in development mode (``pip install -e .``)
+   - Check that the provider module is importable
+
+2. **Schema Validation Errors**
+
+   - Use the ``notify`` method's ``raise_on_errors`` parameter to debug
+   - Check all required fields are provided
+   - Verify data types match the schema
+
+3. **Response Handling**
+
+   - Always return a ``Response`` object from ``_notify``
+   - Include relevant error messages in the response
+   - Handle API rate limits and timeouts
+
+Real-World Example
+~~~~~~~~~~~~~~~~
+
+Here's a complete example of a provider that sends notifications via a REST API:
+
+.. code:: python
+
+    import requests
+    from notifiers.core import Provider, Response
+    from notifiers.utils.schema import one_of
+    from notifiers.exceptions import NotifierException
+
+    class RestAPIProvider(Provider):
+        name = "rest_api"
+        site_url = "https://api.example.com"
+        
+        _required = {"required": ["message", "api_key", "endpoint"]}
+        _schema = {
+            "type": "object",
+            "properties": {
+                "message": {"type": "string"},
+                "api_key": {"type": "string"},
+                "endpoint": {"type": "string"},
+                "method": one_of(["GET", "POST"], default="POST"),
+                "timeout": {"type": "integer", "minimum": 1, "default": 10}
+            }
+        }
+        
+        def _notify(self, data: dict) -> Response:
+            try:
+                headers = {
+                    "Authorization": f"Bearer {data['api_key']}",
+                    "Content-Type": "application/json"
+                }
+                
+                payload = {
+                    "text": data["message"]
+                }
+                
+                response = requests.request(
+                    method=data["method"],
+                    url=f"{self.site_url}/{data['endpoint']}",
+                    headers=headers,
+                    json=payload,
+                    timeout=data.get("timeout", 10)
+                )
+                
+                response.raise_for_status()
+                
+                return Response(
+                    status="Success",
+                    provider=self.name,
+                    data=response.json()
+                )
+                
+            except requests.exceptions.RequestException as e:
+                raise NotifierException(
+                    provider=self.name,
+                    message=f"API request failed: {str(e)}"
+                )
+
+Usage example:
+
+.. code:: python
+
+    >>> notifier = get_notifier('rest_api')
+    >>> notifier.notify(
+    ...     message="Hello API",
+    ...     api_key="your-api-key",
+    ...     endpoint="notifications/send"
+    ... )
+
+Community Providers
+~~~~~~~~~~~~~~~~
+
+Here are some community-created providers that you can use or reference when building your own:
+
+- `notifiers-wecom-provider <https://github.com/loonghao/notifiers_wecom_provider>`_: A provider for sending notifications to WeCom (企业微信)
+
+These providers serve as excellent examples of how to implement custom notification providers. Feel free to:
+
+- Use them directly in your projects
+- Study their implementation for best practices
+- Contribute to their development
+- Use them as templates for your own providers
+
+If you've created a provider, please let us know so we can add it to this list!
+
+Best Practices
+~~~~~~~~~~~~
+
+1. Always validate input data using the schema
+2. Implement proper error handling
+3. Include comprehensive documentation
+4. Add tests for your provider
+5. Follow the notifiers package conventions
+
+For more examples and detailed API documentation, refer to the :ref:`api_reference` section.
 
 Provider resources
 ------------------
@@ -205,34 +505,3 @@ You can also use the ``ok`` property:
     False
     >>> rsp.errors
     ['application token is invalid']
-
-
-Writing your own providers
------------------
-Making your provider installable by others
-If you want to make your provider externally available,
-you may define a so-called entry point for your distribution so that notifiers finds your provider module.
-Entry points are a feature that is provided by Documentation.
-notifiers looks up the `notifiers` entrypoint to discover its providers and you can thus make your provider available
-by defining it in your setuptools-invocation:
-
-.. code:: python
-
-    >>> # sample ./setup.py file
-    >>> from setuptools import setup
-
-    >>> setup(
-    >>>    name="myproject",
-    >>>    packages=["myproject"],
-    >>>    # the following makes a plugin available to notifiers
-    >>>    entry_points={"notifiers": ["name_of_provider = myproject.provider"]},
-    >>> )
-
-If a package is installed this way, `notifiers` will load `myproject.provider` as a provider for notifiers.
-
-.. code:: python
-
-    >>> from notifiers import get_notifier
-    >>> notifier = get_notifier('name_of_provider')
-    >>> notifier.notify(msgtype='text', api_key='1234', message='test')
-
