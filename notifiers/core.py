@@ -1,6 +1,9 @@
+import importlib.machinery
+import importlib.util
 import logging
 from abc import ABC
 from abc import abstractmethod
+from importlib.metadata import entry_points
 
 import jsonschema
 import requests
@@ -340,16 +343,75 @@ def get_notifier(provider_name: str, strict: bool = False) -> Provider:
     :return: :class:`Provider` or None
     :raises ValueError: In case ``strict`` is True and provider not found
     """
-    if provider_name in _all_providers:
+    providers = get_all_providers()
+    if provider_name in providers:
         log.debug("found a match for '%s', returning", provider_name)
-        return _all_providers[provider_name]()
+        return providers[provider_name]()
     elif strict:
         raise NoSuchNotifierError(name=provider_name)
 
 
+def load_provider_from_points(entry_points: str):
+    """Load a Provider class from a given entry point string.
+
+    This function takes an entry point string in the format
+    'module_path:class_name', imports the module dynamically using
+    importlib, and returns the specified class from the module.
+
+    :param entry_points: A string specifying the module path and class name, separated by a colon.
+    :return: :class:`Provider` or None
+    :raises ImportError: If the specified module cannot be imported.
+    :raises AttributeError: If the specified class cannot be found in the module.
+
+    Example:
+        >>> entry_points = "xxx.provider:Provider"
+        >>> plugin_class = load_provider_from_points(entry_points)
+        >>> plugin_instance = plugin_class()
+    """
+    instance_path, instance = entry_points.split(":")
+    module = importlib.import_module(instance_path)
+    provider = getattr(module, instance)
+    return provider
+
+
+def get_providers_from_entry_points(group_name: str = "notifiers") -> dict:
+    """
+    Get a dictionary of plugins from the entry points based on the given group name.
+
+    This function will search for the entry points with the specified group name
+    and return a dictionary where the keys are the names of the entry points and
+    the values are the corresponding entry point values.
+
+    :param group_name: The group name of the entry points to search for.
+    :return: Dict: A dictionary containing the entry point names as keys and their corresponding values as values.
+
+    Example:
+        >>> get_providers_from_entry_points("notifiers")
+        {"plugin1": "package.module:PluginClass", "plugin2": "package2.module:OtherPluginClass"}
+    """
+    result: dict = {}
+    points = entry_points()
+    for item in points.get(group_name, []):
+        if item.group == group_name:
+            result[item.name] = load_provider_from_points(item.value)
+    return result
+
+
+def get_all_providers() -> dict:
+    """Get all providers from the entry points and the default providers.
+
+    :return: Dict: A dictionary containing the entry point names as keys and their corresponding values as values.
+
+    """
+    default_providers = _all_providers.copy()
+    entry_point_providers = get_providers_from_entry_points()
+    default_providers.update(entry_point_providers)
+    return default_providers
+
+
 def all_providers() -> list:
     """Returns a list of all :class:`~notifiers.core.Provider` names"""
-    return list(_all_providers.keys())
+    return list(get_all_providers().keys())
 
 
 def notify(provider_name: str, **kwargs) -> Response:
