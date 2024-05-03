@@ -2,8 +2,6 @@ import logging
 import os
 from pathlib import Path
 
-from distutils.util import strtobool
-
 log = logging.getLogger("notifiers")
 
 
@@ -14,7 +12,7 @@ def text_to_bool(value: str) -> bool:
     :param value: Value to check
     """
     try:
-        return bool(strtobool(value))
+        return value.lower() in {"y", "yes", "t", "true", "on", "1"}
     except (ValueError, AttributeError):
         return value is not None
 
