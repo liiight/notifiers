@@ -34,6 +34,7 @@ To view the main help just enter ``notifiers`` or ``notifiers --help``:
       telegram    Options for 'telegram'
       zulip       Options for 'zulip'
       victorops       Options for 'victorops'
+      notify      Options for 'notify'
 
 
 To view all providers use the ``providers`` command like so:
