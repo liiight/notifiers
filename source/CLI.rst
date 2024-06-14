@@ -123,7 +123,7 @@ Notifiers CLI enable using pipe to directly pass value to the ``message`` argume
 
 .. code-block:: console
 
-    $ cat file.txt | notifiers notify email --to blah@foo.com
+    $ cat file.txt | notifiers email notify --to blah@foo.com
 
 Environment variables
 =====================
@@ -135,7 +135,7 @@ If you defined for example ``NOTIFIERS_PUSHOVER_TOKEN`` and ``NOTIFIERS_PUSHOVER
 
     $ export NOTIFIERS_PUSHOVER_TOKEN=FOO
     $ export NOTIFIERS_PUSHOVER_USER=BAR
-    $ notifiers notify pushover "wow, this is easy!"
+    $ notifiers pushover notify "wow, this is easy!"
 
 You can change the default env var prefix (which is ``NOTIFIERS_``) by sending the ``--env-prefix`` option:
 
@@ -149,7 +149,7 @@ You can change the default env var prefix (which is ``NOTIFIERS_``) by sending t
 
    .. code-block:: console
 
-        $ alias notify="notifiers notify pushover"
+        $ alias notify="notifiers pushover notify"
 
    And when combining this with setting environment variables, you can run:
 
