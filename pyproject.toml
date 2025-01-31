@@ -43,7 +43,7 @@ sphinx-rtd-theme = "^1.0.0"
 hypothesis = "^6.37.0"
 pre-commit = "^2.20.0"
 retry = "^0.9.2"
-Sphinx = "^5.0.2"
+Sphinx = "^5.1.0"
 
 [tool.poetry.scripts]
 notifiers = "notifiers_cli.core:entry_point"
