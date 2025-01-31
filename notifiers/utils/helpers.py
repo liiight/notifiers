@@ -2,6 +2,8 @@ import logging
 import os
 from pathlib import Path
 
+from distutils.util import strtobool
+
 log = logging.getLogger("notifiers")
 
 
