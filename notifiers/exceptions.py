@@ -62,7 +62,7 @@ class NotificationError(NotifierException):
 
     def __init__(self, *args, **kwargs):
         self.errors = kwargs.pop("errors", None)
-        kwargs["message"] = f'Notification errors: {",".join(self.errors)}'
+        kwargs["message"] = f"Notification errors: {','.join(self.errors)}"
         super().__init__(*args, **kwargs)
 
     def __repr__(self):
@@ -78,7 +78,7 @@ class ResourceError(NotifierException):
     def __init__(self, *args, **kwargs):
         self.errors = kwargs.pop("errors", None)
         self.resource = kwargs.pop("resource", None)
-        kwargs["message"] = f'Notifier resource errors: {",".join(self.errors)}'
+        kwargs["message"] = f"Notifier resource errors: {','.join(self.errors)}"
         super().__init__(*args, **kwargs)
 
     def __repr__(self):

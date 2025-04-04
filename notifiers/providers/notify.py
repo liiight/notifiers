@@ -1,5 +1,4 @@
-from ..core import Provider
-from ..core import Response
+from ..core import Provider, Response
 from ..utils import requests
 
 

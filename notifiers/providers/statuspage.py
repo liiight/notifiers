@@ -1,8 +1,5 @@
-from ..core import Provider
-from ..core import ProviderResource
-from ..core import Response
-from ..exceptions import BadArguments
-from ..exceptions import ResourceError
+from ..core import Provider, ProviderResource, Response
+from ..exceptions import BadArguments, ResourceError
 from ..utils import requests
 
 
@@ -35,9 +32,7 @@ class StatuspageComponents(StatuspageMixin, ProviderResource):
     def _get_resource(self, data: dict) -> dict:
         url = self.base_url.format(page_id=data["page_id"]) + self.components_url
         params = {"api_key": data.pop("api_key")}
-        response, errors = requests.get(
-            url, params=params, path_to_errors=self.path_to_errors
-        )
+        response, errors = requests.get(url, params=params, path_to_errors=self.path_to_errors)
         if errors:
             raise ResourceError(
                 errors=errors,
@@ -63,8 +58,7 @@ class Statuspage(StatuspageMixin, Provider):
     __component_ids = {
         "type": "array",
         "items": {"type": "string"},
-        "title": "List of components whose subscribers should be notified (only applicable for pages with "
-        "component subscriptions enabled)",
+        "title": "List of components whose subscribers should be notified (only applicable for pages with component subscriptions enabled)",
     }
 
     _required = {"required": ["message", "api_key", "page_id"]}
@@ -149,18 +143,16 @@ class Statuspage(StatuspageMixin, Provider):
         if scheduled and backfill:
             raise BadArguments(
                 provider=self.name,
-                validation_error="Cannot set both 'backfill' and 'scheduled' incident properties "
-                "in the same notification!",
+                validation_error="Cannot set both 'backfill' and 'scheduled' incident properties in the same notification!",
             )
 
         status = data.get("status")
         if scheduled and status and status not in self.scheduled_statuses:
             raise BadArguments(
                 provider=self.name,
-                validation_error=f"Status '{status}' is a realtime incident status! "
-                f"Please choose one of {self.scheduled_statuses}",
+                validation_error=f"Status '{status}' is a realtime incident status! Please choose one of {self.scheduled_statuses}",
             )
-        elif backfill and status:
+        if backfill and status:
             raise BadArguments(
                 provider=self.name,
                 validation_error="Cannot set 'status' when setting 'backfill'!",
@@ -183,7 +175,5 @@ class Statuspage(StatuspageMixin, Provider):
     def _send_notification(self, data: dict) -> Response:
         url = self.base_url.format(page_id=data.pop("page_id")) + self.incidents_url
         params = {"api_key": data.pop("api_key")}
-        response, errors = requests.post(
-            url, data=data, params=params, path_to_errors=self.path_to_errors
-        )
+        response, errors = requests.post(url, data=data, params=params, path_to_errors=self.path_to_errors)
         return self.create_response(data, response, errors)

@@ -1,8 +1,6 @@
-from ..core import Provider
-from ..core import Response
+from ..core import Provider, Response
 from ..utils import requests
-from ..utils.schema.helpers import list_to_commas
-from ..utils.schema.helpers import one_or_more
+from ..utils.schema.helpers import list_to_commas, one_or_more
 
 
 class PopcornNotify(Provider):
@@ -24,8 +22,7 @@ class PopcornNotify(Provider):
                 {
                     "type": "string",
                     "format": "email",
-                    "title": "The recipient email address or phone number."
-                    " Or an array of email addresses and phone numbers",
+                    "title": "The recipient email address or phone number. Or an array of email addresses and phone numbers",
                 }
             ),
             "subject": {
@@ -42,7 +39,5 @@ class PopcornNotify(Provider):
         return data
 
     def _send_notification(self, data: dict) -> Response:
-        response, errors = requests.post(
-            url=self.base_url, json=data, path_to_errors=self.path_to_errors
-        )
+        response, errors = requests.post(url=self.base_url, json=data, path_to_errors=self.path_to_errors)
         return self.create_response(data, response, errors)

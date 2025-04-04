@@ -1,14 +1,8 @@
-import pytest
-
 import notifiers
+import pytest
 from notifiers import notify
-from notifiers.core import Provider
-from notifiers.core import Response
-from notifiers.core import SUCCESS_STATUS
-from notifiers.exceptions import BadArguments
-from notifiers.exceptions import NoSuchNotifierError
-from notifiers.exceptions import NotificationError
-from notifiers.exceptions import SchemaError
+from notifiers.core import SUCCESS_STATUS, Provider, Response
+from notifiers.exceptions import BadArguments, NoSuchNotifierError, NotificationError, SchemaError
 
 
 class TestCore:
@@ -48,10 +42,7 @@ class TestCore:
         assert isinstance(rsp, Response)
         assert not rsp.errors
         assert rsp.raise_on_errors() is None
-        assert (
-            repr(rsp)
-            == f"<Response,provider=Mock_provider,status={SUCCESS_STATUS}, errors=None>"
-        )
+        assert repr(rsp) == f"<Response,provider=Mock_provider,status={SUCCESS_STATUS}, errors=None>"
         assert repr(mock_provider) == "<Provider:[Mock_provider]>"
 
     @pytest.mark.parametrize(
@@ -123,8 +114,7 @@ class TestCore:
         with pytest.raises(TypeError) as e:
             bad_provider()
         assert (
-            "Can't instantiate abstract class BadProvider with abstract methods _required,"
-            " _schema, _send_notification, base_url, name, site_url"
+            "Can't instantiate abstract class BadProvider with abstract methods _required, _schema, _send_notification, base_url, name, site_url"
         ) in str(e.value)
 
     def test_environs(self, mock_provider, monkeypatch):
@@ -135,9 +125,7 @@ class TestCore:
         assert rsp.status == SUCCESS_STATUS
         assert rsp.data["required"] == "foo"
 
-    def test_provided_data_takes_precedence_over_environ(
-        self, mock_provider, monkeypatch
-    ):
+    def test_provided_data_takes_precedence_over_environ(self, mock_provider, monkeypatch):
         """Verify that given data overrides environ"""
         prefix = "mock_"
         monkeypatch.setenv(f"{prefix}{mock_provider.name}_required".upper(), "foo")
@@ -154,10 +142,7 @@ class TestCore:
         rsrc = resources[0]
         resource = getattr(mock_provider, rsrc)
         assert resource
-        assert (
-            repr(resource)
-            == "<ProviderResource,provider=mock_provider,resource=mock_resource>"
-        )
+        assert repr(resource) == "<ProviderResource,provider=mock_provider,resource=mock_resource>"
         assert resource.resource_name == "mock_resource"
         assert resource.name == mock_provider.name
         assert resource.schema == {

@@ -1,7 +1,5 @@
 import pytest
-
-from notifiers.exceptions import BadArguments
-from notifiers.exceptions import NotificationError
+from notifiers.exceptions import BadArguments, NotificationError
 
 provider = "icloud"
 
@@ -16,9 +14,7 @@ class TestiCloud:
             "site_url": "https://www.icloud.com/mail",
         }
 
-    @pytest.mark.parametrize(
-        "data, message", [({}, "message"), ({"message": "foo"}, "to")]
-    )
+    @pytest.mark.parametrize("data, message", [({}, "message"), ({"message": "foo"}, "to")])
     def test_icloud_missing_required(self, data, message, provider):
         data["env_prefix"] = "test"
         with pytest.raises(BadArguments) as e:
@@ -53,9 +49,7 @@ class TestiCloud:
 
     def test_multiple_to(self, provider):
         to = ["foo@foo.com", "bar@foo.com"]
-        rsp = provider.notify(
-            to=to, message="foo", host="goo", username="ding", password="dong"
-        )
+        rsp = provider.notify(to=to, message="foo", host="goo", username="ding", password="dong")
         assert rsp.data["to"] == ",".join(to)
 
     def test_icloud_negative(self, provider):

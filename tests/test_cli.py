@@ -1,8 +1,7 @@
 import re
 
-import pytest
-
 import notifiers
+import pytest
 
 mock_name = "mock_provider"
 
@@ -16,15 +15,13 @@ class TestCLI:
         cmd = f"{mock_name} notify".split()
         result = cli_runner(cmd)
         assert result.exit_code
-        assert getattr(result, "exception")
+        assert result.exception
 
     def test_notify_sanity(self, cli_runner):
         """Test valid notification usage"""
         cmd = f"{mock_name} notify --required bar foo".split()
         result = cli_runner(cmd)
-        assert (
-            not result.exit_code
-        ), f"Exit code is {result.exit_code}. Output: {result.output}"
+        assert not result.exit_code, f"Exit code is {result.exit_code}. Output: {result.output}"
         assert "Succesfully sent a notification" in result.output
 
     def test_providers(self, cli_runner):
@@ -60,7 +57,7 @@ class TestCLI:
 
     def test_no_defaults(self, cli_runner):
         """Test defaults command"""
-        cmd = "pushover defaults".split()
+        cmd = ["pushover", "defaults"]
         result = cli_runner(cmd)
         assert not result.exit_code
         assert "{}" in result.output

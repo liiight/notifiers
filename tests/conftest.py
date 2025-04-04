@@ -6,17 +6,11 @@ from unittest.mock import MagicMock
 
 import pytest
 from click.testing import CliRunner
-
-from notifiers.core import get_notifier
-from notifiers.core import Provider
-from notifiers.core import ProviderResource
-from notifiers.core import Response
-from notifiers.core import SUCCESS_STATUS
+from notifiers.core import SUCCESS_STATUS, Provider, ProviderResource, Response, get_notifier
 from notifiers.logging import NotificationHandler
 from notifiers.providers import _all_providers
 from notifiers.utils.helpers import text_to_bool
-from notifiers.utils.schema.helpers import list_to_commas
-from notifiers.utils.schema.helpers import one_or_more
+from notifiers.utils.schema.helpers import list_to_commas, one_or_more
 
 log = logging.getLogger(__name__)
 
@@ -50,9 +44,7 @@ class MockProvider(MockProxy, Provider):
     _schema = {
         "type": "object",
         "properties": {
-            "not_required": one_or_more(
-                {"type": "string", "title": "example for not required arg"}
-            ),
+            "not_required": one_or_more({"type": "string", "title": "example for not required arg"}),
             "required": {"type": "string"},
             "option_with_default": {"type": "string"},
             "message": {"type": "string"},

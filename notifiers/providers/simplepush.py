@@ -1,5 +1,4 @@
-from ..core import Provider
-from ..core import Response
+from ..core import Provider, Response
 from ..utils import requests
 
 
@@ -28,7 +27,5 @@ class SimplePush(Provider):
 
     def _send_notification(self, data: dict) -> Response:
         path_to_errors = ("message",)
-        response, errors = requests.post(
-            self.base_url, data=data, path_to_errors=path_to_errors
-        )
+        response, errors = requests.post(self.base_url, data=data, path_to_errors=path_to_errors)
         return self.create_response(data, response, errors)

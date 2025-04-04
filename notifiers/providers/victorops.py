@@ -1,5 +1,4 @@
-from ..core import Provider
-from ..core import Response
+from ..core import Provider, Response
 from ..utils import requests
 
 
@@ -63,10 +62,7 @@ class VictorOps(Provider):
                     "^vo_annotate.i.": {"type": "string"},
                 },
                 "minProperties": 1,
-                "title": "annotations can be of three types: "
-                "vo_annotate.u.{custom_name}, "
-                "vo_annotate.s.{custom_name}, "
-                "vo_annotate.i.{custom_name} .",
+                "title": "annotations can be of three types: vo_annotate.u.{custom_name}, vo_annotate.s.{custom_name}, vo_annotate.i.{custom_name} .",
                 "additionalProperties": False,
             },
             "additional_keys": {

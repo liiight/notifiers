@@ -1,7 +1,6 @@
 import datetime
 
 import pytest
-
 from notifiers.exceptions import BadArguments
 
 provider = "pagerduty"

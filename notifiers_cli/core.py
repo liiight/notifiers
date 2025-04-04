@@ -1,17 +1,12 @@
 from functools import partial
 
 import click
-
-from notifiers import __version__
-from notifiers import get_notifier
+from notifiers import __version__, get_notifier
 from notifiers.core import all_providers
 from notifiers.exceptions import NotifierException
-from notifiers_cli.utils.callbacks import _notify
-from notifiers_cli.utils.callbacks import _resource
-from notifiers_cli.utils.callbacks import _resources
-from notifiers_cli.utils.callbacks import func_factory
-from notifiers_cli.utils.dynamic_click import CORE_COMMANDS
-from notifiers_cli.utils.dynamic_click import schema_to_command
+
+from notifiers_cli.utils.callbacks import _notify, _resource, _resources, func_factory
+from notifiers_cli.utils.dynamic_click import CORE_COMMANDS, schema_to_command
 
 
 def provider_group_factory():
@@ -35,17 +30,13 @@ def provider_group_factory():
         )
         group.add_command(resources_cmd)
 
-        pretty_opt = click.Option(
-            ["--pretty/--not-pretty"], help="Output a pretty version of the JSON"
-        )
+        pretty_opt = click.Option(["--pretty/--not-pretty"], help="Output a pretty version of the JSON")
 
         # Add any provider resources
         for resource in p.resources:
             rsc = getattr(p, resource)
             rsrc_callback = partial(_resource, rsc)
-            rsrc_command = schema_to_command(
-                rsc, resource, rsrc_callback, add_message=False
-            )
+            rsrc_command = schema_to_command(rsc, resource, rsrc_callback, add_message=False)
             rsrc_command.params.append(pretty_opt)
             group.add_command(rsrc_command)
 
@@ -64,9 +55,7 @@ def provider_group_factory():
 
 
 @click.group()
-@click.version_option(
-    version=__version__, prog_name="notifiers", message=("%(prog)s %(version)s")
-)
+@click.version_option(version=__version__, prog_name="notifiers", message=("%(prog)s %(version)s"))
 @click.option("--env-prefix", help="Set a custom prefix for env vars usage")
 @click.pass_context
 def notifiers_cli(ctx, env_prefix):

@@ -1,7 +1,6 @@
 import os
 
 import pytest
-
 from notifiers.exceptions import BadArguments
 
 provider = "pushbullet"
@@ -16,9 +15,7 @@ class TestPushbullet:
             "site_url": "https://www.pushbullet.com",
         }
 
-    @pytest.mark.parametrize(
-        "data, message", [({}, "message"), ({"message": "foo"}, "token")]
-    )
+    @pytest.mark.parametrize("data, message", [({}, "message"), ({"message": "foo"}, "token")])
     def test_missing_required(self, data, message, provider):
         data["env_prefix"] = "test"
         with pytest.raises(BadArguments) as e:
@@ -53,7 +50,7 @@ class TestPushbulletCLI:
     """Test Pushbullet specific CLI"""
 
     def test_pushbullet_devices_negative(self, cli_runner):
-        cmd = "pushbullet devices --token bad_token".split()
+        cmd = ["pushbullet", "devices", "--token", "bad_token"]
         result = cli_runner(cmd)
         assert result.exit_code
         assert not result.output

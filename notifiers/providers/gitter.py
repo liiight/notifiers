@@ -1,6 +1,4 @@
-from ..core import Provider
-from ..core import ProviderResource
-from ..core import Response
+from ..core import Provider, ProviderResource, Response
 from ..exceptions import ResourceError
 from ..utils import requests
 
@@ -98,7 +96,5 @@ class Gitter(GitterMixin, Provider):
         url = self.base_url + self.message_url.format(room_id=room_id)
 
         headers = self._get_headers(data.pop("token"))
-        response, errors = requests.post(
-            url, json=data, headers=headers, path_to_errors=self.path_to_errors
-        )
+        response, errors = requests.post(url, json=data, headers=headers, path_to_errors=self.path_to_errors)
         return self.create_response(data, response, errors)

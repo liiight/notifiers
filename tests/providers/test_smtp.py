@@ -1,14 +1,12 @@
 from email.message import EmailMessage
 
 import pytest
-
-from notifiers.exceptions import BadArguments
-from notifiers.exceptions import NotificationError
+from notifiers.exceptions import BadArguments, NotificationError
 
 provider = "email"
 
 
-class TestSMTP(object):
+class TestSMTP:
     """SMTP tests"""
 
     def test_smtp_metadata(self, provider):
@@ -18,9 +16,7 @@ class TestSMTP(object):
             "site_url": "https://en.wikipedia.org/wiki/Email",
         }
 
-    @pytest.mark.parametrize(
-        "data, message", [({}, "message"), ({"message": "foo"}, "to")]
-    )
+    @pytest.mark.parametrize("data, message", [({}, "message"), ({"message": "foo"}, "to")])
     def test_smtp_missing_required(self, data, message, provider):
         data["env_prefix"] = "test"
         with pytest.raises(BadArguments) as e:
@@ -39,12 +35,8 @@ class TestSMTP(object):
             rsp = provider.notify(**data)
             rsp.raise_on_errors()
         possible_errors = "Errno 111", "Errno 61", "Errno 8", "Errno -2", "Errno -3"
-        assert any(
-            error in e.value.message for error in possible_errors
-        ), f"Error not in expected errors; {e.value.message}"
-        assert any(
-            error in rsp_error for rsp_error in rsp.errors for error in possible_errors
-        ), f"Error not in expected errors; {rsp.errors}"
+        assert any(error in e.value.message for error in possible_errors), f"Error not in expected errors; {e.value.message}"
+        assert any(error in rsp_error for rsp_error in rsp.errors for error in possible_errors), f"Error not in expected errors; {rsp.errors}"
 
     def test_email_from_key(self, provider):
         rsp = provider.notify(
@@ -61,9 +53,7 @@ class TestSMTP(object):
 
     def test_multiple_to(self, provider):
         to = ["foo@foo.com", "bar@foo.com"]
-        rsp = provider.notify(
-            to=to, message="foo", host="nohost", username="ding", password="dong"
-        )
+        rsp = provider.notify(to=to, message="foo", host="nohost", username="ding", password="dong")
         assert rsp.data["to"] == ",".join(to)
 
     def test_attachment(self, provider, tmpdir):

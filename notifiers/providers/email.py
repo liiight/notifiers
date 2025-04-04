@@ -4,16 +4,11 @@ import socket
 from email.message import EmailMessage
 from email.utils import formatdate
 from pathlib import Path
-from smtplib import SMTPAuthenticationError
-from smtplib import SMTPSenderRefused
-from smtplib import SMTPServerDisconnected
-from typing import List
-from typing import Tuple
+from smtplib import SMTPAuthenticationError, SMTPSenderRefused, SMTPServerDisconnected
+from typing import List, Tuple
 
-from ..core import Provider
-from ..core import Response
-from ..utils.schema.helpers import list_to_commas
-from ..utils.schema.helpers import one_or_more
+from ..core import Provider, Response
+from ..utils.schema.helpers import list_to_commas, one_or_more
 
 DEFAULT_SUBJECT = "New email from 'notifiers'!"
 DEFAULT_FROM = f"notifiers@{socket.getfqdn()}"
@@ -181,23 +176,12 @@ class SMTP(Provider):
         errors = None
         try:
             configuration = self._get_configuration(data)
-            if (
-                not self.configuration
-                or not self.smtp_server
-                or self.configuration != configuration
-            ):
+            if not self.configuration or not self.smtp_server or self.configuration != configuration:
                 self._connect_to_server(data)
             email = self._build_email(data)
             if data.get("attachments"):
                 self._add_attachments(data["attachments"], email)
             self.smtp_server.send_message(email)
-        except (
-            SMTPServerDisconnected,
-            SMTPSenderRefused,
-            socket.error,
-            OSError,
-            IOError,
-            SMTPAuthenticationError,
-        ) as e:
+        except (SMTPServerDisconnected, SMTPSenderRefused, OSError, SMTPAuthenticationError) as e:
             errors = [str(e)]
         return self.create_response(data, errors=errors)

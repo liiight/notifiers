@@ -5,10 +5,8 @@ from time import sleep
 
 import pytest
 import requests
-
 from notifiers.core import FAILURE_STATUS
-from notifiers.exceptions import BadArguments
-from notifiers.exceptions import ResourceError
+from notifiers.exceptions import BadArguments, ResourceError
 
 provider = "statuspage"
 
@@ -119,12 +117,8 @@ class TestStatusPage:
                     "wants_twitter_update": False,
                     "impact_override": "minor",
                     "deliver_notifications": False,
-                    "scheduled_for": (
-                        datetime.datetime.utcnow() + datetime.timedelta(minutes=10)
-                    ).isoformat(),
-                    "scheduled_until": (
-                        datetime.datetime.utcnow() + datetime.timedelta(minutes=12)
-                    ).isoformat(),
+                    "scheduled_for": (datetime.datetime.utcnow() + datetime.timedelta(minutes=10)).isoformat(),
+                    "scheduled_until": (datetime.datetime.utcnow() + datetime.timedelta(minutes=12)).isoformat(),
                     "scheduled_remind_prior": False,
                     "scheduled_auto_in_progress": True,
                     "scheduled_auto_completed": True,
@@ -136,9 +130,7 @@ class TestStatusPage:
                     "body": "Incident body",
                     "impact_override": "minor",
                     "backfilled": True,
-                    "backfill_date": (
-                        datetime.date.today() - datetime.timedelta(days=1)
-                    ).isoformat(),
+                    "backfill_date": (datetime.date.today() - datetime.timedelta(days=1)).isoformat(),
                 }
             ),
         ],

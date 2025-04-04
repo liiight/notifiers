@@ -1,9 +1,7 @@
 import datetime
 
 import pytest
-
-from notifiers.exceptions import BadArguments
-from notifiers.exceptions import NotifierException
+from notifiers.exceptions import BadArguments, NotifierException
 
 provider = "zulip"
 

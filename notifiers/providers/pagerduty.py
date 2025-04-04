@@ -1,5 +1,4 @@
-from ..core import Provider
-from ..core import Response
+from ..core import Provider, Response
 from ..utils import requests
 
 
@@ -29,8 +28,7 @@ class PagerDuty(Provider):
             "properties": {
                 "src": {
                     "type": "string",
-                    "title": "The source of the image being attached to the incident. "
-                    "This image must be served via HTTPS.",
+                    "title": "The source of the image being attached to the incident. This image must be served via HTTPS.",
                 },
                 "href": {
                     "type": "string",
@@ -62,17 +60,14 @@ class PagerDuty(Provider):
         },
     }
 
-    _required = {
-        "required": ["routing_key", "event_action", "source", "severity", "message"]
-    }
+    _required = {"required": ["routing_key", "event_action", "source", "severity", "message"]}
 
     _schema = {
         "type": "object",
         "properties": {
             "message": {
                 "type": "string",
-                "title": "A brief text summary of the event, used to generate the summaries/titles of any "
-                "associated alerts",
+                "title": "A brief text summary of the event, used to generate the summaries/titles of any associated alerts",
             },
             "routing_key": {
                 "type": "string",
@@ -96,8 +91,7 @@ class PagerDuty(Provider):
             "severity": {
                 "type": "string",
                 "enum": ["critical", "error", "warning", "info"],
-                "title": "The perceived severity of the status the event is describing with respect to the "
-                "affected system",
+                "title": "The perceived severity of the status the event is describing with respect to the affected system",
             },
             "timestamp": {
                 "type": "string",
@@ -123,18 +117,12 @@ class PagerDuty(Provider):
     }
 
     def _prepare_data(self, data: dict) -> dict:
-        payload = {
-            attribute: data.pop(attribute)
-            for attribute in self.__payload_attributes
-            if data.get(attribute)
-        }
+        payload = {attribute: data.pop(attribute) for attribute in self.__payload_attributes if data.get(attribute)}
         payload["summary"] = payload.pop("message")
         data["payload"] = payload
         return data
 
     def _send_notification(self, data: dict) -> Response:
         url = self.base_url
-        response, errors = requests.post(
-            url, json=data, path_to_errors=self.path_to_errors
-        )
+        response, errors = requests.post(url, json=data, path_to_errors=self.path_to_errors)
         return self.create_response(data, response, errors)

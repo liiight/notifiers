@@ -1,12 +1,9 @@
 import hypothesis.strategies as st
 import pytest
 from hypothesis import given
-from jsonschema import validate
-from jsonschema import ValidationError
-
+from jsonschema import ValidationError, validate
 from notifiers.utils.schema.formats import format_checker
-from notifiers.utils.schema.helpers import list_to_commas
-from notifiers.utils.schema.helpers import one_or_more
+from notifiers.utils.schema.helpers import list_to_commas, one_or_more
 
 
 class TestFormats:

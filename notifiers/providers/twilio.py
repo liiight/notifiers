@@ -1,5 +1,4 @@
-from ..core import Provider
-from ..core import Response
+from ..core import Provider, Response
 from ..utils import requests
 from ..utils.helpers import snake_to_camel_case
 
@@ -77,8 +76,7 @@ class Twilio(Provider):
             },
             "max_price": {
                 "type": "number",
-                "title": "The total maximum price up to the fourth decimal (0.0001) in US dollars acceptable for "
-                "the message to be delivered",
+                "title": "The total maximum price up to the fourth decimal (0.0001) in US dollars acceptable for the message to be delivered",
             },
             "provide_feedback": {
                 "type": "boolean",
@@ -110,7 +108,5 @@ class Twilio(Provider):
         account_sid = data.pop("account_sid")
         url = self.base_url.format(account_sid)
         auth = (account_sid, data.pop("auth_token"))
-        response, errors = requests.post(
-            url, data=data, auth=auth, path_to_errors=self.path_to_errors
-        )
+        response, errors = requests.post(url, data=data, auth=auth, path_to_errors=self.path_to_errors)
         return self.create_response(data, response, errors)

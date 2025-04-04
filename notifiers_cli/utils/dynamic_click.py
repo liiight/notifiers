@@ -2,6 +2,7 @@
 Helper module with tools to dynamically convert :class:`~notifiers.core.Provider` and
 :class:`~notifiers.core.ProviderResource` classes to :mod:`click` data types
 """
+
 from functools import partial
 
 import click
@@ -36,7 +37,7 @@ def handle_oneof(oneof_schema: list) -> tuple:
     for key, value in oneof_dict.items():
         if key == "array":
             continue
-        elif key in SCHEMA_BASE_MAP:
+        if key in SCHEMA_BASE_MAP:
             if oneof_dict.get("array") and oneof_dict["array"]["items"]["type"] == key:
                 multiple = True
             # Found a match to a primitive type
@@ -108,7 +109,7 @@ def params_factory(schema: dict, add_message: bool) -> list:
         if property == "message":
             continue
 
-        elif not prpty_schema.get("oneOf"):
+        if not prpty_schema.get("oneOf"):
             click_type, description, choices = json_schema_to_click_type(prpty_schema)
         else:
             click_type, multiple, description = handle_oneof(prpty_schema["oneOf"])
@@ -131,9 +132,7 @@ def params_factory(schema: dict, add_message: bool) -> list:
                     description += "."
                 description += " Multiple usages of this option are allowed"
         # Construct the base command options
-        option = partial(
-            click.Option, param_decls=param_decls, help=description, multiple=multiple
-        )
+        option = partial(click.Option, param_decls=param_decls, help=description, multiple=multiple)
 
         if choices:
             option = option(type=choices)
@@ -145,9 +144,7 @@ def params_factory(schema: dict, add_message: bool) -> list:
     return params
 
 
-def schema_to_command(
-    p, name: str, callback: callable, add_message: bool
-) -> click.Command:
+def schema_to_command(p, name: str, callback: callable, add_message: bool) -> click.Command:
     """
     Generates a ``notify`` :class:`click.Command` for :class:`~notifiers.core.Provider`
 

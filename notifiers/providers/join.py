@@ -2,12 +2,9 @@ import json
 
 import requests
 
-from ..core import Provider
-from ..core import ProviderResource
-from ..core import Response
+from ..core import Provider, ProviderResource, Response
 from ..exceptions import ResourceError
-from ..utils.schema.helpers import list_to_commas
-from ..utils.schema.helpers import one_or_more
+from ..utils.schema.helpers import list_to_commas, one_or_more
 
 
 class JoinMixin:

@@ -1,7 +1,6 @@
 import logging
 
 import pytest
-
 from notifiers.exceptions import NoSuchNotifierError
 
 log = logging.getLogger("test_logger")
@@ -40,15 +39,11 @@ class TestLogger:
         log.addHandler(hdlr)
 
         log.info("test")
-        magic_mock_provider.notify.assert_called_with(
-            foo="bar", message="test", raise_on_errors=True
-        )
+        magic_mock_provider.notify.assert_called_with(foo="bar", message="test", raise_on_errors=True)
 
     def test_with_fallback(self, magic_mock_provider, handler):
         data = {"env_prefix": "foo"}
-        hdlr = handler(
-            "pushover", logging.INFO, data, fallback=magic_mock_provider.name
-        )
+        hdlr = handler("pushover", logging.INFO, data, fallback=magic_mock_provider.name)
         log.addHandler(hdlr)
         log.info("test")
 

@@ -1,6 +1,4 @@
-from ..core import Provider
-from ..core import ProviderResource
-from ..core import Response
+from ..core import Provider, ProviderResource, Response
 from ..exceptions import ResourceError
 from ..utils import requests
 
@@ -30,9 +28,7 @@ class PushbulletDevices(PushbulletMixin, ProviderResource):
 
     def _get_resource(self, data: dict) -> list:
         headers = self._get_headers(data["token"])
-        response, errors = requests.get(
-            self.devices_url, headers=headers, path_to_errors=self.path_to_errors
-        )
+        response, errors = requests.get(self.devices_url, headers=headers, path_to_errors=self.path_to_errors)
         if errors:
             raise ResourceError(
                 errors=errors,

@@ -1,10 +1,7 @@
-from ..core import Provider
-from ..core import ProviderResource
-from ..core import Response
+from ..core import Provider, ProviderResource, Response
 from ..exceptions import ResourceError
 from ..utils import requests
-from ..utils.schema.helpers import list_to_commas
-from ..utils.schema.helpers import one_or_more
+from ..utils.schema.helpers import list_to_commas, one_or_more
 
 
 class PushoverMixin:
@@ -18,9 +15,7 @@ class PushoverResourceMixin(PushoverMixin):
 
     _schema = {
         "type": "object",
-        "properties": {
-            "token": {"type": "string", "title": "your application's API token"}
-        },
+        "properties": {"token": {"type": "string", "title": "your application's API token"}},
     }
 
 
@@ -31,9 +26,7 @@ class PushoverSounds(PushoverResourceMixin, ProviderResource):
     def _get_resource(self, data: dict):
         url = self.base_url + self.sounds_url
         params = {"token": data["token"]}
-        response, errors = requests.get(
-            url, params=params, path_to_errors=self.path_to_errors
-        )
+        response, errors = requests.get(url, params=params, path_to_errors=self.path_to_errors)
         if errors:
             raise ResourceError(
                 errors=errors,
@@ -52,9 +45,7 @@ class PushoverLimits(PushoverResourceMixin, ProviderResource):
     def _get_resource(self, data: dict):
         url = self.base_url + self.limits_url
         params = {"token": data["token"]}
-        response, errors = requests.get(
-            url, params=params, path_to_errors=self.path_to_errors
-        )
+        response, errors = requests.get(url, params=params, path_to_errors=self.path_to_errors)
         if errors:
             raise ResourceError(
                 errors=errors,
@@ -127,14 +118,12 @@ class Pushover(PushoverMixin, Provider):
             "retry": {
                 "type": "integer",
                 "minimum": 30,
-                "title": "how often (in seconds) the Pushover servers will send the same notification to the "
-                "user. priority must be set to 2",
+                "title": "how often (in seconds) the Pushover servers will send the same notification to the user. priority must be set to 2",
             },
             "expire": {
                 "type": "integer",
                 "maximum": 86400,
-                "title": "how many seconds your notification will continue to be retried for. "
-                "priority must be set to 2",
+                "title": "how many seconds your notification will continue to be retried for. priority must be set to 2",
             },
             "callback": {
                 "type": "string",

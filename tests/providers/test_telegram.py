@@ -1,10 +1,8 @@
 import json
 
 import pytest
+from notifiers.exceptions import BadArguments, NotificationError
 from retry import retry
-
-from notifiers.exceptions import BadArguments
-from notifiers.exceptions import NotificationError
 
 provider = "telegram"
 
@@ -92,7 +90,7 @@ class TestTelegramCLI:
     """Test telegram specific CLI"""
 
     def test_telegram_updates_negative(self, cli_runner):
-        cmd = "telegram updates --token bad_token".split()
+        cmd = ["telegram", "updates", "--token", "bad_token"]
         result = cli_runner(cmd)
         assert result.exit_code
         assert not result.output
@@ -100,7 +98,7 @@ class TestTelegramCLI:
     @pytest.mark.online
     @retry(AssertionError, tries=3, delay=10)
     def test_telegram_updates_positive(self, cli_runner):
-        cmd = "telegram updates".split()
+        cmd = ["telegram", "updates"]
         result = cli_runner(cmd)
         assert not result.exit_code
         reply = json.loads(result.output)

@@ -1,7 +1,5 @@
 import pytest
-
-from notifiers.exceptions import BadArguments
-from notifiers.exceptions import NotificationError
+from notifiers.exceptions import BadArguments, NotificationError
 
 provider = "gmail"
 
@@ -16,9 +14,7 @@ class TestGmail:
             "site_url": "https://www.google.com/gmail/about/",
         }
 
-    @pytest.mark.parametrize(
-        "data, message", [({}, "message"), ({"message": "foo"}, "to")]
-    )
+    @pytest.mark.parametrize("data, message", [({}, "message"), ({"message": "foo"}, "to")])
     def test_gmail_missing_required(self, data, message, provider):
         data["env_prefix"] = "test"
         with pytest.raises(BadArguments) as e:
@@ -52,9 +48,7 @@ class TestGmail:
 
     def test_multiple_to(self, provider):
         to = ["foo@foo.com", "bar@foo.com"]
-        rsp = provider.notify(
-            to=to, message="foo", host="goo", username="ding", password="dong"
-        )
+        rsp = provider.notify(to=to, message="foo", host="goo", username="ding", password="dong")
         assert rsp.data["to"] == ",".join(to)
 
     def test_gmail_negative(self, provider):

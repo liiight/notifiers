@@ -1,6 +1,4 @@
-def one_or_more(
-    schema: dict, unique_items: bool = True, min: int = 1, max: int = None
-) -> dict:
+def one_or_more(schema: dict, unique_items: bool = True, min: int = 1, max: int = None) -> dict:
     """
     Helper function to construct a schema that validates items matching
     `schema` or an array containing items matching `schema`.

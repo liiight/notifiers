@@ -1,21 +1,23 @@
-from . import email
-from . import gitter
-from . import gmail
-from . import icloud
-from . import join
-from . import mailgun
-from . import notify
-from . import pagerduty
-from . import popcornnotify
-from . import pushbullet
-from . import pushover
-from . import simplepush
-from . import slack
-from . import statuspage
-from . import telegram
-from . import twilio
-from . import victorops
-from . import zulip
+from . import (
+    email,
+    gitter,
+    gmail,
+    icloud,
+    join,
+    mailgun,
+    notify,
+    pagerduty,
+    popcornnotify,
+    pushbullet,
+    pushover,
+    simplepush,
+    slack,
+    statuspage,
+    telegram,
+    twilio,
+    victorops,
+    zulip,
+)
 
 _all_providers = {
     "pushover": pushover.Pushover,

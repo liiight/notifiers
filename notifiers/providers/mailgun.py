@@ -1,7 +1,6 @@
 import json
 
-from ..core import Provider
-from ..core import Response
+from ..core import Provider, Response
 from ..utils import requests
 from ..utils.schema.helpers import one_or_more
 
@@ -75,9 +74,7 @@ class MailGun(Provider):
             "cc": __email_list,
             "bcc": __email_list,
             "subject": {"type": "string", "title": "Message subject"},
-            "attachment": one_or_more(
-                {"type": "string", "format": "valid_file", "title": "File attachment"}
-            ),
+            "attachment": one_or_more({"type": "string", "format": "valid_file", "title": "File attachment"}),
             "inline": one_or_more(
                 {
                     "type": "string",
@@ -101,8 +98,7 @@ class MailGun(Provider):
             "deliverytime": {
                 "type": "string",
                 "format": "rfc2822",
-                "title": "Desired time of delivery. Note: Messages can be scheduled for a maximum of 3 days in "
-                "the future.",
+                "title": "Desired time of delivery. Note: Messages can be scheduled for a maximum of 3 days in the future.",
             },
             "testmode": {"type": "boolean", "title": "Enables sending in test mode."},
             "tracking": {
@@ -111,8 +107,7 @@ class MailGun(Provider):
             },
             "tracking_clicks": {
                 "type": ["string", "boolean"],
-                "title": "Toggles clicks tracking on a per-message basis. Has higher priority than domain-level"
-                " setting. Pass yes, no or htmlonly.",
+                "title": "Toggles clicks tracking on a per-message basis. Has higher priority than domain-level setting. Pass yes, no or htmlonly.",
                 "enum": [True, False, "htmlonly"],
             },
             "tracking_opens": {

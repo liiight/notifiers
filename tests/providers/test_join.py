@@ -1,8 +1,5 @@
 import pytest
-
-from notifiers.exceptions import BadArguments
-from notifiers.exceptions import NotificationError
-from notifiers.exceptions import ResourceError
+from notifiers.exceptions import BadArguments, NotificationError, ResourceError
 
 provider = "join"
 
@@ -15,9 +12,7 @@ class TestJoin:
             "site_url": "https://joaoapps.com/join/api/",
         }
 
-    @pytest.mark.parametrize(
-        "data, message", [({}, "apikey"), ({"apikey": "foo"}, "message")]
-    )
+    @pytest.mark.parametrize("data, message", [({}, "apikey"), ({"apikey": "foo"}, "message")])
     def test_missing_required(self, data, message, provider):
         data["env_prefix"] = "test"
         with pytest.raises(BadArguments) as e:
@@ -69,7 +64,7 @@ class TestJoinCLI:
     """Test Join specific CLI"""
 
     def test_join_devices_negative(self, cli_runner):
-        cmd = "join devices --apikey bad_token".split()
+        cmd = ["join", "devices", "--apikey", "bad_token"]
         result = cli_runner(cmd)
         assert result.exit_code
         assert not result.output
@@ -77,7 +72,7 @@ class TestJoinCLI:
     @pytest.mark.skip("tests fail due to no device connected")
     @pytest.mark.online
     def test_join_updates_positive(self, cli_runner):
-        cmd = "join devices".split()
+        cmd = ["join", "devices"]
         result = cli_runner(cmd)
         assert not result.exit_code
         replies = ["You have no devices associated with this apikey", "Device name: "]

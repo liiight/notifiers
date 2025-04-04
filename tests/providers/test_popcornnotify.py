@@ -1,8 +1,6 @@
 import pytest
-
 from notifiers.core import FAILURE_STATUS
-from notifiers.exceptions import BadArguments
-from notifiers.exceptions import NotificationError
+from notifiers.exceptions import BadArguments, NotificationError
 
 provider = "popcornnotify"
 

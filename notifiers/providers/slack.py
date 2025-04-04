@@ -1,5 +1,4 @@
-from ..core import Provider
-from ..core import Response
+from ..core import Provider, Response
 from ..utils import requests
 
 
@@ -20,13 +19,11 @@ class Slack(Provider):
                 "title": {"type": "string", "title": "Required Field Title"},
                 "value": {
                     "type": "string",
-                    "title": "Text value of the field. May contain standard message markup and must"
-                    " be escaped as normal. May be multi-line",
+                    "title": "Text value of the field. May contain standard message markup and must be escaped as normal. May be multi-line",
                 },
                 "short": {
                     "type": "boolean",
-                    "title": "Optional flag indicating whether the `value` is short enough to be displayed"
-                    " side-by-side with other values",
+                    "title": "Optional flag indicating whether the `value` is short enough to be displayed side-by-side with other values",
                 },
             },
             "required": ["title"],
@@ -45,8 +42,7 @@ class Slack(Provider):
                 },
                 "author_link": {
                     "type": "string",
-                    "title": "A valid URL that will hyperlink the author_name text mentioned above. "
-                    "Will only work if author_name is present",
+                    "title": "A valid URL that will hyperlink the author_name text mentioned above. Will only work if author_name is present",
                 },
                 "author_icon": {
                     "type": "string",

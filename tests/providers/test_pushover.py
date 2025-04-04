@@ -1,7 +1,5 @@
 import pytest
-
-from notifiers.exceptions import BadArguments
-from notifiers.exceptions import NotificationError
+from notifiers.exceptions import BadArguments, NotificationError
 
 provider = "pushover"
 
@@ -34,13 +32,9 @@ class TestPushover:
             provider.notify(**data)
         assert f"'{message}' is a required property" in e.value.message
 
-    @pytest.mark.parametrize(
-        "data, message", [({}, "expire"), ({"expire": 30}, "retry")]
-    )
+    @pytest.mark.parametrize("data, message", [({}, "expire"), ({"expire": 30}, "retry")])
     @pytest.mark.online
-    def test_pushover_priority_2_restrictions(
-        self, data, message, provider, test_message
-    ):
+    def test_pushover_priority_2_restrictions(self, data, message, provider, test_message):
         """Pushover specific API restrictions when using priority 2"""
         base_data = {"message": test_message, "priority": 2}
         final_data = {**base_data, **data}
@@ -100,9 +94,7 @@ class TestPushoverSoundsResource:
     def test_pushover_sounds_attribs(self, resource):
         assert resource.schema == {
             "type": "object",
-            "properties": {
-                "token": {"type": "string", "title": "your application's API token"}
-            },
+            "properties": {"token": {"type": "string", "title": "your application's API token"}},
             "required": ["token"],
         }
 
@@ -123,9 +115,7 @@ class TestPushoverLimitsResource:
     def test_pushover_limits_attribs(self, resource):
         assert resource.schema == {
             "type": "object",
-            "properties": {
-                "token": {"type": "string", "title": "your application's API token"}
-            },
+            "properties": {"token": {"type": "string", "title": "your application's API token"}},
             "required": ["token"],
         }
 
@@ -143,27 +133,27 @@ class TestPushoverLimitsResource:
 
 class TestPushoverCLI:
     def test_pushover_sounds_negative(self, cli_runner):
-        cmd = "pushover sounds --token bad_token".split()
+        cmd = ["pushover", "sounds", "--token", "bad_token"]
         result = cli_runner(cmd)
         assert result.exit_code
         assert not result.output
 
     @pytest.mark.online
     def test_pushover_sounds_positive(self, cli_runner):
-        cmd = "pushover sounds".split()
+        cmd = ["pushover", "sounds"]
         result = cli_runner(cmd)
         assert not result.exit_code
         assert "piano" in result.output
 
     def test_pushover_limits(self, cli_runner):
-        cmd = "pushover limits --token bad_token".split()
+        cmd = ["pushover", "limits", "--token", "bad_token"]
         result = cli_runner(cmd)
         assert result.exit_code
         assert not result.output
 
     @pytest.mark.online
     def test_pushover_limits_positive(self, cli_runner):
-        cmd = "pushover limits".split()
+        cmd = ["pushover", "limits"]
         result = cli_runner(cmd)
         assert not result.exit_code
         assert all(key in result.output for key in ["limit", "remaining", "reset"])

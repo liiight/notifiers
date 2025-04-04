@@ -79,9 +79,7 @@ def post(url: str, *args, **kwargs) -> tuple:
     return RequestsHelper.request(url, "post", *args, **kwargs)
 
 
-def file_list_for_request(
-    list_of_paths: list, key_name: str, mimetype: str = None
-) -> list:
+def file_list_for_request(list_of_paths: list, key_name: str, mimetype: str = None) -> list:
     """
     Convenience function to construct a list of files for multiple files upload by :mod:`requests`
 
@@ -91,8 +89,5 @@ def file_list_for_request(
     :return: List of open files ready to be used in a request
     """
     if mimetype:
-        return [
-            (key_name, (file, open(file, mode="rb"), mimetype))
-            for file in list_of_paths
-        ]
+        return [(key_name, (file, open(file, mode="rb"), mimetype)) for file in list_of_paths]
     return [(key_name, (file, open(file, mode="rb"))) for file in list_of_paths]

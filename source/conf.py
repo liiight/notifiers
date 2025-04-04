@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 #
 # notifiers documentation build configuration file, created by
 # sphinx-quickstart on Thu Aug 10 18:14:08 2017.
@@ -147,9 +146,7 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
-latex_documents = [
-    (master_doc, "notifiers.tex", "notifiers Documentation", "Or Carmi", "manual")
-]
+latex_documents = [(master_doc, "notifiers.tex", "notifiers Documentation", "Or Carmi", "manual")]
 
 # -- Options for manual page output ---------------------------------------
 

@@ -3,7 +3,6 @@ import time
 from email import utils
 
 import pytest
-
 from notifiers.core import FAILURE_STATUS
 from notifiers.exceptions import BadArguments
 

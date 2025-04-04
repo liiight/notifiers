@@ -1,6 +1,4 @@
-from ..core import Provider
-from ..core import ProviderResource
-from ..core import Response
+from ..core import Provider, ProviderResource, Response
 from ..exceptions import ResourceError
 from ..utils import requests
 
@@ -61,8 +59,7 @@ class Telegram(TelegramMixin, Provider):
             "token": {"type": "string", "title": "Bot token"},
             "chat_id": {
                 "oneOf": [{"type": "string"}, {"type": "integer"}],
-                "title": "Unique identifier for the target chat or username of the target channel "
-                "(in the format @channelusername)",
+                "title": "Unique identifier for the target chat or username of the target channel (in the format @channelusername)",
             },
             "parse_mode": {
                 "type": "string",
@@ -93,7 +90,5 @@ class Telegram(TelegramMixin, Provider):
     def _send_notification(self, data: dict) -> Response:
         token = data.pop("token")
         url = self.base_url.format(token=token) + self.push_endpoint
-        response, errors = requests.post(
-            url, json=data, path_to_errors=self.path_to_errors
-        )
+        response, errors = requests.post(url, json=data, path_to_errors=self.path_to_errors)
         return self.create_response(data, response, errors)
