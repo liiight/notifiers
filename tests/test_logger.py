@@ -65,5 +65,5 @@ class TestLogger:
 
         magic_mock_provider.notify.assert_called_with(
             foo="bar",
-            message="Could not log msg to provider 'pushover'!Error with sent data: 'user' is a required property",
+            message="Could not log msg to provider 'pushover'!\nError with sent data: 'user' is a required property",
         )

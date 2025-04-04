@@ -22,6 +22,7 @@ class TestGmail:
             provider.notify(**data)
         assert f"'{message}' is a required property" in e.value.message
 
+    @pytest.mark.skip(reason="Disabled account")
     @pytest.mark.online
     def test_smtp_sanity(self, provider, test_message):
         """using Gmail SMTP"""
