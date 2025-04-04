@@ -23,7 +23,7 @@ class TestHelpers:
             ("false", False),
             ("0", False),
             ("foo", True),
-            ("bla", True),
+            ("bla", False),
         ],
     )
     def test_text_to_bool(self, text, result):
