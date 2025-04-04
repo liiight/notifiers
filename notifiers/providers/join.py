@@ -35,7 +35,7 @@ class JoinMixin:
                     errors = [response.text]
             else:
                 response = None
-                errors = [(str(e))]
+                errors = [str(e)]
 
         return response, errors
 

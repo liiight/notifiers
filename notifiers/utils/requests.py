@@ -17,7 +17,7 @@ class RequestsHelper:
         raise_for_status: bool = True,
         path_to_errors: tuple = None,
         *args,
-        **kwargs
+        **kwargs,
     ) -> tuple:
         """
         A wrapper method for :meth:`~requests.Session.request``, which adds some defaults and logging
