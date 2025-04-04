@@ -8,27 +8,22 @@ jobs:
     strategy:
       max-parallel: 1
       matrix:
-        python-version: [ 3.7, 3.8, 3.9, "3.10" ]
-        poetry-version: [ 1.1.12 ]
-
+        python-version:
+          - 3.8
+          - 3.9
+          - "3.10"
+          - "3.11"
+          - "3.12"
+          - "3.13"
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+      - uses: actions/checkout@v4
+      - name: Install uv and set the python version
+        uses: astral-sh/setup-uv@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install Poetry
-        shell: bash
-        run: curl -sSL https://install.python-poetry.org | python3 - --version ${{ matrix.poetry-version }}
-      - name: Update PATH
-        shell: bash
-        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
-      - name: Install package
-        shell: bash
-        run: poetry install
       - name: Test with pytest
         shell: bash
-        run: poetry run pytest --cov=./
+        run: uv run pytest --cov=./
         env:
           NOTIFIERS_EMAIL_PASSWORD: ${{secrets.NOTIFIERS_EMAIL_PASSWORD}}
           NOTIFIERS_EMAIL_TO: ${{secrets.NOTIFIERS_EMAIL_TO}}
