@@ -1,3 +1,4 @@
+import sys
 import typing
 
 import pytest
@@ -121,7 +122,13 @@ class TestCore:
         """Test bad provider inheritance"""
         with pytest.raises(TypeError) as e:
             bad_provider()
-        assert ("Can't instantiate abstract class BadProvider with abstract methods _required, _schema, _send_notification, base_url, name, site_url") in str(e.value)
+        if sys.version_info < (3, 12):
+            assert ("Can't instantiate abstract class BadProvider with abstract methods _required, _schema, _send_notification, base_url, name, site_url") in str(e.value)
+        else:
+            assert (
+                "Can't instantiate abstract class BadProvider without an implementation for abstract methods '_required', '_schema',"
+                " '_send_notification', 'base_url', 'name', 'site_url'" in str(e.value)
+            )
 
     def test_environs(self, mock_provider, monkeypatch):
         """Test environs usage"""
