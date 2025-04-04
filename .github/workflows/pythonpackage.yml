@@ -23,7 +23,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Test with pytest
         shell: bash
-        run: uv run pytest --cov=./
+        run: uv run pytest --cov=./ --junit-xml=report.xml
         env:
           NOTIFIERS_EMAIL_PASSWORD: ${{secrets.NOTIFIERS_EMAIL_PASSWORD}}
           NOTIFIERS_EMAIL_TO: ${{secrets.NOTIFIERS_EMAIL_TO}}
@@ -62,6 +62,8 @@ jobs:
           NOTIFIERS_ZULIP_EMAIL: ${{secrets.NOTIFIERS_ZULIP_EMAIL}}
           NOTIFIERS_ZULIP_TO: ${{secrets.NOTIFIERS_ZULIP_TO}}
           NOTIFIERS_VICTOROPS_REST_URL: ${{secrets.NOTIFIERS_VICTOROPS_REST_URL}}
+      - name: JUnit Report Action
+        uses: mikepenz/action-junit-report@v5
       - name: Upload coverage to Codecov
         if: success()
         uses: codecov/codecov-action@v2
