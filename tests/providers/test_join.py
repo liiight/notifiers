@@ -1,4 +1,5 @@
 import pytest
+
 from notifiers.exceptions import BadArguments, NotificationError, ResourceError
 
 provider = "join"
@@ -12,7 +13,7 @@ class TestJoin:
             "site_url": "https://joaoapps.com/join/api/",
         }
 
-    @pytest.mark.parametrize("data, message", [({}, "apikey"), ({"apikey": "foo"}, "message")])
+    @pytest.mark.parametrize(("data", "message"), [({}, "apikey"), ({"apikey": "foo"}, "message")])
     def test_missing_required(self, data, message, provider):
         data["env_prefix"] = "test"
         with pytest.raises(BadArguments) as e:

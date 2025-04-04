@@ -1,4 +1,5 @@
 import pytest
+
 from notifiers.exceptions import BadArguments, NotificationError
 
 provider = "gmail"
@@ -14,7 +15,7 @@ class TestGmail:
             "site_url": "https://www.google.com/gmail/about/",
         }
 
-    @pytest.mark.parametrize("data, message", [({}, "message"), ({"message": "foo"}, "to")])
+    @pytest.mark.parametrize(("data", "message"), [({}, "message"), ({"message": "foo"}, "to")])
     def test_gmail_missing_required(self, data, message, provider):
         data["env_prefix"] = "test"
         with pytest.raises(BadArguments) as e:

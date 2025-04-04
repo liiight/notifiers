@@ -87,8 +87,7 @@ class Join(JoinMixin, Provider):
         "properties": {
             "message": {
                 "type": "string",
-                "title": "usually used as a Tasker or EventGhost command. Can also be used with URLs and Files "
-                "to add a description for those elements",
+                "title": "usually used as a Tasker or EventGhost command. Can also be used with URLs and Files to add a description for those elements",
             },
             "apikey": {"type": "string", "title": "user API key"},
             "deviceId": {
@@ -110,12 +109,11 @@ class Join(JoinMixin, Provider):
             "url": {
                 "type": "string",
                 "format": "uri",
-                "title": " A URL you want to open on the device. If a notification is created with this push, "
-                "this will make clicking the notification open this URL",
+                "title": " A URL you want to open on the device. If a notification is created with this push, this will make clicking the notification open this URL",
             },
             "clipboard": {
                 "type": "string",
-                "title": "some text you want to set on the receiving device’s clipboard",
+                "title": "some text you want to set on the receiving device’s clipboard",  # noqa: RUF001
             },
             "file": {
                 "type": "string",
@@ -150,8 +148,7 @@ class Join(JoinMixin, Provider):
             },
             "title": {
                 "type": "string",
-                "title": "If used, will always create a notification on the receiving device with this as the "
-                "title and text as the notification’s text",
+                "title": "If used, will always create a notification on the receiving device with this as the title and text as the notification’s text",  # noqa: RUF001
             },
             "icon": {
                 "type": "string",

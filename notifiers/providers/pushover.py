@@ -105,15 +105,13 @@ class Pushover(PushoverMixin, Provider):
             },
             "sound": {
                 "type": "string",
-                "title": "the name of one of the sounds supported by device clients to override the "
-                "user's default sound choice. See `sounds` resource",
+                "title": "the name of one of the sounds supported by device clients to override the user's default sound choice. See `sounds` resource",
             },
             "timestamp": {
                 "type": ["integer", "string"],
                 "format": "timestamp",
                 "minimum": 0,
-                "title": "a Unix timestamp of your message's date and time to display to the user, "
-                "rather than the time your message is received by our API",
+                "title": "a Unix timestamp of your message's date and time to display to the user, rather than the time your message is received by our API",
             },
             "retry": {
                 "type": "integer",
@@ -128,8 +126,7 @@ class Pushover(PushoverMixin, Provider):
             "callback": {
                 "type": "string",
                 "format": "uri",
-                "title": "a publicly-accessible URL that our servers will send a request to when the user"
-                " has acknowledged your notification. priority must be set to 2",
+                "title": "a publicly-accessible URL that our servers will send a request to when the user has acknowledged your notification. priority must be set to 2",
             },
             "html": {"type": "boolean", "title": "enable HTML formatting"},
             "attachment": {

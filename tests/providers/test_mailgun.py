@@ -3,6 +3,7 @@ import time
 from email import utils
 
 import pytest
+
 from notifiers.core import FAILURE_STATUS
 from notifiers.exceptions import BadArguments
 
@@ -18,7 +19,7 @@ class TestMailgun:
         }
 
     @pytest.mark.parametrize(
-        "data, message",
+        ("data", "message"),
         [
             ({}, "to"),
             ({"to": "foo"}, "domain"),

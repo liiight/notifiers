@@ -5,6 +5,7 @@ from time import sleep
 
 import pytest
 import requests
+
 from notifiers.core import FAILURE_STATUS
 from notifiers.exceptions import BadArguments, ResourceError
 
@@ -14,7 +15,7 @@ log = logging.getLogger("statuspage")
 
 
 @pytest.fixture(autouse=True, scope="module")
-def close_all_open_incidents(request):
+def close_all_open_incidents():
     api_key = os.getenv("NOTIFIERS_STATUSPAGE_API_KEY")
     page_id = os.getenv("NOTIFIERS_STATUSPAGE_PAGE_ID")
 
@@ -40,7 +41,7 @@ class TestStatusPage:
         }
 
     @pytest.mark.parametrize(
-        "data, message",
+        ("data", "message"),
         [
             ({}, "message"),
             ({"message": "foo"}, "api_key"),
@@ -53,7 +54,7 @@ class TestStatusPage:
             provider.notify(**data)
 
     @pytest.mark.parametrize(
-        "added_data, message",
+        ("added_data", "message"),
         [
             (
                 {

@@ -3,7 +3,7 @@ repos:
     rev: v0.11.2
     hooks:
       - id: ruff
-        args: [--fix]
+        args: [--fix, --unsafe-fixes]
       - id: ruff-format
   - repo: https://github.com/astral-sh/uv-pre-commit
     # uv version.

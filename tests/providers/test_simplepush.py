@@ -1,4 +1,5 @@
 import pytest
+
 from notifiers.exceptions import BadArguments
 
 provider = "simplepush"
@@ -17,7 +18,7 @@ class TestSimplePush:
             "name": "simplepush",
         }
 
-    @pytest.mark.parametrize("data, message", [({}, "key"), ({"key": "foo"}, "message")])
+    @pytest.mark.parametrize(("data", "message"), [({}, "key"), ({"key": "foo"}, "message")])
     def test_simplepush_missing_required(self, data, message, provider):
         data["env_prefix"] = "test"
         with pytest.raises(BadArguments) as e:

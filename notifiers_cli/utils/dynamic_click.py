@@ -56,9 +56,8 @@ def json_schema_to_click_type(schema: dict) -> tuple:
      if the allowed values are a closed list (JSON schema ``enum``)
     """
     choices = None
-    if isinstance(schema["type"], list):
-        if "string" in schema["type"]:
-            schema["type"] = "string"
+    if isinstance(schema["type"], list) and "string" in schema["type"]:
+        schema["type"] = "string"
     click_type = SCHEMA_BASE_MAP[schema["type"]]
     description = schema.get("title")
     if schema.get("enum"):
@@ -78,7 +77,7 @@ def clean_data(data: dict) -> dict:
 
         # Multiple choice command are passed as tuples, convert to list to match schema
         if isinstance(value, tuple):
-            value = list(value)
+            value = list(value)  # noqa: PLW2901
         new_data[key] = value
     return new_data
 
@@ -154,8 +153,7 @@ def schema_to_command(p, name: str, callback: callable, add_message: bool) -> cl
     """
     params = params_factory(p.schema["properties"], add_message=add_message)
     help = p.__doc__
-    cmd = click.Command(name=name, callback=callback, params=params, help=help)
-    return cmd
+    return click.Command(name=name, callback=callback, params=params, help=help)
 
 
 def get_param_decals_from_name(option_name: str) -> str:

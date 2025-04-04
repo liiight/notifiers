@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 from abc import ABC, abstractmethod
 
@@ -5,7 +7,12 @@ import jsonschema
 import requests
 from jsonschema.exceptions import best_match
 
-from .exceptions import BadArguments, NoSuchNotifierError, NotificationError, SchemaError
+from .exceptions import (
+    BadArguments,
+    NoSuchNotifierError,
+    NotificationError,
+    SchemaError,
+)
 from .utils.helpers import dict_from_environs, merge_dicts
 from .utils.schema.formats import format_checker
 
@@ -34,7 +41,7 @@ class Response:
         provider: str,
         data: dict,
         response: requests.Response = None,
-        errors: list = None,
+        errors: list | None = None,
     ):
         self.status = status
         self.provider = provider
@@ -113,7 +120,12 @@ class SchemaResource(ABC):
         """A dict of default provider values if such is needed"""
         return {}
 
-    def create_response(self, data: dict = None, response: requests.Response = None, errors: list = None) -> Response:
+    def create_response(
+        self,
+        data: dict | None = None,
+        response: requests.Response = None,
+        errors: list | None = None,
+    ) -> Response:
         """
         Helper function to generate a :class:`~notifiers.core.Response` object
 
@@ -141,7 +153,7 @@ class SchemaResource(ABC):
         log.debug("merging defaults %s into data %s", self.defaults, data)
         return merge_dicts(data, self.defaults)
 
-    def _get_environs(self, prefix: str = None) -> dict:
+    def _get_environs(self, prefix: str | None = None) -> dict:
         """
         Fetches set environment variables if such exist, via the :func:`~notifiers.utils.helpers.dict_from_environs`
         Searches for `[PREFIX_NAME]_[PROVIDER_NAME]_[ARGUMENT]` for each of the arguments defined in the schema
@@ -175,7 +187,7 @@ class SchemaResource(ABC):
             log.debug("validating provider schema")
             self.validator.check_schema(self.schema)
         except jsonschema.SchemaError as e:
-            raise SchemaError(schema_error=e.message, provider=self.name, data=self.schema)
+            raise SchemaError(schema_error=e.message, provider=self.name, data=self.schema) from e
 
     def _validate_data(self, data: dict):
         """
@@ -218,8 +230,7 @@ class SchemaResource(ABC):
         data = self._merge_defaults(data)
         self._validate_data(data)
         data = self._validate_data_dependencies(data)
-        data = self._prepare_data(data)
-        return data
+        return self._prepare_data(data)
 
     def __init__(self):
         self.validator = jsonschema.Draft4Validator(self.schema, format_checker=format_checker)
@@ -326,6 +337,7 @@ def get_notifier(provider_name: str, strict: bool = False) -> Provider:
         return _all_providers[provider_name]()
     if strict:
         raise NoSuchNotifierError(name=provider_name)
+    return None
 
 
 def all_providers() -> list:

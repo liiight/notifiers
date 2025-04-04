@@ -6,7 +6,14 @@ from unittest.mock import MagicMock
 
 import pytest
 from click.testing import CliRunner
-from notifiers.core import SUCCESS_STATUS, Provider, ProviderResource, Response, get_notifier
+
+from notifiers.core import (
+    SUCCESS_STATUS,
+    Provider,
+    ProviderResource,
+    Response,
+    get_notifier,
+)
 from notifiers.logging import NotificationHandler
 from notifiers.providers import _all_providers
 from notifiers.utils.helpers import text_to_bool

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 import logging
 
@@ -15,7 +17,7 @@ class RequestsHelper:
         url: str,
         method: str,
         raise_for_status: bool = True,
-        path_to_errors: tuple = None,
+        path_to_errors: tuple | None = None,
         *args,
         **kwargs,
     ) -> tuple:
@@ -79,7 +81,7 @@ def post(url: str, *args, **kwargs) -> tuple:
     return RequestsHelper.request(url, "post", *args, **kwargs)
 
 
-def file_list_for_request(list_of_paths: list, key_name: str, mimetype: str = None) -> list:
+def file_list_for_request(list_of_paths: list, key_name: str, mimetype: str | None = None) -> list:
     """
     Convenience function to construct a list of files for multiple files upload by :mod:`requests`
 

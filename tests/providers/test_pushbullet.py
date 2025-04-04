@@ -1,6 +1,7 @@
 import os
 
 import pytest
+
 from notifiers.exceptions import BadArguments
 
 provider = "pushbullet"
@@ -15,7 +16,7 @@ class TestPushbullet:
             "site_url": "https://www.pushbullet.com",
         }
 
-    @pytest.mark.parametrize("data, message", [({}, "message"), ({"message": "foo"}, "token")])
+    @pytest.mark.parametrize(("data", "message"), [({}, "message"), ({"message": "foo"}, "token")])
     def test_missing_required(self, data, message, provider):
         data["env_prefix"] = "test"
         with pytest.raises(BadArguments) as e:

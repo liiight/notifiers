@@ -1,14 +1,22 @@
-import notifiers
+import typing
+
 import pytest
+
+import notifiers
 from notifiers import notify
 from notifiers.core import SUCCESS_STATUS, Provider, Response
-from notifiers.exceptions import BadArguments, NoSuchNotifierError, NotificationError, SchemaError
+from notifiers.exceptions import (
+    BadArguments,
+    NoSuchNotifierError,
+    NotificationError,
+    SchemaError,
+)
 
 
 class TestCore:
     """Test core classes"""
 
-    valid_data = {"required": "foo", "not_required": ["foo", "bar"]}
+    valid_data: typing.ClassVar = {"required": "foo", "not_required": ["foo", "bar"]}
 
     def test_sanity(self, mock_provider):
         """Test basic notification flow"""
@@ -113,9 +121,7 @@ class TestCore:
         """Test bad provider inheritance"""
         with pytest.raises(TypeError) as e:
             bad_provider()
-        assert (
-            "Can't instantiate abstract class BadProvider with abstract methods _required, _schema, _send_notification, base_url, name, site_url"
-        ) in str(e.value)
+        assert ("Can't instantiate abstract class BadProvider with abstract methods _required, _schema, _send_notification, base_url, name, site_url") in str(e.value)
 
     def test_environs(self, mock_provider, monkeypatch):
         """Test environs usage"""

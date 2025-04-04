@@ -2,13 +2,14 @@ import hypothesis.strategies as st
 import pytest
 from hypothesis import given
 from jsonschema import ValidationError, validate
+
 from notifiers.utils.schema.formats import format_checker
 from notifiers.utils.schema.helpers import list_to_commas, one_or_more
 
 
 class TestFormats:
     @pytest.mark.parametrize(
-        "formatter, value",
+        ("formatter", "value"),
         [
             ("iso8601", "2018-07-15T07:39:59+00:00"),
             ("iso8601", "2018-07-15T07:39:59Z"),
@@ -34,7 +35,7 @@ class TestFormats:
         validate(str(file_1), {"format": "valid_file"}, format_checker=format_checker)
 
     @pytest.mark.parametrize(
-        "formatter, value",
+        ("formatter", "value"),
         [
             ("iso8601", "2018-14-15T07:39:59+00:00"),
             ("iso8601", "2018-07-15T07:39:59Z~"),
@@ -57,7 +58,7 @@ class TestFormats:
 
 class TestSchemaUtils:
     @pytest.mark.parametrize(
-        "input_schema, unique_items, min, max, data",
+        ("input_schema", "unique_items", "min", "max", "data"),
         [
             ({"type": "string"}, True, 1, 1, "foo"),
             ({"type": "string"}, True, 1, 2, ["foo", "bar"]),
@@ -70,7 +71,7 @@ class TestSchemaUtils:
         validate(data, expected_schema)
 
     @pytest.mark.parametrize(
-        "input_schema, unique_items, min, max, data",
+        ("input_schema", "unique_items", "min", "max", "data"),
         [
             ({"type": "string"}, True, 1, 1, 1),
             ({"type": "string"}, True, 1, 1, ["foo", "bar"]),

@@ -1,4 +1,5 @@
 import pytest
+
 from notifiers.exceptions import BadArguments, NotificationError, ResourceError
 
 provider = "gitter"
@@ -14,7 +15,7 @@ class TestGitter:
         }
 
     @pytest.mark.parametrize(
-        "data, message",
+        ("data", "message"),
         [
             ({}, "message"),
             ({"message": "foo"}, "token"),
@@ -30,16 +31,16 @@ class TestGitter:
     def test_bad_request(self, provider):
         data = {"token": "foo", "room_id": "baz", "message": "bar"}
         with pytest.raises(NotificationError) as e:
-            rsp = provider.notify(**data)
-            rsp.raise_on_errors()
+            provider.notify(**data).raise_on_errors()
+
         assert "Unauthorized" in e.value.message
 
     @pytest.mark.online
     def test_bad_room_id(self, provider):
         data = {"room_id": "baz", "message": "bar"}
         with pytest.raises(NotificationError) as e:
-            rsp = provider.notify(**data)
-            rsp.raise_on_errors()
+            provider.notify(**data).raise_on_errors()
+
         assert "Bad Request" in e.value.message
 
     @pytest.mark.online

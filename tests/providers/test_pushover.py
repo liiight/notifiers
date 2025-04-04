@@ -1,4 +1,5 @@
 import pytest
+
 from notifiers.exceptions import BadArguments, NotificationError
 
 provider = "pushover"
@@ -19,7 +20,7 @@ class TestPushover:
         }
 
     @pytest.mark.parametrize(
-        "data, message",
+        ("data", "message"),
         [
             ({}, "user"),
             ({"user": "foo"}, "message"),
@@ -32,7 +33,7 @@ class TestPushover:
             provider.notify(**data)
         assert f"'{message}' is a required property" in e.value.message
 
-    @pytest.mark.parametrize("data, message", [({}, "expire"), ({"expire": 30}, "retry")])
+    @pytest.mark.parametrize(("data", "message"), [({}, "expire"), ({"expire": 30}, "retry")])
     @pytest.mark.online
     def test_pushover_priority_2_restrictions(self, data, message, provider, test_message):
         """Pushover specific API restrictions when using priority 2"""

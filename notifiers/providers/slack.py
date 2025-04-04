@@ -46,8 +46,7 @@ class Slack(Provider):
                 },
                 "author_icon": {
                     "type": "string",
-                    "title": "A valid URL that displays a small 16x16px image to the left of the author_name text. "
-                    "Will only work if author_name is present",
+                    "title": "A valid URL that displays a small 16x16px image to the left of the author_name text. Will only work if author_name is present",
                 },
                 "title_link": {"type": "string", "title": "Attachment title URL"},
                 "image_url": {"type": "string", "format": "uri", "title": "Image URL"},

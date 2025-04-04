@@ -3,6 +3,8 @@ Callbacks and callback factories to enable dynamically associating :class:`~noti
 :class:`click.Group` and :class:`click.Command`
 """
 
+from __future__ import annotations
+
 import json
 import sys
 from functools import partial
@@ -47,7 +49,7 @@ def _notify(p, **data):
     click.secho(f"Succesfully sent a notification to {p.name}!", fg="green")
 
 
-def _resource(resource, pretty: bool = None, **data):
+def _resource(resource, pretty: bool | None = None, **data):
     """The callback func that will be hooked to the generic resource commands"""
     data = clean_data(data)
 

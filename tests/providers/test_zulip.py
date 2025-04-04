@@ -1,6 +1,7 @@
 import datetime
 
 import pytest
+
 from notifiers.exceptions import BadArguments, NotifierException
 
 provider = "zulip"
@@ -15,7 +16,7 @@ class TestZulip:
         }
 
     @pytest.mark.parametrize(
-        "data, message",
+        ("data", "message"),
         [
             (
                 {"email": "foo", "api_key": "bar", "message": "boo", "to": "bla"},

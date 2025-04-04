@@ -1,6 +1,7 @@
 import logging
 
 import pytest
+
 from notifiers.exceptions import NoSuchNotifierError
 
 log = logging.getLogger("test_logger")
@@ -47,9 +48,7 @@ class TestLogger:
         log.addHandler(hdlr)
         log.info("test")
 
-        magic_mock_provider.notify.assert_called_with(
-            message="Could not log msg to provider 'pushover'!\nError with sent data: 'user' is a required property"
-        )
+        magic_mock_provider.notify.assert_called_with(message="Could not log msg to provider 'pushover'!Error with sent data: 'user' is a required property")
 
     def test_with_fallback_with_defaults(self, magic_mock_provider, handler):
         fallback_defaults = {"foo": "bar"}
@@ -66,5 +65,5 @@ class TestLogger:
 
         magic_mock_provider.notify.assert_called_with(
             foo="bar",
-            message="Could not log msg to provider 'pushover'!\nError with sent data: 'user' is a required property",
+            message="Could not log msg to provider 'pushover'!Error with sent data: 'user' is a required property",
         )

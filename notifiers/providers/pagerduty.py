@@ -71,8 +71,7 @@ class PagerDuty(Provider):
             },
             "routing_key": {
                 "type": "string",
-                "title": 'The GUID of one of your Events API V2 integrations. This is the "Integration Key" listed on'
-                " the Events API V2 integration's detail page",
+                "title": 'The GUID of one of your Events API V2 integrations. This is the "Integration Key" listed on the Events API V2 integration\'s detail page',
             },
             "event_action": {
                 "type": "string",

@@ -1,4 +1,5 @@
 import pytest
+
 from notifiers.core import FAILURE_STATUS
 from notifiers.exceptions import BadArguments, NotificationError
 
@@ -14,7 +15,7 @@ class TestPopcornNotify:
         }
 
     @pytest.mark.parametrize(
-        "data, message",
+        ("data", "message"),
         [
             ({}, "message"),
             ({"message": "foo"}, "api_key"),

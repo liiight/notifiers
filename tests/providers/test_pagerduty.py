@@ -1,6 +1,7 @@
 import datetime
 
 import pytest
+
 from notifiers.exceptions import BadArguments
 
 provider = "pagerduty"
@@ -15,7 +16,7 @@ class TestPagerDuty:
         }
 
     @pytest.mark.parametrize(
-        "data, message",
+        ("data", "message"),
         [
             ({}, "routing_key"),
             ({"routing_key": "foo"}, "event_action"),

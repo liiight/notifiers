@@ -1,4 +1,5 @@
 import pytest
+
 from notifiers.exceptions import BadArguments, NotificationError
 
 provider = "icloud"
@@ -14,12 +15,12 @@ class TestiCloud:
             "site_url": "https://www.icloud.com/mail",
         }
 
-    @pytest.mark.parametrize("data, message", [({}, "message"), ({"message": "foo"}, "to")])
+    @pytest.mark.parametrize(("data", "message"), [({}, "message"), ({"message": "foo"}, "to")])
     def test_icloud_missing_required(self, data, message, provider):
         data["env_prefix"] = "test"
         with pytest.raises(BadArguments) as e:
-            provider.notify(**data)
-            print(e.value.message)
+            provider.notify(**data).raise_on_errors()
+
         assert f"'{message}' is a required property" in e.value.message
 
     @pytest.mark.online

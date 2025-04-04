@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import copy
 import logging
 import sys
@@ -9,7 +11,7 @@ from notifiers.exceptions import NotifierException
 class NotificationHandler(logging.Handler):
     """A :class:`logging.Handler` that enables directly sending log messages to notifiers"""
 
-    def __init__(self, provider: str, defaults: dict = None, **kwargs):
+    def __init__(self, provider: str, defaults: dict | None = None, **kwargs):
         """
         Sets ups the handler
 
@@ -54,7 +56,7 @@ class NotificationHandler(logging.Handler):
     def __repr__(self):
         level = logging.getLevelName(self.level)
         name = self.provider.name
-        return "<%s %s(%s)>" % (self.__class__.__name__, name, level)
+        return f"<{self.__class__.__name__} {name}({level})>"
 
     def handleError(self, record):
         """

@@ -1,7 +1,8 @@
 import re
 
-import notifiers
 import pytest
+
+import notifiers
 
 mock_name = "mock_provider"
 
@@ -83,7 +84,7 @@ class TestCLI:
         assert "Succesfully sent a notification" in result.output
 
     @pytest.mark.parametrize(
-        "prefix, command",
+        ("prefix", "command"),
         [
             (None, f"{mock_name} notify".split()),
             ("FOO_", f"--env-prefix FOO_ {mock_name} notify".split()),

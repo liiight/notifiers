@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import mimetypes
 import smtplib
 import socket
@@ -5,7 +7,6 @@ from email.message import EmailMessage
 from email.utils import formatdate
 from pathlib import Path
 from smtplib import SMTPAuthenticationError, SMTPSenderRefused, SMTPServerDisconnected
-from typing import List, Tuple
 
 from ..core import Provider, Response
 from ..utils.schema.helpers import list_to_commas, one_or_more
@@ -97,7 +98,7 @@ class SMTP(Provider):
     }
 
     @staticmethod
-    def _get_mimetype(attachment: Path) -> Tuple[str, str]:
+    def _get_mimetype(attachment: Path) -> tuple[str, str]:
         """Taken from https://docs.python.org/3/library/email.examples.html"""
         ctype, encoding = mimetypes.guess_type(str(attachment))
         if ctype is None or encoding is not None:
@@ -146,9 +147,9 @@ class SMTP(Provider):
         email.add_alternative(data["message"], subtype=content_type)
         return email
 
-    def _add_attachments(self, attachments: List[str], email: EmailMessage):
-        for attachment in attachments:
-            attachment = Path(attachment)
+    def _add_attachments(self, attachments: list[str], email: EmailMessage):
+        for attachment_ in attachments:
+            attachment = Path(attachment_)
             maintype, subtype = self._get_mimetype(attachment)
             email.add_attachment(
                 attachment.read_bytes(),
@@ -182,6 +183,11 @@ class SMTP(Provider):
             if data.get("attachments"):
                 self._add_attachments(data["attachments"], email)
             self.smtp_server.send_message(email)
-        except (SMTPServerDisconnected, SMTPSenderRefused, OSError, SMTPAuthenticationError) as e:
+        except (
+            SMTPServerDisconnected,
+            SMTPSenderRefused,
+            OSError,
+            SMTPAuthenticationError,
+        ) as e:
             errors = [str(e)]
         return self.create_response(data, errors=errors)

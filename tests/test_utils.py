@@ -1,11 +1,18 @@
 import pytest
-from notifiers.utils.helpers import dict_from_environs, merge_dicts, snake_to_camel_case, text_to_bool, valid_file
+
+from notifiers.utils.helpers import (
+    dict_from_environs,
+    merge_dicts,
+    snake_to_camel_case,
+    text_to_bool,
+    valid_file,
+)
 from notifiers.utils.requests import file_list_for_request
 
 
 class TestHelpers:
     @pytest.mark.parametrize(
-        "text, result",
+        ("text", "result"),
         [
             ("y", True),
             ("yes", True),
@@ -23,7 +30,7 @@ class TestHelpers:
         assert text_to_bool(text) is result
 
     @pytest.mark.parametrize(
-        "target_dict, merge_dict, result",
+        ("target_dict", "merge_dict", "result"),
         [
             ({"a": "foo"}, {"b": "bar"}, {"a": "foo", "b": "bar"}),
             ({"a": "foo"}, {"a": "bar"}, {"a": "foo"}),
@@ -33,7 +40,7 @@ class TestHelpers:
         assert merge_dicts(target_dict, merge_dict) == result
 
     @pytest.mark.parametrize(
-        "prefix, name, args, result",
+        ("prefix", "name", "args", "result"),
         [("foo", "bar", ["key1", "key2"], {"key1": "baz", "key2": "baz"})],
     )
     def test_dict_from_environs(self, prefix, name, args, result, monkeypatch):
@@ -43,7 +50,7 @@ class TestHelpers:
         assert dict_from_environs(prefix, name, args) == result
 
     @pytest.mark.parametrize(
-        "snake_value, cc_value",
+        ("snake_value", "cc_value"),
         [
             ("foo_bar", "FooBar"),
             ("foo", "Foo"),

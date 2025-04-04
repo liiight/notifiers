@@ -71,8 +71,7 @@ class Twilio(Provider):
             },
             "application_sid": {
                 "type": "string",
-                "title": "Twilio will POST MessageSid as well as MessageStatus=sent or MessageStatus=failed to the URL "
-                "in the MessageStatusCallback property of this Application",
+                "title": "Twilio will POST MessageSid as well as MessageStatus=sent or MessageStatus=failed to the URL in the MessageStatusCallback property of this Application",
             },
             "max_price": {
                 "type": "number",
@@ -99,9 +98,9 @@ class Twilio(Provider):
             "auth_token": data.pop("auth_token"),
             "account_sid": data.pop("account_sid"),
         }
-        for key in data:
+        for key, value in data.items():
             camel_case_key = snake_to_camel_case(key)
-            new_data[camel_case_key] = data[key]
+            new_data[camel_case_key] = value
         return new_data
 
     def _send_notification(self, data: dict) -> Response:

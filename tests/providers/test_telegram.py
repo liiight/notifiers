@@ -1,8 +1,9 @@
 import json
 
 import pytest
-from notifiers.exceptions import BadArguments, NotificationError
 from retry import retry
+
+from notifiers.exceptions import BadArguments, NotificationError
 
 provider = "telegram"
 
@@ -18,7 +19,7 @@ class TestTelegram:
         }
 
     @pytest.mark.parametrize(
-        "data, message",
+        ("data", "message"),
         [
             ({}, "message"),
             ({"message": "foo"}, "chat_id"),
@@ -34,16 +35,14 @@ class TestTelegram:
     def test_bad_token(self, provider):
         data = {"token": "foo", "chat_id": 1, "message": "foo"}
         with pytest.raises(NotificationError) as e:
-            rsp = provider.notify(**data)
-            rsp.raise_on_errors()
+            provider.notify(**data).raise_on_errors()
         assert "Not Found" in e.value.message
 
     @pytest.mark.online
     def test_missing_chat_id(self, provider):
         data = {"chat_id": 1, "message": "foo"}
         with pytest.raises(NotificationError) as e:
-            rsp = provider.notify(**data)
-            rsp.raise_on_errors()
+            provider.notify(**data).raise_on_errors()
         assert "chat not found" in e.value.message
 
     @pytest.mark.online

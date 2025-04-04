@@ -1,10 +1,11 @@
+import sys
 from functools import partial
 
 import click
+
 from notifiers import __version__, get_notifier
 from notifiers.core import all_providers
 from notifiers.exceptions import NotifierException
-
 from notifiers_cli.utils.callbacks import _notify, _resource, _resources, func_factory
 from notifiers_cli.utils.dynamic_click import CORE_COMMANDS, schema_to_command
 
@@ -76,7 +77,7 @@ def entry_point():
         notifiers_cli(obj={})
     except NotifierException as e:
         click.secho(f"ERROR: {e.message}", bold=True, fg="red")
-        exit(1)
+        sys.exit(1)
 
 
 if __name__ == "__main__":

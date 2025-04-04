@@ -76,19 +76,16 @@ class Pushbullet(PushbulletMixin, Provider):
             },
             "client_iden": {
                 "type": "string",
-                "title": "Client iden of the target client, sends a push to all users who have granted access to "
-                "this client. The current user must own this client",
+                "title": "Client iden of the target client, sends a push to all users who have granted access to this client. The current user must own this client",
             },
             "channel_tag": {
                 "type": "string",
-                "title": "Channel tag of the target channel, sends a push to all people who are subscribed to "
-                "this channel. The current user must own this channel.",
+                "title": "Channel tag of the target channel, sends a push to all people who are subscribed to this channel. The current user must own this channel.",
             },
             "email": {
                 "type": "string",
                 "format": "email",
-                "title": "Email address to send the push to. If there is a pushbullet user with this address,"
-                " they get a push, otherwise they get an email",
+                "title": "Email address to send the push to. If there is a pushbullet user with this address, they get a push, otherwise they get an email",
             },
             "guid": {
                 "type": "string",

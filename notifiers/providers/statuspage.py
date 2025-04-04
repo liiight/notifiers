@@ -168,7 +168,7 @@ class Statuspage(StatuspageMixin, Provider):
         }
         for key, value in data.items():
             if isinstance(value, bool):
-                value = "t" if value else "f"
+                value = "t" if value else "f"  # noqa: PLW2901
             new_data[f"incident[{key}]"] = value
         return new_data
 
