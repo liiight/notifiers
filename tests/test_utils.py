@@ -22,7 +22,7 @@ class TestHelpers:
             ("off", False),
             ("false", False),
             ("0", False),
-            ("foo", True),
+            ("foo", False),
             ("bla", False),
         ],
     )
