@@ -64,6 +64,9 @@ jobs:
           NOTIFIERS_VICTOROPS_REST_URL: ${{secrets.NOTIFIERS_VICTOROPS_REST_URL}}
       - name: JUnit Report Action
         uses: mikepenz/action-junit-report@v5
+        if: success() || failure()
+        with:
+          report_paths: report.xml
       - name: Upload coverage to Codecov
         if: success()
         uses: codecov/codecov-action@v2
