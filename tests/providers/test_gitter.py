@@ -28,6 +28,8 @@ class TestGitter:
             provider.notify(**data)
         assert f"'{message}' is a required property" in e.value.message
 
+    @pytest.mark.skip(reason="Disabled account")
+    @pytest.mark.online
     def test_bad_request(self, provider):
         data = {"token": "foo", "room_id": "baz", "message": "bar"}
         with pytest.raises(NotificationError) as e:
@@ -36,6 +38,7 @@ class TestGitter:
         assert "Unauthorized" in e.value.message
 
     @pytest.mark.online
+    @pytest.mark.skip(reason="Disabled account")
     def test_bad_room_id(self, provider):
         data = {"room_id": "baz", "message": "bar"}
         with pytest.raises(NotificationError) as e:
@@ -44,6 +47,7 @@ class TestGitter:
         assert "Bad Request" in e.value.message
 
     @pytest.mark.online
+    @pytest.mark.skip(reason="Disabled account")
     def test_sanity(self, provider, test_message):
         data = {"message": test_message}
         rsp = provider.notify(**data)
@@ -56,6 +60,7 @@ class TestGitter:
         assert "rooms" in provider.resources
 
 
+@pytest.mark.skip(reason="Disabled account")
 class TestGitterResources:
     resource = "rooms"
 
@@ -92,6 +97,7 @@ class TestGitterResources:
         assert resource(filter="notifiers/testing")
 
 
+@pytest.mark.skip(reason="Disabled account")
 class TestGitterCLI:
     """Test Gitter specific CLI commands"""
 

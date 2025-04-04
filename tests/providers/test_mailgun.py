@@ -10,6 +10,7 @@ from notifiers.exceptions import BadArguments
 provider = "mailgun"
 
 
+@pytest.mark.skip(reason="Disabled account")
 class TestMailgun:
     def test_mailgun_metadata(self, provider):
         assert provider.metadata == {
