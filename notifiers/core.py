@@ -1,22 +1,17 @@
 from __future__ import annotations
 
-import logging
-from abc import ABC
-from abc import abstractmethod
-from importlib.metadata import entry_points
 import importlib.machinery
 import importlib.util
+import logging
+from abc import ABC, abstractmethod
+from importlib.metadata import entry_points
 
 import jsonschema
 import requests
 from jsonschema.exceptions import best_match
 
-from .exceptions import BadArguments
-from .exceptions import NoSuchNotifierError
-from .exceptions import NotificationError
-from .exceptions import SchemaError
-from .utils.helpers import dict_from_environs
-from .utils.helpers import merge_dicts
+from .exceptions import BadArguments, NoSuchNotifierError, NotificationError, SchemaError
+from .utils.helpers import dict_from_environs, merge_dicts
 from .utils.schema.formats import format_checker
 
 DEFAULT_ENVIRON_PREFIX = "NOTIFIERS_"
@@ -344,7 +339,7 @@ def get_notifier(provider_name: str, strict: bool = False) -> Provider:
     return None
 
 
-def load_provider_from_points(entry_points: str) -> 'Provider':
+def load_provider_from_points(entry_points: str) -> Provider:
     """Load a Provider class from a given entry point string.
 
     This function takes an entry point string in the format
@@ -363,38 +358,26 @@ def load_provider_from_points(entry_points: str) -> 'Provider':
         >>> provider_class = load_provider_from_points(entry_points)
         >>> provider = provider_class()
     """
-    if not entry_points or ':' not in entry_points:
-        raise ValueError(
-            f"Invalid entry point format: {entry_points}. "
-            "Expected format: 'module_path:class_name'"
-        )
+    if not entry_points or ":" not in entry_points:
+        raise ValueError(f"Invalid entry point format: {entry_points}. Expected format: 'module_path:class_name'")
 
     try:
         module_path, class_name = entry_points.split(":", 1)
     except ValueError as e:
-        raise ValueError(
-            f"Multiple colons found in entry point: {entry_points}. "
-            "Expected format: 'module_path:class_name'"
-        ) from e
+        raise ValueError(f"Multiple colons found in entry point: {entry_points}. Expected format: 'module_path:class_name'") from e
 
     try:
         module = importlib.import_module(module_path.strip())
     except ImportError as e:
-        raise ImportError(
-            f"Failed to import module '{module_path}': {str(e)}"
-        ) from e
+        raise ImportError(f"Failed to import module '{module_path}': {e!s}") from e
 
     try:
         provider_class = getattr(module, class_name.strip())
     except AttributeError as e:
-        raise AttributeError(
-            f"Class '{class_name}' not found in module '{module_path}'"
-        ) from e
+        raise AttributeError(f"Class '{class_name}' not found in module '{module_path}'") from e
 
     if not (isinstance(provider_class, type) and issubclass(provider_class, Provider)):
-        raise TypeError(
-            f"'{module_path}:{class_name}' must be a subclass of Provider"
-        )
+        raise TypeError(f"'{module_path}:{class_name}' must be a subclass of Provider")
 
     return provider_class
 
