@@ -1,6 +1,6 @@
 from . import (
-    email,
     dingtalk,
+    email,
     gitter,
     gmail,
     icloud,
