@@ -47,7 +47,7 @@ class Telegram(TelegramMixin, Provider):
 
     _resources = {"updates": TelegramUpdates()}
 
-    _required = {"required": ["message", "chat_id", "token"]}
+    _required = {"required": ["message", "chat_id", "token", "message_thread_id"]}
     _schema = {
         "type": "object",
         "properties": {
@@ -57,6 +57,10 @@ class Telegram(TelegramMixin, Provider):
                 "maxLength": 4096,
             },
             "token": {"type": "string", "title": "Bot token"},
+            "message_thread_id": {
+                "oneOf": [{"type": "string"}, {"type": "integer"}],
+                "title": "Thread ID",
+            },
             "chat_id": {
                 "oneOf": [{"type": "string"}, {"type": "integer"}],
                 "title": "Unique identifier for the target chat or username of the target channel (in the format @channelusername)",
