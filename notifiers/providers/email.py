@@ -138,8 +138,10 @@ class SMTP(Provider):
     def _build_email(data: dict) -> EmailMessage:
         email = EmailMessage()
         email["To"] = data["to"]
-        email["CC"] = data.get("cc", [])
-        email["Bcc"] = data.get("bcc", [])
+        if "cc" in data:
+            email["CC"] = data.get("cc")
+        if "bcc" in data:
+            email["Bcc"] = data.get("bcc")
         email["From"] = data["from"]
         email["Subject"] = data["subject"]
         email["Date"] = formatdate(localtime=True)
