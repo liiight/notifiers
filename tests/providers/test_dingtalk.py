@@ -8,7 +8,7 @@ class TestDingTalk:
         assert provider.metadata == {
             "base_url": "https://oapi.dingtalk.com/robot/send",
             "name": "dingtalk",
-            "site_url": "https://oapi.dingtalk.com/",
+            "site_url": "https://open.dingtalk.com/document/",
         }
 
     @pytest.mark.online
