@@ -4,10 +4,10 @@ import importlib.machinery
 import importlib.util
 import logging
 from abc import ABC, abstractmethod
-from importlib.metadata import entry_points
 
 import jsonschema
 import requests
+from importlib_metadata import entry_points
 from jsonschema.exceptions import best_match
 
 from .exceptions import BadArguments, NoSuchNotifierError, NotificationError, SchemaError
@@ -397,12 +397,7 @@ def get_providers_from_entry_points(group_name: str = "notifiers") -> dict:
         >>> get_providers_from_entry_points("notifiers")
         {"plugin1": "package.module:PluginClass", "plugin2": "package2.module:OtherPluginClass"}
     """
-    result: dict = {}
-    points = entry_points()
-    for item in points.get(group_name, []):
-        if item.group == group_name:
-            result[item.name] = load_provider_from_points(item.value)
-    return result
+    return {point.name: load_provider_from_points(point.value) for point in entry_points(group=group_name)}
 
 
 def get_all_providers() -> dict:

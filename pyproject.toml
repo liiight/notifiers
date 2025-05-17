@@ -28,7 +28,6 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -39,6 +38,7 @@ classifiers = [
 ]
 dependencies = [
     "click>=8.0.3",
+    "importlib-metadata>=3.6",
     "jsonschema>=4.4.0",
     "requests>=2.27.1,<3",
 ]
