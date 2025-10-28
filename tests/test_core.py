@@ -89,6 +89,18 @@ class TestCore:
         assert p
         assert isinstance(p, Provider)
 
+    def test_get_notifier_entry_points(self, mock_provider, monkeypatch):
+        from notifiers import get_notifier
+
+        def fake_entry_points(_=None):
+            return {"dummy": type(mock_provider)}
+
+        monkeypatch.setattr("notifiers.core.get_providers_from_entry_points", fake_entry_points)
+
+        p = get_notifier("dummy")
+        assert p
+        assert isinstance(p, type(mock_provider))
+
     def test_all_providers(self, mock_provider, monkeypatch):
         """Test ``all_providers()`` helper function"""
 
