@@ -179,7 +179,7 @@ class SMTP(Provider):
         errors = None
         try:
             configuration = self._get_configuration(data)
-            if not self.configuration or not self.smtp_server or self.configuration != configuration:
+            if not self.configuration or not self._is_smtp_connection_alive(self.smtp_server) or self.configuration != configuration:
                 self._connect_to_server(data)
             email = self._build_email(data)
             if data.get("attachments"):
@@ -193,3 +193,13 @@ class SMTP(Provider):
         ) as e:
             errors = [str(e)]
         return self.create_response(data, errors=errors)
+
+    @staticmethod
+    def _is_smtp_connection_alive(smtp_server: smtplib.SMTP):
+        if smtp_server is None:
+            return False
+        try:
+            status = smtp_server.noop()[0]
+            return status == 250
+        except Exception:
+            return False
