@@ -333,7 +333,7 @@ def get_notifier(provider_name: str, strict: bool = False) -> Provider:
     providers = get_all_providers()
     if provider_name in providers:
         log.debug("found a match for '%s', returning", provider_name)
-        return _all_providers[provider_name]()
+        return providers[provider_name]()
     if strict:
         raise NoSuchNotifierError(name=provider_name)
     return None
