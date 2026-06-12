@@ -141,3 +141,8 @@ class Slack(Provider):
         url = data.pop("webhook_url")
         response, errors = requests.post(url, json=data)
         return self.create_response(data, response, errors)
+
+    async def _send_notification_async(self, data: dict) -> Response:
+        url = data.pop("webhook_url")
+        response, errors = await requests.async_post(url, json=data)
+        return self.create_response(data, response, errors)

@@ -1,9 +1,10 @@
 import json
 
-import requests
+import requests as requests_sync
 
 from ..core import Provider, ProviderResource, Response
 from ..exceptions import ResourceError
+from ..utils import requests
 from ..utils.schema.helpers import list_to_commas, one_or_more
 
 
@@ -18,12 +19,12 @@ class JoinMixin:
         # Can 't use generic requests util since API doesn't always return error status
         errors = None
         try:
-            response = requests.get(url, params=data)
+            response = requests_sync.get(url, params=data)
             response.raise_for_status()
             rsp = response.json()
             if not rsp["success"]:
                 errors = [rsp["errorMessage"]]
-        except requests.RequestException as e:
+        except requests_sync.RequestException as e:
             if e.response is not None:
                 response = e.response
                 try:
@@ -33,6 +34,30 @@ class JoinMixin:
             else:
                 response = None
                 errors = [str(e)]
+
+        return response, errors
+
+    @staticmethod
+    async def _join_request_async(url: str, data: dict) -> tuple:
+        errors = None
+        try:
+            response, errors = await requests.async_get(url, params=data, raise_for_status=False)
+            if response is not None:
+                try:
+                    response.raise_for_status()
+                    rsp = response.json()
+                    if not rsp["success"]:
+                        errors = [rsp["errorMessage"]]
+                except Exception as e:
+                    try:
+                        errors = [response.json()["errorMessage"]]
+                    except (json.decoder.JSONDecodeError, ValueError, KeyError):
+                        errors = [response.text or str(e)]
+            else:
+                pass
+        except Exception as e:
+            response = None
+            errors = [str(e)]
 
         return response, errors
 
@@ -53,6 +78,19 @@ class JoinDevices(JoinMixin, ProviderResource):
     def _get_resource(self, data: dict):
         url = self.base_url + self.devices_url
         response, errors = self._join_request(url, data)
+        if errors:
+            raise ResourceError(
+                errors=errors,
+                resource=self.resource_name,
+                provider=self.name,
+                data=data,
+                response=response,
+            )
+        return response.json()["records"]
+
+    async def _get_resource_async(self, data: dict):
+        url = self.base_url + self.devices_url
+        response, errors = await self._join_request_async(url, data)
         if errors:
             raise ResourceError(
                 errors=errors,
@@ -195,4 +233,9 @@ class Join(JoinMixin, Provider):
         # Can 't use generic requests util since API doesn't always return error status
         url = self.base_url + self.push_url
         response, errors = self._join_request(url, data)
+        return self.create_response(data, response, errors)
+
+    async def _send_notification_async(self, data: dict) -> Response:
+        url = self.base_url + self.push_url
+        response, errors = await self._join_request_async(url, data)
         return self.create_response(data, response, errors)

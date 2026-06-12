@@ -43,6 +43,11 @@ dependencies = [
     "requests>=2.27.1,<3",
 ]
 
+[project.optional-dependencies]
+async = [
+    "httpx>=0.23.0",
+]
+
 [project.urls]
 Homepage = "https://github.com/liiight/notifiers"
 Repository = "https://github.com/liiight/notifiers"
@@ -62,6 +67,8 @@ dev = [
     "pre-commit",
     "retry",
     "Sphinx",
+    "pytest-asyncio",
+    "httpx",
 ]
 
 [tool.hatch.build.targets.sdist]

@@ -125,3 +125,8 @@ class PagerDuty(Provider):
         url = self.base_url
         response, errors = requests.post(url, json=data, path_to_errors=self.path_to_errors)
         return self.create_response(data, response, errors)
+
+    async def _send_notification_async(self, data: dict) -> Response:
+        url = self.base_url
+        response, errors = await requests.async_post(url, json=data, path_to_errors=self.path_to_errors)
+        return self.create_response(data, response, errors)

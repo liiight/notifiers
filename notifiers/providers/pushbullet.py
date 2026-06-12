@@ -39,6 +39,19 @@ class PushbulletDevices(PushbulletMixin, ProviderResource):
             )
         return response.json()["devices"]
 
+    async def _get_resource_async(self, data: dict) -> list:
+        headers = self._get_headers(data["token"])
+        response, errors = await requests.async_get(self.devices_url, headers=headers, path_to_errors=self.path_to_errors)
+        if errors:
+            raise ResourceError(
+                errors=errors,
+                resource=self.resource_name,
+                provider=self.name,
+                data=data,
+                response=response,
+            )
+        return response.json()["devices"]
+
 
 class Pushbullet(PushbulletMixin, Provider):
     """Send Pushbullet notifications"""
@@ -114,6 +127,16 @@ class Pushbullet(PushbulletMixin, Provider):
     def _send_notification(self, data: dict) -> Response:
         headers = self._get_headers(data.pop("token"))
         response, errors = requests.post(
+            self.base_url,
+            json=data,
+            headers=headers,
+            path_to_errors=self.path_to_errors,
+        )
+        return self.create_response(data, response, errors)
+
+    async def _send_notification_async(self, data: dict) -> Response:
+        headers = self._get_headers(data.pop("token"))
+        response, errors = await requests.async_post(
             self.base_url,
             json=data,
             headers=headers,

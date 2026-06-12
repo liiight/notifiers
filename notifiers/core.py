@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import importlib.machinery
 import importlib.util
 import logging
@@ -278,6 +279,17 @@ class Provider(SchemaResource, ABC):
         :param data: Notification data
         """
 
+    async def _send_notification_async(self, data: dict) -> Response:
+        """
+        The core method to trigger the provider notification asynchronously.
+        By default, runs the synchronous `_send_notification` in the running loop's default executor.
+
+        :param data: Notification data
+        :return: A :class:`~notifiers.core.Response` object
+        """
+        loop = asyncio.get_running_loop()
+        return await loop.run_in_executor(None, self._send_notification, data)
+
     def notify(self, raise_on_errors: bool = False, **kwargs) -> Response:
         """
         The main method to send notifications. Prepares the data via the
@@ -296,6 +308,24 @@ class Provider(SchemaResource, ABC):
             rsp.raise_on_errors()
         return rsp
 
+    async def notify_async(self, raise_on_errors: bool = False, **kwargs) -> Response:
+        """
+        The main async method to send notifications. Prepares the data via the
+        :meth:`~notifiers.core.SchemaResource._prepare_data` method and then sends the notification
+        via the async :meth:`~notifiers.core.Provider._send_notification_async` method.
+
+        :param kwargs: Notification data
+        :param raise_on_errors: Should the :meth:`~notifiers.core.Response.raise_on_errors` be invoked immediately
+        :return: A :class:`~notifiers.core.Response` object
+        :raises: :class:`~notifiers.exceptions.NotificationError` if ``raise_on_errors`` is set to True and response
+         contained errors
+        """
+        data = self._process_data(**kwargs)
+        rsp = await self._send_notification_async(data)
+        if raise_on_errors:
+            rsp.raise_on_errors()
+        return rsp
+
 
 class ProviderResource(SchemaResource, ABC):
     """The base class that is used to fetch provider related resources like rooms, channels, users etc."""
@@ -309,9 +339,28 @@ class ProviderResource(SchemaResource, ABC):
     def _get_resource(self, data: dict):
         pass
 
+    async def _get_resource_async(self, data: dict):
+        """
+        The core method to retrieve the resource asynchronously.
+        By default, runs the synchronous `_get_resource` in the running loop's default executor.
+
+        :param data: Resource query data
+        """
+        loop = asyncio.get_running_loop()
+        return await loop.run_in_executor(None, self._get_resource, data)
+
     def __call__(self, **kwargs):
         data = self._process_data(**kwargs)
         return self._get_resource(data)
+
+    async def get_resource_async(self, **kwargs):
+        """
+        Asynchronously fetches provider related resources like rooms, channels, users etc.
+
+        :param kwargs: Resource query data
+        """
+        data = self._process_data(**kwargs)
+        return await self._get_resource_async(data)
 
     def __repr__(self):
         return f"<ProviderResource,provider={self.name},resource={self.resource_name}>"
@@ -428,3 +477,16 @@ def notify(provider_name: str, **kwargs) -> Response:
      will raise notification error
     """
     return get_notifier(provider_name=provider_name, strict=True).notify(**kwargs)
+
+
+async def notify_async(provider_name: str, **kwargs) -> Response:
+    """
+    Quickly sends a notification asynchronously without needing to get a notifier via the :func:`get_notifier` method.
+
+    :param provider_name: Name of the notifier to use. Note that if this notifier name does not exist it will raise a
+    :param kwargs: Notification data, dependant on provider
+    :return: :class:`Response`
+    :raises: :class:`~notifiers.exceptions.NoSuchNotifierError` If ``provider_name`` is unknown,
+     will raise notification error
+    """
+    return await get_notifier(provider_name=provider_name, strict=True).notify_async(**kwargs)

@@ -109,3 +109,10 @@ class Twilio(Provider):
         auth = (account_sid, data.pop("auth_token"))
         response, errors = requests.post(url, data=data, auth=auth, path_to_errors=self.path_to_errors)
         return self.create_response(data, response, errors)
+
+    async def _send_notification_async(self, data: dict) -> Response:
+        account_sid = data.pop("account_sid")
+        url = self.base_url.format(account_sid)
+        auth = (account_sid, data.pop("auth_token"))
+        response, errors = await requests.async_post(url, data=data, auth=auth, path_to_errors=self.path_to_errors)
+        return self.create_response(data, response, errors)

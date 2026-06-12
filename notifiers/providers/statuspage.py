@@ -43,6 +43,20 @@ class StatuspageComponents(StatuspageMixin, ProviderResource):
             )
         return response.json()
 
+    async def _get_resource_async(self, data: dict) -> dict:
+        url = self.base_url.format(page_id=data["page_id"]) + self.components_url
+        params = {"api_key": data.pop("api_key")}
+        response, errors = await requests.async_get(url, params=params, path_to_errors=self.path_to_errors)
+        if errors:
+            raise ResourceError(
+                errors=errors,
+                resource=self.resource_name,
+                provider=self.name,
+                data=data,
+                response=response,
+            )
+        return response.json()
+
 
 class Statuspage(StatuspageMixin, Provider):
     """Create Statuspage incidents"""
@@ -176,4 +190,10 @@ class Statuspage(StatuspageMixin, Provider):
         url = self.base_url.format(page_id=data.pop("page_id")) + self.incidents_url
         params = {"api_key": data.pop("api_key")}
         response, errors = requests.post(url, data=data, params=params, path_to_errors=self.path_to_errors)
+        return self.create_response(data, response, errors)
+
+    async def _send_notification_async(self, data: dict) -> Response:
+        url = self.base_url.format(page_id=data.pop("page_id")) + self.incidents_url
+        params = {"api_key": data.pop("api_key")}
+        response, errors = await requests.async_post(url, data=data, params=params, path_to_errors=self.path_to_errors)
         return self.create_response(data, response, errors)

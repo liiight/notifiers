@@ -58,6 +58,27 @@ class GitterRooms(GitterMixin, ProviderResource):
         rsp = response.json()
         return rsp["results"] if filter_ else rsp
 
+    async def _get_resource_async(self, data: dict) -> list:
+        headers = self._get_headers(data["token"])
+        filter_ = data.get("filter")
+        params = {"q": filter_} if filter_ else {}
+        response, errors = await requests.async_get(
+            self.base_url,
+            headers=headers,
+            params=params,
+            path_to_errors=self.path_to_errors,
+        )
+        if errors:
+            raise ResourceError(
+                errors=errors,
+                resource=self.resource_name,
+                provider=self.name,
+                data=data,
+                response=response,
+            )
+        rsp = response.json()
+        return rsp["results"] if filter_ else rsp
+
 
 class Gitter(GitterMixin, Provider):
     """Send Gitter notifications"""
@@ -97,4 +118,12 @@ class Gitter(GitterMixin, Provider):
 
         headers = self._get_headers(data.pop("token"))
         response, errors = requests.post(url, json=data, headers=headers, path_to_errors=self.path_to_errors)
+        return self.create_response(data, response, errors)
+
+    async def _send_notification_async(self, data: dict) -> Response:
+        room_id = data.pop("room_id")
+        url = self.base_url + self.message_url.format(room_id=room_id)
+
+        headers = self._get_headers(data.pop("token"))
+        response, errors = await requests.async_post(url, json=data, headers=headers, path_to_errors=self.path_to_errors)
         return self.create_response(data, response, errors)

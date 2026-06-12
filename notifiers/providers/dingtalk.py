@@ -106,6 +106,17 @@ class DingTalk(Provider):
         params = {"access_token": data["access_token"]}
         payload = self._prepare_data(data)
 
-        response = requests.post(url, params=params, json=payload, headers={"Content-Type": "application/json", "Accept": "application/json"})
+        headers = {"Content-Type": "application/json", "Accept": "application/json"}
+        response, errors = requests.post(url, params=params, json=payload, headers=headers, path_to_errors=self.path_to_errors)
 
-        return self._create_response(response)
+        return self.create_response(payload, response, errors)
+
+    async def _send_notification_async(self, data: dict) -> Response:
+        url = self._prepare_url()
+        params = {"access_token": data["access_token"]}
+        payload = self._prepare_data(data)
+
+        headers = {"Content-Type": "application/json", "Accept": "application/json"}
+        response, errors = await requests.async_post(url, params=params, json=payload, headers=headers, path_to_errors=self.path_to_errors)
+
+        return self.create_response(payload, response, errors)

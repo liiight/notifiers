@@ -207,3 +207,23 @@ class MailGun(Provider):
             path_to_errors=self.path_to_errors,
         )
         return self.create_response(data, response, errors)
+
+    async def _send_notification_async(self, data: dict) -> Response:
+        base_url = data.pop("base_url")
+        domain = data.pop("domain")
+        url = f"{base_url}/v3/{domain}/messages"
+        auth = "api", data.pop("api_key")
+        files = []
+        if data.get("attachment"):
+            files += requests.file_list_for_request(data["attachment"], "attachment")
+        if data.get("inline"):
+            files += requests.file_list_for_request(data["inline"], "inline")
+
+        response, errors = await requests.async_post(
+            url=url,
+            data=data,
+            auth=auth,
+            files=files,
+            path_to_errors=self.path_to_errors,
+        )
+        return self.create_response(data, response, errors)

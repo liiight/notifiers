@@ -41,3 +41,7 @@ class PopcornNotify(Provider):
     def _send_notification(self, data: dict) -> Response:
         response, errors = requests.post(url=self.base_url, json=data, path_to_errors=self.path_to_errors)
         return self.create_response(data, response, errors)
+
+    async def _send_notification_async(self, data: dict) -> Response:
+        response, errors = await requests.async_post(url=self.base_url, json=data, path_to_errors=self.path_to_errors)
+        return self.create_response(data, response, errors)

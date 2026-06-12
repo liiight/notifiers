@@ -62,3 +62,19 @@ class Notify(NotifyMixin, Provider):
             path_to_errors=self.path_to_errors,
         )
         return self.create_response(data, response, errors)
+
+    async def _send_notification_async(self, data: dict) -> Response:
+        url = self.base_url.format(base_url=data.pop("base_url"))
+        token = data.pop("token", None)
+        headers = self._get_headers(token) if token else {}
+        response, errors = await requests.async_post(
+            url,
+            json={
+                "message": data.pop("message"),
+                "title": data.pop("title", None),
+                "tags": data.pop("tags", []),
+            },
+            headers=headers,
+            path_to_errors=self.path_to_errors,
+        )
+        return self.create_response(data, response, errors)

@@ -37,6 +37,20 @@ class PushoverSounds(PushoverResourceMixin, ProviderResource):
             )
         return list(response.json()["sounds"].keys())
 
+    async def _get_resource_async(self, data: dict):
+        url = self.base_url + self.sounds_url
+        params = {"token": data["token"]}
+        response, errors = await requests.async_get(url, params=params, path_to_errors=self.path_to_errors)
+        if errors:
+            raise ResourceError(
+                errors=errors,
+                resource=self.resource_name,
+                provider=self.name,
+                data=data,
+                response=response,
+            )
+        return list(response.json()["sounds"].keys())
+
 
 class PushoverLimits(PushoverResourceMixin, ProviderResource):
     resource_name = "limits"
@@ -46,6 +60,20 @@ class PushoverLimits(PushoverResourceMixin, ProviderResource):
         url = self.base_url + self.limits_url
         params = {"token": data["token"]}
         response, errors = requests.get(url, params=params, path_to_errors=self.path_to_errors)
+        if errors:
+            raise ResourceError(
+                errors=errors,
+                resource=self.resource_name,
+                provider=self.name,
+                data=data,
+                response=response,
+            )
+        return response.json()
+
+    async def _get_resource_async(self, data: dict):
+        url = self.base_url + self.limits_url
+        params = {"token": data["token"]}
+        response, errors = await requests.async_get(url, params=params, path_to_errors=self.path_to_errors)
         if errors:
             raise ResourceError(
                 errors=errors,
@@ -155,6 +183,21 @@ class Pushover(PushoverMixin, Provider):
         if data.get("attachment"):
             files = requests.file_list_for_request(data["attachment"], "attachment")
         response, errors = requests.post(
+            url,
+            data=data,
+            headers=headers,
+            files=files,
+            path_to_errors=self.path_to_errors,
+        )
+        return self.create_response(data, response, errors)
+
+    async def _send_notification_async(self, data: dict) -> Response:
+        url = self.base_url + self.message_url
+        headers = {}
+        files = []
+        if data.get("attachment"):
+            files = requests.file_list_for_request(data["attachment"], "attachment")
+        response, errors = await requests.async_post(
             url,
             data=data,
             headers=headers,

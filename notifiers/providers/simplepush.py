@@ -29,3 +29,8 @@ class SimplePush(Provider):
         path_to_errors = ("message",)
         response, errors = requests.post(self.base_url, data=data, path_to_errors=path_to_errors)
         return self.create_response(data, response, errors)
+
+    async def _send_notification_async(self, data: dict) -> Response:
+        path_to_errors = ("message",)
+        response, errors = await requests.async_post(self.base_url, data=data, path_to_errors=path_to_errors)
+        return self.create_response(data, response, errors)

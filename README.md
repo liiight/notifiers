@@ -27,6 +27,10 @@ Via pip:
 ```
 $ pip install notifiers
 ```
+For asynchronous support:
+```
+$ pip install notifiers[async]
+```
 Via homebrew:
 ```
 $ brew install notifiers
@@ -51,6 +55,24 @@ Or:
 >>> from notifiers import notify
 >>> notify('pushover', user='foo', token='bar', message='test')
 <NotificationResponse,provider=Pushover,status=Success>
+```
+
+# Asynchronous Usage
+
+```python
+>>> import asyncio
+>>> from notifiers import notify_async
+>>> asyncio.run(notify_async('slack', webhook_url='https://...', message='Hello Async!'))
+<Response,provider=Slack,status=Success, errors=None>
+```
+
+Or via a notifier instance:
+```python
+>>> import asyncio
+>>> from notifiers import get_notifier
+>>> p = get_notifier('slack')
+>>> asyncio.run(p.notify_async(webhook_url='https://...', message='Hello Async!'))
+<Response,provider=Slack,status=Success, errors=None>
 ```
 
 # From CLI
