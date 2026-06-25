@@ -11,7 +11,7 @@ from importlib_metadata import entry_points
 from jsonschema.exceptions import best_match
 
 from .exceptions import BadArguments, NoSuchNotifierError, NotificationError, SchemaError
-from .utils.helpers import dict_from_environs, merge_dicts
+from .utils.helpers import dict_from_environs, merge_dicts, text_to_bool
 from .utils.schema.formats import format_checker
 
 DEFAULT_ENVIRON_PREFIX = "NOTIFIERS_"
@@ -162,7 +162,37 @@ class SchemaResource(ABC):
         if not prefix:
             log.debug("using default environ prefix")
             prefix = DEFAULT_ENVIRON_PREFIX
-        return dict_from_environs(prefix, self.name, list(self.arguments.keys()))
+        environs = dict_from_environs(prefix, self.name, list(self.arguments.keys()))
+        return self._coerce_environs(environs)
+
+    def _coerce_environs(self, environs: dict) -> dict:
+        """
+        Coerces environment variable strings to the types declared in the provider schema.
+        Environment variables are always strings; this converts ``"true"``/``"1"`` to :class:`bool`
+        and numeric strings to :class:`int` or :class:`float` where the schema requires it.
+
+        :param environs: Raw environ dict (all values are strings)
+        :return: Environ dict with values cast to schema-declared types
+        """
+        properties = self.arguments
+        coerced = {}
+        for key, value in environs.items():
+            prop_type = properties.get(key, {}).get("type")
+            if prop_type == "boolean":
+                coerced[key] = text_to_bool(value)
+            elif prop_type == "integer":
+                try:
+                    coerced[key] = int(value)
+                except (ValueError, TypeError):
+                    coerced[key] = value
+            elif prop_type == "number":
+                try:
+                    coerced[key] = float(value)
+                except (ValueError, TypeError):
+                    coerced[key] = value
+            else:
+                coerced[key] = value
+        return coerced
 
     def _prepare_data(self, data: dict) -> dict:
         """

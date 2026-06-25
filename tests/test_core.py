@@ -4,7 +4,7 @@ import typing
 import pytest
 
 import notifiers
-from notifiers import notify
+from notifiers import get_notifier, notify
 from notifiers.core import SUCCESS_STATUS, Provider, Response
 from notifiers.exceptions import (
     BadArguments,
@@ -83,8 +83,6 @@ class TestCore:
 
     def test_get_notifier(self, mock_provider):
         """Test ``get_notifier()`` helper function"""
-        from notifiers import get_notifier
-
         p = get_notifier("mock_provider")
         assert p
         assert isinstance(p, Provider)
@@ -189,3 +187,19 @@ class TestCore:
     def test_direct_notify_negative(self):
         with pytest.raises(NoSuchNotifierError, match="No such notifier with name"):
             notify("foo", message="whateverz")
+
+    def test_environ_bool_and_int_coercion(self, monkeypatch):
+        """Env vars for boolean/integer schema fields must be coerced from string (issue #387)."""
+        p = get_notifier("email")
+
+        prefix = "COERCE_TEST_"
+        env_prefix = prefix + p.name + "_"
+        monkeypatch.setenv((env_prefix + "tls").upper(), "true")
+        monkeypatch.setenv((env_prefix + "ssl").upper(), "false")
+        monkeypatch.setenv((env_prefix + "port").upper(), "587")
+
+        environs = p._get_environs(prefix)
+        assert environs["tls"] is True, "'true' string must coerce to boolean True"
+        assert environs["ssl"] is False, "'false' string must coerce to boolean False"
+        assert environs["port"] == 587, "'587' string must coerce to integer 587"
+        assert isinstance(environs["port"], int)
