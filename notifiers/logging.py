@@ -66,7 +66,7 @@ class NotificationHandler(logging.Handler):
         :param record: :class:`logging.LogRecord`
         """
         if logging.raiseExceptions:
-            t, v, tb = sys.exc_info()
+            t, v, _tb = sys.exc_info()
             if issubclass(t, NotifierException) and self.fallback:
                 msg = f"Could not log msg to provider '{self.provider.name}'!\n{v}"
                 self.fallback_defaults["message"] = msg
