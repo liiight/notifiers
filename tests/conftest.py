@@ -144,6 +144,16 @@ def handler(caplog):
     return return_handler
 
 
+@pytest.fixture(autouse=True)
+def isolate_offline_tests_from_credentials(request, monkeypatch):
+    """Offline tests must not depend on provider credentials (``NOTIFIERS_*``) set for online tests, e.g. in CI"""
+    if request.node.get_closest_marker("online"):
+        return
+    for key in list(os.environ):
+        if key.startswith("NOTIFIERS_"):
+            monkeypatch.delenv(key)
+
+
 def pytest_runtest_setup(item):
     """Skips PRs if secure env vars are set and test is marked as online"""
     pull_request = text_to_bool(os.environ.get("TRAVIS_PULL_REQUEST"))

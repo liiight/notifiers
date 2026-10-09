@@ -14,8 +14,11 @@ provider = "statuspage"
 log = logging.getLogger("statuspage")
 
 
-@pytest.fixture(autouse=True, scope="module")
-def close_all_open_incidents():
+@pytest.fixture(autouse=True)
+def close_all_open_incidents(request):
+    """Online tests create real incidents, so open ones are closed first. Offline tests make no API calls"""
+    if not request.node.get_closest_marker("online"):
+        return
     api_key = os.getenv("NOTIFIERS_STATUSPAGE_API_KEY")
     page_id = os.getenv("NOTIFIERS_STATUSPAGE_PAGE_ID")
     if not (api_key and page_id):
@@ -27,6 +30,9 @@ def close_all_open_incidents():
     s.headers = {"Authorization": f"OAuth {api_key}"}
     url = f"{base_url}/unresolved"
     incidents = s.get(url).json()
+    if not isinstance(incidents, list):
+        log.warning("could not list statuspage incidents: %s", incidents)
+        return
     for incident in incidents:
         incident_id = incident["id"]
         url = f"{base_url}/{incident_id}"

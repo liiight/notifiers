@@ -72,7 +72,8 @@ Development
 - CI runs the offline test suite (``-m "not online"``) on every Python version (``fail-fast: false``), plus a ruff lint and
   format check. Tests that need network access are marked ``online``.
 - ruff 0.16.10 in pre-commit and in the dev dependency group.
-- The statuspage test setup no longer fails when statuspage credentials aren't set.
+- Offline tests run without ``NOTIFIERS_*`` credentials in the environment, so they behave the same locally and in CI.
+- The statuspage incident cleanup runs for online tests only, and tolerates API errors.
 
 1.3.0
 ------
