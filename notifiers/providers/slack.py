@@ -54,7 +54,7 @@ class SlackSchema(SchemaModel):
     channel: str | None = Field(None, description="override default channel or private message")
     unfurl_links: bool | None = Field(None, description="avoid automatic attachment creation from URLs")
     message: str = Field(description="This is the text that will be posted to the channel")
-    attachments: list[SlackAttachment] | None = Field(None)
+    attachments: list[SlackAttachment] | None = Field(None, description="Attachments add more context to the message")
 
 
 class Slack(Provider):

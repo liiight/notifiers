@@ -39,8 +39,8 @@ class PagerDutySchema(SchemaModel):
     group: str | None = Field(None, description="Logical grouping of components of a service")
     class_: str | None = Field(None, alias="class", description="The class/type of the event")
     custom_details: dict[str, Any] | None = Field(None, description="Additional details about the event and affected system")
-    images: list[PagerDutyImage] | None = Field(None)
-    links: list[PagerDutyLink] | None = Field(None)
+    images: list[PagerDutyImage] | None = Field(None, description="List of images to include")
+    links: list[PagerDutyLink] | None = Field(None, description="List of links to include")
 
 
 class PagerDuty(Provider):

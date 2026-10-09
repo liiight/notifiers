@@ -53,6 +53,25 @@ Changes
   (``notifiers@<hostname>``) is computed only when sending an email without a ``from`` address, via
   ``notifiers.providers.email.default_from()``. Replaces the ``DEFAULT_FROM`` constant.
 
+CLI
+~~~
+
+- ``notify`` and resource command options are generated from the provider's schema model. Every option and flag that
+  existed before 2.0 keeps its name and type. Additions:
+
+  - Arguments named in camelCase by the remote API also accept a ``--kebab-case`` spelling, e.g. Join ``--deviceId`` or
+    ``--device-id``, ``--smsnumber`` or ``--sms-number``.
+  - List arguments can be passed several times: Notify ``--tags``, Statuspage ``--component-ids``.
+  - Options for arguments without a description before 2.0 have help text, e.g. Telegram ``--chat-id``.
+
+- Removed the duplicate ``--type-`` option of Pushbullet and Zulip, use ``--type``.
+- Boolean flags that aren't passed don't send a value, so the provider's default applies, like in the library. Before 2.0
+  they were sent as ``False``: e.g. ``notifiers gmail notify`` connected without TLS and without logging in unless
+  ``--tls`` and ``--login`` were passed.
+- Provider command groups are built on demand, only for the invoked provider, which makes CLI startup faster.
+  ``notifiers_cli.core.provider_group_factory()`` still builds all of them up front, but isn't needed to run the CLI.
+- Provider documentation lists each provider's arguments in a table generated from its schema model.
+
 Fixes
 ~~~~~
 
@@ -73,6 +92,9 @@ Development
   format check. Tests that need network access are marked ``online``.
 - ruff 0.16.10 in pre-commit and in the dev dependency group.
 - Offline tests run without ``NOTIFIERS_*`` credentials in the environment, so they behave the same locally and in CI.
+- Tests: added ``tests/test_cli_options.py`` (CLI option generation, email / Gmail / iCloud via the CLI against a fake SMTP
+  server, on demand provider groups).
+- Docs: added the ``provider-arguments`` Sphinx directive (``source/_ext/provider_arguments.py``).
 - The statuspage incident cleanup runs for online tests only, and tolerates API errors.
 
 1.3.0
