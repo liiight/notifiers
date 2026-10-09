@@ -24,7 +24,7 @@ class TestiCloud:
         assert f"'{message}' is a required property" in e.value.message
 
     @pytest.mark.online
-    @pytest.mark.skip(reason="Disabled account")
+    @pytest.mark.skip(reason="iCloud test account credentials are rejected (535 authentication failed)")
     def test_smtp_sanity(self, provider, test_message):
         """using iCloud SMTP"""
         data = {

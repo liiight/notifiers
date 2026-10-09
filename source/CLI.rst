@@ -21,33 +21,31 @@ To view the main help just enter ``notifiers`` or ``notifiers --help``:
       --help             Show this message and exit.
 
     Commands:
-      dingtalk       Options for 'dingtalk'
-      email          Options for 'email'
-      gitter         Options for 'gitter'
-      gmail          Options for 'gmail'
-      icloud         Options for 'icloud'
-      join           Options for 'join'
-      mailgun        Options for 'mailgun'
-      notify         Options for 'notify'
-      pagerduty      Options for 'pagerduty'
-      popcornnotify  Options for 'popcornnotify'
-      providers      Shows all available providers
-      pushbullet     Options for 'pushbullet'
-      pushover       Options for 'pushover'
-      simplepush     Options for 'simplepush'
-      slack          Options for 'slack'
-      statuspage     Options for 'statuspage'
-      telegram       Options for 'telegram'
-      twilio         Options for 'twilio'
-      victorops      Options for 'victorops'
-      zulip          Options for 'zulip'
+      dingtalk    Options for 'dingtalk'
+      email       Options for 'email'
+      gmail       Options for 'gmail'
+      icloud      Options for 'icloud'
+      join        Options for 'join'
+      mailgun     Options for 'mailgun'
+      notify      Options for 'notify'
+      pagerduty   Options for 'pagerduty'
+      providers   Shows all available providers
+      pushbullet  Options for 'pushbullet'
+      pushover    Options for 'pushover'
+      simplepush  Options for 'simplepush'
+      slack       Options for 'slack'
+      statuspage  Options for 'statuspage'
+      telegram    Options for 'telegram'
+      twilio      Options for 'twilio'
+      victorops   Options for 'victorops'
+      zulip       Options for 'zulip'
 
 To view all providers use the ``providers`` command like so:
 
 .. code-block:: console
 
     $ notifiers providers
-    pushover, simplepush, slack, email, dingtalk, gmail, icloud, telegram, gitter, pushbullet, join, zulip, twilio, pagerduty, mailgun, popcornnotify, statuspage, victorops, notify
+    pushover, simplepush, slack, email, dingtalk, gmail, icloud, telegram, pushbullet, join, zulip, twilio, pagerduty, mailgun, statuspage, victorops, notify
 
 This will return all available provider names, including providers installed via the ``notifiers`` entry point.
 

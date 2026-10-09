@@ -11,6 +11,8 @@ from notifiers.exceptions import BadArguments, ResourceError
 
 provider = "statuspage"
 
+statuspage_account_unavailable = pytest.mark.skip(reason="Statuspage test account is inactive, see https://github.com/liiight/notifiers/issues/489")
+
 log = logging.getLogger("statuspage")
 
 
@@ -105,6 +107,7 @@ class TestStatusPage:
         assert rsp.status == FAILURE_STATUS
         assert "Could not authenticate" in rsp.errors
 
+    @statuspage_account_unavailable
     @pytest.mark.online
     @pytest.mark.parametrize(
         "data",

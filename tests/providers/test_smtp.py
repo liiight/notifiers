@@ -100,7 +100,6 @@ class TestSMTP:
         assert attach3.get_content_type() == "application/pdf"
 
     @pytest.mark.online
-    @pytest.mark.skip(reason="Disabled account")
     def test_smtp_sanity(self, provider, test_message):
         """using Gmail SMTP"""
         data = {

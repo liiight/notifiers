@@ -22,7 +22,6 @@ class TestGmail:
             provider.notify(**data)
         assert f"'{message}' is a required property" in e.value.message
 
-    @pytest.mark.skip(reason="Disabled account")
     @pytest.mark.online
     def test_smtp_sanity(self, provider, test_message):
         """using Gmail SMTP"""
@@ -65,4 +64,5 @@ class TestGmail:
         with pytest.raises(NotificationError) as e:
             rsp.raise_on_errors()
 
-        assert "Username and Password not accepted" in e.value.errors[0]
+        # Google either rejects the credentials or closes the connection
+        assert any(error in e.value.errors[0] for error in ("Username and Password not accepted", "Connection unexpectedly closed"))

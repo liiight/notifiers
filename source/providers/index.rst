@@ -8,14 +8,12 @@ Providers
 
    dingtalk
    email
-   gitter
    gmail
    icloud
    join
    mailgun
    notify
    pagerduty
-   popcornnotify
    pushbullet
    pushover
    simplepush

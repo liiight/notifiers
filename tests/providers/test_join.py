@@ -23,7 +23,7 @@ class TestJoin:
     def test_defaults(self, provider):
         assert provider.defaults == {"deviceId": "group.all"}
 
-    @pytest.mark.skip("tests fail due to no device connected")
+    @pytest.mark.skip(reason="No device registered to the Join test account")
     @pytest.mark.online
     def test_sanity(self, provider):
         data = {"message": "foo"}
@@ -68,7 +68,7 @@ class TestJoinCLI:
         assert result.exit_code
         assert not result.output
 
-    @pytest.mark.skip("tests fail due to no device connected")
+    @pytest.mark.skip(reason="No device registered to the Join test account")
     @pytest.mark.online
     def test_join_updates_positive(self, cli_runner):
         cmd = ["join", "devices"]
