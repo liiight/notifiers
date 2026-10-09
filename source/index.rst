@@ -14,7 +14,7 @@ See latest changes in :ref:`changelog`.
 Advantages
 ----------
 - Spend your precious time on your own code base, instead of chasing down 3rd party provider APIs. That's what we're here for!
-- With a minimal set of well known and stable dependencies (`requests <https://pypi.python.org/pypi/requests>`_, `jsonschema <https://pypi.python.org/pypi/jsonschema/2.6.0>`_ and `click <https://pypi.python.org/pypi/click/6.7>`_) you're better off than installing 3rd party SDKs.
+- With a minimal set of well known and stable dependencies (`requests <https://pypi.org/project/requests/>`_, `pydantic <https://pypi.org/project/pydantic/>`_ and `click <https://pypi.org/project/click/>`_) you're better off than installing 3rd party SDKs.
 - A unified interface means that you already support any new providers that will be added, no more work needed!
 - Thorough testing means protection against any breaking API changes. We make sure your code your notifications will always get delivered!
 
@@ -43,7 +43,7 @@ Basic Usage
     >>> pushover.required
     {'required': ['user', 'message', 'token']}
     >>> pushover.notify(user='foo', token='bar', message='test')
-    <NotificationResponse,provider=Pushover,status=Success>
+    <Response,provider=Pushover,status=Success, errors=None>
 
 From CLI
 --------
@@ -79,6 +79,7 @@ Documentation
    :caption: Contents:
 
    changelog
+   migration
    about
    installation
    usage
@@ -102,11 +103,11 @@ API documentation
 Development documentation
 -------------------------
 
-Notifiers uses `poetry <https://python-poetry.org>`_
+Notifiers uses `uv <https://docs.astral.sh/uv/>`_
 
 .. code-block:: bash
 
-   $ poetry install && poetry run pytest
+   $ uv sync && uv run pytest
 
 Donations
 ---------

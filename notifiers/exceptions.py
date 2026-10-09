@@ -23,10 +23,12 @@ class BadArguments(NotifierException):
 
     :param validation_error: The validation error message
     :param args: Exception arguments
-    :param kwargs: Exception kwargs
+    :param kwargs: Exception kwargs. ``errors`` may hold a list of all validation errors, each a dict with ``loc``,
+     ``msg`` and ``type`` keys
     """
 
     def __init__(self, validation_error: str, *args, **kwargs):
+        self.errors = kwargs.pop("errors", None) or []
         kwargs["message"] = f"Error with sent data: {validation_error}"
         super().__init__(*args, **kwargs)
 
@@ -36,7 +38,10 @@ class BadArguments(NotifierException):
 
 class SchemaError(NotifierException):
     """
-    Raised on schema issues, relevant probably when creating or changing a provider schema
+    Raised on schema issues, relevant probably when creating or changing a provider schema.
+
+    Not raised by notifiers itself: invalid pydantic schemas fail when the model is defined or first used.
+    Available so code that catches it keeps working.
 
     :param schema_error: The schema error that was raised
     :param args: Exception arguments

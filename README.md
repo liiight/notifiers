@@ -17,7 +17,7 @@ Got an app or service, and you want to enable your users to use notifications wi
 # Advantages
 
 -   Spend your precious time on your own code base, instead of chasing down 3rd party provider APIs. That's what we're here for!
--   With a minimal set of well known and stable dependencies ([requests](https://pypi.python.org/pypi/requests), [jsonschema](https://pypi.python.org/pypi/jsonschema/2.6.0) and [click](https://pypi.python.org/pypi/click/6.7)) you're better off than installing 3rd party SDKs.
+-   With a minimal set of well known and stable dependencies ([requests](https://pypi.org/project/requests/), [pydantic](https://pypi.org/project/pydantic/) and [click](https://pypi.org/project/click/)) you're better off than installing 3rd party SDKs.
 -   A unified interface means that you already support any new providers that will be added, no more work needed!
 -   Thorough testing means protection against any breaking API changes. We make sure your code your notifications will always get delivered!
 
@@ -43,14 +43,14 @@ $ docker pull liiight/notifiers
 >>> p.required
 {'required': ['user', 'message', 'token']}
 >>> p.notify(user='foo', token='bar', message='test')
-<NotificationResponse,provider=Pushover,status=Success>
+<Response,provider=Pushover,status=Success, errors=None>
 ```
 
 Or:
 ```python
 >>> from notifiers import notify
 >>> notify('pushover', user='foo', token='bar', message='test')
-<NotificationResponse,provider=Pushover,status=Success>
+<Response,provider=Pushover,status=Success, errors=None>
 ```
 
 # From CLI

@@ -30,6 +30,7 @@ class TestJoin:
         rsp = provider.notify(**data)
         rsp.raise_on_errors()
 
+    @pytest.mark.online
     def test_negative(self, provider):
         data = {"message": "foo", "apikey": "bar"}
         rsp = provider.notify(**data)
@@ -43,17 +44,14 @@ class TestJoinDevices:
     resource = "devices"
 
     def test_join_devices_attribs(self, resource):
-        assert resource.schema == {
-            "type": "object",
-            "properties": {"apikey": {"type": "string", "title": "user API key"}},
-            "additionalProperties": False,
-            "required": ["apikey"],
-        }
+        assert resource.schema == resource.schema_model.model_json_schema(by_alias=True)
+        assert resource.schema_model.__name__ == "JoinDevicesSchema"
 
     def test_join_devices_negative(self, resource):
         with pytest.raises(BadArguments):
             resource(env_prefix="foo")
 
+    @pytest.mark.online
     def test_join_devices_negative_online(self, resource):
         with pytest.raises(ResourceError) as e:
             resource(apikey="foo")

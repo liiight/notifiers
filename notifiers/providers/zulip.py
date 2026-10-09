@@ -1,6 +1,38 @@
+from __future__ import annotations
+
+from typing import Literal
+
+from pydantic import Field, model_validator
+from pydantic_core import PydanticCustomError
+
 from ..core import Provider, Response
 from ..exceptions import NotifierException
+from ..models import Email, SchemaModel, Url
 from ..utils import requests
+
+
+class ZulipSchema(SchemaModel):
+    message: str = Field(description="Message content")
+    email: Email = Field(description="User email")
+    api_key: str = Field(description="User API Key")
+    type_: Literal["stream", "private"] = Field(
+        "stream",
+        description="Type of message to send",
+        alias="type",
+    )
+    to: str = Field(description="Target of the message")
+    subject: str | None = Field(None, description="Title of the stream message. Required when using stream.")
+    domain: str | None = Field(None, min_length=1, description="Zulip cloud domain")
+    server: Url | None = Field(None, description="Zulip server URL. Example: https://myzulip.server.com")
+
+    @model_validator(mode="after")
+    def _domain_or_server(self):
+        passed = [name for name in ("domain", "server") if self.is_set(name)]
+        if not passed:
+            raise PydanticCustomError("required_argument", "One of 'domain', 'server' is required")
+        if len(passed) > 1:
+            raise PydanticCustomError("domain_or_server", "Only one of 'domain' or 'server' is allowed")
+        return self
 
 
 class Zulip(Provider):
@@ -12,55 +44,12 @@ class Zulip(Provider):
     base_url = "https://{domain}.zulipchat.com"
     path_to_errors = ("msg",)
 
-    __type = {
-        "type": "string",
-        "enum": ["stream", "private"],
-        "title": "Type of message to send",
-    }
-    _required = {
-        "allOf": [
-            {"required": ["message", "email", "api_key", "to"]},
-            {
-                "oneOf": [{"required": ["domain"]}, {"required": ["server"]}],
-                "error_oneOf": "Only one of 'domain' or 'server' is allowed",
-            },
-        ]
-    }
-
-    _schema = {
-        "type": "object",
-        "properties": {
-            "message": {"type": "string", "title": "Message content"},
-            "email": {"type": "string", "format": "email", "title": "User email"},
-            "api_key": {"type": "string", "title": "User API Key"},
-            "type": __type,
-            "type_": __type,
-            "to": {"type": "string", "title": "Target of the message"},
-            "subject": {
-                "type": "string",
-                "title": "Title of the stream message. Required when using stream.",
-            },
-            "domain": {"type": "string", "minLength": 1, "title": "Zulip cloud domain"},
-            "server": {
-                "type": "string",
-                "format": "uri",
-                "title": "Zulip server URL. Example: https://myzulip.server.com",
-            },
-        },
-        "additionalProperties": False,
-    }
-
-    @property
-    def defaults(self) -> dict:
-        return {"type": "stream"}
+    schema_model = ZulipSchema
 
     def _prepare_data(self, data: dict) -> dict:
         base_url = self.base_url.format(domain=data.pop("domain")) if data.get("domain") else data.pop("server")
         data["url"] = base_url + self.api_endpoint
         data["content"] = data.pop("message")
-        # A workaround since `type` is a reserved word
-        if data.get("type_"):
-            data["type"] = data.pop("type_")
         return data
 
     def _validate_data_dependencies(self, data: dict) -> dict:

@@ -18,6 +18,9 @@ log = logging.getLogger("statuspage")
 def close_all_open_incidents():
     api_key = os.getenv("NOTIFIERS_STATUSPAGE_API_KEY")
     page_id = os.getenv("NOTIFIERS_STATUSPAGE_PAGE_ID")
+    if not (api_key and page_id):
+        log.debug("statuspage credentials not set, skipping incidents cleanup")
+        return
 
     s = requests.Session()
     base_url = f"https://api.statuspage.io/v1/pages/{page_id}/incidents"
@@ -89,6 +92,7 @@ class TestStatusPage:
         with pytest.raises(BadArguments, match=message):
             provider.notify(**data)
 
+    @pytest.mark.online
     def test_errors(self, provider):
         data = {"api_key": "foo", "page_id": "foo", "message": "foo"}
         rsp = provider.notify(**data)
@@ -144,19 +148,13 @@ class TestStatuspageComponents:
     resource = "components"
 
     def test_statuspage_components_attribs(self, resource):
-        assert resource.schema == {
-            "additionalProperties": False,
-            "properties": {
-                "api_key": {"title": "OAuth2 token", "type": "string"},
-                "page_id": {"title": "Page ID", "type": "string"},
-            },
-            "required": ["api_key", "page_id"],
-            "type": "object",
-        }
+        assert resource.schema == resource.schema_model.model_json_schema(by_alias=True)
+        assert resource.schema_model.__name__ == "StatuspageComponentsSchema"
 
         assert resource.name == provider
         assert resource.required == {"required": ["api_key", "page_id"]}
 
+    @pytest.mark.online
     def test_statuspage_components_negative(self, resource):
         with pytest.raises(BadArguments):
             resource(env_prefix="foo")

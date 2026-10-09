@@ -1,4 +1,15 @@
+from __future__ import annotations
+
+from pydantic import Field
+
+from ..models import Hostname, Port
 from . import email
+
+
+class GmailSchema(email.SMTPSchema):
+    host: Hostname = Field("smtp.gmail.com", description="the host of the SMTP server")
+    port: Port = Field(587, description="the port number to use")
+    tls: bool = Field(True, description="should TLS be used")
 
 
 class Gmail(email.SMTP):
@@ -8,10 +19,4 @@ class Gmail(email.SMTP):
     base_url = "smtp.gmail.com"
     name = "gmail"
 
-    @property
-    def defaults(self) -> dict:
-        data = super().defaults
-        data["host"] = self.base_url
-        data["port"] = 587
-        data["tls"] = True
-        return data
+    schema_model = GmailSchema

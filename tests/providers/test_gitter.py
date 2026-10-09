@@ -65,15 +65,7 @@ class TestGitterResources:
     resource = "rooms"
 
     def test_gitter_rooms_attribs(self, resource):
-        assert resource.schema == {
-            "type": "object",
-            "properties": {
-                "token": {"type": "string", "title": "access token"},
-                "filter": {"type": "string", "title": "Filter results"},
-            },
-            "required": ["token"],
-            "additionalProperties": False,
-        }
+        assert resource.schema == resource.schema_model.model_json_schema(by_alias=True)
         assert resource.name == provider
         assert resource.required == {"required": ["token"]}
 

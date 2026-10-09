@@ -70,4 +70,12 @@ API documentation for the different providers.
    :members:
    :undoc-members:
 
+.. automodule:: notifiers.providers.dingtalk
+   :members:
+   :undoc-members:
+
+.. automodule:: notifiers.providers.notify
+   :members:
+   :undoc-members:
+
 

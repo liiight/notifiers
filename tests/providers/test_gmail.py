@@ -53,6 +53,7 @@ class TestGmail:
         rsp = provider.notify(to=to, message="foo", host="goo", username="ding", password="dong")
         assert rsp.data["to"] == ",".join(to)
 
+    @pytest.mark.online
     def test_gmail_negative(self, provider):
         data = {
             "username": "foo",

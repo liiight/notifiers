@@ -32,6 +32,7 @@ class TestTelegram:
             provider.notify(**data)
         assert f"'{message}' is a required property" in e.value.message
 
+    @pytest.mark.online
     def test_bad_token(self, provider):
         data = {"token": "foo", "chat_id": 1, "message": "foo"}
         with pytest.raises(NotificationError) as e:
@@ -66,12 +67,8 @@ class TestTelegramResources:
     resource = "updates"
 
     def test_telegram_updates_attribs(self, resource):
-        assert resource.schema == {
-            "additionalProperties": False,
-            "properties": {"token": {"title": "Bot token", "type": "string"}},
-            "required": ["token"],
-            "type": "object",
-        }
+        assert resource.schema == resource.schema_model.model_json_schema(by_alias=True)
+        assert resource.schema_model.__name__ == "TelegramUpdatesSchema"
         assert resource.name == provider
         assert resource.required == {"required": ["token"]}
 

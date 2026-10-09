@@ -1,6 +1,30 @@
+from __future__ import annotations
+
+from typing import Literal
+
+from pydantic import Field
+
 from ..core import Provider, ProviderResource, Response
 from ..exceptions import ResourceError
+from ..models import SchemaModel
 from ..utils import requests
+
+
+class TelegramUpdatesSchema(SchemaModel):
+    token: str = Field(description="Bot token")
+
+
+class TelegramSchema(SchemaModel):
+    message: str = Field(description="Text of the message to be sent", max_length=4096)
+    chat_id: str | int = Field(description="Unique identifier for the target chat or username of the target channel (in the format @channelusername)")
+    token: str = Field(description="Bot token")
+    parse_mode: Literal["markdown", "html"] | None = Field(
+        None,
+        description="Send Markdown or HTML, if you want Telegram apps to show bold, italic, fixed-width text or inline URLs in your bot's message.",
+    )
+    disable_web_page_preview: bool | None = Field(None, description="Disables link previews for links in this message")
+    disable_notification: bool | None = Field(None, description="Sends the message silently. Users will receive a notification with no sound.")
+    reply_to_message_id: int | None = Field(None, description="If the message is a reply, ID of the original message")
 
 
 class TelegramMixin:
@@ -17,13 +41,7 @@ class TelegramUpdates(TelegramMixin, ProviderResource):
     resource_name = "updates"
     updates_endpoint = "/getUpdates"
 
-    _required = {"required": ["token"]}
-
-    _schema = {
-        "type": "object",
-        "properties": {"token": {"type": "string", "title": "Bot token"}},
-        "additionalProperties": False,
-    }
+    schema_model = TelegramUpdatesSchema
 
     def _get_resource(self, data: dict) -> list:
         url = self.base_url.format(token=data["token"]) + self.updates_endpoint
@@ -47,40 +65,7 @@ class Telegram(TelegramMixin, Provider):
 
     _resources = {"updates": TelegramUpdates()}
 
-    _required = {"required": ["message", "chat_id", "token"]}
-    _schema = {
-        "type": "object",
-        "properties": {
-            "message": {
-                "type": "string",
-                "title": "Text of the message to be sent",
-                "maxLength": 4096,
-            },
-            "token": {"type": "string", "title": "Bot token"},
-            "chat_id": {
-                "oneOf": [{"type": "string"}, {"type": "integer"}],
-                "title": "Unique identifier for the target chat or username of the target channel (in the format @channelusername)",
-            },
-            "parse_mode": {
-                "type": "string",
-                "title": "Send Markdown or HTML, if you want Telegram apps to show bold, italic, fixed-width text or inline URLs in your bot's message.",
-                "enum": ["markdown", "html"],
-            },
-            "disable_web_page_preview": {
-                "type": "boolean",
-                "title": "Disables link previews for links in this message",
-            },
-            "disable_notification": {
-                "type": "boolean",
-                "title": "Sends the message silently. Users will receive a notification with no sound.",
-            },
-            "reply_to_message_id": {
-                "type": "integer",
-                "title": "If the message is a reply, ID of the original message",
-            },
-        },
-        "additionalProperties": False,
-    }
+    schema_model = TelegramSchema
 
     def _prepare_data(self, data: dict) -> dict:
         data["text"] = data.pop("message")
