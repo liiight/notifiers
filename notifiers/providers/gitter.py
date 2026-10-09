@@ -1,6 +1,22 @@
+from __future__ import annotations
+
+from pydantic import Field
+
 from ..core import Provider, ProviderResource, Response
 from ..exceptions import ResourceError
+from ..models import SchemaModel
 from ..utils import requests
+
+
+class GitterRoomsSchema(SchemaModel):
+    token: str = Field(description="access token")
+    filter: str | None = Field(None, description="Filter results")
+
+
+class GitterSchema(SchemaModel):
+    message: str = Field(description="Body of the message")
+    token: str = Field(description="access token")
+    room_id: str = Field(description="ID of the room to send the notification to")
 
 
 class GitterMixin:
@@ -26,16 +42,7 @@ class GitterRooms(GitterMixin, ProviderResource):
 
     resource_name = "rooms"
 
-    _required = {"required": ["token"]}
-
-    _schema = {
-        "type": "object",
-        "properties": {
-            "token": {"type": "string", "title": "access token"},
-            "filter": {"type": "string", "title": "Filter results"},
-        },
-        "additionalProperties": False,
-    }
+    schema_model = GitterRoomsSchema
 
     def _get_resource(self, data: dict) -> list:
         headers = self._get_headers(data["token"])
@@ -67,19 +74,7 @@ class Gitter(GitterMixin, Provider):
 
     _resources = {"rooms": GitterRooms()}
 
-    _required = {"required": ["message", "token", "room_id"]}
-    _schema = {
-        "type": "object",
-        "properties": {
-            "message": {"type": "string", "title": "Body of the message"},
-            "token": {"type": "string", "title": "access token"},
-            "room_id": {
-                "type": "string",
-                "title": "ID of the room to send the notification to",
-            },
-        },
-        "additionalProperties": False,
-    }
+    schema_model = GitterSchema
 
     def _prepare_data(self, data: dict) -> dict:
         data["text"] = data.pop("message")

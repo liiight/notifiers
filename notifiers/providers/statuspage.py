@@ -1,6 +1,45 @@
+from __future__ import annotations
+
+from typing import Literal
+
+from pydantic import Field, model_validator
+
 from ..core import Provider, ProviderResource, Response
 from ..exceptions import BadArguments, ResourceError
+from ..models import DateString, ISO8601Datetime, SchemaModel
 from ..utils import requests
+
+REALTIME_STATUSES = ["investigating", "identified", "monitoring", "resolved"]
+SCHEDULED_STATUSES = ["scheduled", "in_progress", "verifying", "completed"]
+
+
+class StatuspageComponentsSchema(SchemaModel):
+    api_key: str = Field(description="OAuth2 token")
+    page_id: str = Field(description="Page ID")
+
+
+class StatuspageSchema(SchemaModel):
+    message: str = Field(description="The name of the incident")
+    api_key: str = Field(description="OAuth2 token")
+    page_id: str = Field(description="Page ID")
+    status: Literal["investigating", "identified", "monitoring", "resolved", "scheduled", "in_progress", "verifying", "completed"] | None = Field(
+        None, description="Status of the incident"
+    )
+    body: str | None = Field(None, description="The initial message, created as the first incident update")
+    wants_twitter_update: bool | None = Field(None, description="Post the new incident to twitter")
+    impact_override: Literal["none", "minor", "major", "critical"] | None = Field(None, description="Override calculated impact value")
+    component_ids: list[str] | None = Field(
+        None,
+        description="List of components whose subscribers should be notified (only applicable for pages with component subscriptions enabled)",
+    )
+    deliver_notifications: bool | None = Field(None, description="Control whether notifications should be delivered for the initial incident update")
+    scheduled_for: ISO8601Datetime | None = Field(None, description="Time the scheduled maintenance should begin")
+    scheduled_until: ISO8601Datetime | None = Field(None, description="Time the scheduled maintenance should end")
+    scheduled_remind_prior: bool | None = Field(None, description="Remind subscribers 60 minutes before scheduled start")
+    scheduled_auto_in_progress: bool | None = Field(None, description="Automatically transition incident to 'In Progress' at start")
+    scheduled_auto_completed: bool | None = Field(None, description="Automatically transition incident to 'Completed' at end")
+    backfilled: bool | None = Field(None, description="Create an historical incident")
+    backfill_date: DateString | None = Field(None, description="Date of incident in YYYY-MM-DD format")
 
 
 class StatuspageMixin:
@@ -11,6 +50,21 @@ class StatuspageMixin:
     path_to_errors = ("error",)
     site_url = "https://statuspage.io"
 
+    @model_validator(mode="after")
+    def _check_dependencies(self):
+        self.require_dependencies(
+            {
+                "backfill_date": ["backfilled"],
+                "backfilled": ["backfill_date"],
+                "scheduled_for": ["scheduled_until"],
+                "scheduled_until": ["scheduled_for"],
+                "scheduled_remind_prior": ["scheduled_for"],
+                "scheduled_auto_in_progress": ["scheduled_for"],
+                "scheduled_auto_completed": ["scheduled_for"],
+            }
+        )
+        return self
+
 
 class StatuspageComponents(StatuspageMixin, ProviderResource):
     """Return a list of Statuspage components for the page ID"""
@@ -18,16 +72,7 @@ class StatuspageComponents(StatuspageMixin, ProviderResource):
     resource_name = "components"
     components_url = "components.json"
 
-    _required = {"required": ["api_key", "page_id"]}
-
-    _schema = {
-        "type": "object",
-        "properties": {
-            "api_key": {"type": "string", "title": "OAuth2 token"},
-            "page_id": {"type": "string", "title": "Page ID"},
-        },
-        "additionalProperties": False,
-    }
+    schema_model = StatuspageComponentsSchema
 
     def _get_resource(self, data: dict) -> dict:
         url = self.base_url.format(page_id=data["page_id"]) + self.components_url
@@ -51,87 +96,11 @@ class Statuspage(StatuspageMixin, Provider):
 
     _resources = {"components": StatuspageComponents()}
 
-    realtime_statuses = ["investigating", "identified", "monitoring", "resolved"]
+    realtime_statuses = REALTIME_STATUSES
 
-    scheduled_statuses = ["scheduled", "in_progress", "verifying", "completed"]
+    scheduled_statuses = SCHEDULED_STATUSES
 
-    __component_ids = {
-        "type": "array",
-        "items": {"type": "string"},
-        "title": "List of components whose subscribers should be notified (only applicable for pages with component subscriptions enabled)",
-    }
-
-    _required = {"required": ["message", "api_key", "page_id"]}
-
-    _schema = {
-        "type": "object",
-        "properties": {
-            "message": {"type": "string", "title": "The name of the incident"},
-            "api_key": {"type": "string", "title": "OAuth2 token"},
-            "page_id": {"type": "string", "title": "Page ID"},
-            "status": {
-                "type": "string",
-                "title": "Status of the incident",
-                "enum": realtime_statuses + scheduled_statuses,
-            },
-            "body": {
-                "type": "string",
-                "title": "The initial message, created as the first incident update",
-            },
-            "wants_twitter_update": {
-                "type": "boolean",
-                "title": "Post the new incident to twitter",
-            },
-            "impact_override": {
-                "type": "string",
-                "title": "Override calculated impact value",
-                "enum": ["none", "minor", "major", "critical"],
-            },
-            "component_ids": __component_ids,
-            "deliver_notifications": {
-                "type": "boolean",
-                "title": "Control whether notifications should be delivered for the initial incident update",
-            },
-            "scheduled_for": {
-                "type": "string",
-                "format": "iso8601",
-                "title": "Time the scheduled maintenance should begin",
-            },
-            "scheduled_until": {
-                "type": "string",
-                "format": "iso8601",
-                "title": "Time the scheduled maintenance should end",
-            },
-            "scheduled_remind_prior": {
-                "type": "boolean",
-                "title": "Remind subscribers 60 minutes before scheduled start",
-            },
-            "scheduled_auto_in_progress": {
-                "type": "boolean",
-                "title": "Automatically transition incident to 'In Progress' at start",
-            },
-            "scheduled_auto_completed": {
-                "type": "boolean",
-                "title": "Automatically transition incident to 'Completed' at end",
-            },
-            "backfilled": {"type": "boolean", "title": "Create an historical incident"},
-            "backfill_date": {
-                "format": "date",
-                "type": "string",
-                "title": "Date of incident in YYYY-MM-DD format",
-            },
-        },
-        "dependencies": {
-            "backfill_date": ["backfilled"],
-            "backfilled": ["backfill_date"],
-            "scheduled_for": ["scheduled_until"],
-            "scheduled_until": ["scheduled_for"],
-            "scheduled_remind_prior": ["scheduled_for"],
-            "scheduled_auto_in_progress": ["scheduled_for"],
-            "scheduled_auto_completed": ["scheduled_for"],
-        },
-        "additionalProperties": False,
-    }
+    schema_model = StatuspageSchema
 
     def _validate_data_dependencies(self, data: dict) -> dict:
         scheduled_properties = [prop for prop in data if prop.startswith("scheduled")]

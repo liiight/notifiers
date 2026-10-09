@@ -1,8 +1,67 @@
+from __future__ import annotations
+
 import json
+from typing import Annotated, Any, Literal
+
+from pydantic import Field, model_validator
+from pydantic_core import PydanticCustomError
 
 from ..core import Provider, Response
+from ..models import AsciiStr, Email, FilePath, OneOrMore, RFC2822Datetime, SchemaModel, one_or_more
 from ..utils import requests
-from ..utils.schema.helpers import one_or_more
+
+_EMAIL_LIST_DESCRIPTION = 'Email address of the recipient(s). Example: "Bob <bob@host.com>".'
+
+
+class MailGunSchema(SchemaModel):
+    base_url: Literal["https://api.mailgun.net", "https://api.eu.mailgun.net"] = Field(
+        "https://api.mailgun.net", description="MailGun's API base URL. Use https://api.eu.mailgun.net for the EU region"
+    )
+    api_key: str = Field(description="User's API key")
+    message: str | None = Field(None, description="Body of the message. (text version)")
+    html: str | None = Field(None, description="Body of the message. (HTML version)")
+    to: OneOrMore[str] = Field(description=_EMAIL_LIST_DESCRIPTION)
+    from_: Email | None = Field(None, alias="from", description="Email address for From header")
+    domain: str = Field(description="MailGun's domain to use")
+    cc: OneOrMore[str] | None = Field(None, description=_EMAIL_LIST_DESCRIPTION)
+    bcc: OneOrMore[str] | None = Field(None, description=_EMAIL_LIST_DESCRIPTION)
+    subject: str | None = Field(None, description="Message subject")
+    attachment: OneOrMore[FilePath] | None = Field(None, description="File attachment")
+    inline: OneOrMore[FilePath] | None = Field(None, description="Attachment with inline disposition. Can be used to send inline images")
+    tag: one_or_more(Annotated[AsciiStr, Field(max_length=128)], max_items=3) | None = Field(None, description="Tag string")
+    dkim: bool | None = Field(None, description="Enables/disables DKIM signatures on per-message basis")
+    deliverytime: RFC2822Datetime | None = Field(None, description="Desired time of delivery. Note: Messages can be scheduled for a maximum of 3 days in the future.")
+    testmode: bool | None = Field(None, description="Enables sending in test mode.")
+    tracking: bool | None = Field(None, description="Toggles tracking on a per-message basis")
+    tracking_clicks: Literal[True, False, "htmlonly"] | None = Field(
+        None,
+        description="Toggles clicks tracking on a per-message basis. Has higher priority than domain-level setting. Pass yes, no or htmlonly.",
+    )
+    tracking_opens: bool | None = Field(None, description="Toggles opens tracking on a per-message basis. Has higher priority than domain-level setting")
+    require_tls: bool | None = Field(
+        None,
+        description="If set to True this requires the message only be sent over a TLS connection."
+        " If a TLS connection can not be established, Mailgun will not deliver the message."
+        "If set to False, Mailgun will still try and upgrade the connection, but if Mailgun can not,"
+        " the message will be delivered over a plaintext SMTP connection.",
+    )
+    skip_verification: bool | None = Field(
+        None,
+        description="If set to True, the certificate and hostname will not be verified when trying to establish "
+        "a TLS connection and Mailgun will accept any certificate during delivery. If set to False,"
+        " Mailgun will verify the certificate and hostname. If either one can not be verified, "
+        "a TLS connection will not be established.",
+    )
+    headers: dict[str, str] | None = Field(None, description="Any other header to add")
+    data: dict[str, dict[str, Any]] | None = Field(None, description="attach a custom JSON data to the message")
+
+    @model_validator(mode="after")
+    def _check_required(self):
+        if not self.is_set("from_"):
+            raise PydanticCustomError("required_argument", "'from' is a required property")
+        if not (self.is_set("message") or self.is_set("html")):
+            raise PydanticCustomError("required_argument", 'Need either "message" or "html"')
+        return self
 
 
 class MailGun(Provider):
@@ -25,127 +84,9 @@ class MailGun(Provider):
         "skip_verification",
     ]
 
-    __email_list = one_or_more(
-        {
-            "type": "string",
-            "title": 'Email address of the recipient(s). Example: "Bob <bob@host.com>".',
-        }
-    )
-
-    _required = {
-        "allOf": [
-            {"required": ["to", "domain", "api_key"]},
-            {"anyOf": [{"required": ["from"]}, {"required": ["from_"]}]},
-            {
-                "anyOf": [{"required": ["message"]}, {"required": ["html"]}],
-                "error_anyOf": 'Need either "message" or "html"',
-            },
-        ]
-    }
-
-    defaults = {"base_url": "https://api.mailgun.net"}
-
-    _schema = {
-        "type": "object",
-        "properties": {
-            "base_url": {
-                "type": "string",
-                "enum": ["https://api.mailgun.net", "https://api.eu.mailgun.net"],
-            },
-            "api_key": {"type": "string", "title": "User's API key"},
-            "message": {
-                "type": "string",
-                "title": "Body of the message. (text version)",
-            },
-            "html": {"type": "string", "title": "Body of the message. (HTML version)"},
-            "to": __email_list,
-            "from": {
-                "type": "string",
-                "format": "email",
-                "title": "Email address for From header",
-            },
-            "from_": {
-                "type": "string",
-                "format": "email",
-                "title": "Email address for From header",
-                "duplicate": True,
-            },
-            "domain": {"type": "string", "title": "MailGun's domain to use"},
-            "cc": __email_list,
-            "bcc": __email_list,
-            "subject": {"type": "string", "title": "Message subject"},
-            "attachment": one_or_more({"type": "string", "format": "valid_file", "title": "File attachment"}),
-            "inline": one_or_more(
-                {
-                    "type": "string",
-                    "format": "valid_file",
-                    "title": "Attachment with inline disposition. Can be used to send inline images",
-                }
-            ),
-            "tag": one_or_more(
-                schema={
-                    "type": "string",
-                    "format": "ascii",
-                    "title": "Tag string",
-                    "maxLength": 128,
-                },
-                max=3,
-            ),
-            "dkim": {
-                "type": "boolean",
-                "title": "Enables/disables DKIM signatures on per-message basis",
-            },
-            "deliverytime": {
-                "type": "string",
-                "format": "rfc2822",
-                "title": "Desired time of delivery. Note: Messages can be scheduled for a maximum of 3 days in the future.",
-            },
-            "testmode": {"type": "boolean", "title": "Enables sending in test mode."},
-            "tracking": {
-                "type": "boolean",
-                "title": "Toggles tracking on a per-message basis",
-            },
-            "tracking_clicks": {
-                "type": ["string", "boolean"],
-                "title": "Toggles clicks tracking on a per-message basis. Has higher priority than domain-level setting. Pass yes, no or htmlonly.",
-                "enum": [True, False, "htmlonly"],
-            },
-            "tracking_opens": {
-                "type": "boolean",
-                "title": "Toggles opens tracking on a per-message basis. Has higher priority than domain-level setting",
-            },
-            "require_tls": {
-                "type": "boolean",
-                "title": "If set to True this requires the message only be sent over a TLS connection."
-                " If a TLS connection can not be established, Mailgun will not deliver the message."
-                "If set to False, Mailgun will still try and upgrade the connection, but if Mailgun can not,"
-                " the message will be delivered over a plaintext SMTP connection.",
-            },
-            "skip_verification": {
-                "type": "boolean",
-                "title": "If set to True, the certificate and hostname will not be verified when trying to establish "
-                "a TLS connection and Mailgun will accept any certificate during delivery. If set to False,"
-                " Mailgun will verify the certificate and hostname. If either one can not be verified, "
-                "a TLS connection will not be established.",
-            },
-            "headers": {
-                "type": "object",
-                "additionalProperties": {"type": "string"},
-                "title": "Any other header to add",
-            },
-            "data": {
-                "type": "object",
-                "additionalProperties": {"type": "object"},
-                "title": "attach a custom JSON data to the message",
-            },
-        },
-        "additionalProperties": False,
-    }
+    schema_model = MailGunSchema
 
     def _prepare_data(self, data: dict) -> dict:
-        if data.get("from_"):
-            data["from"] = data.pop("from_")
-
         new_data = {
             "to": data.pop("to"),
             "from": data.pop("from"),

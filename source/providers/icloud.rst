@@ -1,5 +1,5 @@
 iCloud
------
+------
 Send emails via `iCLoud <https://www.icloud.com/mail>`_
 
 This is a private use case of the :class:`~notifiers.providers.email.SMTP` provider

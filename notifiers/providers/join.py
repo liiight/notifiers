@@ -1,10 +1,61 @@
+from __future__ import annotations
+
 import json
 
 import requests
+from pydantic import Field, model_validator
+from pydantic_core import PydanticCustomError
 
 from ..core import Provider, ProviderResource, Response
 from ..exceptions import ResourceError
-from ..utils.schema.helpers import list_to_commas, one_or_more
+from ..models import OneOrMore, SchemaModel, Url
+from ..utils.helpers import list_to_commas
+
+
+class JoinDevicesSchema(SchemaModel):
+    api_key: str = Field(alias="apikey", description="user API key")
+
+
+class JoinSchema(SchemaModel):
+    api_key: str = Field(alias="apikey", description="user API key")
+    message: str = Field(
+        description="usually used as a Tasker or EventGhost command. Can also be used with URLs and Files to add a description for those elements",
+    )
+    device_id: str = Field("group.all", alias="deviceId", description="The device ID or group ID of the device you want to send the message to")
+    device_ids: OneOrMore[str] | None = Field(None, alias="deviceIds", description="A comma separated list of device IDs you want to send the push to")
+    device_names: OneOrMore[str] | None = Field(None, alias="deviceNames", description="A comma separated list of device names you want to send the push to")
+    url: Url | None = Field(
+        None,
+        description=" A URL you want to open on the device. If a notification is created with this push, this will make clicking the notification open this URL",
+    )
+    clipboard: str | None = Field(None, description="some text you want to set on the receiving device’s clipboard")  # noqa: RUF001
+    file: Url | None = Field(None, description="a publicly accessible URL of a file")
+    sms_number: str | None = Field(None, alias="smsnumber", description="phone number to send an SMS to")
+    sms_text: str | None = Field(None, alias="smstext", description="some text to send in an SMS")
+    call_number: str | None = Field(None, alias="callnumber", description="number to call to")
+    interruption_filter: int | None = Field(None, ge=1, le=4, alias="interruptionFilter", description="set interruption filter mode")
+    mms_file: Url | None = Field(None, alias="mmsfile", description="publicly accessible mms file url")
+    media_volume: int | None = Field(None, alias="mediaVolume", description="set device media volume")
+    ring_volume: str | None = Field(None, alias="ringVolume", description="set device ring volume")
+    alarm_volume: str | None = Field(None, alias="alarmVolume", description="set device alarm volume")
+    wallpaper: Url | None = Field(None, description="a publicly accessible URL of an image file")
+    find: bool | None = Field(None, description="set to true to make your device ring loudly")
+    title: str | None = Field(
+        None,
+        description="If used, will always create a notification on the receiving device with this as the title and text as the notification’s text",  # noqa: RUF001
+    )
+    icon: Url | None = Field(None, description="notification's icon URL")
+    small_icon: Url | None = Field(None, alias="smallicon", description="Status Bar Icon URL")
+    priority: int | None = Field(None, ge=-2, le=2, description="control how your notification is displayed")
+    group: str | None = Field(None, description="allows you to join notifications in different groups")
+    image: Url | None = Field(None, description="Notification image URL")
+
+    @model_validator(mode="after")
+    def _check_sms(self):
+        self.require_dependencies({"sms_text": ["sms_number"], "call_number": ["sms_number"]})
+        if self.is_set("sms_number") and not (self.is_set("sms_text") or self.is_set("mms_file")):
+            raise PydanticCustomError("sms_content", "Must use either 'smstext' or 'mmsfile' with 'smsnumber'")
+        return self
 
 
 class JoinMixin:
@@ -42,13 +93,7 @@ class JoinDevices(JoinMixin, ProviderResource):
 
     resource_name = "devices"
     devices_url = "/listDevices"
-    _required = {"required": ["apikey"]}
-
-    _schema = {
-        "type": "object",
-        "properties": {"apikey": {"type": "string", "title": "user API key"}},
-        "additionalProperties": False,
-    }
+    schema_model = JoinDevicesSchema
 
     def _get_resource(self, data: dict):
         url = self.base_url + self.devices_url
@@ -72,116 +117,7 @@ class Join(JoinMixin, Provider):
 
     _resources = {"devices": JoinDevices()}
 
-    _required = {
-        "dependencies": {"smstext": ["smsnumber"], "callnumber": ["smsnumber"]},
-        "anyOf": [
-            {"dependencies": {"smsnumber": ["smstext"]}},
-            {"dependencies": {"smsnumber": ["mmsfile"]}},
-        ],
-        "error_anyOf": "Must use either 'smstext' or 'mmsfile' with 'smsnumber'",
-        "required": ["apikey", "message"],
-    }
-
-    _schema = {
-        "type": "object",
-        "properties": {
-            "message": {
-                "type": "string",
-                "title": "usually used as a Tasker or EventGhost command. Can also be used with URLs and Files to add a description for those elements",
-            },
-            "apikey": {"type": "string", "title": "user API key"},
-            "deviceId": {
-                "type": "string",
-                "title": "The device ID or group ID of the device you want to send the message to",
-            },
-            "deviceIds": one_or_more(
-                {
-                    "type": "string",
-                    "title": "A comma separated list of device IDs you want to send the push to",
-                }
-            ),
-            "deviceNames": one_or_more(
-                {
-                    "type": "string",
-                    "title": "A comma separated list of device names you want to send the push to",
-                }
-            ),
-            "url": {
-                "type": "string",
-                "format": "uri",
-                "title": " A URL you want to open on the device. If a notification is created with this push, this will make clicking the notification open this URL",
-            },
-            "clipboard": {
-                "type": "string",
-                "title": "some text you want to set on the receiving device’s clipboard",  # noqa: RUF001
-            },
-            "file": {
-                "type": "string",
-                "format": "uri",
-                "title": "a publicly accessible URL of a file",
-            },
-            "smsnumber": {"type": "string", "title": "phone number to send an SMS to"},
-            "smstext": {"type": "string", "title": "some text to send in an SMS"},
-            "callnumber": {"type": "string", "title": "number to call to"},
-            "interruptionFilter": {
-                "type": "integer",
-                "minimum": 1,
-                "maximum": 4,
-                "title": "set interruption filter mode",
-            },
-            "mmsfile": {
-                "type": "string",
-                "format": "uri",
-                "title": "publicly accessible mms file url",
-            },
-            "mediaVolume": {"type": "integer", "title": "set device media volume"},
-            "ringVolume": {"type": "string", "title": "set device ring volume"},
-            "alarmVolume": {"type": "string", "title": "set device alarm volume"},
-            "wallpaper": {
-                "type": "string",
-                "format": "uri",
-                "title": "a publicly accessible URL of an image file",
-            },
-            "find": {
-                "type": "boolean",
-                "title": "set to true to make your device ring loudly",
-            },
-            "title": {
-                "type": "string",
-                "title": "If used, will always create a notification on the receiving device with this as the title and text as the notification’s text",  # noqa: RUF001
-            },
-            "icon": {
-                "type": "string",
-                "format": "uri",
-                "title": "notification's icon URL",
-            },
-            "smallicon": {
-                "type": "string",
-                "format": "uri",
-                "title": "Status Bar Icon URL",
-            },
-            "priority": {
-                "type": "integer",
-                "title": "control how your notification is displayed",
-                "minimum": -2,
-                "maximum": 2,
-            },
-            "group": {
-                "type": "string",
-                "title": "allows you to join notifications in different groups",
-            },
-            "image": {
-                "type": "string",
-                "format": "uri",
-                "title": "Notification image URL",
-            },
-        },
-        "additionalProperties": False,
-    }
-
-    @property
-    def defaults(self) -> dict:
-        return {"deviceId": "group.all"}
+    schema_model = JoinSchema
 
     def _prepare_data(self, data: dict) -> dict:
         if data.get("deviceIds"):

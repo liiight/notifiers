@@ -5,15 +5,50 @@ import smtplib
 import socket
 from email.message import EmailMessage
 from email.utils import formatdate
+from functools import cache
 from pathlib import Path
 from smtplib import SMTPAuthenticationError, SMTPSenderRefused, SMTPServerDisconnected
 
+from pydantic import Field, model_validator
+
 from ..core import Provider, Response
-from ..utils.schema.helpers import list_to_commas, one_or_more
+from ..models import Email, FilePath, Hostname, OneOrMore, Port, SchemaModel
+from ..utils.helpers import list_to_commas
 
 DEFAULT_SUBJECT = "New email from 'notifiers'!"
-DEFAULT_FROM = f"notifiers@{socket.getfqdn()}"
 DEFAULT_SMTP_HOST = "localhost"
+
+
+@cache
+def default_from() -> str:
+    """
+    The default FROM address, ``notifiers@<this machine's fully qualified domain name>``.
+    Computed on first use since the hostname lookup can be slow.
+    """
+    return f"notifiers@{socket.getfqdn()}"
+
+
+class SMTPSchema(SchemaModel):
+    message: str = Field(description="the content of the email message")
+    subject: str = Field(DEFAULT_SUBJECT, description="the subject of the email message")
+    to: OneOrMore[Email] = Field(description="one or more email addresses to use")
+    cc: OneOrMore[Email] | None = Field(None, description="one or more email addresses to use")
+    bcc: OneOrMore[Email] | None = Field(None, description="one or more email addresses to use")
+    from_: Email = Field(default_factory=default_from, alias="from", description="the FROM address to use in the email")
+    attachments: OneOrMore[FilePath] | None = Field(None, description="one or more attachments to use in the email")
+    host: Hostname = Field(DEFAULT_SMTP_HOST, description="the host of the SMTP server")
+    port: Port = Field(25, description="the port number to use")
+    username: str | None = Field(None, description="username if relevant")
+    password: str | None = Field(None, description="password if relevant")
+    tls: bool = Field(False, description="should TLS be used")
+    ssl: bool = Field(False, description="should SSL be used")
+    html: bool = Field(False, description="should the email be parse as an HTML file")
+    login: bool = Field(True, description="Trigger login to server")
+
+    @model_validator(mode="after")
+    def _check_credentials(self):
+        self.require_dependencies({"username": ["password"], "password": ["username"]})
+        return self
 
 
 class SMTP(Provider):
@@ -23,79 +58,7 @@ class SMTP(Provider):
     site_url = "https://en.wikipedia.org/wiki/Email"
     name = "email"
 
-    _required = {"required": ["message", "to"]}
-
-    _schema = {
-        "type": "object",
-        "properties": {
-            "message": {"type": "string", "title": "the content of the email message"},
-            "subject": {"type": "string", "title": "the subject of the email message"},
-            "to": one_or_more(
-                {
-                    "type": "string",
-                    "format": "email",
-                    "title": "one or more email addresses to use",
-                }
-            ),
-            "cc": one_or_more(
-                {
-                    "type": "string",
-                    "format": "email",
-                    "title": "one or more email addresses to use",
-                }
-            ),
-            "bcc": one_or_more(
-                {
-                    "type": "string",
-                    "format": "email",
-                    "title": "one or more email addresses to use",
-                }
-            ),
-            "from": {
-                "type": "string",
-                "format": "email",
-                "title": "the FROM address to use in the email",
-            },
-            "from_": {
-                "type": "string",
-                "format": "email",
-                "title": "the FROM address to use in the email",
-                "duplicate": True,
-            },
-            "attachments": one_or_more(
-                {
-                    "type": "string",
-                    "format": "valid_file",
-                    "title": "one or more attachments to use in the email",
-                }
-            ),
-            "host": {
-                "type": "string",
-                "format": "hostname",
-                "title": "the host of the SMTP server",
-            },
-            "port": {
-                "type": "integer",
-                "format": "port",
-                "title": "the port number to use",
-            },
-            "username": {"type": "string", "title": "username if relevant"},
-            "password": {"type": "string", "title": "password if relevant"},
-            "tls": {"type": "boolean", "title": "should TLS be used"},
-            "ssl": {"type": "boolean", "title": "should SSL be used"},
-            "html": {
-                "type": "boolean",
-                "title": "should the email be parse as an HTML file",
-            },
-            "login": {"type": "boolean", "title": "Trigger login to server"},
-        },
-        "dependencies": {
-            "username": ["password"],
-            "password": ["username"],
-            "ssl": ["tls"],
-        },
-        "additionalProperties": False,
-    }
+    schema_model = SMTPSchema
 
     @staticmethod
     def _get_mimetype(attachment: Path) -> tuple[str, str]:
@@ -113,25 +76,11 @@ class SMTP(Provider):
         self.smtp_server = None
         self.configuration = None
 
-    @property
-    def defaults(self) -> dict:
-        return {
-            "subject": DEFAULT_SUBJECT,
-            "from": DEFAULT_FROM,
-            "host": DEFAULT_SMTP_HOST,
-            "port": 25,
-            "tls": False,
-            "ssl": False,
-            "html": False,
-            "login": True,
-        }
-
     def _prepare_data(self, data: dict) -> dict:
         if isinstance(data["to"], list):
             data["to"] = list_to_commas(data["to"])
-        # A workaround since `from` is a reserved word
-        if data.get("from_"):
-            data["from"] = data.pop("from_")
+        if isinstance(data.get("attachments"), str):
+            data["attachments"] = [data["attachments"]]
         return data
 
     @staticmethod

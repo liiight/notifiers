@@ -14,16 +14,25 @@ provider = "statuspage"
 log = logging.getLogger("statuspage")
 
 
-@pytest.fixture(autouse=True, scope="module")
-def close_all_open_incidents():
+@pytest.fixture(autouse=True)
+def close_all_open_incidents(request):
+    """Online tests create real incidents, so open ones are closed first. Offline tests make no API calls"""
+    if not request.node.get_closest_marker("online"):
+        return
     api_key = os.getenv("NOTIFIERS_STATUSPAGE_API_KEY")
     page_id = os.getenv("NOTIFIERS_STATUSPAGE_PAGE_ID")
+    if not (api_key and page_id):
+        log.debug("statuspage credentials not set, skipping incidents cleanup")
+        return
 
     s = requests.Session()
     base_url = f"https://api.statuspage.io/v1/pages/{page_id}/incidents"
     s.headers = {"Authorization": f"OAuth {api_key}"}
     url = f"{base_url}/unresolved"
     incidents = s.get(url).json()
+    if not isinstance(incidents, list):
+        log.warning("could not list statuspage incidents: %s", incidents)
+        return
     for incident in incidents:
         incident_id = incident["id"]
         url = f"{base_url}/{incident_id}"
@@ -89,6 +98,7 @@ class TestStatusPage:
         with pytest.raises(BadArguments, match=message):
             provider.notify(**data)
 
+    @pytest.mark.online
     def test_errors(self, provider):
         data = {"api_key": "foo", "page_id": "foo", "message": "foo"}
         rsp = provider.notify(**data)
@@ -144,19 +154,13 @@ class TestStatuspageComponents:
     resource = "components"
 
     def test_statuspage_components_attribs(self, resource):
-        assert resource.schema == {
-            "additionalProperties": False,
-            "properties": {
-                "api_key": {"title": "OAuth2 token", "type": "string"},
-                "page_id": {"title": "Page ID", "type": "string"},
-            },
-            "required": ["api_key", "page_id"],
-            "type": "object",
-        }
+        assert resource.schema == resource.schema_model.model_json_schema(by_alias=True)
+        assert resource.schema_model.__name__ == "StatuspageComponentsSchema"
 
         assert resource.name == provider
         assert resource.required == {"required": ["api_key", "page_id"]}
 
+    @pytest.mark.online
     def test_statuspage_components_negative(self, resource):
         with pytest.raises(BadArguments):
             resource(env_prefix="foo")

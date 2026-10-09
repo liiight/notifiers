@@ -3,6 +3,78 @@
 Changelog
 =========
 
+2.0.0 (unreleased)
+------------------
+
+Provider schemas are now `pydantic <https://docs.pydantic.dev/>`_ (v2) models instead of JSON Schema dicts
+validated with ``jsonschema``. The public library API (``notify()``, ``get_notifier()``, ``Provider.notify()``,
+``Response``, exceptions, environment variables and the logging handler) is unchanged. See :ref:`migration_2_0`
+for details and for how to port custom providers.
+
+Breaking changes
+~~~~~~~~~~~~~~~~
+
+- Dropped support for Python 3.8 and 3.9. Python 3.10+ is required.
+- Replaced the ``jsonschema`` dependency with ``pydantic>=2.7,<3``.
+- Custom providers declare their arguments with a ``schema_model`` (a :class:`~notifiers.models.SchemaModel` subclass)
+  instead of the ``_required`` and ``_schema`` dicts. Providers that still define ``_required`` / ``_schema`` can't be
+  instantiated. See :ref:`migration_providers`.
+- Removed ``notifiers.utils.schema`` (``one_or_more``, ``list_to_commas`` and the ``format_checker`` with its ``is_*``
+  format checks). ``list_to_commas`` moved to ``notifiers.utils.helpers``, the format checks are replaced by the types in
+  :mod:`notifiers.models`.
+- Removed ``SchemaResource.validator`` and ``SchemaResource._validate_schema()``. ``SchemaError`` is no longer raised.
+- ``SchemaResource._validate_data()`` returns the validated data instead of ``None``.
+
+Changes
+~~~~~~~
+
+- Argument values are converted to their declared type when possible, e.g. ``port="587"`` becomes ``587``. This makes
+  environment variables usable for integer and boolean arguments.
+- Arguments with an alternative spelling (``from`` / ``from_``, ``type`` / ``type_``) can also be set via environment
+  variables using either spelling.
+- Validation error messages for anything other than missing or unknown arguments and provider specific rules use pydantic's
+  wording, e.g. ``'priority': Input should be less than or equal to 2``.
+- Added ``BadArguments.errors``: a list of all validation errors (``loc``, ``msg`` and ``type`` for each).
+- ``provider.schema`` returns pydantic's ``model_json_schema(by_alias=True)`` of the schema model, and
+  ``provider.arguments`` its ``properties``. The layout follows pydantic (``description`` and ``title`` per argument,
+  optional arguments as ``anyOf`` with ``null``, nested models under ``$defs``).
+- ``provider.required`` lists the required arguments only. Conditional requirements (``anyOf`` / ``oneOf`` /
+  ``dependencies``) are enforced on validation but no longer listed.
+- ``provider.defaults`` is derived from the defaults declared on the schema model.
+- Schema model fields are snake_case. Arguments named differently by the remote API keep that name as an alias, so both
+  spellings are accepted (e.g. Join ``deviceId`` / ``device_id``, ``smsnumber`` / ``sms_number``; DingTalk ``msgtype`` /
+  ``msg_type``, ``atMobiles`` / ``at_mobiles``).
+- Added :mod:`notifiers.models`: the ``SchemaModel`` base class, ``OneOrMore`` / ``one_or_more`` and field types
+  (``Email``, ``Url``, ``Hostname``, ``Port``, ``Timestamp``, ``ISO8601Datetime``, ``RFC2822Datetime``, ``DateString``,
+  ``AsciiStr``, ``FilePath``, ``E164``).
+- Importing notifiers (or any non email provider) no longer performs a hostname lookup via ``socket.getfqdn()``, which
+  could block for seconds depending on the system resolver
+  (`#483 <https://github.com/liiight/notifiers/issues/483>`_). The default email ``from`` address
+  (``notifiers@<hostname>``) is computed only when sending an email without a ``from`` address, via
+  ``notifiers.providers.email.default_from()``. Replaces the ``DEFAULT_FROM`` constant.
+
+Fixes
+~~~~~
+
+- DingTalk: the schema could never validate and sending failed. Rewritten with nested models. Send a text message with
+  ``message='...'`` or any message type with ``msg_data``.
+- ``get_notifier()`` failed for providers registered only via the ``notifiers`` entry point.
+- Email / Gmail / iCloud: a single attachment path (``attachments='/path/to/file'``) failed with
+  ``Is a directory: '/'``.
+- Documentation: the custom provider guide used APIs that don't exist (``notifiers.utils.schema.one_of``, ``_notify``).
+
+Development
+~~~~~~~~~~~
+
+- Tests: added ``tests/test_schema_types.py`` (replaces ``tests/test_json_schema.py``),
+  ``tests/providers/test_generic_provider_tests.py`` (checks every provider and resource, including snake_case field
+  names) and ``tests/providers/test_email_offline.py`` (email, Gmail and iCloud end to end against a fake SMTP server).
+- CI runs the offline test suite (``-m "not online"``) on every Python version (``fail-fast: false``), plus a ruff lint and
+  format check. Tests that need network access are marked ``online``.
+- ruff 0.16.10 in pre-commit and in the dev dependency group.
+- Offline tests run without ``NOTIFIERS_*`` credentials in the environment, so they behave the same locally and in CI.
+- The statuspage incident cleanup runs for online tests only, and tolerates API errors.
+
 1.3.0
 ------
 

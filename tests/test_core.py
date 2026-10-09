@@ -10,7 +10,6 @@ from notifiers.exceptions import (
     BadArguments,
     NoSuchNotifierError,
     NotificationError,
-    SchemaError,
 )
 
 
@@ -26,25 +25,10 @@ class TestCore:
             "name": "mock_provider",
             "site_url": "https://www.mock.com",
         }
-        assert mock_provider.arguments == {
-            "not_required": {
-                "oneOf": [
-                    {
-                        "type": "array",
-                        "items": {
-                            "type": "string",
-                            "title": "example for not required arg",
-                        },
-                        "minItems": 1,
-                        "uniqueItems": True,
-                    },
-                    {"type": "string", "title": "example for not required arg"},
-                ]
-            },
-            "required": {"type": "string"},
-            "option_with_default": {"type": "string"},
-            "message": {"type": "string"},
-        }
+        assert mock_provider.schema == mock_provider.schema_model.model_json_schema(by_alias=True)
+        assert mock_provider.arguments == mock_provider.schema["properties"]
+        assert list(mock_provider.arguments) == ["not_required", "required", "option_with_default", "message"]
+        assert mock_provider.defaults == {"option_with_default": "foo"}
 
         assert mock_provider.required == {"required": ["required"]}
         rsp = mock_provider.notify(**self.valid_data)
@@ -55,22 +39,33 @@ class TestCore:
         assert repr(mock_provider) == "<Provider:[Mock_provider]>"
 
     @pytest.mark.parametrize(
-        "data",
+        ("data", "message"),
         [
-            pytest.param({"not_required": "foo"}, id="Missing required"),
-            pytest.param({"required": 6}, id="Wrong type"),
-            pytest.param({"foo": 6}, id="Additional properties not allowed"),
+            pytest.param({"not_required": "foo"}, "'required' is a required property", id="Missing required"),
+            pytest.param({"required": ["foo"]}, "'required': Input should be a valid string", id="Wrong type"),
+            pytest.param({"required": "foo", "foo": 6}, "Additional properties are not allowed ('foo' was unexpected)", id="Additional properties not allowed"),
+            pytest.param({"required": "foo", "not_required": []}, "'not_required': List should have at least 1 item", id="Empty list"),
+            pytest.param({"required": "foo", "not_required": ["a", "a"]}, "has non-unique elements", id="Non unique items"),
         ],
     )
-    def test_schema_validation(self, data, mock_provider):
+    def test_schema_validation(self, data, message, mock_provider):
         """Test correct schema validations"""
-        with pytest.raises(BadArguments):
+        with pytest.raises(BadArguments) as e:
             mock_provider.notify(**data)
+        assert message in e.value.message
+        assert e.value.errors
+        assert all({"loc", "msg", "type"} <= set(error) for error in e.value.errors)
 
-    def test_bad_schema(self, bad_schema):
-        """Test illegal JSON schema"""
-        with pytest.raises(SchemaError):
-            bad_schema()
+    def test_schema_validation_coerces_types(self, mock_provider):
+        """Values are coerced to their declared type (lax mode), e.g. strings from environment variables"""
+        resource = mock_provider.mock_rsrc
+        assert resource._process_data(key="foo", another_key="5") == {"key": "foo", "another_key": 5}
+
+    def test_environs_are_coerced(self, mock_provider, monkeypatch):
+        """Environment variables (always strings) are coerced to the declared type"""
+        resource = mock_provider.mock_rsrc
+        monkeypatch.setenv("NOTIFIERS_MOCK_PROVIDER_ANOTHER_KEY", "7")
+        assert resource._process_data(key="foo") == {"key": "foo", "another_key": 7}
 
     def test_prepare_data(self, mock_provider):
         """Test ``prepare_data()`` method"""
@@ -83,9 +78,7 @@ class TestCore:
 
     def test_get_notifier(self, mock_provider):
         """Test ``get_notifier()`` helper function"""
-        from notifiers import get_notifier
-
-        p = get_notifier("mock_provider")
+        p = notifiers.get_notifier("mock_provider")
         assert p
         assert isinstance(p, Provider)
 
@@ -123,11 +116,11 @@ class TestCore:
         with pytest.raises(TypeError) as e:
             bad_provider()
         if sys.version_info < (3, 12):
-            assert ("Can't instantiate abstract class BadProvider with abstract methods _required, _schema, _send_notification, base_url, name, site_url") in str(e.value)
+            assert ("Can't instantiate abstract class BadProvider with abstract methods _send_notification, base_url, name, schema_model, site_url") in str(e.value)
         else:
             assert (
-                "Can't instantiate abstract class BadProvider without an implementation for abstract methods '_required', '_schema',"
-                " '_send_notification', 'base_url', 'name', 'site_url'" in str(e.value)
+                "Can't instantiate abstract class BadProvider without an implementation for abstract methods "
+                "'_send_notification', 'base_url', 'name', 'schema_model', 'site_url'" in str(e.value)
             )
 
     def test_environs(self, mock_provider, monkeypatch):
@@ -158,15 +151,8 @@ class TestCore:
         assert repr(resource) == "<ProviderResource,provider=mock_provider,resource=mock_resource>"
         assert resource.resource_name == "mock_resource"
         assert resource.name == mock_provider.name
-        assert resource.schema == {
-            "type": "object",
-            "properties": {
-                "key": {"type": "string", "title": "required key"},
-                "another_key": {"type": "integer", "title": "non-required key"},
-            },
-            "required": ["key"],
-            "additionalProperties": False,
-        }
+        assert resource.schema == resource.schema_model.model_json_schema(by_alias=True)
+        assert resource.arguments["key"]["description"] == "required key"
 
         assert resource.required == {"required": ["key"]}
 

@@ -34,6 +34,7 @@ class TestPopcornNotify:
         data = {"message": test_message}
         provider.notify(**data, raise_on_errors=True)
 
+    @pytest.mark.online
     def test_popcornnotify_error(self, provider):
         data = {"message": "foo", "api_key": "foo", "recipients": "foo@foo.com"}
         rsp = provider.notify(**data)

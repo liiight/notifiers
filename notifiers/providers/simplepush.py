@@ -1,5 +1,17 @@
+from __future__ import annotations
+
+from pydantic import Field
+
 from ..core import Provider, Response
+from ..models import SchemaModel
 from ..utils import requests
+
+
+class SimplePushSchema(SchemaModel):
+    key: str = Field(description="your user key")
+    message: str = Field(description="your message")
+    title: str | None = Field(None, description="message title")
+    event: str | None = Field(None, description="Event ID")
 
 
 class SimplePush(Provider):
@@ -9,17 +21,7 @@ class SimplePush(Provider):
     site_url = "https://simplepush.io/"
     name = "simplepush"
 
-    _required = {"required": ["key", "message"]}
-    _schema = {
-        "type": "object",
-        "properties": {
-            "key": {"type": "string", "title": "your user key"},
-            "message": {"type": "string", "title": "your message"},
-            "title": {"type": "string", "title": "message title"},
-            "event": {"type": "string", "title": "Event ID"},
-        },
-        "additionalProperties": False,
-    }
+    schema_model = SimplePushSchema
 
     def _prepare_data(self, data: dict) -> dict:
         data["msg"] = data.pop("message")

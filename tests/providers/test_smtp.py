@@ -1,8 +1,13 @@
+import socket
+import subprocess
+import sys
 from email.message import EmailMessage
+from unittest.mock import MagicMock
 
 import pytest
 
 from notifiers.exceptions import BadArguments, NotificationError
+from notifiers.providers import email
 
 provider = "email"
 
@@ -24,6 +29,7 @@ class TestSMTP:
             provider.notify(**data)
         assert f"'{message}' is a required property" in e.value.message
 
+    @pytest.mark.online
     def test_smtp_no_host(self, provider):
         data = {
             "to": "foo@foo.com",
@@ -106,3 +112,35 @@ class TestSMTP:
         }
         rsp = provider.notify(**data)
         rsp.raise_on_errors()
+
+
+class TestDefaultFromIsLazy:
+    """The default FROM address needs a hostname lookup, which can block for seconds (#483)"""
+
+    def test_import_does_not_resolve_hostname(self):
+        code = (
+            "from unittest.mock import patch\n"
+            "with patch('socket.getfqdn', return_value='example.test') as lookup:\n"
+            "    import notifiers\n"
+            "    from notifiers.providers.telegram import Telegram\n"
+            "    notifiers.get_notifier('email').schema\n"
+            "    print(lookup.call_count)\n"
+        )
+        result = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, check=True)
+        assert result.stdout.strip() == "0"
+
+    def test_explicit_from_does_not_resolve_hostname(self, provider, monkeypatch):
+        lookup = MagicMock(return_value="example.test")
+        monkeypatch.setattr(socket, "getfqdn", lookup)
+        email.default_from.cache_clear()
+        data = provider._process_data(to="foo@foo.com", message="bar", **{"from": "bla@foo.com"})
+        assert data["from"] == "bla@foo.com"
+        lookup.assert_not_called()
+
+    def test_default_from(self, provider, monkeypatch):
+        monkeypatch.setattr(socket, "getfqdn", MagicMock(return_value="example.test"))
+        email.default_from.cache_clear()
+        try:
+            assert provider._process_data(to="foo@foo.com", message="bar")["from"] == "notifiers@example.test"
+        finally:
+            email.default_from.cache_clear()

@@ -1,5 +1,18 @@
+from __future__ import annotations
+
+from pydantic import Field
+
 from ..core import Provider, Response
+from ..models import SchemaModel
 from ..utils import requests
+
+
+class NotifySchema(SchemaModel):
+    base_url: str = Field(description="The base URL of your Notify instance")
+    message: str = Field(description="your message")
+    title: str = Field(description="your message's title")
+    token: str | None = Field(None, description="your application's send key, see https://github.com/K0IN/Notify/blob/main/doc/docker.md")
+    tags: list[str] | None = Field(None, description="your message's tags")
 
 
 class NotifyMixin:
@@ -24,25 +37,7 @@ class Notify(NotifyMixin, Provider):
     site_url = "https://github.com/K0IN/Notify"
     name = "notify"
 
-    _required = {"required": ["title", "message", "base_url"]}
-    _schema = {
-        "type": "object",
-        "properties": {
-            "base_url": {"type": "string"},
-            "message": {"type": "string", "title": "your message"},
-            "title": {"type": "string", "title": "your message's title"},
-            "token": {
-                "type": "string",
-                "title": "your application's send key, see https://github.com/K0IN/Notify/blob/main/doc/docker.md",
-            },
-            "tags": {
-                "type": "array",
-                "title": "your message's tags",
-                "items": {"type": "string"},
-            },
-        },
-        "additionalProperties": False,
-    }
+    schema_model = NotifySchema
 
     def _prepare_data(self, data: dict) -> dict:
         return data

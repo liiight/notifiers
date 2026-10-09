@@ -1,6 +1,21 @@
+from __future__ import annotations
+
+from pydantic import ConfigDict, Field
+
 from ..core import Provider, Response
+from ..models import Email, OneOrMore, SchemaModel
 from ..utils import requests
-from ..utils.schema.helpers import list_to_commas, one_or_more
+from ..utils.helpers import list_to_commas
+
+
+class PopcornNotifySchema(SchemaModel):
+    # Unknown arguments are passed through to the API
+    model_config = ConfigDict(extra="allow")
+
+    message: str = Field(description="The message to send")
+    api_key: str = Field(description="The API key")
+    recipients: OneOrMore[Email] = Field(description="The recipient email address or phone number. Or an array of email addresses and phone numbers")
+    subject: str | None = Field(None, description="The subject of the email. It will not be included in text messages.")
 
 
 class PopcornNotify(Provider):
@@ -11,26 +26,7 @@ class PopcornNotify(Provider):
     name = "popcornnotify"
     path_to_errors = ("error",)
 
-    _required = {"required": ["message", "api_key", "recipients"]}
-
-    _schema = {
-        "type": "object",
-        "properties": {
-            "message": {"type": "string", "title": "The message to send"},
-            "api_key": {"type": "string", "title": "The API key"},
-            "recipients": one_or_more(
-                {
-                    "type": "string",
-                    "format": "email",
-                    "title": "The recipient email address or phone number. Or an array of email addresses and phone numbers",
-                }
-            ),
-            "subject": {
-                "type": "string",
-                "title": "The subject of the email. It will not be included in text messages.",
-            },
-        },
-    }
+    schema_model = PopcornNotifySchema
 
     def _prepare_data(self, data: dict) -> dict:
         if isinstance(data["recipients"], str):

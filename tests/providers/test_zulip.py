@@ -19,12 +19,12 @@ class TestZulip:
         ("data", "message"),
         [
             (
-                {"email": "foo", "api_key": "bar", "message": "boo", "to": "bla"},
-                "domain",
+                {"email": "foo@foo.com", "api_key": "bar", "message": "boo", "to": "bla"},
+                "One of 'domain', 'server' is required",
             ),
             (
                 {
-                    "email": "foo",
+                    "email": "foo@foo.com",
                     "api_key": "bar",
                     "message": "boo",
                     "to": "bla",

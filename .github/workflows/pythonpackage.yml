@@ -3,13 +3,25 @@ name: Tests and coverage
 on: [ push ]
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/ruff-action@v3
+        with:
+          version: "0.16.10"
+          args: check
+      - uses: astral-sh/ruff-action@v3
+        with:
+          version: "0.16.10"
+          args: format --check
   test:
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 1
+      fail-fast: false
       matrix:
         python-version:
-          - 3.9
           - "3.10"
           - "3.11"
           - "3.12"
@@ -22,7 +34,8 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Test with pytest
         shell: bash
-        run: uv run pytest --cov=./ --junit-xml=report.xml
+        # Tests marked `online` call third party services and depend on live credentials, run them manually
+        run: uv run pytest -m "not online" --cov=./ --junit-xml=report.xml
         env:
           NOTIFIERS_EMAIL_PASSWORD: ${{secrets.NOTIFIERS_EMAIL_PASSWORD}}
           NOTIFIERS_EMAIL_TO: ${{secrets.NOTIFIERS_EMAIL_TO}}
