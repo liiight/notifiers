@@ -1,11 +1,20 @@
 """
 Helper module with tools to dynamically convert :class:`~notifiers.core.Provider` and
-:class:`~notifiers.core.ProviderResource` classes to :mod:`click` data types
+:class:`~notifiers.core.ProviderResource` schema models to :mod:`click` commands
 """
 
-from functools import partial
+from __future__ import annotations
+
+import types
+import typing
+from collections.abc import Callable
+from typing import Annotated, Any, Literal, Union
 
 import click
+from pydantic import BaseModel
+from pydantic.fields import FieldInfo
+
+from notifiers.models.base import field_key
 
 CORE_COMMANDS = {
     "required": "'{}' required schema",
@@ -13,156 +22,149 @@ CORE_COMMANDS = {
     "metadata": "'{}' metadata",
     "defaults": "'{}' default values",
 }
-SCHEMA_BASE_MAP = {
-    "string": click.STRING,
-    "integer": click.INT,
-    "number": click.FLOAT,
-    "boolean": click.BOOL,
+
+PRIMITIVE_TYPES: dict[type, click.ParamType] = {
+    str: click.STRING,
+    int: click.INT,
+    float: click.FLOAT,
+    bool: click.BOOL,
 }
-COMPLEX_TYPES = ["object", "array"]
 
 
-def handle_oneof(oneof_schema: list) -> tuple:
+def _strip_annotated(annotation: Any) -> Any:
+    while typing.get_origin(annotation) is Annotated:
+        annotation = typing.get_args(annotation)[0]
+    return annotation
+
+
+def _union_members(annotation: Any) -> list[Any]:
+    """The members of a union (``X | Y`` or ``Union[X, Y]``) without ``None``, or ``[annotation]`` if it isn't one"""
+    annotation = _strip_annotated(annotation)
+    if typing.get_origin(annotation) in (Union, types.UnionType):
+        members = []
+        for arg in typing.get_args(annotation):
+            if arg is not type(None):
+                members.extend(_union_members(arg))
+        return members
+    return [annotation]
+
+
+def _primitive(annotation: Any) -> type | None:
+    annotation = _strip_annotated(annotation)
+    return annotation if annotation in PRIMITIVE_TYPES else None
+
+
+def field_to_click_type(field: FieldInfo) -> tuple[click.ParamType | None, bool] | None:
     """
-    Custom handle of `oneOf` JSON schema validator. Tried to match primitive type and see if it should be allowed
-     to be passed multiple timns into a command
+    Maps a pydantic field to a click type
 
-    :param oneof_schema: `oneOf` JSON schema
-    :return: Tuple of :class:`click.ParamType`, ``multiple`` flag and ``description`` of option
+    :param field: The pydantic field
+    :return: ``(click_type, multiple)``, ``click_type`` is ``None`` for boolean flags.
+     ``None`` if the field can't be expressed on the command line (dicts, nested models, ...)
     """
-    oneof_dict = {schema["type"]: schema for schema in oneof_schema}
-    click_type = None
-    multiple = False
-    description = None
-    for key, value in oneof_dict.items():
-        if key == "array":
-            continue
-        if key in SCHEMA_BASE_MAP:
-            if oneof_dict.get("array") and oneof_dict["array"]["items"]["type"] == key:
-                multiple = True
-            # Found a match to a primitive type
-            click_type = SCHEMA_BASE_MAP[key]
-            description = value.get("title")
-            break
-    return click_type, multiple, description
+    members = _union_members(field.annotation)
+
+    # A list, or a value or a list of values (``OneOrMore[T]``): the option can be passed several times
+    multiple = any(typing.get_origin(m) is list for m in members)
+    items = [typing.get_args(m)[0] if typing.get_origin(m) is list else m for m in members]
+
+    literals = [m for m in items if typing.get_origin(m) is Literal]
+    if literals and not multiple:
+        choices = [v for literal in literals for v in typing.get_args(literal) if isinstance(v, str)]
+        return (click.Choice(choices) if choices else click.BOOL), False
+
+    primitives = {_primitive(m) for m in items}
+    if not primitives or None in primitives:
+        return None
+    if primitives == {bool} and not multiple:
+        return None, False
+    # Mixed types, e.g. ``str | int``: strings are accepted and converted by the schema model
+    primitive = primitives.pop() if len(primitives) == 1 else str
+    return PRIMITIVE_TYPES[primitive], multiple
 
 
-def json_schema_to_click_type(schema: dict) -> tuple:
+def option_names(name: str, field: FieldInfo) -> list[str]:
     """
-    A generic handler of a single property JSON schema to :class:`click.ParamType` converter
-
-    :param schema: JSON schema property to operate on
-    :return: Tuple of :class:`click.ParamType`, `description`` of option and optionally a :class:`click.Choice`
-     if the allowed values are a closed list (JSON schema ``enum``)
+    Command line spellings of a field: the argument key (alias if set), plus the snake_case field name when it's spelled
+    differently, each as ``--kebab-case`` when written in snake_case and as is otherwise
     """
-    choices = None
-    if isinstance(schema["type"], list) and "string" in schema["type"]:
-        schema["type"] = "string"
-    click_type = SCHEMA_BASE_MAP[schema["type"]]
-    description = schema.get("title")
-    if schema.get("enum"):
-        # todo handle multi type enums better (or at all)
-        enum = [value for value in schema["enum"] if isinstance(value, str)]
-        choices = click.Choice(enum)
-    return click_type, description, choices
+    names = []
+    for key in (field_key(name, field), name.rstrip("_")):
+        option = key.replace("_", "-")
+        if option not in names:
+            names.append(option)
+    return names
 
 
-def clean_data(data: dict) -> dict:
-    """Removes all empty values and converts tuples into lists"""
-    new_data = {}
-    for key, value in data.items():
-        # Verify that only explicitly passed args get passed on
-        if not isinstance(value, bool) and not value:
-            continue
-
-        # Multiple choice command are passed as tuples, convert to list to match schema
-        if isinstance(value, tuple):
-            value = list(value)  # noqa: PLW2901
-        new_data[key] = value
-    return new_data
+def _help(field: FieldInfo, multiple: bool) -> str | None:
+    description = field.description
+    if not description:
+        return None
+    description = description.strip().capitalize()
+    if multiple:
+        if not description.endswith("."):
+            description += "."
+        description += " Multiple usages of this option are allowed"
+    return description
 
 
-def params_factory(schema: dict, add_message: bool) -> list:
+def params_factory(model: type[BaseModel], add_message: bool) -> list[click.Parameter]:
     """
-    Generates list of :class:`click.Option` based on a JSON schema
+    Generates :class:`click.Parameter` objects from a schema model
 
-    :param schema:  JSON schema to operate on
-    :return: Lists of created :class:`click.Option` object to be added to a :class:`click.Command`
+    :param model: The schema model to operate on
+    :param add_message: Whether to add ``message`` as an optional positional argument
+    :return: List of created :class:`click.Parameter` objects to be added to a :class:`click.Command`
     """
-
-    # Immediately create message as an argument
-    params = []
+    params: list[click.Parameter] = []
     if add_message:
         params.append(click.Argument(["message"], required=False))
 
-    for property, prpty_schema in schema.items():
-        multiple = False
-        choices = None
-
-        if any(char in property for char in ["@"]):
+    for name, field in model.model_fields.items():
+        if name == "message":
             continue
-        if prpty_schema.get("type") in COMPLEX_TYPES:
+        click_type = field_to_click_type(field)
+        if click_type is None:
             continue
-        if prpty_schema.get("duplicate"):
-            continue
-        if property == "message":
-            continue
-
-        if not prpty_schema.get("oneOf"):
-            click_type, description, choices = json_schema_to_click_type(prpty_schema)
+        param_type, multiple = click_type
+        # The callback receives the value under the field's argument key (its alias if set), e.g. ``from`` or ``deviceId``
+        dest = field_key(name, field)
+        names = option_names(name, field)
+        if param_type is None:
+            decls = [f"--{option}/--no-{option}" for option in names]
+            params.append(click.Option([*decls, dest], default=None, help=_help(field, multiple)))
         else:
-            click_type, multiple, description = handle_oneof(prpty_schema["oneOf"])
-            # Not all oneOf schema can be handled by click
-            if not click_type:
-                continue
-
-        # Convert bool values into flags
-        if click_type == click.BOOL:
-            param_decls = [get_flag_param_decals_from_bool(property)]
-            click_type = None
-        else:
-            param_decls = [get_param_decals_from_name(property)]
-
-        if description:
-            description = description.capitalize()
-
-            if multiple:
-                if not description.endswith("."):
-                    description += "."
-                description += " Multiple usages of this option are allowed"
-        # Construct the base command options
-        option = partial(click.Option, param_decls=param_decls, help=description, multiple=multiple)
-
-        if choices:
-            option = option(type=choices)
-        elif click_type:
-            option = option(type=click_type)
-        else:
-            option = option()
-        params.append(option)
+            params.append(click.Option([f"--{option}" for option in names] + [dest], type=param_type, multiple=multiple, help=_help(field, multiple)))
     return params
 
 
-def schema_to_command(p, name: str, callback: callable, add_message: bool) -> click.Command:
+def schema_to_command(p, name: str, callback: Callable, add_message: bool) -> click.Command:
     """
-    Generates a ``notify`` :class:`click.Command` for :class:`~notifiers.core.Provider`
+    Generates a :class:`click.Command` from a :class:`~notifiers.core.Provider` or
+    :class:`~notifiers.core.ProviderResource` schema model
 
-    :param p: Relevant Provider
+    :param p: Relevant Provider or ProviderResource
     :param name: Command name
-    :return: A ``notify`` :class:`click.Command`
+    :param callback: The command callback
+    :param add_message: Whether to add ``message`` as an optional positional argument
+    :return: A :class:`click.Command`
     """
-    params = params_factory(p.schema["properties"], add_message=add_message)
-    help = p.__doc__
-    return click.Command(name=name, callback=callback, params=params, help=help)
+    params = params_factory(p.schema_model, add_message=add_message)
+    return click.Command(name=name, callback=callback, params=params, help=p.__doc__)
 
 
-def get_param_decals_from_name(option_name: str) -> str:
-    """Converts a name to a param name"""
-    name = option_name.replace("_", "-")
-    return f"--{name}"
-
-
-def get_flag_param_decals_from_bool(option_name: str) -> str:
-    """Return a '--do/not-do' style flag param"""
-    name = option_name.replace("_", "-")
-    return f"--{name}/--no-{name}"
+def clean_data(data: dict) -> dict:
+    """Removes all values that weren't passed (``None`` or empty) and converts tuples into lists"""
+    new_data = {}
+    for key, value in data.items():
+        if value is None:
+            continue
+        # Multiple value options are passed as tuples, convert to lists to match the schema
+        if isinstance(value, tuple):
+            if not value:
+                continue
+            value = list(value)  # noqa: PLW2901
+        elif not isinstance(value, bool) and value == "":
+            continue
+        new_data[key] = value
+    return new_data

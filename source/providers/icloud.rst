@@ -1,27 +1,21 @@
 iCloud
 ------
-Send emails via `iCLoud <https://www.icloud.com/mail>`_
+Send emails via `iCloud <https://www.icloud.com/mail>`_
 
-This is a private use case of the :class:`~notifiers.providers.email.SMTP` provider
+This is a private use case of the :class:`~notifiers.providers.email.SMTP` provider, with iCloud's server as default:
 
 .. code-block:: python
 
     >>> from notifiers import get_notifier
     >>> icloud = get_notifier('icloud')
     >>> icloud.defaults
-    {'subject': "New email from 'notifiers'!", 'from': '<USERNAME@HOST>', 'host': 'smtp.mail.me.com', 'port': 587, 'tls': True, 'ssl': False, 'html': True}
+    {'subject': "New email from 'notifiers'!", 'from': 'notifiers@<hostname>', 'host': 'smtp.mail.me.com', 'port': 587, 'tls': True, 'ssl': False, 'html': False, 'login': True}
 
     >>> icloud.notify(to='email@addrees.foo', message='hi!', username='username@icloud.com', password='my-icloud-app-password', from_='username@icloud.com')
 
+``username`` and ``password`` are required. ``username`` must be your primary iCloud username, ``from`` (or ``from_``)
+can be an iCloud alias.
 
-.. code-block:: yaml
+Arguments:
 
-    required:
-    - username
-    - password
-    - from_
-    - to
-    type: object
-
-``from_`` can be an iCloud alias
-username must be your primary iCloud username
+.. provider-arguments:: icloud

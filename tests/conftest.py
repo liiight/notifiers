@@ -19,6 +19,7 @@ from notifiers.logging import NotificationHandler
 from notifiers.models import OneOrMore, SchemaModel
 from notifiers.providers import _all_providers
 from notifiers.utils.helpers import list_to_commas, text_to_bool
+from notifiers_cli.core import notifiers_cli
 
 log = logging.getLogger(__name__)
 
@@ -114,13 +115,8 @@ def resource(request, provider):
 
 @pytest.fixture
 def cli_runner(monkeypatch):
-    # TODO(pydantic phase 2): remove once the CLI is generated from pydantic models
-    pytest.skip("CLI is being reworked for pydantic schemas (phase 2)")
-    from notifiers_cli.core import notifiers_cli, provider_group_factory  # noqa: PLC0415
-
     monkeypatch.setenv("LC_ALL", "en_US.utf-8")
     monkeypatch.setenv("LANG", "en_US.utf-8")
-    provider_group_factory()
     runner = CliRunner()
     return partial(runner.invoke, notifiers_cli, obj={})
 
