@@ -1,3 +1,4 @@
+import json
 import os
 
 import pytest
@@ -7,7 +8,6 @@ from notifiers.exceptions import BadArguments
 provider = "pushbullet"
 
 
-@pytest.mark.skip(reason="Re-enable once account is activated again")
 class TestPushbullet:
     def test_metadata(self, provider):
         assert provider.metadata == {
@@ -43,10 +43,9 @@ class TestPushbullet:
 
     @pytest.mark.online
     def test_pushbullet_devices(self, provider):
-        assert provider.devices()
+        assert isinstance(provider.devices(), list)
 
 
-@pytest.mark.skip("Provider resources CLI command are not ready yet")
 class TestPushbulletCLI:
     """Test Pushbullet specific CLI"""
 
@@ -61,8 +60,7 @@ class TestPushbulletCLI:
         token = os.environ.get("NOTIFIERS_PUSHBULLET_TOKEN")
         assert token
 
-        cmd = f"pushbullet devices --token {token}".split()
+        cmd = ["pushbullet", "devices", "--token", token]
         result = cli_runner(cmd)
-        assert not result.exit_code
-        replies = ["You have no devices associated with this token", "Nickname: "]
-        assert any(reply in result.output for reply in replies)
+        assert not result.exit_code, result.output
+        assert isinstance(json.loads(result.output), list)

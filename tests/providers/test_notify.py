@@ -9,6 +9,7 @@ class TestNotify:
     """
 
     @pytest.mark.online
+    @pytest.mark.skip(reason="The public Notify demo server (notify-demo.deno.dev) is gone, needs a self hosted instance")
     def test_notify_sanity(self, provider, test_message):
         """Successful notify notification"""
         data = {

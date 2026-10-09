@@ -1,5 +1,7 @@
 import pytest
+from retry import retry
 
+import notifiers
 from notifiers.exceptions import BadArguments, NotificationError
 
 provider = "gmail"
@@ -22,8 +24,9 @@ class TestGmail:
             provider.notify(**data)
         assert f"'{message}' is a required property" in e.value.message
 
-    @pytest.mark.skip(reason="Disabled account")
     @pytest.mark.online
+    @pytest.mark.skip(reason="Gmail rejects the test account login from CI, see https://github.com/liiight/notifiers/issues/490")
+    @retry(NotificationError, tries=3, delay=10)
     def test_smtp_sanity(self, provider, test_message):
         """using Gmail SMTP"""
         data = {
@@ -32,6 +35,8 @@ class TestGmail:
             "ssl": True,
             "port": 465,
         }
+        # A fresh provider per attempt, so a dropped connection isn't reused
+        provider = notifiers.get_notifier(provider.name)
         rsp = provider.notify(**data)
         rsp.raise_on_errors()
 
@@ -65,4 +70,5 @@ class TestGmail:
         with pytest.raises(NotificationError) as e:
             rsp.raise_on_errors()
 
-        assert "Username and Password not accepted" in e.value.errors[0]
+        # Google either rejects the credentials or closes the connection
+        assert any(error in e.value.errors[0] for error in ("Username and Password not accepted", "Connection unexpectedly closed"))

@@ -6,10 +6,6 @@ API documentation for the different providers.
    :members:
    :undoc-members:
 
-.. automodule:: notifiers.providers.gitter
-   :members:
-   :undoc-members:
-
 .. automodule:: notifiers.providers.gmail
    :members:
    :undoc-members:
@@ -55,10 +51,6 @@ API documentation for the different providers.
    :undoc-members:
 
 .. automodule:: notifiers.providers.mailgun
-   :members:
-   :undoc-members:
-
-.. automodule:: notifiers.providers.popcornnotify
    :members:
    :undoc-members:
 

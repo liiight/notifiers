@@ -4,6 +4,8 @@ from notifiers.exceptions import BadArguments, NotificationError
 
 provider = "pushover"
 
+pushover_account_unavailable = pytest.mark.skip(reason="Pushover test account token is invalid, see https://github.com/liiight/notifiers/issues/488")
+
 
 class TestPushover:
     """Pushover notifier tests
@@ -34,6 +36,7 @@ class TestPushover:
         assert f"'{message}' is a required property" in e.value.message
 
     @pytest.mark.parametrize(("data", "message"), [({}, "expire"), ({"expire": 30}, "retry")])
+    @pushover_account_unavailable
     @pytest.mark.online
     def test_pushover_priority_2_restrictions(self, data, message, provider, test_message):
         """Pushover specific API restrictions when using priority 2"""
@@ -44,6 +47,7 @@ class TestPushover:
             rsp.raise_on_errors()
         assert message in e.value.message
 
+    @pushover_account_unavailable
     @pytest.mark.online
     def test_sanity(self, provider):
         """Successful pushover notification"""
@@ -51,6 +55,7 @@ class TestPushover:
         rsp = provider.notify(**data)
         rsp.raise_on_errors()
 
+    @pushover_account_unavailable
     @pytest.mark.online
     def test_all_options(self, provider, test_message):
         """Use all available pushover options"""
@@ -80,6 +85,7 @@ class TestPushover:
         with pytest.raises(BadArguments):
             provider.notify(**data)
 
+    @pushover_account_unavailable
     @pytest.mark.online
     def test_attachment_positive(self, provider, tmpdir):
         p = tmpdir.mkdir("test").join("image.jpg")
@@ -102,6 +108,7 @@ class TestPushoverSoundsResource:
         with pytest.raises(BadArguments):
             resource(env_prefix="foo")
 
+    @pushover_account_unavailable
     @pytest.mark.online
     def test_pushover_sounds_positive(self, resource):
         assert isinstance(resource(), list)
@@ -120,6 +127,7 @@ class TestPushoverLimitsResource:
         with pytest.raises(BadArguments):
             resource(env_prefix="foo")
 
+    @pushover_account_unavailable
     @pytest.mark.online
     def test_pushover_limits_positive(self, resource):
         assert isinstance(resource(), dict)
@@ -133,6 +141,7 @@ class TestPushoverCLI:
         assert result.exit_code
         assert not result.output
 
+    @pushover_account_unavailable
     @pytest.mark.online
     def test_pushover_sounds_positive(self, cli_runner):
         cmd = ["pushover", "sounds"]
@@ -146,6 +155,7 @@ class TestPushoverCLI:
         assert result.exit_code
         assert not result.output
 
+    @pushover_account_unavailable
     @pytest.mark.online
     def test_pushover_limits_positive(self, cli_runner):
         cmd = ["pushover", "limits"]

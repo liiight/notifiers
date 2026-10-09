@@ -24,6 +24,8 @@ Breaking changes
   :mod:`notifiers.models`.
 - Removed ``SchemaResource.validator`` and ``SchemaResource._validate_schema()``. ``SchemaError`` is no longer raised.
 - ``SchemaResource._validate_data()`` returns the validated data instead of ``None``.
+- Removed the Gitter provider: the Gitter API (``api.gitter.im``) no longer exists, Gitter moved to Matrix.
+- Removed the PopcornNotify provider: the service is down.
 
 Changes
 ~~~~~~~
@@ -90,6 +92,14 @@ Development
   names) and ``tests/providers/test_email_offline.py`` (email, Gmail and iCloud end to end against a fake SMTP server).
 - CI runs the offline test suite (``-m "not online"``) on every Python version (``fail-fast: false``), plus a ruff lint and
   format check. Tests that need network access are marked ``online``.
+- CI runs the online tests (real provider APIs, with the repository secrets) in a separate required ``online`` job, on
+  push, on manual dispatch and weekly. ``--run-skipped-online`` (or ``NOTIFIERS_RUN_SKIPPED_ONLINE=1``, a manual dispatch
+  input) also runs online tests marked as skipped, to check whether an unavailable test account works again.
+- Online tests of providers whose test account is unavailable are skipped with the reason: Pushover
+  (`#488 <https://github.com/liiight/notifiers/issues/488>`_), Statuspage
+  (`#489 <https://github.com/liiight/notifiers/issues/489>`_), Gmail sending
+  (`#490 <https://github.com/liiight/notifiers/issues/490>`_), iCloud, DingTalk, VictorOps, Mailgun, Join and Notify.
+- Pushbullet online tests run again.
 - ruff 0.16.10 in pre-commit and in the dev dependency group.
 - Offline tests run without ``NOTIFIERS_*`` credentials in the environment, so they behave the same locally and in CI.
 - Tests: added ``tests/test_cli_options.py`` (CLI option generation, email / Gmail / iCloud via the CLI against a fake SMTP

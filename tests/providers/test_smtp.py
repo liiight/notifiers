@@ -5,7 +5,9 @@ from email.message import EmailMessage
 from unittest.mock import MagicMock
 
 import pytest
+from retry import retry
 
+import notifiers
 from notifiers.exceptions import BadArguments, NotificationError
 from notifiers.providers import email
 
@@ -100,7 +102,8 @@ class TestSMTP:
         assert attach3.get_content_type() == "application/pdf"
 
     @pytest.mark.online
-    @pytest.mark.skip(reason="Disabled account")
+    @pytest.mark.skip(reason="Gmail rejects the test account login from CI, see https://github.com/liiight/notifiers/issues/490")
+    @retry(NotificationError, tries=3, delay=10)
     def test_smtp_sanity(self, provider, test_message):
         """using Gmail SMTP"""
         data = {
@@ -110,6 +113,8 @@ class TestSMTP:
             "ssl": True,
             "html": True,
         }
+        # A fresh provider per attempt, so a dropped connection isn't reused
+        provider = notifiers.get_notifier(provider.name)
         rsp = provider.notify(**data)
         rsp.raise_on_errors()
 
