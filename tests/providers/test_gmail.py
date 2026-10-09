@@ -1,5 +1,7 @@
 import pytest
+from retry import retry
 
+import notifiers
 from notifiers.exceptions import BadArguments, NotificationError
 
 provider = "gmail"
@@ -23,6 +25,8 @@ class TestGmail:
         assert f"'{message}' is a required property" in e.value.message
 
     @pytest.mark.online
+    # Gmail intermittently closes connections from CI runners
+    @retry(NotificationError, tries=3, delay=10)
     def test_smtp_sanity(self, provider, test_message):
         """using Gmail SMTP"""
         data = {
@@ -31,6 +35,8 @@ class TestGmail:
             "ssl": True,
             "port": 465,
         }
+        # A fresh provider per attempt, so a dropped connection isn't reused
+        provider = notifiers.get_notifier(provider.name)
         rsp = provider.notify(**data)
         rsp.raise_on_errors()
 
