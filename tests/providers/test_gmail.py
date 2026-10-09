@@ -25,7 +25,7 @@ class TestGmail:
         assert f"'{message}' is a required property" in e.value.message
 
     @pytest.mark.online
-    # Gmail intermittently closes connections from CI runners
+    @pytest.mark.skip(reason="Gmail rejects the test account login from CI, see https://github.com/liiight/notifiers/issues/490")
     @retry(NotificationError, tries=3, delay=10)
     def test_smtp_sanity(self, provider, test_message):
         """using Gmail SMTP"""

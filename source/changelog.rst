@@ -97,8 +97,9 @@ Development
   input) also runs online tests marked as skipped, to check whether an unavailable test account works again.
 - Online tests of providers whose test account is unavailable are skipped with the reason: Pushover
   (`#488 <https://github.com/liiight/notifiers/issues/488>`_), Statuspage
-  (`#489 <https://github.com/liiight/notifiers/issues/489>`_), iCloud, DingTalk, VictorOps, Mailgun, Join and Notify.
-- Gmail, SMTP and Pushbullet online tests run again.
+  (`#489 <https://github.com/liiight/notifiers/issues/489>`_), Gmail sending
+  (`#490 <https://github.com/liiight/notifiers/issues/490>`_), iCloud, DingTalk, VictorOps, Mailgun, Join and Notify.
+- Pushbullet online tests run again.
 - ruff 0.16.10 in pre-commit and in the dev dependency group.
 - Offline tests run without ``NOTIFIERS_*`` credentials in the environment, so they behave the same locally and in CI.
 - Tests: added ``tests/test_cli_options.py`` (CLI option generation, email / Gmail / iCloud via the CLI against a fake SMTP
