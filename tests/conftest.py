@@ -150,16 +150,42 @@ def isolate_offline_tests_from_credentials(request, monkeypatch):
             monkeypatch.delenv(key)
 
 
+def pytest_addoption(parser):
+    parser.addoption(
+        "--run-skipped-online",
+        action="store_true",
+        default=text_to_bool(os.environ.get("NOTIFIERS_RUN_SKIPPED_ONLINE")),
+        help="Run online tests even if they're marked as skipped, e.g. to check whether a disabled account works again. Can also be enabled with NOTIFIERS_RUN_SKIPPED_ONLINE=1",
+    )
+
+
+def pytest_collection_modifyitems(config, items):
+    """With ``--run-skipped-online``, ``skip`` markers on online tests are ignored"""
+    if not config.getoption("--run-skipped-online"):
+        return
+    for item in items:
+        if not item.get_closest_marker("online"):
+            continue
+        skips = list(item.iter_markers("skip"))
+        if skips:
+            reasons = "; ".join(m.kwargs.get("reason") or (m.args[0] if m.args else "") for m in skips)
+            item.user_properties.append(("ignored_skip", reasons))
+            item.own_markers = [m for m in item.own_markers if m.name != "skip"]
+            for node in item.listchain():
+                node.own_markers = [m for m in node.own_markers if m.name != "skip"]
+
+
 def pytest_runtest_setup(item):
-    """Skips PRs if secure env vars are set and test is marked as online"""
-    pull_request = text_to_bool(os.environ.get("TRAVIS_PULL_REQUEST"))
-    secure_env_vars = text_to_bool(os.environ.get("TRAVIS_SECURE_ENV_VARS"))
-    online = item.get_closest_marker("online")
-    if online and pull_request and not secure_env_vars:
-        pytest.skip("skipping online tests via PRs")
+    """Online tests need provider credentials. On pull requests from forks GitHub doesn't expose secrets, so skip them"""
+    if not item.get_closest_marker("online"):
+        return
+    if os.environ.get("GITHUB_ACTIONS") and not any(key.startswith("NOTIFIERS_") and value for key, value in os.environ.items()):
+        pytest.skip("online tests need NOTIFIERS_* secrets, which aren't available")
 
 
 @pytest.fixture
 def test_message(request):
-    message = os.environ.get("TRAVIS_BUILD_WEB_URL") or "Local test"
+    message = "Local test"
+    if os.environ.get("GITHUB_RUN_ID"):
+        message = f"{os.environ.get('GITHUB_SERVER_URL')}/{os.environ.get('GITHUB_REPOSITORY')}/actions/runs/{os.environ['GITHUB_RUN_ID']}"
     return f"{message}-{request.node.name}-{datetime.now().isoformat()}"

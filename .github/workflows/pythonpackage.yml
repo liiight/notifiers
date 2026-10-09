@@ -1,6 +1,16 @@
 name: Tests and coverage
 
-on: [ push ]
+on:
+  push:
+  workflow_dispatch:
+    inputs:
+      run_skipped_online:
+        description: "Also run online tests marked as skipped (e.g. disabled accounts)"
+        type: boolean
+        default: false
+  schedule:
+    # Weekly, to notice expired credentials and API changes between pushes
+    - cron: "0 6 * * 1"
 
 jobs:
   lint:
@@ -34,9 +44,35 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Test with pytest
         shell: bash
-        # Tests marked `online` call third party services and depend on live credentials, run them manually
+        # Tests marked `online` run once, in the `online` job
         run: uv run pytest -m "not online" --cov=./ --junit-xml=report.xml
+      - name: JUnit Report Action
+        uses: mikepenz/action-junit-report@v5
+        if: success() || failure()
+        with:
+          report_paths: report.xml
+          check_name: JUnit Test Report (${{ matrix.python-version }})
+      - name: Upload coverage to Codecov
+        if: success()
+        uses: codecov/codecov-action@v2
+        with:
+          token: ${{secrets.CODECOV_TOKEN}}
+  online:
+    # Calls the real provider APIs with the credentials stored as repository secrets, and sends real notifications
+    runs-on: ubuntu-latest
+    # One run at a time, since tests share accounts (e.g. statuspage incidents)
+    concurrency: online-tests
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv and set the python version
+        uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.13"
+      - name: Online tests
+        shell: bash
+        run: uv run pytest -m online -v -rfEs --junit-xml=online-report.xml
         env:
+          NOTIFIERS_RUN_SKIPPED_ONLINE: ${{ inputs.run_skipped_online && '1' || '' }}
           NOTIFIERS_EMAIL_PASSWORD: ${{secrets.NOTIFIERS_EMAIL_PASSWORD}}
           NOTIFIERS_EMAIL_TO: ${{secrets.NOTIFIERS_EMAIL_TO}}
           NOTIFIERS_EMAIL_USERNAME: ${{secrets.NOTIFIERS_EMAIL_USERNAME}}
@@ -74,13 +110,11 @@ jobs:
           NOTIFIERS_ZULIP_EMAIL: ${{secrets.NOTIFIERS_ZULIP_EMAIL}}
           NOTIFIERS_ZULIP_TO: ${{secrets.NOTIFIERS_ZULIP_TO}}
           NOTIFIERS_VICTOROPS_REST_URL: ${{secrets.NOTIFIERS_VICTOROPS_REST_URL}}
-      - name: JUnit Report Action
+      - name: Online JUnit Report
         uses: mikepenz/action-junit-report@v5
         if: success() || failure()
         with:
-          report_paths: report.xml
-      - name: Upload coverage to Codecov
-        if: success()
-        uses: codecov/codecov-action@v2
-        with:
-          token: ${{secrets.CODECOV_TOKEN}}
+          report_paths: online-report.xml
+          check_name: Online Test Report
+          detailed_summary: true
+          include_passed: true
