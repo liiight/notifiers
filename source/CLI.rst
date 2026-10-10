@@ -1,7 +1,9 @@
 Command Line Interface
 ----------------------
 
-Notifiers come with CLI support
+Notifiers come with CLI support. Run it with `uvx <https://docs.astral.sh/uv/guides/tools/>`_ without installing
+anything, e.g. ``uvx notifiers --help``, or install the ``notifiers`` command with ``uv tool install notifiers`` (see
+:ref:`installation`). The examples below use the installed ``notifiers`` command.
 
 Main view
 =========
