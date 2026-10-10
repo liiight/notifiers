@@ -105,6 +105,10 @@ Development
 - Tests: added ``tests/test_cli_options.py`` (CLI option generation, email / Gmail / iCloud via the CLI against a fake SMTP
   server, on demand provider groups).
 - Docs: added the ``provider-arguments`` Sphinx directive (``source/_ext/provider_arguments.py``).
+- Docs: the Sphinx dependencies are in a ``docs`` dependency group, the Read the Docs build installs it with uv, and CI
+  builds the docs with warnings as errors, like Read the Docs. Removed the unused ``sphinx-autodoc-annotation`` extension,
+  the missing static and template paths, and the alabaster sidebar settings. Updated the intersphinx URLs. The PDF is
+  built with xelatex.
 - The statuspage incident cleanup runs for online tests only, and tolerates API errors.
 
 1.3.0

@@ -55,13 +55,14 @@ dev = [
     "pytest",
     "codecov",
     "pytest-cov",
-    "sphinx-autodoc-annotation~=1.0.post1",
-    "sphinx-rtd-theme",
     "hypothesis",
     "pre-commit",
     "ruff==0.16.10",
     "retry",
-    "Sphinx",
+]
+docs = [
+    "sphinx",
+    "sphinx-rtd-theme",
 ]
 
 [tool.hatch.build.targets.sdist]
