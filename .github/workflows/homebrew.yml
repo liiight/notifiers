@@ -1,0 +1,57 @@
+name: Homebrew formula
+
+# Installs notifiers from this checkout with the Homebrew formula in packaging/homebrew/notifiers.rb, the way
+# `brew install notifiers` will after the formula is updated on homebrew-core
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    # Weekly, to notice changes in Homebrew or its python and pydantic formulae
+    - cron: "0 6 * * 1"
+
+jobs:
+  formula:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Check the formula resources against the runtime dependencies
+        run: uv run --no-project --with packaging --python 3.14 python packaging/homebrew/check_formula.py check
+
+      - name: Set up Homebrew
+        id: brew
+        uses: Homebrew/actions/setup-homebrew@main
+
+      - name: Build the sdist and render the formula for it
+        run: |
+          uv build --sdist --out-dir dist
+          brew tap-new --no-git notifiers/local
+          tap="$(brew --repository notifiers/local)"
+          uv run --no-project --with packaging --python 3.14 python packaging/homebrew/check_formula.py render dist/notifiers-*.tar.gz "$tap/Formula/notifiers.rb"
+
+      - name: brew install
+        env:
+          HOMEBREW_NO_INSTALL_FROM_API: ""
+          HOMEBREW_NO_AUTO_UPDATE: "1"
+        run: brew install --build-from-source --formula notifiers/local/notifiers
+
+      - name: brew test
+        run: brew test notifiers/local/notifiers
+
+      - name: Smoke test the installed command
+        run: |
+          notifiers --version
+          notifiers providers
+          if notifiers email notify "no recipient"; then exit 1; fi
+
+      - name: brew audit
+        run: brew audit --strict --formula notifiers/local/notifiers

@@ -121,6 +121,9 @@ Development
   server, on demand provider groups).
 - Docs: added the ``provider-arguments`` Sphinx directive (``source/_ext/provider_arguments.py``).
 - Docs: added :ref:`releasing`, the release steps for maintainers, including the Homebrew formula update for 2.0.0.
+- Homebrew: the formula is kept in ``packaging/homebrew/notifiers.rb``. A CI workflow installs this repository's code with
+  it on macOS and Linux (``brew install --build-from-source``, ``brew test``, ``brew audit --strict``), on pull requests,
+  on ``main`` and weekly, and checks that its resources match the runtime dependencies.
 - Tests: entry point provider discovery is tested with a fake installed plugin. The ``magic_mock_provider`` fixture no
   longer leaks its patched ``MockProvider`` into other tests.
 - Docs: the Sphinx dependencies are in a ``docs`` dependency group, the Read the Docs build installs it with uv, and CI
