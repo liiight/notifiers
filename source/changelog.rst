@@ -14,7 +14,7 @@ for details and for how to port custom providers.
 Breaking changes
 ~~~~~~~~~~~~~~~~
 
-- Dropped support for Python 3.8 and 3.9. Python 3.10+ is required.
+- Dropped support for Python 3.8 and 3.9. Python 3.10+ is required. Python 3.10 to 3.15 are supported and tested.
 - Replaced the ``jsonschema`` dependency with ``pydantic>=2.7,<3``.
 - Custom providers declare their arguments with a ``schema_model`` (a :class:`~notifiers.models.SchemaModel` subclass)
   instead of the ``_required`` and ``_schema`` dicts. Providers that still define ``_required`` / ``_schema`` can't be
@@ -82,7 +82,7 @@ Docker
   ``main`` publishes ``main``. Pull requests build and smoke test the image.
 - The image runs: it failed to start with ``unable to find user user``, and the ``notifiers`` command wasn't on ``PATH``.
 - Rebuilt as a two stage build: installs the locked dependencies with uv, then copies only the virtual environment into a
-  ``python:3.13-alpine`` image running as a ``notifiers`` user. The image is about 25 MB instead of about 100 MB, without
+  ``python:3.14-alpine`` image running as a ``notifiers`` user. The image is about 25 MB instead of about 100 MB, without
   uv, the source tree or development files. ``docker run`` without arguments shows the CLI help.
 
 Fixes
@@ -103,6 +103,8 @@ Development
   names) and ``tests/providers/test_email_offline.py`` (email, Gmail and iCloud end to end against a fake SMTP server).
 - CI runs the offline test suite (``-m "not online"``) on every Python version (``fail-fast: false``), plus a ruff lint and
   format check. Tests that need network access are marked ``online``.
+- Python 3.14 and 3.15 are in the CI test matrix and the package classifiers. The online tests, the docs build (CI and
+  Read the Docs) and the Docker image use Python 3.14.
 - CI runs the online tests (real provider APIs, with the repository secrets) in a separate required ``online`` job, on
   push, on manual dispatch and weekly. ``--run-skipped-online`` (or ``NOTIFIERS_RUN_SKIPPED_ONLINE=1``, a manual dispatch
   input) also runs online tests marked as skipped, to check whether an unavailable test account works again.

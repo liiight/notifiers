@@ -33,7 +33,7 @@ jobs:
       - name: Install uv and set the python version
         uses: astral-sh/setup-uv@v5
         with:
-          python-version: "3.13"
+          python-version: "3.14"
       - name: Build docs
         run: uv run --frozen --no-dev --group docs sphinx-build -W --keep-going -b html source docs-build
   test:
@@ -47,6 +47,8 @@ jobs:
           - "3.11"
           - "3.12"
           - "3.13"
+          - "3.14"
+          - "3.15"
     steps:
       - uses: actions/checkout@v4
       - name: Install uv and set the python version
@@ -78,7 +80,7 @@ jobs:
       - name: Install uv and set the python version
         uses: astral-sh/setup-uv@v5
         with:
-          python-version: "3.13"
+          python-version: "3.14"
       - name: Online tests
         shell: bash
         run: uv run pytest -m online -v -rfEs --junit-xml=online-report.xml

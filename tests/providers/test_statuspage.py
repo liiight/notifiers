@@ -16,6 +16,11 @@ statuspage_account_unavailable = pytest.mark.skip(reason="Statuspage test accoun
 log = logging.getLogger("statuspage")
 
 
+def _utcnow() -> datetime.datetime:
+    """The current UTC time without timezone info, the format the Statuspage API expects"""
+    return datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
+
+
 @pytest.fixture(autouse=True)
 def close_all_open_incidents(request):
     """Online tests create real incidents, so open ones are closed first. Offline tests make no API calls"""
@@ -131,8 +136,8 @@ class TestStatusPage:
                     "wants_twitter_update": False,
                     "impact_override": "minor",
                     "deliver_notifications": False,
-                    "scheduled_for": (datetime.datetime.utcnow() + datetime.timedelta(minutes=10)).isoformat(),
-                    "scheduled_until": (datetime.datetime.utcnow() + datetime.timedelta(minutes=12)).isoformat(),
+                    "scheduled_for": (_utcnow() + datetime.timedelta(minutes=10)).isoformat(),
+                    "scheduled_until": (_utcnow() + datetime.timedelta(minutes=12)).isoformat(),
                     "scheduled_remind_prior": False,
                     "scheduled_auto_in_progress": True,
                     "scheduled_auto_completed": True,
