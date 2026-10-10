@@ -5,9 +5,9 @@ import importlib.util
 import logging
 import os
 from abc import ABC, abstractmethod
+from importlib.metadata import entry_points
 
 import requests
-from importlib_metadata import entry_points
 from pydantic import ValidationError
 
 from .exceptions import BadArguments, NoSuchNotifierError, NotificationError
