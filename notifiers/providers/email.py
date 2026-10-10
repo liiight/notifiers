@@ -124,11 +124,23 @@ class SMTP(Provider):
     def _get_configuration(data: dict) -> tuple:
         return data["host"], data["port"], data.get("username")
 
+    def _is_connected(self) -> bool:
+        """
+        Whether the cached SMTP connection can still be used. smtplib closes the connection on some errors (e.g. a 421
+        reply when the server times out an idle connection), and the server may have dropped it, so check it with NOOP
+        """
+        if self.smtp_server is None:
+            return False
+        try:
+            return self.smtp_server.noop()[0] == 250
+        except (smtplib.SMTPException, OSError):
+            return False
+
     def _send_notification(self, data: dict) -> Response:
         errors = None
         try:
             configuration = self._get_configuration(data)
-            if not self.configuration or not self.smtp_server or self.configuration != configuration:
+            if self.configuration != configuration or not self._is_connected():
                 self._connect_to_server(data)
             email = self._build_email(data)
             if data.get("attachments"):

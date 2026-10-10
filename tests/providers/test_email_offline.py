@@ -37,6 +37,9 @@ class FakeSMTP:
         self.port = port
         self.calls: list[tuple] = []
         self.sent: list[EmailMessage] = []
+        self.connected = True
+        # Exceptions raised by the next send_message calls, in order
+        self.send_failures: list[Exception] = []
         type(self).instances.append(self)
         if type(self).fail_with:
             raise type(self).fail_with
@@ -50,7 +53,21 @@ class FakeSMTP:
     def login(self, username, password):
         self.calls.append(("login", username, password))
 
+    def noop(self):
+        # Like smtplib: a closed connection raises SMTPServerDisconnected
+        if not self.connected:
+            raise smtplib.SMTPServerDisconnected("please run connect() first")
+        return 250, b"OK"
+
     def send_message(self, message):
+        if not self.connected:
+            raise smtplib.SMTPServerDisconnected("please run connect() first")
+        if self.send_failures:
+            error = self.send_failures.pop(0)
+            # Like smtplib, a 421 reply closes the connection
+            if getattr(error, "smtp_code", None) == 421:
+                self.connected = False
+            raise error
         self.sent.append(message)
 
 
@@ -225,6 +242,35 @@ class TestEmail:
         assert len(connection.sent) == 2
         provider.notify(to="foo@foo.com", message="three", host="other.host", **credentials)
         assert len(smtp.instances) == 2
+
+    def test_reconnects_after_server_closed_the_connection(self, smtp):
+        """A 421 reply (e.g. idle timeout) closes the connection: later emails reconnect instead of failing (#478)"""
+        provider = notifiers.get_notifier(self.provider_name)
+        credentials = getattr(self, "credentials", {})
+        provider.notify(to="foo@foo.com", message="one", **credentials)
+        first = smtp.instances[0]
+        first.send_failures = [smtplib.SMTPSenderRefused(421, b"4.4.2 timeout", "me@foo.com")]
+
+        rsp = provider.notify(to="foo@foo.com", message="two", **credentials)
+        assert not rsp.ok
+        assert "421" in rsp.errors[0]
+
+        rsp = provider.notify(to="foo@foo.com", message="three", **credentials)
+        assert rsp.ok, rsp.errors
+        assert len(smtp.instances) == 2
+        assert [body(m)[1] for m in smtp.instances[1].sent] == ["three"]
+
+    def test_reconnects_when_noop_fails(self, smtp):
+        """A connection the server dropped while idle is detected before sending"""
+        provider = notifiers.get_notifier(self.provider_name)
+        credentials = getattr(self, "credentials", {})
+        provider.notify(to="foo@foo.com", message="one", **credentials)
+        smtp.instances[0].connected = False
+
+        rsp = provider.notify(to="foo@foo.com", message="two", **credentials)
+        assert rsp.ok, rsp.errors
+        assert len(smtp.instances) == 2
+        assert [body(m)[1] for m in smtp.instances[1].sent] == ["two"]
 
     def test_port_and_bool_strings_are_coerced(self, smtp):
         rsp = self.notify(to="foo@foo.com", message="hi", port="2525", tls="true", username="u", password="p")
