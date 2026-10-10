@@ -54,7 +54,6 @@ notifiers = "notifiers_cli.core:entry_point"
 [dependency-groups]
 dev = [
     "pytest",
-    "codecov",
     "pytest-cov",
     "hypothesis",
     "pre-commit",

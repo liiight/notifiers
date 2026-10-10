@@ -135,6 +135,13 @@ Development
   the missing static and template paths, and the alabaster sidebar settings. Updated the intersphinx URLs. The PDF is
   built with xelatex.
 - The statuspage incident cleanup runs for online tests only, and tolerates API errors.
+- Coverage: CI measures the ``notifiers`` and ``notifiers_cli`` packages only and uploads ``coverage.xml`` with
+  ``codecov/codecov-action@v5``, one flag per Python version. A failed upload fails the job instead of passing silently
+  (`#452 <https://github.com/liiight/notifiers/issues/452>`_). Removed the deprecated ``codecov`` package from the dev
+  dependencies.
+- Coverage: added ``codecov.yml`` (`#53 <https://github.com/liiight/notifiers/issues/53>`_). Codecov reports once all six
+  Python versions uploaded, the project check allows a 1% drop, the patch check is informational, and the pull request
+  comment is posted only when coverage changes.
 
 1.3.0
 ------

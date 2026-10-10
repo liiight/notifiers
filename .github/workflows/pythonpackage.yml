@@ -42,6 +42,7 @@ jobs:
       max-parallel: 1
       fail-fast: false
       matrix:
+        # Each version uploads coverage: update `after_n_builds` in codecov.yml when changing this list
         python-version:
           - "3.10"
           - "3.11"
@@ -58,7 +59,7 @@ jobs:
       - name: Test with pytest
         shell: bash
         # Tests marked `online` run once, in the `online` job
-        run: uv run pytest -m "not online" --cov=./ --junit-xml=report.xml
+        run: uv run pytest -m "not online" --cov=notifiers --cov=notifiers_cli --cov-report=xml --junit-xml=report.xml
       - name: JUnit Report Action
         uses: mikepenz/action-junit-report@v5
         if: success() || failure()
@@ -67,9 +68,13 @@ jobs:
           check_name: JUnit Test Report (${{ matrix.python-version }})
       - name: Upload coverage to Codecov
         if: success()
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v5
         with:
-          token: ${{secrets.CODECOV_TOKEN}}
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: coverage.xml
+          flags: py${{ matrix.python-version }}
+          disable_search: true
+          fail_ci_if_error: true
   online:
     # Calls the real provider APIs with the credentials stored as repository secrets, and sends real notifications
     runs-on: ubuntu-latest
