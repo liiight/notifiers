@@ -20,17 +20,21 @@ Advantages
 
 Installation
 ------------
-Via pip:
+Requires Python 3.10 or newer.
+
+As a library, add it to your project with `uv <https://docs.astral.sh/uv/>`_:
 
 .. code-block:: console
 
-    $ pip install notifiers
+    $ uv add notifiers
 
-Via Dockerhub:
+To use the CLI, run it with ``uvx`` without installing anything:
 
 .. code-block:: console
 
-    $ docker pull liiight/notifiers
+    $ uvx notifiers --help
+
+See :ref:`installation` for more options (``uv tool install``, pip, homebrew, Docker).
 
 
 Basic Usage
@@ -50,7 +54,7 @@ From CLI
 
 .. code-block:: console
 
-    $ notifiers pushover notify --user foo --token baz "This is so easy!"
+    $ uvx notifiers pushover notify --user foo --token baz "This is so easy!"
 
 As a logger
 -----------

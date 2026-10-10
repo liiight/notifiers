@@ -23,6 +23,22 @@ Got an app or service, and you want to enable your users to use notifications wi
 
 # Installation
 
+Requires Python 3.10 or newer.
+
+As a library, add it to your project with [uv](https://docs.astral.sh/uv/):
+```
+$ uv add notifiers
+```
+
+To use the CLI, run it with `uvx` without installing anything:
+```
+$ uvx notifiers --help
+```
+Or install the `notifiers` command once:
+```
+$ uv tool install notifiers
+```
+
 Via pip:
 ```
 $ pip install notifiers
@@ -55,6 +71,11 @@ Or:
 
 # From CLI
 
+```text
+$ uvx notifiers pushover notify --user foo --token baz "This is so easy!"
+```
+
+Or, after `uv tool install notifiers`:
 ```text
 $ notifiers pushover notify --user foo --token baz "This is so easy!"
 ```

@@ -1,27 +1,60 @@
+.. _installation:
+
 Installation
 ------------
 
-Via pip
-=======
-You can install via pip:
+.. note:: Python 3.10 or newer is required.
+
+As a library
+============
+Add notifiers to your project with `uv <https://docs.astral.sh/uv/>`_:
 
 .. code-block:: console
 
-    $ pip install notifiers
+    $ uv add notifiers
 
 Or install from source:
 
 .. code-block:: console
 
-    $ pip install https://github.com/notifiers/notifiers/master.zip
+    $ uv add git+https://github.com/liiight/notifiers --branch main
 
-Use ``develop`` branch for cutting edge (not recommended):
+As a command line tool
+======================
+Run the CLI with ``uvx``, without installing anything:
 
 .. code-block:: console
 
-    $ pip install https://github.com/notifiers/notifiers/develop.zip
+    $ uvx notifiers --help
+    $ uvx notifiers pushover notify --user foo --token baz "Hello"
 
-.. note:: Python 3.6 and higher is required when installing via pip
+Or install the ``notifiers`` command once, in its own isolated environment:
+
+.. code-block:: console
+
+    $ uv tool install notifiers
+    $ notifiers --help
+
+To run the latest code from the ``main`` branch:
+
+.. code-block:: console
+
+    $ uvx --from git+https://github.com/liiight/notifiers@main notifiers --help
+
+Via pip
+=======
+You can also install via pip:
+
+.. code-block:: console
+
+    $ pip install notifiers
+
+Via homebrew
+============
+
+.. code-block:: console
+
+    $ brew install notifiers
 
 Via docker
 ==========
@@ -31,10 +64,4 @@ Alternatively, use DockerHub:
 
     $ docker pull liiight/notifiers
 
-Use ``develop`` tag for cutting edge (still not recommended):
-
-.. code-block:: console
-
-    $ docker pull liiight/notifiers:develop
-
-Or build from ``DockerFile`` locally
+Or build from ``Dockerfile`` locally
