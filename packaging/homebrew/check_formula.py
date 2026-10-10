@@ -103,10 +103,9 @@ def check() -> int:
 def render(sdist: Path, output: Path) -> int:
     formula = FORMULA.read_text()
     sha256 = hashlib.sha256(sdist.read_bytes()).hexdigest()
-    version = re.search(r"notifiers-(?P<version>[^/]+)\.tar\.gz$", sdist.name)["version"]
+    # Homebrew reads the version from the file name, e.g. notifiers-2.0.0.tar.gz
     formula = re.sub(r'^  url "[^"]+"$', f'  url "file://{sdist.resolve()}"', formula, count=1, flags=re.MULTILINE)
     formula = re.sub(r'^  sha256 "[0-9a-f]{64}"$', f'  sha256 "{sha256}"', formula, count=1, flags=re.MULTILINE)
-    formula = re.sub(r'^  license "MIT"$', f'  version "{version}"\n  license "MIT"', formula, count=1, flags=re.MULTILINE)
     output.write_text(formula)
     print(f"rendered {output} for {sdist.name} (sha256 {sha256})")
     return 0
