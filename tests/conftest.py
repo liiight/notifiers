@@ -123,8 +123,9 @@ def cli_runner(monkeypatch):
 
 @pytest.fixture
 def magic_mock_provider(monkeypatch):
-    MockProvider.notify = MagicMock()
-    MockProxy.name = "magic_mock"
+    # monkeypatch restores the class attributes after the test, so other tests see the real MockProvider
+    monkeypatch.setattr(MockProvider, "notify", MagicMock())
+    monkeypatch.setattr(MockProxy, "name", "magic_mock")
     monkeypatch.setitem(_all_providers, MockProvider.name, MockProvider)
     return MockProvider()
 

@@ -119,6 +119,11 @@ To build the documentation:
 
    $ uv run --group docs sphinx-build -W -b html source docs/_build
 
+.. toctree::
+   :maxdepth: 1
+
+   releasing
+
 Donations
 ---------
 

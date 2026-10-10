@@ -175,3 +175,24 @@ class TestCore:
     def test_direct_notify_negative(self):
         with pytest.raises(NoSuchNotifierError, match="No such notifier with name"):
             notify("foo", message="whateverz")
+
+
+class TestEntryPointProviders:
+    """Providers registered by installed packages via the ``notifiers`` entry point group"""
+
+    @pytest.fixture
+    def plugin_dist(self, tmp_path, monkeypatch):
+        """A fake installed distribution exposing ``plugin_provider`` in the ``notifiers`` group"""
+        (tmp_path / "notifiers_test_plugin.py").write_text("from conftest import MockProvider\n\nclass PluginProvider(MockProvider):\n    name = 'plugin_provider'\n")
+        dist_info = tmp_path / "notifiers_test_plugin-1.0.dist-info"
+        dist_info.mkdir()
+        (dist_info / "METADATA").write_text("Metadata-Version: 2.1\nName: notifiers-test-plugin\nVersion: 1.0\n")
+        (dist_info / "entry_points.txt").write_text("[notifiers]\nplugin_provider = notifiers_test_plugin:PluginProvider\n")
+        monkeypatch.syspath_prepend(str(tmp_path))
+        return tmp_path
+
+    def test_entry_point_provider_is_discovered(self, plugin_dist):
+        assert "plugin_provider" in notifiers.all_providers()
+        provider = notifiers.get_notifier("plugin_provider", strict=True)
+        assert provider.name == "plugin_provider"
+        assert provider.notify(required="foo").ok

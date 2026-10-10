@@ -51,10 +51,14 @@ You can also install via pip:
 
 Via homebrew
 ============
+Installs the CLI, with shell completions:
 
 .. code-block:: console
 
     $ brew install notifiers
+
+The `formula <https://github.com/Homebrew/homebrew-core/blob/main/Formula/n/notifiers.rb>`_ is maintained in
+homebrew-core and updated to new releases after they're published to PyPI.
 
 Via docker
 ==========
