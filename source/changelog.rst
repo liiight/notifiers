@@ -3,7 +3,7 @@
 Changelog
 =========
 
-2.0.0 (unreleased)
+2.0.0 (2026-10-10)
 ------------------
 
 Provider schemas are now `pydantic <https://docs.pydantic.dev/>`_ (v2) models instead of JSON Schema dicts
