@@ -95,6 +95,10 @@ Fixes
 - ``get_notifier()`` failed for providers registered only via the ``notifiers`` entry point.
 - Email / Gmail / iCloud: a single attachment path (``attachments='/path/to/file'``) failed with
   ``Is a directory: '/'``.
+- Email / Gmail / iCloud: when the SMTP connection was closed (e.g. the server replied 421 after an idle timeout, or
+  dropped the connection), every following email failed with ``please run connect() first``. The cached connection is
+  checked with ``NOOP`` before reuse and reopened when needed
+  (`#478 <https://github.com/liiight/notifiers/pull/478>`_, by @broper2).
 - Documentation: the custom provider guide used APIs that don't exist (``notifiers.utils.schema.one_of``, ``_notify``).
 
 Development
