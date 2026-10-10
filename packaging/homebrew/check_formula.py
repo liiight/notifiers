@@ -21,9 +21,9 @@ import argparse
 import hashlib
 import re
 import sys
-import tomllib
 from pathlib import Path
 
+import tomllib
 from packaging.requirements import Requirement
 from packaging.utils import canonicalize_name
 
@@ -84,9 +84,7 @@ def check() -> int:
         errors.append(f"resources that aren't runtime dependencies: {', '.join(sorted(extra))}")
 
     # Every resource must satisfy notifiers' own requirements
-    requirements = {
-        canonicalize_name(r.name): r for r in map(Requirement, tomllib.loads((ROOT / "pyproject.toml").read_text())["project"]["dependencies"])
-    }
+    requirements = {canonicalize_name(r.name): r for r in map(Requirement, tomllib.loads((ROOT / "pyproject.toml").read_text())["project"]["dependencies"])}
     for name, resource in sorted(resources.items()):
         version = _version_from_url(resource["url"])
         requirement = requirements.get(name)
