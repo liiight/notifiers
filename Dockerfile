@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # Build stage: install notifiers and its locked dependencies into a virtual environment
-FROM ghcr.io/astral-sh/uv:python3.13-alpine AS build
+FROM ghcr.io/astral-sh/uv:python3.14-alpine AS build
 
 ENV UV_COMPILE_BYTECODE=1 \
     UV_LINK_MODE=copy \
@@ -21,7 +21,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-dev --no-editable
 
 # Runtime stage: only Python and the virtual environment, no uv and no source tree
-FROM python:3.13-alpine
+FROM python:3.14-alpine
 
 ARG VERSION=dev
 LABEL org.opencontainers.image.title="notifiers" \
