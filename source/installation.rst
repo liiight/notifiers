@@ -58,10 +58,28 @@ Via homebrew
 
 Via docker
 ==========
-Alternatively, use DockerHub:
+The CLI is also published as a Docker image on the
+`GitHub Container Registry <https://github.com/liiight/notifiers/pkgs/container/notifiers>`_, for ``linux/amd64`` and
+``linux/arm64``. Its entry point is the ``notifiers`` command:
 
 .. code-block:: console
 
-    $ docker pull liiight/notifiers
+    $ docker run --rm ghcr.io/liiight/notifiers --version
+    $ docker run --rm ghcr.io/liiight/notifiers pushover notify --user foo --token baz "Hello"
 
-Or build from ``Dockerfile`` locally
+Environment variables and piped messages work as with the installed CLI:
+
+.. code-block:: console
+
+    $ echo "Hello" | docker run --rm -i -e NOTIFIERS_PUSHOVER_USER=foo -e NOTIFIERS_PUSHOVER_TOKEN=baz ghcr.io/liiight/notifiers pushover notify
+
+Image tags:
+
+- ``latest`` and ``<version>`` (e.g. ``2.0.0``, ``2.0``): released versions
+- ``main``: the latest code on the ``main`` branch
+
+To build the image locally:
+
+.. code-block:: console
+
+    $ docker buildx bake

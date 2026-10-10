@@ -1,6 +1,6 @@
 ![Full logo](https://raw.githubusercontent.com/liiight/notifiers/main/assets/images/circle_full_logo.png)
 
-[![Build Status](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Fnotifiers%2Fnotifiers%2Fbadge%3Fref%3Dmain&style=flat-square)](https://actions-badge.atrox.dev/notifiers/notifiers/goto?ref=master) [![PyPi version](https://img.shields.io/pypi/v/notifiers.svg?style=flat-square) ](https://pypi.python.org/pypi/notifiers) [![Supported Python versions](https://img.shields.io/pypi/pyversions/notifiers.svg?style=flat-square) ](https://pypi.org/project/notifiers) [![License](https://img.shields.io/pypi/l/notifiers.svg?style=flat-square) ](https://choosealicense.com/licenses) [![Status](https://img.shields.io/pypi/status/notifiers.svg?style=flat-square) ](https://pypi.org/project/notifiers/) [![Docker build](https://img.shields.io/docker/cloud/build/liiight/notifiers?style=flat-square) ](https://hub.docker.com/r/liiight/notifiers/) [![RTD](https://img.shields.io/readthedocs/notifiers.svg?style=flat-square) ](https://readthedocs.org/projects/notifiers/badge/?version=latest) [![Paypal](https://img.shields.io/badge/Donate-PayPal-green.svg?style=flat-square) ](https://paypal.me/notifiers) [![PyPI Downloads](https://static.pepy.tech/personalized-badge/notifiers?period=total&units=INTERNATIONAL_SYSTEM&left_color=GREY&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/notifiers)
+[![Build Status](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Fnotifiers%2Fnotifiers%2Fbadge%3Fref%3Dmain&style=flat-square)](https://actions-badge.atrox.dev/notifiers/notifiers/goto?ref=master) [![PyPi version](https://img.shields.io/pypi/v/notifiers.svg?style=flat-square) ](https://pypi.python.org/pypi/notifiers) [![Supported Python versions](https://img.shields.io/pypi/pyversions/notifiers.svg?style=flat-square) ](https://pypi.org/project/notifiers) [![License](https://img.shields.io/pypi/l/notifiers.svg?style=flat-square) ](https://choosealicense.com/licenses) [![Status](https://img.shields.io/pypi/status/notifiers.svg?style=flat-square) ](https://pypi.org/project/notifiers/) [![Docker image](https://img.shields.io/github/actions/workflow/status/liiight/notifiers/docker.yml?branch=main&label=docker&style=flat-square)](https://github.com/liiight/notifiers/pkgs/container/notifiers) [![RTD](https://img.shields.io/readthedocs/notifiers.svg?style=flat-square) ](https://readthedocs.org/projects/notifiers/badge/?version=latest) [![Paypal](https://img.shields.io/badge/Donate-PayPal-green.svg?style=flat-square) ](https://paypal.me/notifiers) [![PyPI Downloads](https://static.pepy.tech/personalized-badge/notifiers?period=total&units=INTERNATIONAL_SYSTEM&left_color=GREY&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/notifiers)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 [![X (formerly Twitter) Follow](https://img.shields.io/twitter/follow/liiight?style=social)](https://twitter.com/liiight)
 
@@ -47,9 +47,9 @@ Via homebrew:
 ```
 $ brew install notifiers
 ```
-Or Dockerhub:
+Or run the CLI with Docker:
 ```
-$ docker pull liiight/notifiers
+$ docker run --rm ghcr.io/liiight/notifiers pushover notify --user foo --token baz "This is so easy!"
 ```
 # Basic Usage
 

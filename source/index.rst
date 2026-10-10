@@ -34,7 +34,7 @@ To use the CLI, run it with ``uvx`` without installing anything:
 
     $ uvx notifiers --help
 
-See :ref:`installation` for more options (``uv tool install``, pip, homebrew, Docker).
+See :ref:`installation` for more options (``uv tool install``, pip, homebrew, Docker with ``ghcr.io/liiight/notifiers``).
 
 
 Basic Usage

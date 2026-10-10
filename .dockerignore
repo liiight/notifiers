@@ -1,0 +1,10 @@
+# Only the package sources and the files needed to build them go into the image build context
+*
+!notifiers/
+!notifiers_cli/
+!pyproject.toml
+!uv.lock
+!README.md
+!LICENSE
+**/__pycache__
+**/*.py[cod]
