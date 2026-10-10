@@ -25,6 +25,17 @@ jobs:
         with:
           version: "0.16.10"
           args: format --check
+  docs:
+    # Same build as Read the Docs (warnings are errors), so docs problems show up on the pull request
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv and set the python version
+        uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.13"
+      - name: Build docs
+        run: uv run --frozen --no-dev --group docs sphinx-build -W --keep-going -b html source docs-build
   test:
     runs-on: ubuntu-latest
     strategy:

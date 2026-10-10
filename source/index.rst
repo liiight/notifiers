@@ -109,6 +109,12 @@ Notifiers uses `uv <https://docs.astral.sh/uv/>`_
 
    $ uv sync && uv run pytest
 
+To build the documentation:
+
+.. code-block:: bash
+
+   $ uv run --group docs sphinx-build -W -b html source docs/_build
+
 Donations
 ---------
 

@@ -426,9 +426,10 @@ dev = [
     { name = "pytest-cov" },
     { name = "retry" },
     { name = "ruff" },
+]
+docs = [
     { name = "sphinx", version = "8.1.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "sphinx", version = "8.2.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
-    { name = "sphinx-autodoc-annotation" },
     { name = "sphinx-rtd-theme" },
 ]
 
@@ -449,8 +450,9 @@ dev = [
     { name = "pytest-cov" },
     { name = "retry" },
     { name = "ruff", specifier = "==0.16.10" },
+]
+docs = [
     { name = "sphinx" },
-    { name = "sphinx-autodoc-annotation", specifier = "~=1.0.post1" },
     { name = "sphinx-rtd-theme" },
 ]
 
@@ -892,16 +894,6 @@ sdist = { url = "https://files.pythonhosted.org/packages/38/ad/4360e50ed56cb4836
 wheels = [
     { url = "https://files.pythonhosted.org/packages/31/53/136e9eca6e0b9dc0e1962e2c908fbea2e5ac000c2a2fbd9a35797958c48b/sphinx-8.2.3-py3-none-any.whl", hash = "sha256:4405915165f13521d875a8c29c8970800a0141c14cc5416a38feca4ea5d9b9c3", size = 3589741, upload-time = "2025-03-02T22:31:56.836Z" },
 ]
-
-[[package]]
-name = "sphinx-autodoc-annotation"
-version = "1.0.post1"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "sphinx", version = "8.1.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "sphinx", version = "8.2.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/c9/2b/81f620d831cd0632ba7583723ab42e840ba766b86868307ee0877c40a2e2/sphinx-autodoc-annotation-1.0-1.tar.gz", hash = "sha256:4a3d03081efe1e5f2bc9b9d00746550f45b9f543b0c79519c523168ca7f7d89a", size = 4049, upload-time = "2016-08-16T05:51:01.493Z" }
 
 [[package]]
 name = "sphinx-rtd-theme"

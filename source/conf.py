@@ -36,12 +36,11 @@ extensions = [
     "sphinx.ext.coverage",
     "sphinx.ext.viewcode",
     "sphinx.ext.intersphinx",
-    "sphinx_autodoc_annotation",
     "provider_arguments",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ["_templates"]
+templates_path = []
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
@@ -106,22 +105,7 @@ html_theme = "sphinx_rtd_theme"
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ["_static"]
-
-# Custom sidebar templates, must be a dictionary that maps document names
-# to template names.
-#
-# This is required for the alabaster theme
-# refs: http://alabaster.readthedocs.io/en/latest/installation.html#sidebars
-html_sidebars = {
-    "**": [
-        "about.html",
-        "navigation.html",
-        "relations.html",  # needs 'show_related': True theme option to display
-        "searchbox.html",
-        "donate.html",
-    ]
-}
+html_static_path = []
 
 # -- Options for HTMLHelp output ------------------------------------------
 
@@ -129,6 +113,9 @@ html_sidebars = {
 htmlhelp_basename = "notifiersdoc"
 
 # -- Options for LaTeX output ---------------------------------------------
+
+# xelatex handles the unicode characters used in the docs (e.g. ≥, ≤, box drawing, CJK), which pdflatex can't
+latex_engine = "xelatex"
 
 latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
@@ -174,9 +161,8 @@ texinfo_documents = [
 ]
 
 intersphinx_mapping = {
-    "pydantic": ("https://docs.pydantic.dev/latest/", None),
-    "requests": ("http://docs.python-requests.org/en/latest/", None),
-    "requests-toolbelt": ("http://toolbelt.readthedocs.io/en/latest/", None),
-    "click": ("http://click.pocoo.org/5/", None),
-    "python": ("https://docs.python.org/3.6", None),
+    "pydantic": ("https://pydantic.dev/docs/validation/latest/", None),
+    "requests": ("https://requests.readthedocs.io/en/latest/", None),
+    "click": ("https://click.palletsprojects.com/en/stable/", None),
+    "python": ("https://docs.python.org/3", None),
 }
