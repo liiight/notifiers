@@ -74,6 +74,17 @@ CLI
   ``notifiers_cli.core.provider_group_factory()`` still builds all of them up front, but isn't needed to run the CLI.
 - Provider documentation lists each provider's arguments in a table generated from its schema model.
 
+Docker
+~~~~~~
+
+- The image is published to the GitHub Container Registry as ``ghcr.io/liiight/notifiers``, for ``linux/amd64`` and
+  ``linux/arm64``, by a GitHub Actions workflow: release tags publish ``<version>``, ``<major>.<minor>`` and ``latest``,
+  ``main`` publishes ``main``. Pull requests build and smoke test the image.
+- The image runs: it failed to start with ``unable to find user user``, and the ``notifiers`` command wasn't on ``PATH``.
+- Rebuilt as a two stage build: installs the locked dependencies with uv, then copies only the virtual environment into a
+  ``python:3.13-alpine`` image running as a ``notifiers`` user. The image is about 25 MB instead of about 100 MB, without
+  uv, the source tree or development files. ``docker run`` without arguments shows the CLI help.
+
 Fixes
 ~~~~~
 
