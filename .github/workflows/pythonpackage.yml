@@ -42,6 +42,7 @@ jobs:
       max-parallel: 1
       fail-fast: false
       matrix:
+        # Each version uploads coverage: update `after_n_builds` in codecov.yml when changing this list
         python-version:
           - "3.10"
           - "3.11"

@@ -1,0 +1,22 @@
+codecov:
+  notify:
+    # One upload per Python version in the `test` job matrix of .github/workflows/pythonpackage.yml. Keep in sync.
+    after_n_builds: 6
+
+coverage:
+  precision: 1
+  status:
+    project:
+      default:
+        target: auto
+        threshold: 1%
+    patch:
+      default:
+        target: auto
+        informational: true
+
+comment:
+  layout: "condensed_header, diff, flags, files"
+  require_changes: true
+  # Same as codecov.notify.after_n_builds
+  after_n_builds: 6
