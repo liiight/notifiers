@@ -9,8 +9,8 @@ class Notifiers < Formula
 
   desc "Easy way to send notifications"
   homepage "https://notifiers.readthedocs.io/"
-  url "https://files.pythonhosted.org/packages/source/n/notifiers/notifiers-2.0.0.tar.gz"
-  sha256 "0000000000000000000000000000000000000000000000000000000000000000"
+  url "https://files.pythonhosted.org/packages/c0/57/606eea8e432af3bd431929a2e41d1559cf1083284a73e82d7655eda19261/notifiers-2.0.0.tar.gz"
+  sha256 "0843dd4ecd092d0c952c011c3b1b16d42f61b51950908a1c2337bef83f4455f3"
   license "MIT"
 
   depends_on "certifi" => :no_linkage
