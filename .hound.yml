@@ -1,7 +1,0 @@
-# Ruby in this repository is the Homebrew formula (packaging/homebrew/notifiers.rb). It follows Homebrew's style, checked
-# by `brew audit --strict` in .github/workflows/homebrew.yml, which conflicts with Hound's default RuboCop rules.
-# Python is linted by ruff (pre-commit and CI).
-ruby:
-  enabled: false
-rubocop:
-  enabled: false
